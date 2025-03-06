@@ -12,7 +12,7 @@ export class AuthenticationService {
 
   constructor(private httpClient: HttpClient) {}
 
-  authenticate(dto: Usuario): Observable<HttpResponse<string>> {
+  authenticate(dto: Partial<Usuario>): Observable<HttpResponse<string>> {
     const authHeader = 'Basic ' + btoa(`${dto.email}:${dto.senha}`);
     const headers = new HttpHeaders({
       Authorization: authHeader,

@@ -44,7 +44,7 @@ export class LoginComponent {
   }
 
   realizarCadastro() {
-
+    this.router.navigate(['/register']);
   }
 
   public verificarPerfilAcesso() {

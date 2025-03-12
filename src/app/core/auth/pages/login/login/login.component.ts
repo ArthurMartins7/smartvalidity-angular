@@ -48,7 +48,7 @@ export class LoginComponent {
   }
 
   public verificarPerfilAcesso() {
-    this.router.navigate(['/register']);
+    this.router.navigate(['/corredor']);
   }
 
 }

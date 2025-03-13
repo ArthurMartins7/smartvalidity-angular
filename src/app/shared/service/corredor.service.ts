@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { CorredorDTO } from '../model/dto/corredor.dto';
+import { Corredor } from '../model/entity/corredor';
 
 @Injectable({
   providedIn: 'root'
@@ -15,8 +16,8 @@ export class CorredorService {
     return this.httpClient.post<CorredorDTO>(this.API, novoCorredor);
   }
 
-  listarTodos(): Observable<CorredorDTO[]> {
-    return this.httpClient.get<CorredorDTO[]>(this.API);
+  listarTodos(): Observable<Array<Corredor>> {
+    return this.httpClient.get<Array<Corredor>>(this.API);
   }
 
   buscarPorId(id: number): Observable<CorredorDTO> {

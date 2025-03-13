@@ -5,37 +5,34 @@
       <span>Adicionar Corredor</span>
     </button>
   </div>
+  @for (corredor of corredores; track corredor.id) {
   <div class="flex justify-between">
     <div class="flex-1 mx-2 p-3 bg-white rounded-lg shadow-lg max-w-xs">
       <div class="mb-2">
-          <img src="https://th.bing.com/th/id/OIP.jdq2ZppaEGHTVIFsQBeXLQHaE8?rs=1&pid=ImgDetMain" alt="Descrição da imagem" class="w-full h-24 object-cover rounded-t-lg" />
+        <img src="https://th.bing.com/th/id/OIP.jdq2ZppaEGHTVIFsQBeXLQHaE8?rs=1&pid=ImgDetMain" alt="Descrição da imagem" class="w-full h-24 object-cover rounded-t-lg" />
       </div>
       <div class="flex items-center justify-between mb-2">
-        <h3 class="text-lg font-bold text-gray-800 bg-white-200 rounded">Bebidas</h3>
-        <button class="w-7 h-7 rounded-full bg-blue-500 hover:bg-blue-600 flex items-center justify-center text-white shadow-sm hover:shadow-md transition-all transform hover:scale-105" title="Adicionar categoria">
-          <span class="text-xl font-semibold leading-none mb-0.5">+</span>
+        <h3 class="text-lg font-bold text-gray-800">{{corredor.nome}}</h3>
+        <button class="w-10 h-10 rounded-full flex items-center justify-center ml-2" title="Adicionar categoria">
+          <img src="/icons/add-category.png" alt="add-category" class="w-6 h-6">
         </button>
       </div>
       <div class="max-h-60 overflow-y-auto">
-          <ul class="list-none p-0">
-              <li class="py-1 text-gray-600 hover:bg-gray-200">Águas</li>
-              <li class="py-1 text-gray-600 hover:bg-gray-200">Cervejas</li>
-              <li class="py-1 text-gray-600 hover:bg-gray-200">Chás</li>
-              <li class="py-1 text-gray-600 hover:bg-gray-200">Destilados</li>
-              <li class="py-1 text-gray-600 hover:bg-gray-200">Energéticos</li>
-              <li class="py-1 text-gray-600 hover:bg-gray-200">Espumantes</li>
-              <li class="py-1 text-gray-600 hover:bg-gray-200">Espumantes</li>
-              <li class="py-1 text-gray-600 hover:bg-gray-200">Espumantes</li>
-              <li class="py-1 text-gray-600 hover:bg-gray-200">Espumantes</li>
-              <li class="py-1 text-gray-600 hover:bg-gray-200">Espumantes</li>
-              <li class="py-1 text-gray-600 hover:bg-gray-200">Espumantes</li>
-              <li class="py-1 text-gray-600 hover:bg-gray-200">Espumantes</li>
-              <li class="py-1 text-gray-600 hover:bg-gray-200">Espumantes</li>
-              <li class="py-1 text-gray-600 hover:bg-gray-200">Espumantes</li>
-              <li class="py-1 text-gray-600 hover:bg-gray-200">Espumantes</li>
-              <li class="py-1 text-gray-600 hover:bg-gray-200">Espumantes</li>
-              <li class="py-1 text-gray-600 hover:bg-gray-200">Espumantes</li>
-          </ul>
+        <ul class="list-none p-0">
+          @for (categoria of corredor.categorias; track categoria.id) {
+            <li class="py-1 text-gray-600 hover:bg-gray-200">{{ categoria.nome }}</li>
+          }
+        </ul>
       </div>
+      <div class="flex justify-center mt-2 gap-4">
+        <button class="text-gray-600 hover:text-blue-500 flex items-center gap-1">
+          <img src="/icons/edit.png" alt="Editar" class="w-5 h-5">
+        </button>
+        <button class="text-gray-600 hover:text-red-500 flex items-center gap-1">
+          <img src="https://cdn-icons-png.flaticon.com/512/1214/1214428.png" alt="Excluir" class="w-5 h-5">
+        </button>
+      </div>
+    </div>
   </div>
+}
 </div>

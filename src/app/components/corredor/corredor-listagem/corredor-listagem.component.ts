@@ -4,11 +4,13 @@ import { Corredor } from '../../../shared/model/entity/corredor';
 import { CategoriaService } from '../../../shared/service/categoria.service';
 import { CorredorService } from '../../../shared/service/corredor.service';
 import { Categoria } from '../../../shared/model/entity/categoria';
+import { Router } from '@angular/router';
+
 
 @Component({
   selector: 'app-corredor-listagem',
   standalone: true,
-  imports: [ FormsModule],
+  imports: [FormsModule],
   templateUrl: './corredor-listagem.component.html',
   styleUrl: './corredor-listagem.component.css'
 })
@@ -16,6 +18,7 @@ export class CorredorListagemComponent implements OnInit {
 
   private categoriaService = inject(CategoriaService);
   private corredorService = inject(CorredorService);
+  private router = inject(Router);
 
   public Corredor = new Corredor();
   public corredores: Corredor[] = [];
@@ -37,4 +40,7 @@ export class CorredorListagemComponent implements OnInit {
     );
   }
 
+  public adicionarCorredor() {
+    this.router.navigate(['corredor-detalhe']);
+  }
 }

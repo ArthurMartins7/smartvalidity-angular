@@ -2,48 +2,71 @@ import { Component, OnInit } from '@angular/core';
 import { Corredor } from '../../../shared/model/entity/corredor';
 import { FormsModule } from '@angular/forms';
 import { CorredorService } from '../../../shared/service/corredor.service';
+import { UsuarioService } from '../../../shared/service/usuario.service';
 import { ActivatedRoute, Router } from '@angular/router';
-import { HttpClient } from '@angular/common/http';
 import Swal from 'sweetalert2';
+import { Usuario } from '../../../shared/model/entity/usuario.model';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-corredor-detalhe',
-  imports: [FormsModule],
+  standalone: true,
+  imports: [FormsModule, CommonModule],
   templateUrl: './corredor-detalhe.component.html',
   styleUrl: './corredor-detalhe.component.css'
 })
-export class CorredorDetalheComponent implements OnInit{
+export class CorredorDetalheComponent implements OnInit {
 
   public corredor: Corredor = new Corredor();
   public idCorredor: number;
+  public responsaveisDisponiveis: Usuario[] = [];
 
   constructor(
     private corredorService: CorredorService,
+    private usuarioService: UsuarioService,
     private router: Router,
-    private activatedRoute: ActivatedRoute,
-    private httpClient: HttpClient,
-  ){ }
+    private activatedRoute: ActivatedRoute
+  ) { }
 
   ngOnInit(): void {
-    throw new Error('Method not implemented.');
+    this.idCorredor = Number(this.activatedRoute.snapshot.paramMap.get('id'));
+    this.carregarResponsaveis();
+
+
+  }
+
+  public carregarResponsaveis(): void {
+    this.usuarioService.listarTodos().subscribe(
+      (responsaveis) => {
+        this.responsaveisDisponiveis = responsaveis;
+        console.log(this.responsaveisDisponiveis);
+      },
+      (erro) => {
+        console.error('Erro ao carregar responsáveis:', erro);
+      }
+    );
   }
 
   salvar(): void {
-    if (this.corredor.nome && this.corredor.responsaveis) {
-      if (this.idCorredor) {
-        //this.alterar();
-      } else {
-        this.inserir();
-      }
-    } else {
+    console.log('Corredor a ser salvo:', this.corredor);
+
+    if (!this.corredor.nome || !this.corredor.responsaveis || this.corredor.responsaveis.length === 0) {
       Swal.fire('Preencha todos os campos obrigatórios!', '', 'warning');
+      return;
+
+    }
+
+    if (this.idCorredor) {
+      this.alterar();
+    } else {
+      this.inserir();
     }
   }
 
+
   public inserir(): void {
     this.corredorService.criarCorredor(this.corredor).subscribe(
-      (resposta) => {
-        this.corredor = resposta;
+      () => {
         Swal.fire('Corredor salvo com sucesso!', '', 'success');
         this.voltar();
       },
@@ -53,9 +76,19 @@ export class CorredorDetalheComponent implements OnInit{
     );
   }
 
+  private alterar(): void {
+    this.corredorService.atualizarCorredor(this.idCorredor!, this.corredor).subscribe(
+      () => {
+        Swal.fire('Corredor atualizado com sucesso!', '', 'success');
+        this.voltar();
+      },
+      (erro) => {
+        Swal.fire('Erro ao atualizar o corredor!', erro.error.mensagem, 'error');
+      }
+    );
+  }
 
-
-  public voltar() {
-    this.router.navigate(['corredor'])
+  public voltar(): void {
+    this.router.navigate(['corredor']);
   }
 }

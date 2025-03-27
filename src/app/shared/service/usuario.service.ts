@@ -11,7 +11,7 @@ export class UsuarioService {
 
   constructor(private httpClient: HttpClient) { }
 
-  listarTodos(): Observable<Array<Usuario>> {
+  buscarTodos(): Observable<Array<Usuario>> {
       return this.httpClient.get<Array<Usuario>>(this.API);
     }
 }

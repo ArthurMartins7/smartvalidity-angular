@@ -36,7 +36,7 @@ export class CorredorDetalheComponent implements OnInit {
   }
 
   public carregarResponsaveis(): void {
-    this.usuarioService.listarTodos().subscribe(
+    this.usuarioService.buscarTodos().subscribe(
       (responsaveis) => {
         this.responsaveisDisponiveis = responsaveis;
         console.log(this.responsaveisDisponiveis);

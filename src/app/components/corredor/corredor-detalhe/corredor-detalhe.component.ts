@@ -7,6 +7,8 @@ import { ActivatedRoute, Router } from '@angular/router';
 import Swal from 'sweetalert2';
 import { Usuario } from '../../../shared/model/entity/usuario.model';
 import { CommonModule } from '@angular/common';
+import { catchError, throwError } from 'rxjs';
+import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
   selector: 'app-corredor-detalhe',
@@ -30,30 +32,40 @@ export class CorredorDetalheComponent implements OnInit {
 
   ngOnInit(): void {
     this.idCorredor = Number(this.activatedRoute.snapshot.paramMap.get('id'));
+    if (this.idCorredor) {
+      this.carregarCorredor();
+    }
     this.carregarResponsaveis();
+  }
 
-
+  public carregarCorredor(): void {
+    this.corredorService.buscarPorId(this.idCorredor).subscribe(
+      (corredor) => {
+        this.corredor = corredor;
+      },
+      (erro) => {
+        console.error('Erro ao carregar corredor:', erro);
+        Swal.fire('Erro', 'Não foi possível carregar o corredor!', 'error');
+      }
+    );
   }
 
   public carregarResponsaveis(): void {
     this.usuarioService.buscarTodos().subscribe(
       (responsaveis) => {
         this.responsaveisDisponiveis = responsaveis;
-        console.log(this.responsaveisDisponiveis);
       },
       (erro) => {
         console.error('Erro ao carregar responsáveis:', erro);
+        Swal.fire('Erro', 'Não foi possível carregar os responsáveis!', 'error');
       }
     );
   }
 
   salvar(): void {
-    console.log('Corredor a ser salvo:', this.corredor);
-
     if (!this.corredor.nome || !this.corredor.responsaveis || this.corredor.responsaveis.length === 0) {
       Swal.fire('Preencha todos os campos obrigatórios!', '', 'warning');
       return;
-
     }
 
     if (this.idCorredor) {
@@ -63,17 +75,38 @@ export class CorredorDetalheComponent implements OnInit {
     }
   }
 
-
   public inserir(): void {
-    this.corredorService.criarCorredor(this.corredor).subscribe(
-      () => {
-        Swal.fire('Corredor salvo com sucesso!', '', 'success');
-        this.voltar();
-      },
-      (erro) => {
-        Swal.fire('Erro ao salvar um corredor!', erro.error.mensagem, 'error');
-      }
-    );
+    console.log('Corredor a ser enviado:', this.corredor); // Verifique a estrutura do objeto
+
+    // Mapeamento de dados (se necessário)
+    const corredorMapeado = {
+      ...this.corredor,
+      responsaveis: this.corredor.responsaveis.map(responsavel => {
+        return {
+          id: responsavel.id,
+          perfilAcesso: responsavel.perfilAcesso,
+          cpf: responsavel.cpf,
+          nome: responsavel.nome,
+          email: responsavel.email,
+          senha: responsavel.senha
+        };
+      })
+    };
+
+    this.corredorService.criarCorredor(corredorMapeado)
+      .pipe(
+        catchError((error: HttpErrorResponse) => {
+          console.error('Erro ao salvar o corredor:', error);
+          Swal.fire('Erro ao salvar o corredor!', error.error.message || 'Erro desconhecido', 'error');
+          return throwError(error);
+        })
+      )
+      .subscribe(
+        () => {
+          Swal.fire('Corredor salvo com sucesso!', '', 'success');
+          this.voltar();
+        }
+      );
   }
 
   private alterar(): void {

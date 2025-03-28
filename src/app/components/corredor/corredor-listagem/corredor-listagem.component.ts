@@ -5,6 +5,7 @@ import { CategoriaService } from '../../../shared/service/categoria.service';
 import { CorredorService } from '../../../shared/service/corredor.service';
 import { Categoria } from '../../../shared/model/entity/categoria';
 import { Router } from '@angular/router';
+import Swal from 'sweetalert2';
 
 
 @Component({
@@ -39,6 +40,31 @@ export class CorredorListagemComponent implements OnInit {
       }
     );
   }
+
+  excluir(corredorSelecionado: Corredor) {
+    Swal.fire({
+      title: 'Deseja realmente excluir o corredor?',
+      text: 'Essa ação não poderá ser desfeita!',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Sim, excluir!',
+      cancelButtonText: 'Cancelar'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.corredorService.excluirCorredor(corredorSelecionado.id).subscribe(
+          () => {
+            this.corredores = this.corredores.filter(c => c.id !== corredorSelecionado.id);
+            Swal.fire('Excluído!', 'O corredor foi removido com sucesso.', 'success');
+          },
+          erro => {
+            Swal.fire('Corredor possui categoria associada!', erro.error, 'error');
+          }
+        );
+      }
+    });
+  }
+
+
 
   public adicionarCorredor() {
     this.router.navigate(['corredor-detalhe']);

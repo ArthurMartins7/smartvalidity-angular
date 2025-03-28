@@ -6,6 +6,7 @@
       <span>Adicionar Corredor</span>
     </button>
   </div>
+
   @for (corredor of corredores; track corredor.id) {
   <div class="flex justify-between">
     <div class="flex-1 mx-2 p-3 bg-white rounded-lg shadow-lg max-w-xs">
@@ -13,7 +14,7 @@
         <img src="https://th.bing.com/th/id/OIP.jdq2ZppaEGHTVIFsQBeXLQHaE8?rs=1&pid=ImgDetMain" alt="Descrição da imagem" class="w-full h-24 object-cover rounded-t-lg" />
       </div>
       <div class="flex items-center justify-between mb-2">
-        <h3 class="text-lg font-bold text-gray-800">{{corredor.nome}}</h3>
+        <h3 class="text-lg font-bold text-gray-800">{{ corredor.nome }}</h3>
         <button class="w-10 h-10 rounded-full flex items-center justify-center ml-2" title="Adicionar categoria">
           <img src="/icons/add-category.png" alt="add-category" class="w-6 h-6">
         </button>
@@ -26,14 +27,14 @@
         </ul>
       </div>
       <div class="flex justify-center mt-2 gap-4">
-        <button class="text-gray-600 hover:text-blue-500 flex items-center gap-1">
+        <button class="text-gray-600 hover:text-blue-500 flex items-center gap-1" title="Editar corredor">
           <img src="/icons/edit.png" alt="Editar" class="w-5 h-5">
         </button>
-        <button class="text-gray-600 hover:text-red-500 flex items-center gap-1">
+        <button (click)="excluir(corredor)" class="text-gray-600 hover:text-red-500 flex items-center gap-1" title="Excluir corredor">
           <img src="https://cdn-icons-png.flaticon.com/512/1214/1214428.png" alt="Excluir" class="w-5 h-5">
         </button>
       </div>
     </div>
   </div>
-}
+  }
 </div>

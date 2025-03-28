@@ -76,9 +76,8 @@ export class CorredorDetalheComponent implements OnInit {
   }
 
   public inserir(): void {
-    console.log('Corredor a ser enviado:', this.corredor); // Verifique a estrutura do objeto
+    console.log('Corredor a ser enviado:', this.corredor);
 
-    // Mapeamento de dados (se necessário)
     const corredorMapeado = {
       ...this.corredor,
       responsaveis: this.corredor.responsaveis.map(responsavel => {

@@ -37,7 +37,7 @@ export class RegisterComponent implements OnInit{
         this.usuarios = resultado;
       },
       (erro) => {
-        console.error('Erro ao consultar todos os usuários', erro.error);
+        console.error('Erro ao consultar todos os usuário', erro.error);
       }
       );
   }

@@ -9,7 +9,9 @@ import { Usuario } from '../model/entity/usuario.model';
 export class UsuarioService {
   private readonly API = 'http://localhost:8080/smartvalidity/usuario';
 
-  constructor(private httpClient: HttpClient) { }
+  constructor(private httpClient: HttpClient) {
+
+  }
 
   buscarTodos(): Observable<Array<Usuario>> {
       return this.httpClient.get<Array<Usuario>>(this.API);

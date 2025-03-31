@@ -27,7 +27,7 @@
         </ul>
       </div>
       <div class="flex justify-center mt-2 gap-4">
-        <button class="text-gray-600 hover:text-blue-500 flex items-center gap-1" title="Editar corredor">
+        <button (click)="editar(corredor)" class="text-gray-600 hover:text-blue-500 flex items-center gap-1" title="Editar corredor">
           <img src="/icons/edit.png" alt="Editar" class="w-5 h-5">
         </button>
         <button (click)="excluir(corredor)" class="text-gray-600 hover:text-red-500 flex items-center gap-1" title="Excluir corredor">

@@ -64,7 +64,9 @@ export class CorredorListagemComponent implements OnInit {
     });
   }
 
-
+  editar(corredorSelecionado: Corredor){
+    this.router.navigate(['/corredor-editar/', corredorSelecionado]);
+  }
 
   public adicionarCorredor() {
     this.router.navigate(['corredor-detalhe']);

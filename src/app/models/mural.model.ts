@@ -1,10 +1,13 @@
 export interface MuralItem {
-  id: number;
+  id: string;
   itemProduto: string;
   produto: {
-    id: number;
+    id: string;
     nome: string;
     descricao: string;
+    codigoBarras: string;
+    marca: string;
+    unidadeMedida: string;
   };
   categoria: string;
   corredor: string;

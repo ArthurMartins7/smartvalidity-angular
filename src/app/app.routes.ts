@@ -12,6 +12,6 @@ export const routes: Routes = [
   { path: 'register', component: RegisterComponent },
   { path: 'corredor', component: CorredorListagemComponent },
   { path: 'corredor-detalhe', component: CorredorDetalheComponent },
-  { path: 'mural-listagem', component: MuralListagemComponent }
-  { path: 'mural-detalhe', component: MuralDetalheComponent },
+  { path: 'mural-listagem', component: MuralListagemComponent },
+  { path: 'mural-detalhe', component: MuralDetalheComponent }
 ];

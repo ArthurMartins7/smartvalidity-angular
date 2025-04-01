@@ -24,8 +24,8 @@ export class SidebarComponent {
   menuItems: MenuItem[] = [
     { id: 'mural', icon: 'dashboard', label: 'Mural', route: '/mural' },
     { id: 'estoque', icon: 'inventory', label: 'Estoque', route: '/estoque' },
-    { id: 'layout', icon: 'grid_view', label: 'Layout', route: '/layout' },
-    { id: 'fornecedores', icon: 'business', label: 'Fornecedores', route: '/fornecedores' },
+    { id: 'layout', icon: 'grid_view', label: 'Layout', route: '/corredor' },
+    { id: 'fornecedores', icon: 'business', label: 'Fornecedores', route: '/fornecedor-listagem' },
   ];
 
   additionalItems: MenuItem[] = [

@@ -5,6 +5,8 @@ import { CorredorListagemComponent } from './components/corredor/corredor-listag
 import { CorredorDetalheComponent } from './components/corredor/corredor-detalhe/corredor-detalhe.component';
 import { ProdutoListagemComponent } from './components/produto/produto-listagem/produto-listagem.component';
 import { CorredorEditarComponent } from './components/corredor/corredor-editar/corredor-editar/corredor-editar.component';
+import { FornecedorListagemComponent } from './components/fornecedor/fornecedor-listagem/fornecedor-listagem/fornecedor-listagem.component';
+import { FornecedorDetalheComponent } from './components/fornecedor/fornecedor-listagem/fornecedor-detalhe/fornecedor-detalhe.component';
 
 export const routes: Routes = [
   { path: '', component: LoginComponent },
@@ -13,5 +15,7 @@ export const routes: Routes = [
   { path: 'corredor-detalhe', component: CorredorDetalheComponent },
   { path: 'corredor-editar', component: CorredorEditarComponent },
   { path: 'produto-listagem', component: ProdutoListagemComponent },
+  { path: 'fornecedor-listagem', component: FornecedorListagemComponent },
+  { path: 'fornecedor-detalhe', component: FornecedorDetalheComponent }
 
 ];

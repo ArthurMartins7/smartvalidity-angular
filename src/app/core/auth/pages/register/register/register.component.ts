@@ -37,7 +37,7 @@ export class RegisterComponent implements OnInit{
         this.usuarios = resultado;
       },
       (erro) => {
-        console.error('Erro ao consultar todos os usuário', erro.error);
+        console.error('Erro ao consultar todos os usuárioss', erro.error);
       }
       );
   }
@@ -68,7 +68,7 @@ export class RegisterComponent implements OnInit{
   }
 
   public voltar() {
-    this.router.navigate([''])
+    this.router.navigate(['/login'])
   }
 
 

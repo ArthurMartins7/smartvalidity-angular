@@ -1,1 +1,65 @@
-<p>sidebar works!</p>
+<!-- Header -->
+<header class="w-full bg-white shadow-md fixed top-0 left-0 z-50 px-4 py-3 flex items-center justify-between">
+  <!-- Menu Toggle Button -->
+  <button (click)="toggleSidebar()" class="text-gray-700 hover:text-blue-600 focus:outline-none transition-colors duration-200">
+    <i class="material-icons text-2xl">{{ isSidebarOpen ? 'menu_open' : 'menu' }}</i>
+  </button>
+
+  <!-- Validata Logo & Title -->
+  <div class="flex items-center justify-center absolute left-1/2 transform -translate-x-1/2">
+    <img class="w-8 h-8 mr-2"
+      src="https://static.vecteezy.com/system/resources/thumbnails/016/774/412/small_2x/blue-check-mark-icon-on-transparent-background-free-png.png" alt="logo">
+    <span class="text-xl font-bold text-blue-600">VALIDATA</span>
+  </div>
+
+  <!-- User profile icon -->
+  <button class="text-gray-700 hover:text-blue-600 focus:outline-none">
+    <i class="material-icons text-2xl">account_circle</i>
+  </button>
+</header>
+
+<!-- Sidebar -->
+<div class="w-64 h-screen bg-white text-gray-800 flex flex-col fixed left-0 top-16 shadow-md border-r border-gray-200 transition-all duration-300 ease-in-out overflow-y-auto"
+     [ngClass]="isSidebarOpen ? 'translate-x-0' : '-translate-x-full'">
+  <!-- Main navigation options -->
+  <div class="flex flex-col mb-5 pt-4">
+    <div *ngFor="let item of menuItems"
+         (click)="setActive(item.id, item.route)"
+         class="flex items-center py-3 px-6 cursor-pointer hover:bg-gray-100 transition-colors duration-200"
+         [ngClass]="{'border-l-4 border-blue-500 bg-blue-50 text-blue-600': isActive(item.id),
+                     'border-l-4 border-transparent': !isActive(item.id)}">
+      <i class="material-icons mr-4">{{item.icon}}</i>
+      <span class="font-medium">{{item.label}}</span>
+    </div>
+  </div>
+
+  <!-- Additional options -->
+  <div class="flex flex-col mb-5 border-t border-gray-200 pt-5">
+    <div *ngFor="let item of additionalItems"
+         (click)="setActive(item.id, item.route)"
+         class="flex items-center py-3 px-6 cursor-pointer hover:bg-gray-100 transition-colors duration-200"
+         [ngClass]="{'border-l-4 border-blue-500 bg-blue-50 text-blue-600': isActive(item.id),
+                     'border-l-4 border-transparent': !isActive(item.id)}">
+      <i class="material-icons mr-4">{{item.icon}}</i>
+      <span class="font-medium">{{item.label}}</span>
+      <span *ngIf="item.badge" class="bg-orange-500 text-white text-xs px-2 py-1 rounded-full ml-2">{{item.badge}}</span>
+    </div>
+  </div>
+
+  <!-- User options -->
+  <div class="flex flex-col mt-auto border-t border-gray-200 pt-5 pb-4">
+    <div *ngFor="let item of userOptions"
+         (click)="setActive(item.id, item.route)"
+         class="flex items-center py-3 px-6 cursor-pointer hover:bg-gray-100 transition-colors duration-200"
+         [ngClass]="{'border-l-4 border-blue-500 bg-blue-50 text-blue-600': isActive(item.id),
+                     'border-l-4 border-transparent': !isActive(item.id)}">
+      <i class="material-icons mr-4">{{item.icon}}</i>
+      <span class="font-medium">{{item.label}}</span>
+    </div>
+  </div>
+</div>
+
+<!-- Main content area padding for when sidebar is open -->
+<div class="pt-16 transition-all duration-300" [ngClass]="{'ml-64': isSidebarOpen}">
+  <router-outlet></router-outlet>
+</div>

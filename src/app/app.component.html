@@ -1,1 +1,7 @@
-<router-outlet></router-outlet>
+<!-- Mostrar a Sidebar apenas se não estiver nas páginas de login/cadastro -->
+<app-sidebar *ngIf="!isAuthRoute()"></app-sidebar>
+
+<!-- Área principal da aplicação -->
+<div [ngClass]="{'ml-64': !isAuthRoute()}" class="p-6 pt-16">
+  <router-outlet></router-outlet>
+</div>

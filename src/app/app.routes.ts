@@ -9,13 +9,19 @@ import { FornecedorListagemComponent } from './components/fornecedor/fornecedor-
 import { FornecedorDetalheComponent } from './components/fornecedor/fornecedor-listagem/fornecedor-detalhe/fornecedor-detalhe.component';
 
 export const routes: Routes = [
-  { path: '', component: LoginComponent },
+  // Auth routes (without sidebar)
+  { path: 'login', component: LoginComponent },
   { path: 'register', component: RegisterComponent },
+
+  // Main routes (with sidebar)
   { path: 'corredor', component: CorredorListagemComponent },
   { path: 'corredor-detalhe', component: CorredorDetalheComponent },
   { path: 'corredor-editar', component: CorredorEditarComponent },
   { path: 'produto-listagem', component: ProdutoListagemComponent },
   { path: 'fornecedor-listagem', component: FornecedorListagemComponent },
   { path: 'fornecedor-detalhe', component: FornecedorDetalheComponent }
+  { path: '', redirectTo: 'produto-listagem', pathMatch: 'full' },
 
+  // Catch all route
+  { path: '**', redirectTo: 'login' }
 ];

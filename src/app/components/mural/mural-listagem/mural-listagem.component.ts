@@ -4,6 +4,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MuralItem } from '../../../models/mural.model';
 import { MuralService } from '../../../services/mural.service';
+import { SidebarComponent } from '../../../shared/ui/sidebar/sidebar.component';
 
 @Component({
   selector: 'app-mural-listagem',

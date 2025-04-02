@@ -16,10 +16,10 @@ export const routes: Routes = [
   { path: 'corredor', component: CorredorListagemComponent },
   { path: 'corredor-detalhe', component: CorredorDetalheComponent },
   { path: 'produto-listagem', component: ProdutoListagemComponent },
-  { path: '', redirectTo: 'produto-listagem', pathMatch: 'full' },
+  //{ path: '', redirectTo: 'produto-listagem', pathMatch: 'full' },
 
   // Catch all route
-  { path: '**', redirectTo: 'login' },
+  //{ path: '**', redirectTo: 'login' },
   { path: 'corredor-detalhe', component: CorredorDetalheComponent },
   { path: 'mural-listagem', component: MuralListagemComponent },
   { path: 'mural-detalhe', component: MuralDetalheComponent }

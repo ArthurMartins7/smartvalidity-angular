@@ -22,7 +22,7 @@ export class SidebarComponent {
   isSidebarOpen = true; // Control sidebar visibility
 
   menuItems: MenuItem[] = [
-    { id: 'mural', icon: 'dashboard', label: 'Mural', route: '/mural' },
+    { id: 'mural', icon: 'dashboard', label: 'Mural', route: '/mural-listagem' },
     { id: 'estoque', icon: 'inventory', label: 'Estoque', route: '/estoque' },
     { id: 'layout', icon: 'grid_view', label: 'Layout', route: '/layout' },
     { id: 'fornecedores', icon: 'business', label: 'Fornecedores', route: '/fornecedores' },

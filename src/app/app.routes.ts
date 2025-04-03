@@ -19,7 +19,7 @@ export const routes: Routes = [
   { path: 'corredor-editar', component: CorredorEditarComponent },
   { path: 'produto-listagem', component: ProdutoListagemComponent },
   { path: 'fornecedor-listagem', component: FornecedorListagemComponent },
-  { path: 'fornecedor-detalhe', component: FornecedorDetalheComponent }
+  { path: 'fornecedor-detalhe', component: FornecedorDetalheComponent },
   { path: '', redirectTo: 'produto-listagem', pathMatch: 'full' },
 
   // Catch all route

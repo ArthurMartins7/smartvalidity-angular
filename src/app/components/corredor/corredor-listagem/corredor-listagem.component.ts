@@ -41,6 +41,7 @@ export class CorredorListagemComponent implements OnInit {
     );
   }
 
+
   excluir(corredorSelecionado: Corredor) {
     Swal.fire({
       title: 'Deseja realmente excluir o corredor?',

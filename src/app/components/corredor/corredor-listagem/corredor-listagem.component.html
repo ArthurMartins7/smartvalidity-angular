@@ -1,4 +1,16 @@
 <div class="p-3 bg-gray-100">
+  <!-- Campo de pesquisa -->
+  <div class="mb-6">
+    <div class="relative">
+      <div class="absolute inset-y-0 left-3 flex items-center pointer-events-none">
+        <svg class="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+        </svg>
+      </div>
+      <input type="text" placeholder="Pesquisar..." class="w-full pl-12 pr-4 py-3 border rounded-full bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-200 text-lg">
+    </div>
+  </div>
+
   <div class="mb-4 flex justify-start">
     <button (click)="adicionarCorredor()"
       class="bg-white hover:bg-gray-50 text-gray-800 px-4 py-2 rounded-full flex items-center transition-all transform hover:scale-105 shadow-sm hover:shadow-md border border-gray-200">
@@ -7,9 +19,9 @@
     </button>
   </div>
 
-  @for (corredor of corredores; track corredor.id) {
-  <div class="flex justify-between">
-    <div class="flex-1 mx-2 p-3 bg-white rounded-lg shadow-lg max-w-xs">
+  <div class="flex flex-wrap gap-4">
+    @for (corredor of corredores; track corredor.id) {
+    <div class="flex-1 p-3 bg-white rounded-lg shadow-lg max-w-xs flex flex-col h-[350px]">
       <div class="mb-2">
         <img src="https://th.bing.com/th/id/OIP.jdq2ZppaEGHTVIFsQBeXLQHaE8?rs=1&pid=ImgDetMain" alt="Descrição da imagem" class="w-full h-24 object-cover rounded-t-lg" />
       </div>
@@ -19,14 +31,14 @@
           <img src="/icons/add-category.png" alt="add-category" class="w-6 h-6">
         </button>
       </div>
-      <div class="max-h-60 overflow-y-auto">
+      <div class="h-[140px] overflow-y-auto">
         <ul class="list-none p-0">
           @for (categoria of corredor.categorias; track categoria.id) {
             <li class="py-1 text-gray-600 hover:bg-gray-200">{{ categoria.nome }}</li>
           }
         </ul>
       </div>
-      <div class="flex justify-center mt-2 gap-4">
+      <div class="flex justify-center mt-4 pt-4 border-t border-gray-200 gap-8">
         <button (click)="editar(corredor)" class="text-gray-600 hover:text-blue-500 flex items-center gap-1" title="Editar corredor">
           <img src="/icons/edit.png" alt="Editar" class="w-5 h-5">
         </button>
@@ -35,6 +47,6 @@
         </button>
       </div>
     </div>
+    }
   </div>
-  }
 </div>

@@ -1,4 +1,13 @@
-<div class="flex justify-center items-center min-h-screen bg-gray-100">
+<!-- Cabeçalho -->
+<div class="flex items-center gap-2 mb-8">
+  <i class="material-icons text-gray-600">arrow_forward</i>
+  <div>
+    <div class="text-gray-500">Corredores</div>
+    <div class="text-2xl font-bold">Cadastro</div>
+  </div>
+</div>
+
+<div class="flex justify-center items-center min-h-screen">
   <form class="w-full max-w-2xl bg-white shadow-md rounded-lg px-8 pt-6 pb-8">
     <h2 class="mb-4 text-xl font-bold text-gray-900 text-center">Cadastrar um novo Corredor</h2>
 
@@ -16,9 +25,10 @@
         <label for="responsavelCorredor" class="block mb-2 text-sm font-medium text-gray-900">
           Responsável pelo Corredor:
         </label>
-        <select multiple [(ngModel)]="corredor.responsaveis" name="responsavelCorredor" id="responsavelCorredor"
+        <select [(ngModel)]="responsavelSelecionado" name="responsavelCorredor" id="responsavelCorredor"
           class="bg-gray-100 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600
           focus:border-primary-600 block w-full p-2.5" required>
+          <option [ngValue]="null">Selecione um responsável</option>
           <option *ngFor="let responsavel of responsaveisDisponiveis" [ngValue]="responsavel">
             {{ responsavel.nome }}
           </option>
@@ -27,16 +37,17 @@
     </div>
 
     <div class="flex justify-center mt-6">
-      <button (click)="voltar()" type="button"
-        class="inline-flex items-center px-5 py-2.5 mr-4 text-sm font-medium text-white bg-gray-800 rounded-lg
-        focus:outline-none focus:ring-2 focus:ring-gray-600 focus:ring-opacity-50">
-        <span class="text-xl font-bold">Voltar</span>
+      <button type="button" (click)="voltar()"
+        class="inline-flex items-center px-11 py-2 text-lg font-medium text-white bg-gray-500 rounded-full min-w-[140px]
+        transition duration-300 ease-in-out hover:bg-gray-600 hover:shadow-md">
+        Voltar
       </button>
-      <button (click)="salvar()" type="submit"
-        class="inline-flex items-center px-5 py-2.5 text-sm font-medium text-white bg-green-600 rounded-lg
-        focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50">
-        <span class="text-xl font-bold">Salvar</span>
+      <button type="submit"
+        class="inline-flex items-center px-11 py-2 text-lg font-medium text-white bg-blue-800 rounded-full min-w-[140px] ml-4
+        transition duration-300 ease-in-out hover:bg-blue-900 hover:shadow-md">
+        Salvar
       </button>
     </div>
+
   </form>
 </div>

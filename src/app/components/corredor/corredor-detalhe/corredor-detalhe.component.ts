@@ -22,6 +22,7 @@ export class CorredorDetalheComponent implements OnInit {
   public corredor: Corredor = new Corredor();
   public idCorredor: number;
   public responsaveisDisponiveis: Usuario[] = [];
+  public responsavelSelecionado: Usuario | null = null;
 
   constructor(
     private corredorService: CorredorService,
@@ -42,6 +43,9 @@ export class CorredorDetalheComponent implements OnInit {
     this.corredorService.buscarPorId(this.idCorredor).subscribe(
       (corredor) => {
         this.corredor = corredor;
+        if (corredor.responsaveis && corredor.responsaveis.length > 0) {
+          this.responsavelSelecionado = corredor.responsaveis[0];
+        }
       },
       (erro) => {
         console.error('Erro ao carregar corredor:', erro);
@@ -63,10 +67,13 @@ export class CorredorDetalheComponent implements OnInit {
   }
 
   salvar(): void {
-    if (!this.corredor.nome || !this.corredor.responsaveis || this.corredor.responsaveis.length === 0) {
+    if (!this.corredor.nome || !this.responsavelSelecionado) {
       Swal.fire('Preencha todos os campos obrigatórios!', '', 'warning');
       return;
     }
+
+    // Atualiza o array de responsáveis com o responsável selecionado
+    this.corredor.responsaveis = [this.responsavelSelecionado];
 
     if (this.idCorredor) {
       this.alterar();
@@ -80,16 +87,16 @@ export class CorredorDetalheComponent implements OnInit {
 
     const corredorMapeado = {
       ...this.corredor,
-      responsaveis: this.corredor.responsaveis.map(responsavel => {
-        return {
-          id: responsavel.id,
-          perfilAcesso: responsavel.perfilAcesso,
-          cpf: responsavel.cpf,
-          nome: responsavel.nome,
-          email: responsavel.email,
-          senha: responsavel.senha
-        };
-      })
+      responsaveis: [
+        {
+          id: this.responsavelSelecionado!.id,
+          perfilAcesso: this.responsavelSelecionado!.perfilAcesso,
+          cpf: this.responsavelSelecionado!.cpf,
+          nome: this.responsavelSelecionado!.nome,
+          email: this.responsavelSelecionado!.email,
+          senha: this.responsavelSelecionado!.senha
+        }
+      ]
     };
 
     this.corredorService.criarCorredor(corredorMapeado)

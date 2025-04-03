@@ -22,6 +22,7 @@ export class CorredorEditarComponent {
   public idCorredor: number;
   public responsaveisDisponiveis: Usuario[] = [];
   public selectedFile: File | null = null;
+  public responsavelSelecionado: Usuario | null = null;
 
   constructor(
     private corredorService: CorredorService,
@@ -42,6 +43,9 @@ export class CorredorEditarComponent {
     this.corredorService.buscarPorId(this.idCorredor).subscribe(
       (corredor) => {
         this.corredor = corredor;
+        if (corredor.responsaveis && corredor.responsaveis.length > 0) {
+          this.responsavelSelecionado = corredor.responsaveis[0];
+        }
       },
       (erro) => {
         console.error('Erro ao carregar corredor:', erro);
@@ -63,18 +67,25 @@ export class CorredorEditarComponent {
   }
 
   atualizar(): void {
+    if (!this.corredor.nome || !this.responsavelSelecionado) {
+      Swal.fire('Preencha todos os campos obrigatórios!', '', 'warning');
+      return;
+    }
+
     console.log('Corredor a ser atualizado:', this.corredor);
 
     const corredorMapeado = {
       ...this.corredor,
-      responsaveis: this.corredor.responsaveis.map(responsavel => ({
-        id: responsavel.id,
-        perfilAcesso: responsavel.perfilAcesso,
-        cpf: responsavel.cpf,
-        nome: responsavel.nome,
-        email: responsavel.email,
-        senha: responsavel.senha
-      }))
+      responsaveis: [
+        {
+          id: this.responsavelSelecionado.id,
+          perfilAcesso: this.responsavelSelecionado.perfilAcesso,
+          cpf: this.responsavelSelecionado.cpf,
+          nome: this.responsavelSelecionado.nome,
+          email: this.responsavelSelecionado.email,
+          senha: this.responsavelSelecionado.senha
+        }
+      ]
     };
 
     this.corredorService.atualizarCorredor(this.idCorredor!, corredorMapeado)

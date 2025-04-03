@@ -8,6 +8,7 @@ import { EntradaEstoqueComponent } from './components/entrada-estoque/entrada-es
 import { CorredorEditarComponent } from './components/corredor/corredor-editar/corredor-editar/corredor-editar.component';
 import { FornecedorListagemComponent } from './components/fornecedor/fornecedor-listagem/fornecedor-listagem/fornecedor-listagem.component';
 import { FornecedorDetalheComponent } from './components/fornecedor/fornecedor-listagem/fornecedor-detalhe/fornecedor-detalhe.component';
+import { CategoriaDetalheComponent } from './components/categoria/categoria-detalhe/categoria-detalhe/categoria-detalhe.component';
 
 export const routes: Routes = [
   { path: '', component: LoginComponent },
@@ -19,4 +20,6 @@ export const routes: Routes = [
   { path: 'fornecedor-listagem', component: FornecedorListagemComponent },
   { path: 'fornecedor-detalhe', component: FornecedorDetalheComponent },
   { path: 'entrada-estoque', component: EntradaEstoqueComponent },
+  { path: 'categoria-detalhe', component: CategoriaDetalheComponent },
+
 ];

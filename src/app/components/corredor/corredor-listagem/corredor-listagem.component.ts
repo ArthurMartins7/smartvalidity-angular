@@ -72,4 +72,13 @@ export class CorredorListagemComponent implements OnInit {
   public adicionarCorredor() {
     this.router.navigate(['corredor-detalhe']);
   }
+
+  public adicionarCategoria(corredor: Corredor) {
+    this.router.navigate(['/categoria-detalhe'], { queryParams: { corredorId: corredor.id } });
+}
+
+public irParaProdutoListagem(categoriaId: number) {
+  this.router.navigate(['/produto-listagem'], { queryParams: { categoriaId } });
+}
+
 }

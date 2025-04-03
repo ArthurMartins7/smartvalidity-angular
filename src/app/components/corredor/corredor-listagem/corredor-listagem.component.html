@@ -9,7 +9,7 @@
   </div>
 </div>
 
-<div class="p-3">
+<div class="p-3 bg-white-100">
   <!-- Campo de pesquisa -->
   <div class="mb-6">
     <div class="relative">
@@ -38,14 +38,16 @@
       </div>
       <div class="flex items-center justify-between mb-2">
         <h3 class="text-lg font-bold text-gray-800">{{ corredor.nome }}</h3>
-        <button class="w-10 h-10 rounded-full flex items-center justify-center ml-2" title="Adicionar categoria">
+        <button (click)="adicionarCategoria(corredor)" class="w-10 h-10 rounded-full flex items-center justify-center ml-2" title="Adicionar categoria">
           <img src="/icons/add-category.png" alt="add-category" class="w-6 h-6">
         </button>
+
       </div>
       <div class="h-[140px] overflow-y-auto">
         <ul class="list-none p-0">
           @for (categoria of corredor.categorias; track categoria.id) {
-            <li class="py-1 text-gray-600 hover:bg-gray-200">{{ categoria.nome }}</li>
+            <li class="py-1 text-gray-600 hover:bg-gray-200 cursor-pointer"
+            (click)="irParaProdutoListagem(categoria.id)">{{ categoria.nome }}</li>
           }
         </ul>
       </div>

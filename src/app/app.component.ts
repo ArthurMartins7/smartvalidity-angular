@@ -16,7 +16,7 @@ export class AppComponent {
   private router = inject(Router);
 
   isAuthRoute(): boolean {
-    const authRoutes = ['/login', '/register'];
+    const authRoutes = ['/', '/register'];
     return authRoutes.includes(this.router.url);
   }
 

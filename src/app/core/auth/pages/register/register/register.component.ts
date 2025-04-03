@@ -68,7 +68,7 @@ export class RegisterComponent implements OnInit{
   }
 
   public voltar() {
-    this.router.navigate(['/login'])
+    this.router.navigate(['/'])
   }
 
 

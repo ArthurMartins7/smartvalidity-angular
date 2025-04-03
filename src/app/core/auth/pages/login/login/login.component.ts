@@ -28,7 +28,7 @@ export class LoginComponent {
         Swal.fire('Sucesso', 'Usuário autenticado com sucesso', 'success');
         let token: string = jwt.body + '';
         localStorage.setItem('tokenUsuarioAutenticado', token);
-        //this.verificarPerfilAcesso();
+        this.verificarPerfilAcesso();
       },
       error: (erro) => {
         var mensagem: string;
@@ -48,7 +48,7 @@ export class LoginComponent {
   }
 
   public verificarPerfilAcesso() {
-    this.router.navigate(['/produto-listagem']);
+    this.router.navigate(['/entrada-estoque']);
   }
 
 }

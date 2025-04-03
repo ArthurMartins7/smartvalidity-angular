@@ -7,12 +7,10 @@ import { ProdutoListagemComponent } from './components/produto/produto-listagem/
 import { EntradaEstoqueComponent } from './components/entrada-estoque/entrada-estoque.component';
 
 export const routes: Routes = [
-  { path: 'login', component: LoginComponent },
+  { path: '', component: LoginComponent },
   { path: 'register', component: RegisterComponent },
-
   { path: 'corredor', component: CorredorListagemComponent },
   { path: 'corredor-detalhe', component: CorredorDetalheComponent },
   { path: 'produto-listagem', component: ProdutoListagemComponent },
   { path: 'entrada-estoque', component: EntradaEstoqueComponent },
-  //{ path: '**', redirectTo: 'login' }
 ];

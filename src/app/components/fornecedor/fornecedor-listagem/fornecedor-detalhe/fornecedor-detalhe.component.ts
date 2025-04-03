@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Fornecedor } from '../../../../shared/model/entity/fornecedor';
 import { FornecedorService } from '../../../../shared/service/fornecedor.service';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -11,7 +11,7 @@ import { FormsModule } from '@angular/forms';
   templateUrl: './fornecedor-detalhe.component.html',
   styleUrl: './fornecedor-detalhe.component.css'
 })
-export class FornecedorDetalheComponent {
+export class FornecedorDetalheComponent implements OnInit{
 
   public fornecedor: Fornecedor = new Fornecedor();
   public idFornecedor: number;
@@ -32,8 +32,8 @@ export class FornecedorDetalheComponent {
 
   buscarFornecedor(): void {
     this.fornecedorService.buscarPorId(this.idFornecedor).subscribe(
-      (carta) => {
-        this.fornecedor = carta;
+      (fornecedor) => {
+        this.fornecedor = fornecedor;
       },
       (erro) => {
         Swal.fire('Erro ao buscar o fornecedor!', erro, 'error');
@@ -51,7 +51,7 @@ inserir(): void {
     this.fornecedorService.criarFornecedor(this.fornecedor).subscribe(
       () => {
         Swal.fire('Fornecedor salvo com sucesso!', '', 'success');
-        this.voltar(); // Retorna após salvar
+        this.voltar();
       },
       (erro) => {
         Swal.fire('Erro ao salvar o fornecedor: ' + erro.error, 'error');

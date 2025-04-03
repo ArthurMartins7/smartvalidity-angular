@@ -19,11 +19,11 @@ export class FornecedorListagemComponent implements OnInit {
     private router = inject(Router);
 
     public Fornecedor = new Fornecedor();
-     public fornecedores: Fornecedor[] = [];
+    public fornecedores: Fornecedor[] = [];
 
 
     ngOnInit(): void {
-      this.buscarFornecedores();
+     // this.buscarFornecedores();
     }
 
 

@@ -23,7 +23,7 @@ export class FornecedorListagemComponent implements OnInit {
 
 
     ngOnInit(): void {
-     // this.buscarFornecedores();
+      this.buscarFornecedores();
     }
 
 

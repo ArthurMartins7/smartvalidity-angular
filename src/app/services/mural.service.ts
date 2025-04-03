@@ -15,6 +15,10 @@ export class MuralService {
     return this.httpClient.get<MuralItem[]>(`${this.API}/proximos-vencer`);
   }
 
+  getProximosVencer2(): Observable<Array<MuralItem>> {
+    return this.httpClient.get<Array<MuralItem>>(`${this.API}/proximos-vencer`);
+  }
+
   getVencemHoje(): Observable<MuralItem[]> {
     return this.httpClient.get<MuralItem[]>(`${this.API}/vencem-hoje`);
   }

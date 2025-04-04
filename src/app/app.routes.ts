@@ -7,8 +7,9 @@ import { ProdutoListagemComponent } from './components/produto/produto-listagem/
 import { EntradaEstoqueComponent } from './components/entrada-estoque/entrada-estoque.component';
 import { CorredorEditarComponent } from './components/corredor/corredor-editar/corredor-editar/corredor-editar.component';
 import { FornecedorListagemComponent } from './components/fornecedor/fornecedor-listagem/fornecedor-listagem/fornecedor-listagem.component';
-import { FornecedorDetalheComponent } from './components/fornecedor/fornecedor-listagem/fornecedor-detalhe/fornecedor-detalhe.component';
 import { CategoriaDetalheComponent } from './components/categoria/categoria-detalhe/categoria-detalhe/categoria-detalhe.component';
+import { FornecedorEditarComponent } from './components/fornecedor/fornecedor-editar/fornecedor-editar/fornecedor-editar.component';
+import { FornecedorDetalheComponent } from './components/fornecedor/fornecedor-detalhe/fornecedor-detalhe.component';
 
 export const routes: Routes = [
   { path: '', component: LoginComponent },
@@ -19,6 +20,7 @@ export const routes: Routes = [
   { path: 'produto-listagem', component: ProdutoListagemComponent },
   { path: 'fornecedor-listagem', component: FornecedorListagemComponent },
   { path: 'fornecedor-detalhe', component: FornecedorDetalheComponent },
+  { path: 'fornecedor-editar', component: FornecedorEditarComponent },
   { path: 'entrada-estoque', component: EntradaEstoqueComponent },
   { path: 'categoria-detalhe', component: CategoriaDetalheComponent },
 

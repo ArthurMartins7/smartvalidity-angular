@@ -1,57 +1,61 @@
 <main class="container mx-auto px-4 py-6">
   <!-- Cabeçalho -->
-  <div class="flex items-center gap-2 mb-4">
-    <i class="material-icons text-gray-600">arrow_forward</i>
-    <div>
-      <div class="text-gray-500">Corredores</div>
-      <div class="text-2xl font-bold">Cadastro</div>
+  <header class="mb-8">
+    <nav class="flex items-center gap-2">
+      <i class="material-icons text-gray-600">arrow_forward</i>
+      <div>
+        <div class="text-gray-500">Corredores</div>
+        <div class="text-2xl font-bold">Cadastro</div>
+      </div>
+    </nav>
+  </header>
+
+  <section class="max-w-2xl mx-auto mt-6">
+    <!-- Formulário -->
+    <div class="flex justify-center">
+      <form class="w-full bg-white shadow-md rounded-lg p-6">
+        <h2 class="mb-4 text-xl font-bold text-gray-900 text-center">Cadastrar um novo Corredor</h2>
+
+        <div class="grid gap-4 sm:grid-cols-2 sm:gap-4">
+          <div class="w-full">
+            <label for="nomeCorredor" class="block mb-1.5 text-sm font-medium text-gray-900">
+              Nome do Corredor:
+            </label>
+            <input [(ngModel)]="corredor.nome" type="text" name="nomeCorredor" id="nomeCorredor"
+              class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg p-2.5
+              focus:ring-2 focus:ring-blue-500 focus:border-blue-500" required>
+          </div>
+
+          <div class="w-full">
+            <label for="responsavelCorredor" class="block mb-1.5 text-sm font-medium text-gray-900">
+              Responsável pelo Corredor:
+            </label>
+            <select [(ngModel)]="responsavelSelecionado" name="responsavelCorredor" id="responsavelCorredor"
+              class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg p-2.5
+              focus:ring-2 focus:ring-blue-500 focus:border-blue-500" required>
+              <option [ngValue]="null">Selecione um responsável</option>
+              <option *ngFor="let responsavel of responsaveisDisponiveis" [ngValue]="responsavel">
+                {{ responsavel.nome }}
+              </option>
+            </select>
+          </div>
+        </div>
+
+        <div class="flex justify-center gap-4 mt-6">
+          <button type="button" (click)="voltar()"
+            class="px-8 py-2 text-lg font-medium text-white bg-gray-500 rounded-full min-w-[140px]
+            transition duration-300 ease-in-out hover:bg-gray-600 hover:shadow-md
+            focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2">
+            Voltar
+          </button>
+          <button type="button" (click)="salvar()"
+            class="px-8 py-2 text-lg font-medium text-white bg-blue-800 rounded-full min-w-[140px]
+            transition duration-300 ease-in-out hover:bg-blue-900 hover:shadow-md
+            focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+            Salvar
+          </button>
+        </div>
+      </form>
     </div>
-  </div>
-
-  <!-- Formulário -->
-  <div class="flex justify-center">
-    <form class="w-full max-w-2xl bg-white shadow-md rounded-lg p-6">
-      <h2 class="mb-4 text-xl font-bold text-gray-900 text-center">Cadastrar um novo Corredor</h2>
-
-      <div class="grid gap-4 sm:grid-cols-2 sm:gap-4">
-        <div class="w-full">
-          <label for="nomeCorredor" class="block mb-1.5 text-sm font-medium text-gray-900">
-            Nome do Corredor:
-          </label>
-          <input [(ngModel)]="corredor.nome" type="text" name="nomeCorredor" id="nomeCorredor"
-            class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg p-2.5
-            focus:ring-2 focus:ring-blue-500 focus:border-blue-500" required>
-        </div>
-
-        <div class="w-full">
-          <label for="responsavelCorredor" class="block mb-1.5 text-sm font-medium text-gray-900">
-            Responsável pelo Corredor:
-          </label>
-          <select [(ngModel)]="responsavelSelecionado" name="responsavelCorredor" id="responsavelCorredor"
-            class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg p-2.5
-            focus:ring-2 focus:ring-blue-500 focus:border-blue-500" required>
-            <option [ngValue]="null">Selecione um responsável</option>
-            <option *ngFor="let responsavel of responsaveisDisponiveis" [ngValue]="responsavel">
-              {{ responsavel.nome }}
-            </option>
-          </select>
-        </div>
-      </div>
-
-      <div class="flex justify-center gap-4 mt-6">
-        <button type="button" (click)="voltar()"
-          class="px-8 py-2 text-lg font-medium text-white bg-gray-500 rounded-full min-w-[140px]
-          transition duration-300 ease-in-out hover:bg-gray-600 hover:shadow-md
-          focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2">
-          Voltar
-        </button>
-        <button type="button" (click)="salvar()"
-          class="px-8 py-2 text-lg font-medium text-white bg-blue-800 rounded-full min-w-[140px]
-          transition duration-300 ease-in-out hover:bg-blue-900 hover:shadow-md
-          focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
-          Salvar
-        </button>
-      </div>
-    </form>
-  </div>
+  </section>
 </main>

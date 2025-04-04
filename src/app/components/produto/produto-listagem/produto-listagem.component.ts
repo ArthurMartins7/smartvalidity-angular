@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, inject, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { FornecedorService } from '../../../shared/service/fornecedor.service';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { Fornecedor } from '../../../shared/model/entity/fornecedor';
 import { Produto } from '../../../shared/model/entity/produto';
 import { ProdutoService } from '../../../shared/service/produto.service';
@@ -17,19 +17,23 @@ import Swal from 'sweetalert2';
 })
 export class ProdutoListagemComponent implements OnInit{
 
-  ngOnInit(): void {
-    this.buscarProdutos();
-  }
-
   private fornecedorService = inject(FornecedorService);
   private produtoService = inject(ProdutoService);
   private router = inject(Router);
-
+  private route = inject(ActivatedRoute);
 
   public Produto = new Produto();
   public produtos: Produto[] = [];
   public Fornecedor = new Fornecedor();
   public fornecedores: Fornecedor[] = [];
+  public categoriaId: number | null = null;
+
+  ngOnInit(): void {
+    this.route.queryParams.subscribe(params => {
+      this.categoriaId = params['categoriaId'] ? Number(params['categoriaId']) : null;
+      this.buscarProdutos();
+    });
+  }
 
   public buscarFornecedores() {
     this.fornecedorService.listarTodos().subscribe(
@@ -44,15 +48,27 @@ export class ProdutoListagemComponent implements OnInit{
   }
 
   public buscarProdutos() {
-    this.produtoService.listarTodos().subscribe(
-      (resultado) => {
-        this.produtos = resultado;
-        console.log(this.produtos);
-      },
-      (erro) => {
-        console.error('Erro ao consultar todos os produtos', erro.error.mensagem);
-      }
-    );
+    if (this.categoriaId) {
+      this.produtoService.listarPorCategoria(this.categoriaId).subscribe(
+        (resultado) => {
+          this.produtos = resultado;
+          console.log(this.produtos);
+        },
+        (erro) => {
+          console.error('Erro ao consultar produtos da categoria', erro.error.mensagem);
+        }
+      );
+    } else {
+      this.produtoService.listarTodos().subscribe(
+        (resultado) => {
+          this.produtos = resultado;
+          console.log(this.produtos);
+        },
+        (erro) => {
+          console.error('Erro ao consultar todos os produtos', erro.error.mensagem);
+        }
+      );
+    }
   }
 
   excluir(produtoSelecionado: Produto) {

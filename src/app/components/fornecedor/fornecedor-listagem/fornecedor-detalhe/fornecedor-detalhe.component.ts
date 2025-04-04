@@ -4,11 +4,13 @@ import { FornecedorService } from '../../../../shared/service/fornecedor.service
 import { ActivatedRoute, Router } from '@angular/router';
 import Swal from 'sweetalert2';
 import { FormsModule } from '@angular/forms';
+import { CommonModule } from '@angular/common';
 import { EnderecoDTO } from '../../../../shared/model/dto/endereco.dto';
 
 @Component({
   selector: 'app-fornecedor-detalhe',
-  imports: [FormsModule],
+  standalone: true,
+  imports: [FormsModule, CommonModule],
   templateUrl: './fornecedor-detalhe.component.html',
   styleUrl: './fornecedor-detalhe.component.css'
 })
@@ -16,6 +18,7 @@ export class FornecedorDetalheComponent implements OnInit{
 
   public fornecedor: FornecedorDTO = new FornecedorDTO();
   public idFornecedor: number;
+  public secaoAtiva: 'dadosGerais' | 'endereco' = 'dadosGerais';
 
   constructor(private fornecedorService: FornecedorService,
     private router: Router,

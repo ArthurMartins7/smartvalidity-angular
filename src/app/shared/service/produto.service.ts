@@ -15,6 +15,10 @@ export class ProdutoService {
     return this.httpClient.get<Produto[]>(this.API);
   }
 
+  listarPorCategoria(categoriaId: number): Observable<Produto[]> {
+    return this.httpClient.get<Produto[]>(`${this.API}/categoria/${categoriaId}`);
+  }
+
   buscarPorId(id: number): Observable<Produto> {
     return this.httpClient.get<Produto>(`${this.API}/${id}`);
   }

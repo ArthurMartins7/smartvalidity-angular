@@ -14,16 +14,15 @@ import { EnderecoDTO } from '../../../shared/model/dto/endereco.dto';
   templateUrl: './fornecedor-detalhe.component.html',
   styleUrl: './fornecedor-detalhe.component.css'
 })
-export class FornecedorDetalheComponent implements OnInit{
+export class FornecedorDetalheComponent implements OnInit {
 
   public fornecedor: FornecedorDTO = new FornecedorDTO();
   public idFornecedor: number;
   public secaoAtiva: 'dadosGerais' | 'endereco' = 'dadosGerais';
 
   constructor(private fornecedorService: FornecedorService,
-    private router: Router,
-    private route: ActivatedRoute
-) {
+              private router: Router,
+              private route: ActivatedRoute) {
     // Initialize endereco when creating a new Fornecedor
     this.fornecedor.endereco = new EnderecoDTO();
   }
@@ -31,53 +30,10 @@ export class FornecedorDetalheComponent implements OnInit{
   ngOnInit(): void {
     this.route.params.subscribe((params) => {
       this.idFornecedor = params['id'];
-      if(this.idFornecedor) {
+      if (this.idFornecedor) {
         this.buscarFornecedor();
       }
     });
-  }
-
-  private validarCNPJ(cnpj: string): boolean {
-    // Remove caracteres não numéricos
-    cnpj = cnpj.replace(/[^\d]/g, '');
-
-    // Verifica se tem 14 dígitos
-    if (cnpj.length !== 14) {
-      return false;
-    }
-
-    // Verifica se todos os dígitos são iguais
-    if (/^(\d)\1+$/.test(cnpj)) {
-      return false;
-    }
-
-    // Validação do primeiro dígito verificador
-    let soma = 0;
-    let peso = 5;
-    for (let i = 0; i < 12; i++) {
-      soma += parseInt(cnpj.charAt(i)) * peso;
-      peso = peso === 2 ? 9 : peso - 1;
-    }
-    let digito = 11 - (soma % 11);
-    if (digito > 9) digito = 0;
-    if (parseInt(cnpj.charAt(12)) !== digito) {
-      return false;
-    }
-
-    // Validação do segundo dígito verificador
-    soma = 0;
-    peso = 6;
-    for (let i = 0; i < 13; i++) {
-      soma += parseInt(cnpj.charAt(i)) * peso;
-      peso = peso === 2 ? 9 : peso - 1;
-    }
-    digito = 11 - (soma % 11);
-    if (digito > 9) digito = 0;
-    if (parseInt(cnpj.charAt(13)) !== digito) {
-      return false;
-    }
-
-    return true;
   }
 
   buscarFornecedor(): void {
@@ -94,16 +50,6 @@ export class FornecedorDetalheComponent implements OnInit{
   salvar(event: Event): void {
     event.preventDefault();
 
-    if (!this.fornecedor.cnpj || !this.validarCNPJ(this.fornecedor.cnpj)) {
-      Swal.fire({
-        title: 'CNPJ Inválido',
-        text: 'Por favor, insira um CNPJ válido',
-        icon: 'error',
-        confirmButtonText: 'OK'
-      });
-      return;
-    }
-
     this.inserir();
   }
 
@@ -115,12 +61,8 @@ export class FornecedorDetalheComponent implements OnInit{
       },
       (erro) => {
         console.error('Erro completo:', erro);
-        if (erro.error?.message?.toLowerCase().includes('cnpj')) {
-          Swal.fire('CNPJ Inválido', 'Por favor, verifique o CNPJ informado', 'error');
-        } else {
-          const mensagemErro = erro.error?.message || erro.message || 'Erro desconhecido ao salvar o fornecedor';
-          Swal.fire('Erro!', mensagemErro, 'error');
-        }
+        const mensagemErro = erro.error?.message || erro.message || 'Erro desconhecido ao salvar o fornecedor';
+        Swal.fire('Erro!', mensagemErro, 'error');
       }
     );
   }

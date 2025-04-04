@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Corredor } from '../../../../shared/model/entity/corredor';
 import { Usuario } from '../../../../shared/model/entity/usuario.model';
@@ -12,11 +12,12 @@ import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
   selector: 'app-corredor-editar',
+  standalone: true,
   imports: [FormsModule, CommonModule],
   templateUrl: './corredor-editar.component.html',
   styleUrl: './corredor-editar.component.css'
 })
-export class CorredorEditarComponent {
+export class CorredorEditarComponent implements OnInit {
 
   public corredor: Corredor = new Corredor();
   public idCorredor: number;
@@ -44,7 +45,9 @@ export class CorredorEditarComponent {
       (corredor) => {
         this.corredor = corredor;
         if (corredor.responsaveis && corredor.responsaveis.length > 0) {
-          this.responsavelSelecionado = corredor.responsaveis[0];
+          this.responsavelSelecionado = this.responsaveisDisponiveis.find(
+            r => r.id === corredor.responsaveis[0].id
+          ) || null;
         }
       },
       (erro) => {
@@ -58,6 +61,11 @@ export class CorredorEditarComponent {
     this.usuarioService.buscarTodos().subscribe(
       (responsaveis) => {
         this.responsaveisDisponiveis = responsaveis;
+        if (this.corredor.responsaveis && this.corredor.responsaveis.length > 0) {
+          this.responsavelSelecionado = responsaveis.find(
+            r => r.id === this.corredor.responsaveis[0].id
+          ) || null;
+        }
       },
       (erro) => {
         console.error('Erro ao carregar responsáveis:', erro);

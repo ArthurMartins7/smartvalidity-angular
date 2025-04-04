@@ -68,16 +68,10 @@ export class FornecedorEditarComponent implements OnInit {
       },
       error: (error: any) => {
         console.error('Erro ao atualizar fornecedor:', error);
-        let mensagemErro = 'Erro ao atualizar o fornecedor';
-
-        if (error.error && typeof error.error === 'string' && error.error.toLowerCase().includes('cnpj')) {
-          mensagemErro = 'CNPJ Inválido';
-        }
-
         Swal.fire({
           icon: 'error',
           title: 'Erro',
-          text: mensagemErro
+          text: 'Erro ao atualizar o fornecedor'
         });
       }
     });

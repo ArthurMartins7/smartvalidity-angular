@@ -20,7 +20,7 @@ export const routes: Routes = [
   { path: 'produto-listagem', component: ProdutoListagemComponent },
   { path: 'fornecedor-listagem', component: FornecedorListagemComponent },
   { path: 'fornecedor-detalhe', component: FornecedorDetalheComponent },
-  { path: 'fornecedor-editar', component: FornecedorEditarComponent },
+  { path: 'fornecedor-editar/:id', component: FornecedorEditarComponent },
   { path: 'entrada-estoque', component: EntradaEstoqueComponent },
   { path: 'categoria-detalhe', component: CategoriaDetalheComponent },
 

@@ -26,4 +26,8 @@ export class MuralService {
   getVencidos(): Observable<MuralItem[]> {
     return this.httpClient.get<MuralItem[]>(`${this.API}/vencidos`);
   }
+
+  marcarInspecionado(id: string): Observable<MuralItem> {
+    return this.httpClient.put<MuralItem>(`${this.API}/inspecionar/${id}`, {});
+  }
 }

@@ -15,4 +15,6 @@ export interface MuralItem {
   dataValidade: Date;
   lote: string;
   status: 'proximo' | 'hoje' | 'vencido';
+  inspecionado: boolean;
+  selecionado?: boolean; // Para controle de seleção no frontend
 }

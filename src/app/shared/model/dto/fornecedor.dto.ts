@@ -1,4 +1,5 @@
 import { EnderecoDTO } from "./endereco.dto";
+import { ProdutoDTO } from "./produto.dto";
 
 export class FornecedorDTO{
 
@@ -7,4 +8,5 @@ export class FornecedorDTO{
   telefone: string;
   cnpj: string;
   endereco: EnderecoDTO;
+  produtos: ProdutoDTO[];
 }

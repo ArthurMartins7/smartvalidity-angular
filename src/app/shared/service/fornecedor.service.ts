@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { FornecedorDTO } from '../model/dto/fornecedor.dto';
+import { Fornecedor } from '../model/entity/fornecedor';
 
 @Injectable({
   providedIn: 'root'
@@ -11,20 +11,20 @@ export class FornecedorService {
 
   constructor(private httpClient: HttpClient) { }
 
-  criarFornecedor(novoFornecedor: FornecedorDTO): Observable<FornecedorDTO> {
-    return this.httpClient.post<FornecedorDTO>(this.API, novoFornecedor);
+  criarFornecedor(novoFornecedor: Fornecedor): Observable<Fornecedor> {
+    return this.httpClient.post<Fornecedor>(this.API, novoFornecedor);
   }
 
-  listarTodos(): Observable<FornecedorDTO[]> {
-    return this.httpClient.get<FornecedorDTO[]>(this.API);
+  listarTodos(): Observable<Fornecedor[]> {
+    return this.httpClient.get<Fornecedor[]>(this.API);
   }
 
-  buscarPorId(id: number): Observable<FornecedorDTO> {
-    return this.httpClient.get<FornecedorDTO>(`${this.API}/${id}`);
+  buscarPorId(id: number): Observable<Fornecedor> {
+    return this.httpClient.get<Fornecedor>(`${this.API}/${id}`);
   }
 
-  atualizarFornecedor(id: number, fornecedorAtualizado: FornecedorDTO): Observable<FornecedorDTO> {
-    return this.httpClient.put<FornecedorDTO>(`${this.API}/${id}`, fornecedorAtualizado);
+  atualizarFornecedor(id: number, fornecedorAtualizado: Fornecedor): Observable<Fornecedor> {
+    return this.httpClient.put<Fornecedor>(`${this.API}/${id}`, fornecedorAtualizado);
   }
 
   excluirFornecedor(id: number): Observable<void> {

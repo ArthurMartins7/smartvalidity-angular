@@ -4,7 +4,6 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
 import { FornecedorService } from '../../../../shared/service/fornecedor.service';
-import { FornecedorDTO } from '../../../../shared/model/dto/fornecedor.dto';
 import Swal from 'sweetalert2';
 import { Fornecedor } from '../../../../shared/model/entity/fornecedor';
 import { Endereco } from '../../../../shared/model/entity/endereco';
@@ -37,8 +36,8 @@ export class FornecedorEditarComponent implements OnInit {
 
   carregarFornecedor(id: number): void {
     this.fornecedorService.buscarPorId(id).subscribe({
-      next: (fornecedorDTO: FornecedorDTO) => {
-        this.fornecedor = this.converterDTOParaModel(fornecedorDTO);
+      next: (fornecedor: Fornecedor) => {
+        this.fornecedor = fornecedor;
       },
       error: (error: any) => {
         console.error('Erro ao carregar fornecedor:', error);
@@ -54,9 +53,7 @@ export class FornecedorEditarComponent implements OnInit {
   atualizar(event: Event): void {
     event.preventDefault();
 
-    const fornecedorDTO = this.converterModelParaDTO(this.fornecedor);
-
-    this.fornecedorService.atualizarFornecedor(this.fornecedor.id!, fornecedorDTO).subscribe({
+    this.fornecedorService.atualizarFornecedor(this.fornecedor.id!, this.fornecedor).subscribe({
       next: () => {
         Swal.fire({
           icon: 'success',
@@ -79,25 +76,5 @@ export class FornecedorEditarComponent implements OnInit {
 
   voltar(): void {
     this.router.navigate(['/fornecedor-listagem']);
-  }
-
-  private converterDTOParaModel(dto: FornecedorDTO): Fornecedor {
-    const fornecedor = new Fornecedor();
-    fornecedor.id = dto.id;
-    fornecedor.cnpj = dto.cnpj;
-    fornecedor.nome = dto.nome;
-    fornecedor.telefone = dto.telefone;
-    fornecedor.endereco = dto.endereco;
-    return fornecedor;
-  }
-
-  private converterModelParaDTO(model: Fornecedor): FornecedorDTO {
-    return {
-      id: model.id,
-      cnpj: model.cnpj,
-      nome: model.nome,
-      telefone: model.telefone,
-      endereco: model.endereco
-    };
   }
 }

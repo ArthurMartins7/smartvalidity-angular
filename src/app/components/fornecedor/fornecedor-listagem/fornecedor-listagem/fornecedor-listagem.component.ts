@@ -14,27 +14,34 @@ import Swal from 'sweetalert2';
 })
 export class FornecedorListagemComponent implements OnInit {
 
-
     private fornecedorService = inject(FornecedorService);
     private router = inject(Router);
 
     public Fornecedor = new Fornecedor();
     public fornecedores: Fornecedor[] = [];
 
-
     ngOnInit(): void {
       this.buscarFornecedores();
     }
 
-
     public buscarFornecedores() {
       this.fornecedorService.listarTodos().subscribe(
         (resultado) => {
+          console.log('Dados brutos recebidos:', resultado);
           this.fornecedores = resultado;
-          console.log(this.fornecedores);
+          console.log('Fornecedores após atribuição:', this.fornecedores);
+
+          this.fornecedores.forEach((fornecedor, index) => {
+            console.log(`Fornecedor ${index + 1}:`, fornecedor);
+            console.log(`Nome: ${fornecedor.nome}`);
+            console.log(`Produtos do fornecedor ${fornecedor.nome}:`, fornecedor.produtos);
+            console.log(`Tipo de produtos:`, typeof fornecedor.produtos);
+            console.log(`É array?`, Array.isArray(fornecedor.produtos));
+            console.log(`Quantidade de produtos:`, fornecedor.produtos?.length);
+          });
         },
         (erro) => {
-          console.error('Erro ao consultar todos os fornecedores', erro.error.mensagem);
+          console.error('Erro ao consultar todos os fornecedores', erro);
         }
       );
     }

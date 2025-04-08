@@ -4,8 +4,8 @@ import Swal from 'sweetalert2';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { FornecedorService } from '../../../shared/service/fornecedor.service';
-import { FornecedorDTO } from '../../../shared/model/dto/fornecedor.dto';
-import { EnderecoDTO } from '../../../shared/model/dto/endereco.dto';
+import { Fornecedor } from '../../../shared/model/entity/fornecedor';
+import { Endereco } from '../../../shared/model/entity/endereco';
 
 @Component({
   selector: 'app-fornecedor-detalhe',
@@ -16,7 +16,7 @@ import { EnderecoDTO } from '../../../shared/model/dto/endereco.dto';
 })
 export class FornecedorDetalheComponent implements OnInit {
 
-  public fornecedor: FornecedorDTO = new FornecedorDTO();
+  public fornecedor: Fornecedor = new Fornecedor();
   public idFornecedor: number;
   public secaoAtiva: 'dadosGerais' | 'endereco' = 'dadosGerais';
 
@@ -24,7 +24,7 @@ export class FornecedorDetalheComponent implements OnInit {
               private router: Router,
               private route: ActivatedRoute) {
     // Initialize endereco when creating a new Fornecedor
-    this.fornecedor.endereco = new EnderecoDTO();
+    this.fornecedor.endereco = new Endereco();
   }
 
   ngOnInit(): void {

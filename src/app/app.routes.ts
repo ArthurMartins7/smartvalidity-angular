@@ -6,16 +6,15 @@ import { CorredorDetalheComponent } from './components/corredor/corredor-detalhe
 import { ProdutoListagemComponent } from './components/produto/produto-listagem/produto-listagem.component';
 import { MuralListagemComponent } from './components/mural/mural-listagem/mural-listagem.component';
 import { MuralDetalheComponent } from './components/mural/mural-detalhe/mural-detalhe.component';
+import { EntradaEstoqueComponent } from './components/entrada-estoque/entrada-estoque.component';
 
 export const routes: Routes = [
-  // Auth routes (without sidebar)
-  { path: 'login', component: LoginComponent },
+  { path: '', component: LoginComponent },
   { path: 'register', component: RegisterComponent },
-
-  // Main routes (with sidebar)
   { path: 'corredor', component: CorredorListagemComponent },
   { path: 'corredor-detalhe', component: CorredorDetalheComponent },
   { path: 'produto-listagem', component: ProdutoListagemComponent },
+  { path: 'entrada-estoque', component: EntradaEstoqueComponent },
 
   // Catch all route
   { path: 'corredor-detalhe', component: CorredorDetalheComponent },

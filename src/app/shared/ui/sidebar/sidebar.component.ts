@@ -23,9 +23,9 @@ export class SidebarComponent {
 
   menuItems: MenuItem[] = [
     { id: 'mural', icon: 'dashboard', label: 'Mural', route: '/mural-listagem' },
-    { id: 'estoque', icon: 'inventory', label: 'Estoque', route: '/estoque' },
-    { id: 'layout', icon: 'grid_view', label: 'Layout', route: '/layout' },
-    { id: 'fornecedores', icon: 'business', label: 'Fornecedores', route: '/fornecedores' },
+    { id: 'estoque', icon: 'inventory', label: 'Estoque', route: '/entrada-estoque' },
+    { id: 'layout', icon: 'grid_view', label: 'Layout', route: '/corredor' },
+    { id: 'fornecedores', icon: 'business', label: 'Fornecedores', route: '/fornecedor-listagem' },
   ];
 
   additionalItems: MenuItem[] = [
@@ -35,7 +35,7 @@ export class SidebarComponent {
   ];
 
   userOptions: MenuItem[] = [
-    { id: 'entrar', icon: 'account_circle', label: 'Entrar', route: '/login' },
+    { id: 'entrar', icon: 'account_circle', label: 'Entrar', route: '/' },
     { id: 'idioma', icon: 'language', label: 'Português', route: '/idioma' },
   ];
 

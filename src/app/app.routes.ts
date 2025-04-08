@@ -19,5 +19,5 @@ export const routes: Routes = [
   // Catch all route
   { path: 'corredor-detalhe', component: CorredorDetalheComponent },
   { path: 'mural-listagem', component: MuralListagemComponent },
-  { path: 'mural-detalhe', component: MuralDetalheComponent }
+  { path: 'mural-detalhe/:id', component: MuralDetalheComponent }
 ];

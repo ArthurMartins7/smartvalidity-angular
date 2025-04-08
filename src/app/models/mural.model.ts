@@ -13,7 +13,10 @@ export interface MuralItem {
   corredor: string;
   fornecedor: string;
   dataValidade: Date;
+  dataFabricacao?: Date;
+  dataRecebimento?: Date;
   lote: string;
+  precoVenda?: number;
   status: 'proximo' | 'hoje' | 'vencido';
   inspecionado: boolean;
   selecionado?: boolean; // Para controle de seleção no frontend

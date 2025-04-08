@@ -30,4 +30,12 @@ export class MuralService {
   marcarInspecionado(id: string): Observable<MuralItem> {
     return this.httpClient.put<MuralItem>(`${this.API}/inspecionar/${id}`, {});
   }
+
+  marcarVariosInspecionados(ids: string[]): Observable<MuralItem[]> {
+    return this.httpClient.put<MuralItem[]>(`${this.API}/inspecionar-lote`, ids);
+  }
+
+  getItemById(id: string): Observable<MuralItem> {
+    return this.httpClient.get<MuralItem>(`${this.API}/item/${id}`);
+  }
 }

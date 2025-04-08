@@ -1,1 +1,99 @@
-<p>mural-detalhe works!</p>
+<div class="container mx-auto p-4">
+  <!-- Cabeçalho com navegação -->
+  <div class="mb-6">
+    <div class="flex items-center mb-2">
+      <button class="text-blue-600 mr-3" [routerLink]="['/mural-listagem']" [queryParams]="{tab: activeTab}">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+        </svg>
+      </button>
+      <div>
+        <h5 class="text-gray-500 text-sm">Produtos vencidos</h5>
+        <h2 class="text-xl font-bold">Inspecionar</h2>
+      </div>
+    </div>
+    <div class="w-full bg-black h-1 mt-2"></div>
+  </div>
+
+  <!-- Conteúdo de Loading -->
+  <div *ngIf="loading" class="flex justify-center items-center py-12">
+    <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+  </div>
+
+  <!-- Mensagem de erro -->
+  <div *ngIf="error" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+    <p>{{ error }}</p>
+  </div>
+
+  <!-- Detalhes do produto -->
+  <div *ngIf="item && !loading" class="bg-white rounded-lg shadow-md p-6 max-w-3xl mx-auto border border-gray-200">
+    <h3 class="text-xl font-bold text-center text-gray-700 mb-6">Detalhes</h3>
+
+    <div class="mb-8 space-y-6">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="flex flex-col">
+          <p class="font-bold text-gray-800 text-sm uppercase">CÓDIGO DE BARRAS:</p>
+          <p class="text-gray-700">{{ item.produto?.codigoBarras }}</p>
+        </div>
+
+        <div class="flex flex-col">
+          <p class="font-bold text-gray-800 text-sm uppercase">MARCA:</p>
+          <p class="text-gray-700">{{ item.produto?.marca }}</p>
+        </div>
+      </div>
+
+      <div class="flex flex-col">
+        <p class="font-bold text-gray-800 text-sm uppercase">DESCRIÇÃO:</p>
+        <p class="text-gray-700">{{ item.produto?.descricao }}</p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="flex flex-col">
+          <p class="font-bold text-gray-800 text-sm uppercase">UNIDADE DE MEDIDA:</p>
+          <p class="text-gray-700">{{ item.produto?.unidadeMedida }}</p>
+        </div>
+
+        <div class="flex flex-col">
+          <p class="font-bold text-gray-800 text-sm uppercase">LOTE:</p>
+          <p class="text-gray-700">{{ item.lote }}</p>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="flex flex-col">
+          <p class="font-bold text-gray-800 text-sm uppercase">PREÇO DE VENDA:</p>
+          <p class="text-gray-700">R$ {{ item.precoVenda | number:'1.2-2' }}</p>
+        </div>
+
+        <div class="flex flex-col">
+          <p class="font-bold text-gray-800 text-sm uppercase">DATA DE RECEBIMENTO:</p>
+          <p class="text-gray-700">{{ item.dataRecebimento | date:'dd/MM/yyyy' }}</p>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="flex flex-col">
+          <p class="font-bold text-gray-800 text-sm uppercase">DATA DE FABRICAÇÃO:</p>
+          <p class="text-gray-700">{{ item.dataFabricacao | date:'dd/MM/yyyy: HH:mm:ss' }}</p>
+        </div>
+
+        <div class="flex flex-col">
+          <p class="font-bold text-gray-800 text-sm uppercase">DATA DE VENCIMENTO:</p>
+          <p class="text-gray-700">{{ item.dataValidade | date:'dd/MM/yyyy: HH:mm:ss' }}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Botão para marcar como inspecionado -->
+    <div class="flex justify-center mt-8">
+      <button
+        (click)="marcarInspecionado()"
+        class="flex items-center bg-blue-600 text-white px-6 py-3 rounded-md hover:bg-blue-700 transition-colors focus:outline-none">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+        </svg>
+        Marcar como inspecionado
+      </button>
+    </div>
+  </div>
+</div>

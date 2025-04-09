@@ -30,12 +30,27 @@
       </div>
     </div>
 
-    <!-- Botão para adicionar fornecedor -->
-    <div class="mb-4">
+    <!-- Adicione este código antes da tabela -->
+    <div class="flex justify-between items-center mb-4">
+      <!-- Botão para adicionar fornecedor -->
       <button (click)="adicionarFornecedor()" class="bg-white hover:bg-gray-50 text-gray-800 px-4 py-2 rounded-full flex items-center transition-all transform hover:scale-105 shadow-sm hover:shadow-md border border-gray-200">
         <span class="mr-2 text-xl font-semibold">+</span>
         <span class="font-medium">Adicionar Fornecedor</span>
       </button>
+
+      <!-- Seletor de itens por página -->
+      <div class="flex items-center gap-2">
+        <label for="itensPorPagina" class="text-sm text-gray-600">Itens por página:</label>
+        <select
+          id="itensPorPagina"
+          [(ngModel)]="itensPorPagina"
+          (ngModelChange)="alterarItensPorPagina()"
+          class="bg-white border border-gray-300 text-gray-700 py-2 px-4 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+          <option *ngFor="let opcao of opcoesItensPorPagina" [value]="opcao">
+            {{ opcao }}
+          </option>
+        </select>
+      </div>
     </div>
 
     <!-- Container da tabela -->

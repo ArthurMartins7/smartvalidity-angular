@@ -19,6 +19,8 @@ export class FornecedorListagemComponent implements OnInit {
   public fornecedores: Fornecedor[] = [];
   public totalPaginas: number = 0;
   public tamanhoPagina: number = 5;
+  public opcoesItensPorPagina: number[] = [5, 10, 15, 20, 25, 50];
+  public itensPorPagina: number = 5;
 
   constructor(
     private fornecedorService: FornecedorService,
@@ -27,7 +29,7 @@ export class FornecedorListagemComponent implements OnInit {
 
   ngOnInit(): void {
     this.seletor.pagina = 1;
-    this.seletor.limite = this.tamanhoPagina; // Define o limite no seletor
+    this.seletor.limite = this.itensPorPagina;
     this.buscarFornecedores();
   }
 
@@ -46,7 +48,7 @@ export class FornecedorListagemComponent implements OnInit {
   private calcularTotalPaginas(): void {
     this.fornecedorService.contarTotalRegistros(this.seletor).subscribe(
       (total) => {
-        this.totalPaginas = Math.ceil(total / this.tamanhoPagina);
+        this.totalPaginas = Math.ceil(total / this.itensPorPagina);
       },
       (erro) => {
         console.error('Erro ao contar total de registros', erro);
@@ -116,5 +118,11 @@ export class FornecedorListagemComponent implements OnInit {
       paginas.push(i);
     }
     return paginas;
+  }
+
+  public alterarItensPorPagina() {
+    this.seletor.limite = this.itensPorPagina;
+    this.seletor.pagina = 1; // Volta para a primeira página
+    this.buscarFornecedores();
   }
 }

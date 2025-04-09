@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Fornecedor } from '../model/entity/fornecedor';
 import { FornecedorSeletor } from '../model/seletor/fornecedor.seletor';
+import { Corredor } from '../model/entity/corredor';
 
 @Injectable({
   providedIn: 'root'
@@ -42,5 +43,9 @@ export class FornecedorService {
 
   excluirFornecedor(id: number): Observable<void> {
     return this.httpClient.delete<void>(`${this.API}/${id}`);
+  }
+
+  buscarCorredoresPorFornecedor(fornecedorId: number): Observable<Corredor[]> {
+    return this.httpClient.get<Corredor[]>(`${this.API}/${fornecedorId}/corredores`);
   }
 }

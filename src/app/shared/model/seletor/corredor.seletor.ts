@@ -1,7 +1,9 @@
-import { BaseSeletor } from "./base.seletor";
+import { BaseSeletor } from './base.seletor';
 
 export class CorredorSeletor extends BaseSeletor {
-  nomeCorredor: string;
-  responsavelCorredor: string;
-
+  nome: string = '';
+  responsavel: string = '';
+  responsavelId: string | null = null;
+  override pagina: number = 1;
+  override limite: number = 5;
 }

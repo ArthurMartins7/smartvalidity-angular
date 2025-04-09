@@ -19,5 +19,6 @@ export interface MuralItem {
   precoVenda?: number;
   status: 'proximo' | 'hoje' | 'vencido';
   inspecionado: boolean;
+  motivoInspecao?: string;
   selecionado?: boolean; // Para controle de seleção no frontend
 }

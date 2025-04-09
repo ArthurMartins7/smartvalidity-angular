@@ -1,11 +1,15 @@
 import { CommonModule } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
+import { Subscription } from 'rxjs';
 import { MuralItem } from '../../../models/mural.model';
 import { MuralService } from '../../../services/mural.service';
 
+/**
+ * Componente para listagem e gestão dos itens no mural de validade
+ */
 @Component({
   selector: 'app-mural-listagem',
   standalone: true,
@@ -13,45 +17,85 @@ import { MuralService } from '../../../services/mural.service';
   templateUrl: './mural-listagem.component.html',
   styleUrl: './mural-listagem.component.css'
 })
-export class MuralListagemComponent implements OnInit {
-  // Dados principais
+export class MuralListagemComponent implements OnInit, OnDestroy {
+  // -------------------- Propriedades Principais --------------------
+  /** Lista de todos os itens carregados */
   items: MuralItem[] = [];
+
+  /** Lista de itens filtrados atualmente visíveis */
   filteredItems: MuralItem[] = [];
+
+  /** Aba ativa atual */
   activeTab: 'proximo' | 'hoje' | 'vencido' = 'proximo';
 
-  // Pesquisa e ordenação
+  /** Termo de pesquisa para filtrar itens */
   searchTerm: string = '';
+
+  /** Direção de ordenação atual */
   sortDirection: 'asc' | 'desc' = 'asc';
 
-  // Filtros básicos
+  // -------------------- Filtros --------------------
+  /** Filtro de data */
   dateFilter = {
     startDate: '',
     endDate: ''
   };
+
+  /** Filtro de marca */
   brandFilter: string = '';
+
+  /** Marcas disponíveis para filtro */
   availableBrands: string[] = [];
 
-  // Modal e filtros avançados
-  showFilterModal: boolean = false;
+  /** Corredores disponíveis para filtro */
   availableCorredores: string[] = [];
+
+  /** Categorias disponíveis para filtro */
   availableCategorias: string[] = [];
+
+  /** Fornecedores disponíveis para filtro */
   availableFornecedores: string[] = [];
+
+  /** Lotes disponíveis para filtro */
   availableLotes: string[] = [];
 
-  // Controle para dropdowns personalizados
+  // -------------------- Controle de UI --------------------
+  /** Visibilidade do modal de filtros avançados */
+  showFilterModal: boolean = false;
+
+  /** Visibilidade do dropdown de marca */
   showMarcaDropdown: boolean = false;
+
+  /** Visibilidade do dropdown de fornecedor */
   showFornecedorDropdown: boolean = false;
+
+  /** Visibilidade do dropdown de lote */
   showLoteDropdown: boolean = false;
+
+  /** Visibilidade do dropdown de corredor */
   showCorredorDropdown: boolean = false;
+
+  /** Visibilidade do dropdown de categoria */
   showCategoriaDropdown: boolean = false;
 
-  // Listas filtradas para os dropdowns
+  // -------------------- Listas Filtradas --------------------
+  /** Lista filtrada de marcas para dropdown */
   filteredBrands: string[] = [];
+
+  /** Lista filtrada de fornecedores para dropdown */
   filteredFornecedores: string[] = [];
+
+  /** Lista filtrada de lotes para dropdown */
   filteredLotes: string[] = [];
+
+  /** Lista filtrada de corredores para dropdown */
   filteredCorredores: string[] = [];
+
+  /** Lista filtrada de categorias para dropdown */
   filteredCategorias: string[] = [];
 
+  // -------------------- Filtros Avançados --------------------
+  /** Configuração de filtros avançados */
   advancedFilters = {
     corredor: '',
     categoria: '',
@@ -72,25 +116,74 @@ export class MuralListagemComponent implements OnInit {
     }
   };
 
+  /** Subscriptions para gerenciar unsubscribe */
+  private subscriptions: Subscription[] = [];
+
+  // -------------------- Propriedades para Modal de Filtro --------------------
+  showInspecaoModal = false;
+
+  // -------------------- Propriedades para Dropdown de Motivo de Inspeção --------------------
+  motivoInspecao: string = '';
+  motivosInspecao: string[] = ['Avaria/Quebra', 'Promoção'];
+  itensSelecionados: string[] = [];
+  motivoInspecaoError: string | null = null;
+
+  /**
+   * Construtor do componente
+   */
   constructor(
     private muralService: MuralService,
     private route: ActivatedRoute,
     private router: Router
   ) {
     // Adicionar um listener para fechar os dropdowns quando o usuário clica fora deles
-    document.addEventListener('click', (event) => {
-      const target = event.target as HTMLElement;
-      if (!target.closest('.dropdown-container')) {
-        this.showMarcaDropdown = false;
-        this.showFornecedorDropdown = false;
-        this.showLoteDropdown = false;
-        this.showCorredorDropdown = false;
-        this.showCategoriaDropdown = false;
-      }
-    });
+    document.addEventListener('click', this.handleOutsideClick.bind(this));
   }
 
-  ngOnInit() {
+  /**
+   * Handler para fechar dropdowns quando o usuário clica fora deles
+   */
+  private handleOutsideClick(event: MouseEvent): void {
+    const target = event.target as HTMLElement;
+    if (!target.closest('.dropdown-container')) {
+      this.closeAllDropdowns();
+    }
+  }
+
+  /**
+   * Fecha todos os dropdowns abertos
+   */
+  private closeAllDropdowns(): void {
+    this.showMarcaDropdown = false;
+    this.showFornecedorDropdown = false;
+    this.showLoteDropdown = false;
+    this.showCorredorDropdown = false;
+    this.showCategoriaDropdown = false;
+  }
+
+  /**
+   * Inicialização do componente
+   */
+  ngOnInit(): void {
+    this.initializeFromRouting();
+    this.loadFilterOptions();
+  }
+
+  /**
+   * Limpeza ao destruir o componente
+   */
+  ngOnDestroy(): void {
+    // Remover event listener para evitar memory leaks
+    document.removeEventListener('click', this.handleOutsideClick.bind(this));
+
+    // Cancelar todas as subscriptions ativas
+    this.subscriptions.forEach(sub => sub.unsubscribe());
+  }
+
+  /**
+   * Inicializa o componente com base nos parâmetros de rota
+   */
+  private initializeFromRouting(): void {
     // Primeiro verificamos se há um state com a aba ativa
     const navigation = this.router.getCurrentNavigation();
     if (navigation?.extras.state && 'activeTab' in navigation.extras.state) {
@@ -98,54 +191,56 @@ export class MuralListagemComponent implements OnInit {
       this.loadItems();
     } else {
       // Se não houver estado, verificamos os parâmetros da URL
-      this.route.queryParams.subscribe(params => {
+      const subscription = this.route.queryParams.subscribe(params => {
         if (params['tab']) {
           this.activeTab = params['tab'] as 'proximo' | 'hoje' | 'vencido';
         }
         this.loadItems();
       });
+      this.subscriptions.push(subscription);
     }
-    this.loadFilterOptions();
   }
 
-  loadItems() {
+  /**
+   * Carrega os itens com base na aba ativa
+   */
+  loadItems(): void {
+    let serviceCall;
     switch (this.activeTab) {
       case 'proximo':
-        this.muralService.getProximosVencer().subscribe({
-          next: (items) => {
-            this.items = items.filter(item => !item.inspecionado);
-            this.extractAvailableFilterOptions();
-            this.applyFilter();
-          },
-          error: (error) => console.error('Erro ao carregar próximos a vencer:', error)
-        });
+        serviceCall = this.muralService.getProximosVencer();
         break;
       case 'hoje':
-        this.muralService.getVencemHoje().subscribe({
-          next: (items) => {
-            this.items = items.filter(item => !item.inspecionado);
-            this.extractAvailableFilterOptions();
-            this.applyFilter();
-          },
-          error: (error) => console.error('Erro ao carregar vencem hoje:', error)
-        });
+        serviceCall = this.muralService.getVencemHoje();
         break;
       case 'vencido':
-        this.muralService.getVencidos().subscribe({
-          next: (items) => {
-            this.items = items.filter(item => !item.inspecionado);
-            this.extractAvailableFilterOptions();
-            this.applyFilter();
-          },
-          error: (error) => console.error('Erro ao carregar vencidos:', error)
-        });
+        serviceCall = this.muralService.getVencidos();
         break;
     }
+
+    const subscription = serviceCall.subscribe({
+      next: (items) => {
+        // Garantir que todos os itens sejam exibidos, incluindo os inspecionados
+        // e que o valor de inspecionado esteja definido corretamente
+        this.items = items.map(item => {
+          if (item.inspecionado === undefined || item.inspecionado === null) {
+            item.inspecionado = false;
+          }
+          return item;
+        });
+        this.extractAvailableFilterOptions();
+        this.applyFilter();
+      },
+      error: (error) => console.error(`Erro ao carregar itens de ${this.activeTab}:`, error)
+    });
+
+    this.subscriptions.push(subscription);
   }
 
-  // Extrair todas as opções disponíveis para os filtros
-  extractAvailableFilterOptions() {
-    // Extrair marcas
+  /**
+   * Extrai as opções disponíveis para os filtros a partir dos itens carregados
+   */
+  extractAvailableFilterOptions(): void {
     const brands = new Set<string>();
     const corredores = new Set<string>();
     const categorias = new Set<string>();
@@ -153,21 +248,11 @@ export class MuralListagemComponent implements OnInit {
     const lotes = new Set<string>();
 
     this.items.forEach(item => {
-      if (item.produto?.marca) {
-        brands.add(item.produto.marca);
-      }
-      if (item.corredor) {
-        corredores.add(item.corredor);
-      }
-      if (item.categoria) {
-        categorias.add(item.categoria);
-      }
-      if (item.fornecedor) {
-        fornecedores.add(item.fornecedor);
-      }
-      if (item.lote) {
-        lotes.add(item.lote);
-      }
+      if (item.produto?.marca) brands.add(item.produto.marca);
+      if (item.corredor) corredores.add(item.corredor);
+      if (item.categoria) categorias.add(item.categoria);
+      if (item.fornecedor) fornecedores.add(item.fornecedor);
+      if (item.lote) lotes.add(item.lote);
     });
 
     this.availableBrands = Array.from(brands).sort();
@@ -175,9 +260,26 @@ export class MuralListagemComponent implements OnInit {
     this.availableCategorias = Array.from(categorias).sort();
     this.availableFornecedores = Array.from(fornecedores).sort();
     this.availableLotes = Array.from(lotes).sort();
+
+    // Atualizar as listas filtradas
+    this.updateFilteredLists();
   }
 
-  setActiveTab(tab: 'proximo' | 'hoje' | 'vencido') {
+  /**
+   * Atualiza as listas filtradas para os dropdowns
+   */
+  private updateFilteredLists(): void {
+    this.filteredBrands = [...this.availableBrands];
+    this.filteredFornecedores = [...this.availableFornecedores];
+    this.filteredLotes = [...this.availableLotes];
+    this.filteredCorredores = [...this.availableCorredores];
+    this.filteredCategorias = [...this.availableCategorias];
+  }
+
+  /**
+   * Define a aba ativa e carrega os itens correspondentes
+   */
+  setActiveTab(tab: 'proximo' | 'hoje' | 'vencido'): void {
     this.activeTab = tab;
     // Atualiza a URL sem recarregar a página
     this.router.navigate([], {
@@ -189,8 +291,10 @@ export class MuralListagemComponent implements OnInit {
     this.loadItems();
   }
 
-  // Função para aplicar filtros
-  applyFilter() {
+  /**
+   * Aplica os filtros aos itens e atualiza a lista filtrada
+   */
+  applyFilter(): void {
     let filtered = [...this.items];
 
     // Filtro de pesquisa textual
@@ -203,158 +307,225 @@ export class MuralListagemComponent implements OnInit {
       );
     }
 
-    // Filtro de marca
-    if (this.advancedFilters.marca) {
-      filtered = filtered.filter(item =>
-        item.produto?.marca === this.advancedFilters.marca
-      );
-    }
-
-    // Filtro de corredor
-    if (this.advancedFilters.corredor) {
-      filtered = filtered.filter(item => item.corredor === this.advancedFilters.corredor);
-    }
-
-    // Filtro de categoria
-    if (this.advancedFilters.categoria) {
-      filtered = filtered.filter(item => item.categoria === this.advancedFilters.categoria);
-    }
-
-    // Filtro de fornecedor
-    if (this.advancedFilters.fornecedor) {
-      filtered = filtered.filter(item => item.fornecedor === this.advancedFilters.fornecedor);
-    }
-
-    // Filtro de lote
-    if (this.advancedFilters.lote) {
-      filtered = filtered.filter(item => item.lote && item.lote.toLowerCase().includes(this.advancedFilters.lote.toLowerCase()));
-    }
-
-    // Filtro de data de vencimento
-    if (this.advancedFilters.dataVencimento.startDate) {
-      const startDate = new Date(this.advancedFilters.dataVencimento.startDate);
-      startDate.setHours(0, 0, 0, 0);
-      filtered = filtered.filter(item => {
-        const itemDate = new Date(item.dataValidade);
-        return itemDate >= startDate;
-      });
-    }
-
-    if (this.advancedFilters.dataVencimento.endDate) {
-      const endDate = new Date(this.advancedFilters.dataVencimento.endDate);
-      endDate.setHours(23, 59, 59, 999);
-      filtered = filtered.filter(item => {
-        const itemDate = new Date(item.dataValidade);
-        return itemDate <= endDate;
-      });
-    }
-
-    // Filtro de data de fabricação
-    if (this.advancedFilters.dataFabricacao.startDate) {
-      const startDate = new Date(this.advancedFilters.dataFabricacao.startDate);
-      startDate.setHours(0, 0, 0, 0);
-      filtered = filtered.filter(item => {
-        if (!item.dataFabricacao) return false;
-        const itemDate = new Date(item.dataFabricacao);
-        return itemDate >= startDate;
-      });
-    }
-
-    if (this.advancedFilters.dataFabricacao.endDate) {
-      const endDate = new Date(this.advancedFilters.dataFabricacao.endDate);
-      endDate.setHours(23, 59, 59, 999);
-      filtered = filtered.filter(item => {
-        if (!item.dataFabricacao) return false;
-        const itemDate = new Date(item.dataFabricacao);
-        return itemDate <= endDate;
-      });
-    }
-
-    // Filtro de data de recebimento
-    if (this.advancedFilters.dataRecebimento.startDate) {
-      const startDate = new Date(this.advancedFilters.dataRecebimento.startDate);
-      startDate.setHours(0, 0, 0, 0);
-      filtered = filtered.filter(item => {
-        if (!item.dataRecebimento) return false;
-        const itemDate = new Date(item.dataRecebimento);
-        return itemDate >= startDate;
-      });
-    }
-
-    if (this.advancedFilters.dataRecebimento.endDate) {
-      const endDate = new Date(this.advancedFilters.dataRecebimento.endDate);
-      endDate.setHours(23, 59, 59, 999);
-      filtered = filtered.filter(item => {
-        if (!item.dataRecebimento) return false;
-        const itemDate = new Date(item.dataRecebimento);
-        return itemDate <= endDate;
-      });
-    }
+    // Aplicar filtros avançados
+    filtered = this.applyAdvancedFiltersToItems(filtered);
 
     this.filteredItems = filtered;
     this.sortItems();
   }
 
-  // Função para abrir o modal de filtros avançados
-  openFilterModal() {
+  /**
+   * Aplica os filtros avançados a uma lista de itens
+   */
+  private applyAdvancedFiltersToItems(items: MuralItem[]): MuralItem[] {
+    let filtered = [...items];
+    const filters = this.advancedFilters;
+
+    // Filtros de texto
+    if (filters.marca) {
+      filtered = filtered.filter(item => item.produto?.marca === filters.marca);
+    }
+    if (filters.corredor) {
+      filtered = filtered.filter(item => item.corredor === filters.corredor);
+    }
+    if (filters.categoria) {
+      filtered = filtered.filter(item => item.categoria === filters.categoria);
+    }
+    if (filters.fornecedor) {
+      filtered = filtered.filter(item => item.fornecedor === filters.fornecedor);
+    }
+    if (filters.lote) {
+      filtered = filtered.filter(item =>
+        item.lote && item.lote.toLowerCase().includes(filters.lote.toLowerCase())
+      );
+    }
+
+    // Filtros de data
+    filtered = this.applyDateFilters(filtered);
+
+    return filtered;
+  }
+
+  /**
+   * Aplica os filtros de data aos itens
+   */
+  private applyDateFilters(items: MuralItem[]): MuralItem[] {
+    let filtered = [...items];
+    const filters = this.advancedFilters;
+
+    // Data de vencimento
+    if (filters.dataVencimento.startDate) {
+      const startDate = new Date(filters.dataVencimento.startDate);
+      startDate.setHours(0, 0, 0, 0);
+      filtered = filtered.filter(item => {
+        const itemDate = new Date(item.dataValidade);
+        return itemDate >= startDate;
+      });
+    }
+
+    if (filters.dataVencimento.endDate) {
+      const endDate = new Date(filters.dataVencimento.endDate);
+      endDate.setHours(23, 59, 59, 999);
+      filtered = filtered.filter(item => {
+        const itemDate = new Date(item.dataValidade);
+        return itemDate <= endDate;
+      });
+    }
+
+    // Data de fabricação
+    if (filters.dataFabricacao.startDate) {
+      const startDate = new Date(filters.dataFabricacao.startDate);
+      startDate.setHours(0, 0, 0, 0);
+      filtered = filtered.filter(item => {
+        if (!item.dataFabricacao) return false;
+        const itemDate = new Date(item.dataFabricacao);
+        return itemDate >= startDate;
+      });
+    }
+
+    if (filters.dataFabricacao.endDate) {
+      const endDate = new Date(filters.dataFabricacao.endDate);
+      endDate.setHours(23, 59, 59, 999);
+      filtered = filtered.filter(item => {
+        if (!item.dataFabricacao) return false;
+        const itemDate = new Date(item.dataFabricacao);
+        return itemDate <= endDate;
+      });
+    }
+
+    // Data de recebimento
+    if (filters.dataRecebimento.startDate) {
+      const startDate = new Date(filters.dataRecebimento.startDate);
+      startDate.setHours(0, 0, 0, 0);
+      filtered = filtered.filter(item => {
+        if (!item.dataRecebimento) return false;
+        const itemDate = new Date(item.dataRecebimento);
+        return itemDate >= startDate;
+      });
+    }
+
+    if (filters.dataRecebimento.endDate) {
+      const endDate = new Date(filters.dataRecebimento.endDate);
+      endDate.setHours(23, 59, 59, 999);
+      filtered = filtered.filter(item => {
+        if (!item.dataRecebimento) return false;
+        const itemDate = new Date(item.dataRecebimento);
+        return itemDate <= endDate;
+      });
+    }
+
+    return filtered;
+  }
+
+  // -------------------- Métodos do Modal de Filtros --------------------
+
+  /**
+   * Abre o modal de filtros avançados
+   */
+  openFilterModal(): void {
     this.showFilterModal = true;
   }
 
-  // Função para fechar o modal de filtros avançados
-  closeFilterModal() {
+  /**
+   * Fecha o modal de filtros avançados
+   */
+  closeFilterModal(): void {
     this.showFilterModal = false;
-    this.showMarcaDropdown = false;
-    this.showFornecedorDropdown = false;
-    this.showLoteDropdown = false;
-    this.showCorredorDropdown = false;
-    this.showCategoriaDropdown = false;
+    this.closeAllDropdowns();
   }
 
-  // Função para limpar todos os filtros avançados
-  resetFilters() {
+  /**
+   * Reseta todos os filtros avançados para seus valores padrão
+   */
+  resetFilters(): void {
     this.advancedFilters = {
       corredor: '',
       categoria: '',
       fornecedor: '',
       marca: '',
       lote: '',
-      dataVencimento: {
-        startDate: '',
-        endDate: ''
-      },
-      dataFabricacao: {
-        startDate: '',
-        endDate: ''
-      },
-      dataRecebimento: {
-        startDate: '',
-        endDate: ''
-      }
+      dataVencimento: { startDate: '', endDate: '' },
+      dataFabricacao: { startDate: '', endDate: '' },
+      dataRecebimento: { startDate: '', endDate: '' }
     };
   }
 
-  // Função para alternar a direção da ordenação
-  toggleSortOrder() {
+  /**
+   * Aplica os filtros avançados e fecha o modal
+   */
+  applyAdvancedFilters(): void {
+    this.applyFilter();
+    this.closeFilterModal();
+  }
+
+  /**
+   * Verifica se há filtros aplicados
+   */
+  hasAppliedFilters(): boolean {
+    const f = this.advancedFilters;
+    return !!(f.marca || f.corredor || f.categoria || f.fornecedor || f.lote ||
+           f.dataVencimento.startDate || f.dataVencimento.endDate ||
+           f.dataFabricacao.startDate || f.dataFabricacao.endDate ||
+           f.dataRecebimento.startDate || f.dataRecebimento.endDate);
+  }
+
+  /**
+   * Limpa um filtro específico
+   */
+  clearFilter(filterName: string): void {
+    if (filterName in this.advancedFilters) {
+      (this.advancedFilters as any)[filterName] = '';
+      this.applyFilter();
+    }
+  }
+
+  /**
+   * Limpa os filtros de data
+   */
+  clearDateFilter(): void {
+    this.advancedFilters.dataVencimento.startDate = '';
+    this.advancedFilters.dataVencimento.endDate = '';
+    this.applyFilter();
+  }
+
+  /**
+   * Reseta todos os filtros e aplica as mudanças
+   */
+  resetAllFilters(): void {
+    this.resetFilters();
+    this.applyFilter();
+  }
+
+  // -------------------- Métodos de Ordenação --------------------
+
+  /**
+   * Alterna entre ordenação ascendente e descendente
+   */
+  toggleSortOrder(): void {
     this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';
     this.sortItems();
   }
 
-  // Função para ordenar os itens
-  sortItems() {
+  /**
+   * Ordena os itens filtrados conforme a direção atual
+   */
+  sortItems(): void {
     this.filteredItems.sort((a, b) => {
       const descA = a.produto?.descricao?.toLowerCase() || '';
       const descB = b.produto?.descricao?.toLowerCase() || '';
 
-      if (this.sortDirection === 'asc') {
-        return descA.localeCompare(descB);
-      } else {
-        return descB.localeCompare(descA);
-      }
+      return this.sortDirection === 'asc'
+        ? descA.localeCompare(descB)
+        : descB.localeCompare(descA);
     });
   }
 
-  // Função para selecionar/desselecionar todos os itens
-  selectAll(event: Event) {
+  // -------------------- Métodos de Seleção --------------------
+
+  /**
+   * Seleciona ou desmarca todos os itens
+   */
+  selectAll(event: Event): void {
     const target = event.target as HTMLInputElement;
     const checked = target.checked;
 
@@ -363,328 +534,266 @@ export class MuralListagemComponent implements OnInit {
     });
   }
 
-  // Verificar se há itens selecionados
+  /**
+   * Verifica se há itens selecionados
+   */
   hasSelectedItems(): boolean {
     return this.filteredItems.some(item => item.selecionado);
   }
 
-  // Obter o número de itens selecionados
+  /**
+   * Retorna o número de itens selecionados
+   */
   getSelectedItemsCount(): number {
     return this.filteredItems.filter(item => item.selecionado).length;
   }
 
-  // Marcar todos os itens selecionados como inspecionados
-  marcarSelecionadosComoInspecionados() {
-    const selectedItems = this.filteredItems.filter(item => item.selecionado);
-    if (selectedItems.length === 0) return;
-
-    // Extrair apenas os IDs dos itens selecionados
-    const selectedIds = selectedItems.map(item => item.id);
-
-    // Usar o novo endpoint para marcar vários itens de uma vez
-    this.muralService.marcarVariosInspecionados(selectedIds).subscribe({
-      next: () => {
-        // Remover os itens inspecionados da lista
-        this.items = this.items.filter(item =>
-          !selectedIds.includes(item.id)
-        );
-        this.applyFilter();
-      },
-      error: (error) => console.error('Erro ao marcar itens como inspecionados:', error)
-    });
+  /**
+   * Marca todos os itens selecionados como inspecionados
+   */
+  marcarSelecionadosComoInspecionados(): void {
+    this.openInspecaoModal();
   }
 
-  // Métodos para o modal de filtros avançados
+  // -------------------- Métodos de Filtros Dropdown --------------------
+
+  /**
+   * Inicializa as opções de filtro
+   */
   loadFilterOptions(): void {
-    // Inicializar as listas filtradas
-    // Os dados reais serão preenchidos pelo método extractAvailableFilterOptions
-    // quando os itens forem carregados do banco de dados
-    this.filteredBrands = [...this.availableBrands];
-    this.filteredFornecedores = [...this.availableFornecedores];
-    this.filteredLotes = [...this.availableLotes];
-    this.filteredCorredores = [...this.availableCorredores];
-    this.filteredCategorias = [...this.availableCategorias];
+    this.updateFilteredLists();
   }
 
-  // Verificar se há filtros aplicados
-  hasAppliedFilters(): boolean {
-    return !!(this.advancedFilters.marca ||
-           this.advancedFilters.corredor ||
-           this.advancedFilters.categoria ||
-           this.advancedFilters.fornecedor ||
-           this.advancedFilters.lote ||
-           this.advancedFilters.dataVencimento.startDate ||
-           this.advancedFilters.dataVencimento.endDate ||
-           this.advancedFilters.dataFabricacao.startDate ||
-           this.advancedFilters.dataFabricacao.endDate ||
-           this.advancedFilters.dataRecebimento.startDate ||
-           this.advancedFilters.dataRecebimento.endDate);
-  }
+  // ----------------- Métodos para manipulação de dropdowns -----------------
 
-  // Limpar um filtro específico
-  clearFilter(filterName: string): void {
-    if (filterName in this.advancedFilters) {
-      (this.advancedFilters as any)[filterName] = '';
-      this.applyFilter();
-    }
-  }
-
-  // Limpar filtro de data
-  clearDateFilter(): void {
-    this.advancedFilters.dataVencimento.startDate = '';
-    this.advancedFilters.dataVencimento.endDate = '';
-    this.applyFilter();
-  }
-
-  // Limpar todos os filtros
-  resetAllFilters(): void {
-    this.resetFilters();
-    this.applyFilter();
-  }
-
-  // Aplicar filtros avançados e fechar o modal
-  applyAdvancedFilters(): void {
-    this.applyFilter();
-    this.closeFilterModal();
-  }
-
-  // Métodos para controle do dropdown de Marca
-  toggleMarcaDropdown(event?: MouseEvent) {
-    if (event) {
-      event.stopPropagation();
-    }
+  /**
+   * Métodos para marca
+   */
+  toggleMarcaDropdown(event?: MouseEvent): void {
+    if (event) event.stopPropagation();
+    this.closeAllDropdowns();
     this.showMarcaDropdown = !this.showMarcaDropdown;
-    this.showFornecedorDropdown = false;
-    this.showLoteDropdown = false;
-
-    // Se o dropdown estiver sendo aberto, reseta a lista filtrada
     if (this.showMarcaDropdown) {
       this.filterBrandOptions(this.advancedFilters.marca);
     }
   }
 
-  filterBrandOptions(searchText: string) {
-    if (!searchText || searchText.trim() === '') {
-      // Se não houver texto de busca, mostrar todas as marcas
-      this.filteredBrands = [...this.availableBrands];
-    } else {
-      // Caso contrário, filtrar as marcas que contêm o texto de busca
-      const normalizedSearch = searchText.toLowerCase().trim();
-      this.filteredBrands = this.availableBrands.filter(brand =>
-        brand.toLowerCase().includes(normalizedSearch)
-      );
-
-      // Se nenhum resultado for encontrado, mostrar todas as marcas
-      if (this.filteredBrands.length === 0) {
-        this.filteredBrands = [...this.availableBrands];
-      }
-    }
+  filterBrandOptions(searchText: string): void {
+    this.filterDropdownOptions(searchText, this.availableBrands, this.filteredBrands);
   }
 
-  selectBrand(brand: string) {
+  selectBrand(brand: string): void {
     this.advancedFilters.marca = brand;
     this.showMarcaDropdown = false;
   }
 
-  // Métodos para controle do dropdown de Fornecedor
-  toggleFornecedorDropdown(event?: MouseEvent) {
-    if (event) {
-      event.stopPropagation();
-    }
+  /**
+   * Métodos para fornecedor
+   */
+  toggleFornecedorDropdown(event?: MouseEvent): void {
+    if (event) event.stopPropagation();
+    this.closeAllDropdowns();
     this.showFornecedorDropdown = !this.showFornecedorDropdown;
-    this.showMarcaDropdown = false;
-    this.showLoteDropdown = false;
-
-    // Se o dropdown estiver sendo aberto, reseta a lista filtrada
     if (this.showFornecedorDropdown) {
       this.filterFornecedorOptions(this.advancedFilters.fornecedor);
     }
   }
 
-  filterFornecedorOptions(searchText: string) {
-    if (!searchText || searchText.trim() === '') {
-      // Se não houver texto de busca, mostrar todos os fornecedores
-      this.filteredFornecedores = [...this.availableFornecedores];
-    } else {
-      // Caso contrário, filtrar os fornecedores que contêm o texto de busca
-      const normalizedSearch = searchText.toLowerCase().trim();
-      this.filteredFornecedores = this.availableFornecedores.filter(fornecedor =>
-        fornecedor.toLowerCase().includes(normalizedSearch)
-      );
-
-      // Se nenhum resultado for encontrado, mostrar todos os fornecedores
-      if (this.filteredFornecedores.length === 0) {
-        this.filteredFornecedores = [...this.availableFornecedores];
-      }
-    }
+  filterFornecedorOptions(searchText: string): void {
+    this.filterDropdownOptions(searchText, this.availableFornecedores, this.filteredFornecedores);
   }
 
-  selectFornecedor(fornecedor: string) {
+  selectFornecedor(fornecedor: string): void {
     this.advancedFilters.fornecedor = fornecedor;
     this.showFornecedorDropdown = false;
   }
 
-  // Métodos para controle do dropdown de Lote
-  toggleLoteDropdown(event?: MouseEvent) {
-    if (event) {
-      event.stopPropagation();
-    }
+  /**
+   * Métodos para lote
+   */
+  toggleLoteDropdown(event?: MouseEvent): void {
+    if (event) event.stopPropagation();
+    this.closeAllDropdowns();
     this.showLoteDropdown = !this.showLoteDropdown;
-    this.showMarcaDropdown = false;
-    this.showFornecedorDropdown = false;
-
-    // Se o dropdown estiver sendo aberto, reseta a lista filtrada
     if (this.showLoteDropdown) {
       this.filterLoteOptions(this.advancedFilters.lote);
     }
   }
 
-  filterLoteOptions(searchText: string) {
-    if (!searchText || searchText.trim() === '') {
-      // Se não houver texto de busca, mostrar todos os lotes
-      this.filteredLotes = [...this.availableLotes];
-    } else {
-      // Caso contrário, filtrar os lotes que contêm o texto de busca
-      const normalizedSearch = searchText.toLowerCase().trim();
-      this.filteredLotes = this.availableLotes.filter(lote =>
-        lote.toLowerCase().includes(normalizedSearch)
-      );
-
-      // Se nenhum resultado for encontrado, mostrar todos os lotes
-      if (this.filteredLotes.length === 0) {
-        this.filteredLotes = [...this.availableLotes];
-      }
-    }
+  filterLoteOptions(searchText: string): void {
+    this.filterDropdownOptions(searchText, this.availableLotes, this.filteredLotes);
   }
 
-  selectLote(lote: string) {
+  selectLote(lote: string): void {
     this.advancedFilters.lote = lote;
     this.showLoteDropdown = false;
   }
 
-  // Métodos para pesquisar explicitamente usando a lupa
-  searchBrands(event: MouseEvent) {
-    event.stopPropagation();
-    this.filterBrandOptions(this.advancedFilters.marca);
-    this.showMarcaDropdown = true;
-    this.showFornecedorDropdown = false;
-    this.showLoteDropdown = false;
-  }
-
-  searchFornecedores(event: MouseEvent) {
-    event.stopPropagation();
-    this.filterFornecedorOptions(this.advancedFilters.fornecedor);
-    this.showFornecedorDropdown = true;
-    this.showMarcaDropdown = false;
-    this.showLoteDropdown = false;
-  }
-
-  searchLotes(event: MouseEvent) {
-    event.stopPropagation();
-    this.filterLoteOptions(this.advancedFilters.lote);
-    this.showLoteDropdown = true;
-    this.showMarcaDropdown = false;
-    this.showFornecedorDropdown = false;
-  }
-
-  // Métodos para controle do dropdown de Corredor
-  toggleCorredorDropdown(event?: MouseEvent) {
-    if (event) {
-      event.stopPropagation();
-    }
+  /**
+   * Métodos para corredor
+   */
+  toggleCorredorDropdown(event?: MouseEvent): void {
+    if (event) event.stopPropagation();
+    this.closeAllDropdowns();
     this.showCorredorDropdown = !this.showCorredorDropdown;
-    this.showCategoriaDropdown = false;
-    this.showMarcaDropdown = false;
-    this.showFornecedorDropdown = false;
-    this.showLoteDropdown = false;
-
-    // Se o dropdown estiver sendo aberto, reseta a lista filtrada
     if (this.showCorredorDropdown) {
       this.filterCorredorOptions(this.advancedFilters.corredor);
     }
   }
 
-  filterCorredorOptions(searchText: string) {
-    if (!searchText || searchText.trim() === '') {
-      // Se não houver texto de busca, mostrar todos os corredores
-      this.filteredCorredores = [...this.availableCorredores];
-    } else {
-      // Caso contrário, filtrar os corredores que contêm o texto de busca
-      const normalizedSearch = searchText.toLowerCase().trim();
-      this.filteredCorredores = this.availableCorredores.filter(corredor =>
-        corredor.toLowerCase().includes(normalizedSearch)
-      );
-
-      // Se nenhum resultado for encontrado, mostrar todos os corredores
-      if (this.filteredCorredores.length === 0) {
-        this.filteredCorredores = [...this.availableCorredores];
-      }
-    }
+  filterCorredorOptions(searchText: string): void {
+    this.filterDropdownOptions(searchText, this.availableCorredores, this.filteredCorredores);
   }
 
-  selectCorredor(corredor: string) {
+  selectCorredor(corredor: string): void {
     this.advancedFilters.corredor = corredor;
     this.showCorredorDropdown = false;
   }
 
-  // Métodos para controle do dropdown de Categoria
-  toggleCategoriaDropdown(event?: MouseEvent) {
-    if (event) {
-      event.stopPropagation();
-    }
+  /**
+   * Métodos para categoria
+   */
+  toggleCategoriaDropdown(event?: MouseEvent): void {
+    if (event) event.stopPropagation();
+    this.closeAllDropdowns();
     this.showCategoriaDropdown = !this.showCategoriaDropdown;
-    this.showCorredorDropdown = false;
-    this.showMarcaDropdown = false;
-    this.showFornecedorDropdown = false;
-    this.showLoteDropdown = false;
-
-    // Se o dropdown estiver sendo aberto, reseta a lista filtrada
     if (this.showCategoriaDropdown) {
       this.filterCategoriaOptions(this.advancedFilters.categoria);
     }
   }
 
-  filterCategoriaOptions(searchText: string) {
-    if (!searchText || searchText.trim() === '') {
-      // Se não houver texto de busca, mostrar todas as categorias
-      this.filteredCategorias = [...this.availableCategorias];
-    } else {
-      // Caso contrário, filtrar as categorias que contêm o texto de busca
-      const normalizedSearch = searchText.toLowerCase().trim();
-      this.filteredCategorias = this.availableCategorias.filter(categoria =>
-        categoria.toLowerCase().includes(normalizedSearch)
-      );
-
-      // Se nenhum resultado for encontrado, mostrar todas as categorias
-      if (this.filteredCategorias.length === 0) {
-        this.filteredCategorias = [...this.availableCategorias];
-      }
-    }
+  filterCategoriaOptions(searchText: string): void {
+    this.filterDropdownOptions(searchText, this.availableCategorias, this.filteredCategorias);
   }
 
-  selectCategoria(categoria: string) {
+  selectCategoria(categoria: string): void {
     this.advancedFilters.categoria = categoria;
     this.showCategoriaDropdown = false;
   }
 
-  // Métodos para pesquisar explicitamente usando a lupa
-  searchCorredores(event: MouseEvent) {
-    event.stopPropagation();
-    this.filterCorredorOptions(this.advancedFilters.corredor);
-    this.showCorredorDropdown = true;
-    this.showCategoriaDropdown = false;
-    this.showMarcaDropdown = false;
-    this.showFornecedorDropdown = false;
-    this.showLoteDropdown = false;
+  /**
+   * Método genérico para filtrar opções de dropdown
+   */
+  private filterDropdownOptions(searchText: string, availableOptions: string[], resultArray: string[]): void {
+    resultArray.length = 0; // Limpar array atual
+
+    if (!searchText || searchText.trim() === '') {
+      // Se não houver texto de busca, mostrar todas as opções
+      resultArray.push(...availableOptions);
+    } else {
+      // Filtrar as opções que contêm o texto de busca
+      const normalizedSearch = searchText.toLowerCase().trim();
+      const filtered = availableOptions.filter(option =>
+        option.toLowerCase().includes(normalizedSearch)
+      );
+
+      // Se não encontrar resultados, mostrar todas as opções
+      if (filtered.length === 0) {
+        resultArray.push(...availableOptions);
+      } else {
+        resultArray.push(...filtered);
+      }
+    }
   }
 
-  searchCategorias(event: MouseEvent) {
+  // ----------------- Métodos de busca explícita -----------------
+
+  /**
+   * Buscas explícitas usando a lupa
+   */
+  searchBrands(event: MouseEvent): void {
+    event.stopPropagation();
+    this.filterBrandOptions(this.advancedFilters.marca);
+    this.closeAllDropdowns();
+    this.showMarcaDropdown = true;
+  }
+
+  searchFornecedores(event: MouseEvent): void {
+    event.stopPropagation();
+    this.filterFornecedorOptions(this.advancedFilters.fornecedor);
+    this.closeAllDropdowns();
+    this.showFornecedorDropdown = true;
+  }
+
+  searchLotes(event: MouseEvent): void {
+    event.stopPropagation();
+    this.filterLoteOptions(this.advancedFilters.lote);
+    this.closeAllDropdowns();
+    this.showLoteDropdown = true;
+  }
+
+  searchCorredores(event: MouseEvent): void {
+    event.stopPropagation();
+    this.filterCorredorOptions(this.advancedFilters.corredor);
+    this.closeAllDropdowns();
+    this.showCorredorDropdown = true;
+  }
+
+  searchCategorias(event: MouseEvent): void {
     event.stopPropagation();
     this.filterCategoriaOptions(this.advancedFilters.categoria);
+    this.closeAllDropdowns();
     this.showCategoriaDropdown = true;
-    this.showCorredorDropdown = false;
-    this.showMarcaDropdown = false;
-    this.showFornecedorDropdown = false;
-    this.showLoteDropdown = false;
+  }
+
+  /**
+   * Abre o modal de inspeção
+   */
+  openInspecaoModal(): void {
+    if (!this.hasSelectedItems()) return;
+
+    this.itensSelecionados = this.filteredItems
+      .filter(item => item.selecionado)
+      .map(item => item.id);
+
+    this.motivoInspecao = '';
+    this.motivoInspecaoError = null;
+    this.showInspecaoModal = true;
+  }
+
+  /**
+   * Fecha o modal de inspeção
+   */
+  closeInspecaoModal(): void {
+    this.showInspecaoModal = false;
+    this.motivoInspecao = '';
+    this.motivoInspecaoError = null;
+  }
+
+  /**
+   * Seleciona um motivo de inspeção
+   */
+  selecionarMotivo(motivo: string): void {
+    this.motivoInspecao = motivo;
+    this.motivoInspecaoError = null;
+  }
+
+  /**
+   * Confirma a inspeção com o motivo selecionado
+   */
+  confirmarInspecao(): void {
+    if (!this.motivoInspecao) {
+      this.motivoInspecaoError = 'Por favor, selecione um motivo para a inspeção.';
+      return;
+    }
+
+    const subscription = this.muralService.marcarVariosInspecionados(this.itensSelecionados, this.motivoInspecao).subscribe({
+      next: () => {
+        this.items.forEach(item => {
+          if (this.itensSelecionados.includes(item.id)) {
+            item.inspecionado = true;
+            item.motivoInspecao = this.motivoInspecao;
+          }
+        });
+        this.closeInspecaoModal();
+        this.applyFilter();
+      },
+      error: (error) => {
+        console.error('Erro ao marcar itens como inspecionados:', error);
+        this.motivoInspecaoError = 'Ocorreu um erro ao processar a inspeção. Por favor, tente novamente.';
+      }
+    });
+
+    this.subscriptions.push(subscription);
   }
 }

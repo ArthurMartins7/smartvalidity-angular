@@ -18,7 +18,11 @@ export class MuralDetalheComponent implements OnInit {
   item: MuralItem | null = null;
   loading: boolean = true;
   error: string | null = null;
-  activeTab: 'proximo' | 'hoje' | 'vencido' = 'proximo'; // Aba ativa padrão
+  activeTab: string = 'proximo';
+  motivoInspecao: string = '';
+  showMotivosDropdown: boolean = false;
+  motivosInspecao: string[] = ['Avaria/Quebra', 'Promoção'];
+  motivoError: string | null = null;
 
   constructor(
     private route: ActivatedRoute,
@@ -33,7 +37,7 @@ export class MuralDetalheComponent implements OnInit {
       // Captura a aba de onde o usuário veio
       this.route.queryParams.subscribe(queryParams => {
         if (queryParams['tab']) {
-          this.activeTab = queryParams['tab'] as 'proximo' | 'hoje' | 'vencido';
+          this.activeTab = queryParams['tab'];
         }
       });
 
@@ -61,7 +65,16 @@ export class MuralDetalheComponent implements OnInit {
   marcarInspecionado(): void {
     if (!this.item) return;
 
-    this.muralService.marcarInspecionado(this.itemId).subscribe({
+    // Limpa erros anteriores
+    this.motivoError = null;
+
+    // Validação específica para o motivo da inspeção
+    if (!this.motivoInspecao) {
+      this.motivoError = 'Por favor, selecione um motivo para a inspeção.';
+      return;
+    }
+
+    this.muralService.marcarInspecionado(this.itemId, this.motivoInspecao).subscribe({
       next: () => {
         // Redireciona para a mesma aba de onde o usuário veio
         this.router.navigate(['/mural-listagem'], {
@@ -74,5 +87,20 @@ export class MuralDetalheComponent implements OnInit {
         this.error = 'Ocorreu um erro ao marcar o item como inspecionado. Por favor, tente novamente mais tarde.';
       }
     });
+  }
+
+  toggleMotivosDropdown(): void {
+    this.showMotivosDropdown = !this.showMotivosDropdown;
+    // Limpa o erro de motivo quando o dropdown é aberto/fechado
+    if (this.motivoError) {
+      this.motivoError = null;
+    }
+  }
+
+  selecionarMotivo(motivo: string): void {
+    this.motivoInspecao = motivo;
+    this.showMotivosDropdown = false;
+    // Limpa o erro de motivo quando um motivo é selecionado
+    this.motivoError = null;
   }
 }

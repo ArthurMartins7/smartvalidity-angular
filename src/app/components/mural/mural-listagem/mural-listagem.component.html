@@ -14,7 +14,12 @@
         <h2 class="text-xl font-bold" *ngIf="activeTab === 'vencido'">Produtos vencidos</h2>
       </div>
     </div>
-    <div class="w-full bg-black h-1 mt-2"></div>
+    <div class="w-full h-1 mt-2"
+      [ngClass]="{
+        'bg-yellow-500': activeTab === 'proximo',
+        'bg-red-500': activeTab === 'hoje',
+        'bg-black': activeTab === 'vencido'
+      }"></div>
   </div>
 
   <!-- Tabs -->
@@ -23,21 +28,21 @@
       <button
         (click)="setActiveTab('proximo')"
         [class.bg-yellow-500]="activeTab === 'proximo'"
-        [class.bg-gray-200]="activeTab !== 'proximo'"
+        [class.bg-gray-500]="activeTab !== 'proximo'"
         class="px-4 py-2 rounded-lg text-white font-medium transition-colors">
         Próximos a Vencer
       </button>
       <button
         (click)="setActiveTab('hoje')"
         [class.bg-red-500]="activeTab === 'hoje'"
-        [class.bg-gray-200]="activeTab !== 'hoje'"
+        [class.bg-gray-500]="activeTab !== 'hoje'"
         class="px-4 py-2 rounded-lg text-white font-medium transition-colors">
         Vencem Hoje
       </button>
       <button
         (click)="setActiveTab('vencido')"
         [class.bg-black]="activeTab === 'vencido'"
-        [class.bg-gray-200]="activeTab !== 'vencido'"
+        [class.bg-gray-500]="activeTab !== 'vencido'"
         class="px-4 py-2 rounded-lg text-white font-medium transition-colors">
         Vencidos
       </button>
@@ -73,14 +78,26 @@
             class="px-4 py-2 border border-gray-300 rounded-lg flex items-center bg-white"
             (click)="toggleSortOrder()"
           >
-            <span class="text-sm font-medium">Ordenar por: </span>
-            <span class="text-sm font-medium ml-1">{{ sortDirection === 'asc' ? 'De A a Z' : 'De Z a A' }}</span>
+            <span class="text-sm font-medium">{{ sortDirection === 'asc' ? 'A a Z' : 'Z a A' }}</span>
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
             </svg>
           </button>
         </div>
       </div>
+
+      <!-- Botão Inspecionar -->
+      <button
+        (click)="marcarSelecionadosComoInspecionados()"
+        [disabled]="!hasSelectedItems()"
+        [class.opacity-50]="!hasSelectedItems()"
+        [class.cursor-not-allowed]="!hasSelectedItems()"
+        class="flex items-center bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors focus:outline-none">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+        </svg>
+        Inspecionar
+      </button>
     </div>
   </div>
 
@@ -125,17 +142,9 @@
     </div>
   </div>
 
-  <!-- Bulk actions for selected items -->
-  <div *ngIf="hasSelectedItems()" class="flex items-center space-x-4 py-2 px-4 bg-gray-100 rounded-lg">
+  <!-- Exibe apenas o contador de itens selecionados, sem o botão de inspecionar -->
+  <div *ngIf="hasSelectedItems()" class="flex items-center space-x-4 py-2 px-4 bg-gray-100 rounded-lg mb-4">
     <span class="text-gray-600">{{ getSelectedItemsCount() }} item(s) selecionado(s)</span>
-    <button
-      (click)="marcarSelecionadosComoInspecionados()"
-      class="flex items-center bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors focus:outline-none">
-      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-      </svg>
-      Marcar como inspecionados
-    </button>
   </div>
 
   <!-- Filter Modal -->
@@ -488,6 +497,83 @@
     </div>
   </div>
 
+  <!-- Modal de Inspeção -->
+  <div *ngIf="showInspecaoModal" class="fixed inset-0 z-50 overflow-y-auto">
+    <!-- Overlay que impede interação com elementos abaixo do modal -->
+    <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+      <!-- Fundo escuro com opacidade -->
+      <div class="fixed inset-0 transition-opacity" aria-hidden="true">
+        <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
+      </div>
+
+      <!-- Modal -->
+      <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+        <!-- Cabeçalho com título e botão de fechar -->
+        <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+          <div class="flex justify-between items-center mb-4">
+            <h3 class="text-lg leading-6 font-medium text-gray-900">
+              Motivo da inspeção
+            </h3>
+            <button
+              type="button"
+              (click)="closeInspecaoModal()"
+              class="bg-white rounded-md p-2 inline-flex items-center justify-center text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500">
+              <span class="sr-only">Fechar</span>
+              <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+
+          <div class="mt-2">
+            <p class="text-sm text-gray-500 mb-4">
+              Selecione o motivo da inspeção para os {{ itensSelecionados.length }} item(ns) selecionado(s):
+            </p>
+
+            <div class="space-y-2">
+              <div *ngFor="let motivo of motivosInspecao" class="flex items-center">
+                <input
+                  type="radio"
+                  [id]="'motivo-' + motivo"
+                  name="motivoInspecao"
+                  [value]="motivo"
+                  (change)="selecionarMotivo(motivo)"
+                  [checked]="motivoInspecao === motivo"
+                  class="h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500">
+                <label [for]="'motivo-' + motivo" class="ml-2 block text-sm text-gray-900">
+                  {{ motivo }}
+                </label>
+              </div>
+            </div>
+
+            <!-- Mensagem de erro se nenhum motivo for selecionado -->
+            <div *ngIf="motivoInspecaoError" class="mt-2 text-sm text-red-600">
+              {{ motivoInspecaoError }}
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+          <button
+            type="button"
+            (click)="confirmarInspecao()"
+            [disabled]="!motivoInspecao"
+            [class.opacity-50]="!motivoInspecao"
+            [class.cursor-not-allowed]="!motivoInspecao"
+            class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none sm:ml-3 sm:w-auto sm:text-sm">
+            Confirmar
+          </button>
+          <button
+            type="button"
+            (click)="closeInspecaoModal()"
+            class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
+            Cancelar
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Table -->
   <div class="bg-white rounded-lg shadow-md overflow-hidden border border-gray-200">
     <table class="min-w-full divide-y divide-gray-200">
@@ -498,8 +584,9 @@
               class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
           </th>
           <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cód. de barras</th>
-          <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Marca</th>
+          <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Lote</th>
           <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Descrição</th>
+          <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Marca</th>
           <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Data de vencimento</th>
           <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider w-24">Inspecionado</th>
           <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider w-24"></th>
@@ -512,10 +599,14 @@
               class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
           </td>
           <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900">{{item.produto?.codigoBarras}}</td>
-          <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900">{{item.produto?.marca}}</td>
+          <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900">{{item.lote}}</td>
           <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900">{{item.produto?.descricao}}</td>
+          <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900">{{item.produto?.marca}}</td>
           <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900">{{item.dataValidade | date:'dd/MM/yyyy HH:mm:ss'}}</td>
           <td class="px-4 py-3 text-center">
+            <svg *ngIf="item.inspecionado" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-500 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+            </svg>
             <svg *ngIf="!item.inspecionado" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-red-500 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
               <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
             </svg>

@@ -25,27 +25,27 @@
   <!-- Tabs -->
   <div class="flex mb-6 items-center justify-between">
     <div class="flex space-x-4">
-      <button
-        (click)="setActiveTab('proximo')"
+    <button
+      (click)="setActiveTab('proximo')"
         [class.bg-yellow-500]="activeTab === 'proximo'"
         [class.bg-gray-500]="activeTab !== 'proximo'"
-        class="px-4 py-2 rounded-lg text-white font-medium transition-colors">
-        Próximos a Vencer
-      </button>
-      <button
-        (click)="setActiveTab('hoje')"
+      class="px-4 py-2 rounded-lg text-white font-medium transition-colors">
+      Próximos a Vencer
+    </button>
+    <button
+      (click)="setActiveTab('hoje')"
         [class.bg-red-500]="activeTab === 'hoje'"
         [class.bg-gray-500]="activeTab !== 'hoje'"
-        class="px-4 py-2 rounded-lg text-white font-medium transition-colors">
-        Vencem Hoje
-      </button>
-      <button
-        (click)="setActiveTab('vencido')"
+      class="px-4 py-2 rounded-lg text-white font-medium transition-colors">
+      Vencem Hoje
+    </button>
+    <button
+      (click)="setActiveTab('vencido')"
         [class.bg-black]="activeTab === 'vencido'"
         [class.bg-gray-500]="activeTab !== 'vencido'"
-        class="px-4 py-2 rounded-lg text-white font-medium transition-colors">
-        Vencidos
-      </button>
+      class="px-4 py-2 rounded-lg text-white font-medium transition-colors">
+      Vencidos
+    </button>
     </div>
 
     <!-- Search and sorting moved to the right -->

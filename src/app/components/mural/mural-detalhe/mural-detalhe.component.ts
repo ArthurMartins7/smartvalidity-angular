@@ -23,6 +23,7 @@ export class MuralDetalheComponent implements OnInit {
   showMotivosDropdown: boolean = false;
   motivosInspecao: string[] = ['Avaria/Quebra', 'Promoção'];
   motivoError: string | null = null;
+  processandoInspecao: boolean = false;
 
   constructor(
     private route: ActivatedRoute,
@@ -65,6 +66,9 @@ export class MuralDetalheComponent implements OnInit {
   marcarInspecionado(): void {
     if (!this.item) return;
 
+    // Já está processando, não permitir cliques duplicados
+    if (this.processandoInspecao) return;
+
     // Limpa erros anteriores
     this.motivoError = null;
 
@@ -74,17 +78,30 @@ export class MuralDetalheComponent implements OnInit {
       return;
     }
 
+    // Atualiza o status para processando
+    this.processandoInspecao = true;
+
     this.muralService.marcarInspecionado(this.itemId, this.motivoInspecao).subscribe({
       next: () => {
-        // Redireciona para a mesma aba de onde o usuário veio
-        this.router.navigate(['/mural-listagem'], {
-          queryParams: { tab: this.activeTab },
-          state: { activeTab: this.activeTab }
-        });
+        // Atualiza o estado local
+        if (this.item) {
+          this.item.inspecionado = true;
+          this.item.motivoInspecao = this.motivoInspecao;
+        }
+
+        // Adiciona um pequeno atraso para permitir que o usuário veja a mudança
+        setTimeout(() => {
+          // Redireciona para a mesma aba de onde o usuário veio
+          this.router.navigate(['/mural-listagem'], {
+            queryParams: { tab: this.activeTab },
+            state: { activeTab: this.activeTab }
+          });
+        }, 1000);
       },
       error: (err) => {
         console.error('Erro ao marcar item como inspecionado:', err);
         this.error = 'Ocorreu um erro ao marcar o item como inspecionado. Por favor, tente novamente mais tarde.';
+        this.processandoInspecao = false;
       }
     });
   }

@@ -53,8 +53,13 @@
               <td class="p-2">{{ produto.unidadeMedida }}</td>
               <td class="p-2">{{ produto.quantidade }}</td>
               <td class="border p-2">
-                <span *ngFor="let fornecedor of produto.fornecedores; let i = index">
-                  {{ fornecedor.nome }}<span *ngIf="i < produto.fornecedores.length - 1">, </span>
+                <span *ngIf="produto.fornecedores && produto.fornecedores.length > 0">
+                  <span *ngFor="let fornecedor of produto.fornecedores; let i = index">
+                    {{ fornecedor.nome }}<span *ngIf="i < produto.fornecedores.length - 1">, </span>
+                  </span>
+                </span>
+                <span *ngIf="!produto.fornecedores || produto.fornecedores.length === 0" class="text-gray-500">
+                  Nenhum fornecedor
                 </span>
               </td>
               <td class="p-2 text-center flex justify-center space-x-4">

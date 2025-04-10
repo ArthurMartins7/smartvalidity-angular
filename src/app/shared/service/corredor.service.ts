@@ -1,8 +1,10 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { CorredorDTO } from '../model/dto/corredor.dto';
 import { Corredor } from '../model/entity/corredor';
+import { CorredorSeletor } from '../model/seletor/corredor.seletor';
+import { UsuarioService } from './usuario.service';
+import { Usuario } from '../model/entity/usuario.model';
 
 @Injectable({
   providedIn: 'root'
@@ -10,22 +12,37 @@ import { Corredor } from '../model/entity/corredor';
 export class CorredorService {
   private readonly API = 'http://localhost:8080/smartvalidity/corredor';
 
-  constructor(private httpClient: HttpClient) { }
+  constructor(
+    private httpClient: HttpClient,
+    private usuarioService: UsuarioService
+  ) { }
 
-  criarCorredor(novoCorredor: CorredorDTO): Observable<CorredorDTO> {
-    return this.httpClient.post<CorredorDTO>(this.API, novoCorredor);
+  criarCorredor(novoCorredor: Corredor): Observable<Corredor> {
+    return this.httpClient.post<Corredor>(this.API, novoCorredor);
   }
 
   listarTodos(): Observable<Array<Corredor>> {
     return this.httpClient.get<Array<Corredor>>(this.API);
   }
 
-  buscarPorId(id: number): Observable<CorredorDTO> {
-    return this.httpClient.get<CorredorDTO>(`${this.API}/${id}`);
+  buscarPorId(id: number): Observable<Corredor> {
+    return this.httpClient.get<Corredor>(`${this.API}/${id}`);
   }
 
-  atualizarCorredor(id: number, corredorAtualizado: CorredorDTO): Observable<CorredorDTO> {
-    return this.httpClient.put<CorredorDTO>(`${this.API}/${id}`, corredorAtualizado);
+  listarComSeletor(seletor: CorredorSeletor): Observable<Corredor[]> {
+    return this.httpClient.post<Corredor[]>(`${this.API}/filtro`, seletor);
+  }
+
+  contarTotalRegistros(seletor: CorredorSeletor): Observable<number> {
+    return this.httpClient.post<number>(`${this.API}/contar`, seletor);
+  }
+
+  listarResponsaveis(): Observable<Usuario[]> {
+    return this.usuarioService.buscarTodos();
+  }
+
+  atualizarCorredor(id: number, corredorAtualizado: Corredor): Observable<Corredor> {
+    return this.httpClient.put<Corredor>(`${this.API}/${id}`, corredorAtualizado);
   }
 
   excluirCorredor(id: number): Observable<void> {

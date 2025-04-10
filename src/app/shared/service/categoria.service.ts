@@ -1,9 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { CategoriaDTO } from '../model/dto/categoria.dto';
-import { CategoriaSeletor } from '../model/seletor/categoria.seletor';
-// import { Page } from '../model/page';
+import { Categoria } from '../model/entity/categoria';
 
 @Injectable({
   providedIn: 'root',
@@ -14,20 +12,20 @@ export class CategoriaService {
   constructor(private httpClient: HttpClient) {}
 
   // listarComFiltros(seletor: CategoriaSeletor): Observable<Page<CategoriaDTO>> {
-  listarTodas(): Observable<CategoriaDTO[]> {
-    return this.httpClient.get<CategoriaDTO[]>(this.API);
+  listarTodas(): Observable<Categoria[]> {
+    return this.httpClient.get<Categoria[]>(this.API);
   }
 
-  buscarPorId(id: number): Observable<CategoriaDTO> {
-    return this.httpClient.get<CategoriaDTO>(`${this.API}/${id}`);
+  buscarPorId(id: number): Observable<Categoria> {
+    return this.httpClient.get<Categoria>(`${this.API}/${id}`);
   }
 
-  criarCategoria(novaCategoria: CategoriaDTO): Observable<CategoriaDTO> {
-    return this.httpClient.post<CategoriaDTO>(this.API, novaCategoria);
+  criarCategoria(novaCategoria: Categoria): Observable<Categoria> {
+    return this.httpClient.post<Categoria>(this.API, novaCategoria);
   }
 
-  atualizarCategoria(id: number, categoriaAtualizada: CategoriaDTO): Observable<CategoriaDTO> {
-    return this.httpClient.put<CategoriaDTO>(`${this.API}/${id}`, categoriaAtualizada);
+  atualizarCategoria(id: number, categoriaAtualizada: Categoria): Observable<Categoria> {
+    return this.httpClient.put<Categoria>(`${this.API}/${id}`, categoriaAtualizada);
   }
 
   excluirCategoria(id: number): Observable<void> {

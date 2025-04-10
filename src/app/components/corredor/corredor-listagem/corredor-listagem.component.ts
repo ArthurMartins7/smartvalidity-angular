@@ -1,46 +1,214 @@
-import { Component, inject, OnInit} from '@angular/core';
-import { FormsModule} from '@angular/forms';
+import { Component, inject, OnInit, OnDestroy } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { Corredor } from '../../../shared/model/entity/corredor';
 import { CategoriaService } from '../../../shared/service/categoria.service';
 import { CorredorService } from '../../../shared/service/corredor.service';
 import { Categoria } from '../../../shared/model/entity/categoria';
 import { Router } from '@angular/router';
-
+import Swal from 'sweetalert2';
+import { Subject } from 'rxjs';
+import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
+import { CommonModule } from '@angular/common';
+import { CorredorSeletor } from '../../../shared/model/seletor/corredor.seletor';
+import { Usuario } from '../../../shared/model/entity/usuario.model';
 
 @Component({
   selector: 'app-corredor-listagem',
   standalone: true,
-  imports: [FormsModule],
+  imports: [FormsModule, CommonModule],
   templateUrl: './corredor-listagem.component.html',
   styleUrl: './corredor-listagem.component.css'
 })
-export class CorredorListagemComponent implements OnInit {
-
+export class CorredorListagemComponent implements OnInit, OnDestroy {
   private categoriaService = inject(CategoriaService);
   private corredorService = inject(CorredorService);
   private router = inject(Router);
 
-  public Corredor = new Corredor();
+  public seletor: CorredorSeletor = new CorredorSeletor();
   public corredores: Corredor[] = [];
-  public categorias: Categoria[] = [];
+  public totalPaginas: number = 0;
+  public tamanhoPagina: number = 5;
+  public opcoesItensPorPagina: number[] = [5, 10, 15, 20, 25, 50];
+  public itensPorPagina: number = 5;
+  public mostrarFiltros: boolean = false;
+  public filtroResponsavel: Usuario | null = null;
+  public responsaveis: Usuario[] = [];
+  private searchSubject = new Subject<string>();
+  public filtroNome: string = '';
 
   ngOnInit(): void {
+    this.seletor.pagina = 1;
+    this.seletor.limite = this.itensPorPagina;
     this.buscarCorredores();
+    this.buscarResponsaveis();
+
+    // Configurar o debounce para a busca em tempo real
+    this.searchSubject.pipe(
+      debounceTime(300),
+      distinctUntilChanged()
+    ).subscribe(() => {
+      this.buscarCorredores();
+    });
   }
 
-  public buscarCorredores() {
-    this.corredorService.listarTodos().subscribe(
+  private buscarResponsaveis(): void {
+    this.corredorService.listarResponsaveis().subscribe(
       (resultado) => {
-        this.corredores = resultado;
-        console.log(this.corredores);
+        this.responsaveis = resultado;
       },
       (erro) => {
-        console.error('Erro ao consultar todos os corredores', erro.error.mensagem);
+        console.error('Erro ao buscar responsáveis', erro);
+        Swal.fire('Erro!', 'Não foi possível carregar os responsáveis.', 'error');
       }
     );
   }
 
+  public onSearchInput(): void {
+    this.seletor.pagina = 1;
+    this.searchSubject.next(this.seletor.nome);
+  }
+
+  public buscarCorredores() {
+    console.log('Buscando corredores com seletor:', this.seletor);
+    this.corredorService.listarComSeletor(this.seletor).subscribe(
+      (resultado) => {
+        console.log('Resultado da busca:', resultado);
+        this.corredores = resultado;
+        this.calcularTotalPaginas();
+      },
+      (erro) => {
+        console.error('Erro ao consultar corredores:', erro);
+        Swal.fire('Erro!', 'Não foi possível carregar os corredores.', 'error');
+      }
+    );
+  }
+
+  private calcularTotalPaginas(): void {
+    this.corredorService.contarTotalRegistros(this.seletor).subscribe({
+      next: (total) => {
+        console.log('Total de registros:', total);
+        this.totalPaginas = Math.ceil(total / this.itensPorPagina);
+        console.log('Total de páginas:', this.totalPaginas);
+      },
+      error: (erro) => {
+        console.error('Erro ao contar total de registros:', erro);
+        // Se houver erro, assume que há apenas uma página
+        this.totalPaginas = 1;
+        // Mostra uma mensagem de erro para o usuário
+        Swal.fire({
+          icon: 'error',
+          title: 'Erro ao carregar paginação',
+          text: 'Não foi possível carregar o total de registros. A paginação pode estar incorreta.',
+          showConfirmButton: false,
+          timer: 2000
+        });
+      }
+    });
+  }
+
+  public alterarItensPorPagina() {
+    this.seletor.limite = this.itensPorPagina;
+    this.seletor.pagina = 1;
+    this.buscarCorredores();
+  }
+
+  public toggleFiltros() {
+    this.mostrarFiltros = !this.mostrarFiltros;
+  }
+
+  public aplicarFiltros() {
+    console.log('Aplicando filtros...');
+    console.log('Responsável selecionado:', this.filtroResponsavel);
+
+    // Resetar para a primeira página ao aplicar filtros
+    this.seletor.pagina = 1;
+
+    // Atualizar o seletor com os filtros
+    this.seletor.nome = this.filtroNome;
+    this.seletor.responsavelId = this.filtroResponsavel?.id || null;
+
+    console.log('Seletor atualizado:', this.seletor);
+
+    // Buscar corredores com os novos filtros
+    this.buscarCorredores();
+  }
+
+  public limparFiltros() {
+    this.filtroNome = '';
+    this.filtroResponsavel = null;
+    this.seletor.nome = '';
+    this.seletor.responsavelId = null;
+    this.buscarCorredores();
+  }
+
+  public voltarPagina(): void {
+    if (this.seletor.pagina > 1) {
+      this.seletor.pagina--;
+      this.buscarCorredores();
+    }
+  }
+
+  public avancarPagina(): void {
+    if (this.seletor.pagina < this.totalPaginas) {
+      this.seletor.pagina++;
+      this.buscarCorredores();
+    }
+  }
+
+  public irParaPagina(indicePagina: number): void {
+    this.seletor.pagina = indicePagina;
+    this.buscarCorredores();
+  }
+
+  public criarArrayPaginas(): number[] {
+    const paginas = [];
+    for (let i = 1; i <= this.totalPaginas; i++) {
+      paginas.push(i);
+    }
+    return paginas;
+  }
+
+  excluir(corredorSelecionado: Corredor) {
+    Swal.fire({
+      title: 'Deseja realmente excluir o corredor?',
+      text: 'Essa ação não poderá ser desfeita!',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Sim, excluir!',
+      cancelButtonText: 'Cancelar'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.corredorService.excluirCorredor(corredorSelecionado.id).subscribe(
+          () => {
+            this.corredores = this.corredores.filter(c => c.id !== corredorSelecionado.id);
+            this.calcularTotalPaginas();
+            Swal.fire('Excluído!', 'O corredor foi removido com sucesso.', 'success');
+          },
+          erro => {
+            Swal.fire('Corredor possui categoria associada!', erro.error, 'error');
+          }
+        );
+      }
+    });
+  }
+
+  editar(corredorSelecionado: Corredor) {
+    this.router.navigate(['/corredor-editar/', corredorSelecionado]);
+  }
+
   public adicionarCorredor() {
     this.router.navigate(['corredor-detalhe']);
+  }
+
+  public adicionarCategoria(corredor: Corredor) {
+    this.router.navigate(['/categoria-detalhe'], { queryParams: { corredorId: corredor.id } });
+  }
+
+  public irParaProdutoListagem(categoriaId: number) {
+    this.router.navigate(['/produto-listagem'], { queryParams: { categoriaId } });
+  }
+
+  ngOnDestroy() {
+    this.searchSubject.complete();
   }
 }

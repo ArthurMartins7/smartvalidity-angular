@@ -1,39 +1,167 @@
-<div class="p-3 bg-gray-100">
-  <div class="mb-4 flex justify-start">
-    <button (click)="adicionarCorredor()"
-      class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg shadow-sm hover:shadow-md transition-all transform hover:scale-105 flex items-center gap-2">
-      <span class="text-xl font-semibold leading-none">+</span>
-      <span>Adicionar Corredor</span>
-    </button>
+<!-- Cabeçalho -->
+<div class="flex items-center gap-2 mb-8">
+  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6 text-gray-600">
+    <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+  </svg>
+  <div>
+    <div class="text-gray-500">Layout</div>
+    <div class="text-2xl font-bold">Corredores</div>
   </div>
-  @for (corredor of corredores; track corredor.id) {
-  <div class="flex justify-between">
-    <div class="flex-1 mx-2 p-3 bg-white rounded-lg shadow-lg max-w-xs">
+</div>
+
+<div class="p-3 bg-white-100">
+  <!-- Campo de pesquisa com filtro -->
+  <div class="mb-6 relative">
+    <div class="relative">
+      <div class="absolute inset-y-0 left-3 flex items-center pointer-events-none">
+        <svg class="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+        </svg>
+      </div>
+      <input
+        type="text"
+        placeholder="Pesquisar..."
+        class="w-full pl-12 pr-12 py-3 border rounded-full bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-200 text-lg"
+        [(ngModel)]="seletor.nome"
+        (ngModelChange)="onSearchInput()">
+      <button
+        (click)="toggleFiltros()"
+        class="absolute inset-y-0 right-3 flex items-center text-gray-400 hover:text-gray-600">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 3c2.755 0 5.455.232 8.083.678.533.09.917.556.917 1.096v1.044a2.25 2.25 0 01-.659 1.591l-5.432 5.432a2.25 2.25 0 00-.659 1.591v2.927a2.25 2.25 0 01-1.244 2.013L9.75 21v-6.568a2.25 2.25 0 00-.659-1.591L3.659 7.409A2.25 2.25 0 013 5.818V4.774c0-.54.384-1.006.917-1.096A48.32 48.32 0 0112 3z" />
+        </svg>
+      </button>
+    </div>
+
+    <!-- Popup de Filtros -->
+    <div *ngIf="mostrarFiltros" class="absolute z-10 mt-2 w-80 bg-white rounded-lg shadow-lg border border-gray-200">
+      <div class="p-4">
+        <div class="flex justify-between items-center mb-4">
+          <h3 class="text-lg font-semibold">Filtros</h3>
+          <button
+            (click)="toggleFiltros()"
+            class="text-gray-400 hover:text-gray-600">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+
+        <div class="space-y-4">
+          <!-- Filtro de Responsável -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Responsável</label>
+            <select
+              [(ngModel)]="filtroResponsavel"
+              class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+              <option [ngValue]="null">Todos os responsáveis</option>
+              <option *ngFor="let responsavel of responsaveis" [ngValue]="responsavel">
+                {{ responsavel.nome }}
+              </option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Botões de Ação -->
+        <div class="flex justify-end space-x-2 mt-4">
+          <button
+            type="button"
+            (click)="limparFiltros()"
+            class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200">
+            Limpar
+          </button>
+          <button
+            type="button"
+            (click)="aplicarFiltros(); toggleFiltros()"
+            class="px-4 py-2 text-sm font-medium text-white bg-blue-500 rounded-lg hover:bg-blue-600">
+            Aplicar
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Seletor de itens por página -->
+  <div class="flex justify-between items-center mb-4">
+    <button (click)="adicionarCorredor()"
+      class="bg-white hover:bg-gray-50 text-gray-800 px-4 py-2 rounded-full flex items-center transition-all transform hover:scale-105 shadow-sm hover:shadow-md border border-gray-200">
+      <span class="mr-2 text-base font-semibold">+</span>
+      <span class="text-sm font-medium">Adicionar Corredor</span>
+    </button>
+
+    <div class="flex items-center gap-2">
+      <label for="itensPorPagina" class="text-sm text-gray-600">Itens por página:</label>
+      <select
+        id="itensPorPagina"
+        [(ngModel)]="itensPorPagina"
+        (ngModelChange)="alterarItensPorPagina()"
+        class="bg-white border border-gray-300 text-gray-700 py-2 px-4 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+        <option *ngFor="let opcao of opcoesItensPorPagina" [value]="opcao">
+          {{ opcao }}
+        </option>
+      </select>
+    </div>
+  </div>
+
+  <div class="flex flex-wrap gap-4">
+    @for (corredor of corredores; track corredor.id) {
+    <div class="flex-1 p-3 bg-white rounded-lg shadow-lg max-w-xs flex flex-col h-[350px]">
       <div class="mb-2">
         <img src="https://th.bing.com/th/id/OIP.jdq2ZppaEGHTVIFsQBeXLQHaE8?rs=1&pid=ImgDetMain" alt="Descrição da imagem" class="w-full h-24 object-cover rounded-t-lg" />
       </div>
       <div class="flex items-center justify-between mb-2">
-        <h3 class="text-lg font-bold text-gray-800">{{corredor.nome}}</h3>
-        <button class="w-10 h-10 rounded-full flex items-center justify-center ml-2" title="Adicionar categoria">
+        <h3 class="text-lg font-bold text-gray-800">{{ corredor.nome }}</h3>
+        <button (click)="adicionarCategoria(corredor)" class="w-10 h-10 rounded-full flex items-center justify-center ml-2" title="Adicionar categoria">
           <img src="/icons/add-category.png" alt="add-category" class="w-6 h-6">
         </button>
       </div>
-      <div class="max-h-60 overflow-y-auto">
+      <div class="h-[140px] overflow-y-auto">
         <ul class="list-none p-0">
           @for (categoria of corredor.categorias; track categoria.id) {
-            <li class="py-1 text-gray-600 hover:bg-gray-200">{{ categoria.nome }}</li>
+            <li class="py-1 text-gray-600 hover:bg-gray-200 cursor-pointer"
+            (click)="irParaProdutoListagem(categoria.id)">{{ categoria.nome }}</li>
           }
         </ul>
       </div>
-      <div class="flex justify-center mt-2 gap-4">
-        <button class="text-gray-600 hover:text-blue-500 flex items-center gap-1">
+      <div class="flex justify-center mt-4 pt-4 border-t border-gray-200 gap-8">
+        <button (click)="editar(corredor)" class="text-gray-600 hover:text-blue-500 flex items-center gap-1" title="Editar corredor">
           <img src="/icons/edit.png" alt="Editar" class="w-5 h-5">
         </button>
-        <button class="text-gray-600 hover:text-red-500 flex items-center gap-1">
+        <button (click)="excluir(corredor)" class="text-gray-600 hover:text-red-500 flex items-center gap-1" title="Excluir corredor">
           <img src="https://cdn-icons-png.flaticon.com/512/1214/1214428.png" alt="Excluir" class="w-5 h-5">
         </button>
       </div>
     </div>
+    }
   </div>
-}
+
+  <!-- Controles de Paginação -->
+  <div class="mt-4 flex justify-between items-center">
+    <!-- Botões de navegação -->
+    <div class="flex space-x-4">
+      <button
+        (click)="voltarPagina()"
+        [disabled]="seletor.pagina === 1"
+        class="px-4 py-2 bg-gray-200 text-gray-600 rounded-lg hover:bg-gray-300 disabled:opacity-50">
+        Anterior
+      </button>
+      <button
+        (click)="avancarPagina()"
+        [disabled]="seletor.pagina === totalPaginas"
+        class="px-4 py-2 bg-gray-200 text-gray-600 rounded-lg hover:bg-gray-300 disabled:opacity-50">
+        Próxima
+      </button>
+    </div>
+
+    <!-- Páginas -->
+    <div class="flex space-x-2">
+      <button
+        *ngFor="let pagina of criarArrayPaginas()"
+        (click)="irParaPagina(pagina)"
+        [class.bg-blue-500]="pagina === seletor.pagina"
+        class="px-4 py-2 rounded-lg text-white hover:bg-blue-600">
+        {{ pagina }}
+      </button>
+    </div>
+  </div>
 </div>

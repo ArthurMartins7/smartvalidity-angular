@@ -1,27 +1,28 @@
+import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
-import { Corredor } from '../../../shared/model/entity/corredor';
 import { FormsModule } from '@angular/forms';
-import { CorredorService } from '../../../shared/service/corredor.service';
-import { UsuarioService } from '../../../shared/service/usuario.service';
+import { Corredor } from '../../../../shared/model/entity/corredor';
+import { Usuario } from '../../../../shared/model/entity/usuario.model';
+import { CorredorService } from '../../../../shared/service/corredor.service';
+import { UsuarioService } from '../../../../shared/service/usuario.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import Swal from 'sweetalert2';
-import { Usuario } from '../../../shared/model/entity/usuario.model';
-import { CommonModule } from '@angular/common';
 import { catchError, throwError } from 'rxjs';
 import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
-  selector: 'app-corredor-detalhe',
+  selector: 'app-corredor-editar',
   standalone: true,
   imports: [FormsModule, CommonModule],
-  templateUrl: './corredor-detalhe.component.html',
-  styleUrl: './corredor-detalhe.component.css'
+  templateUrl: './corredor-editar.component.html',
+  styleUrl: './corredor-editar.component.css'
 })
-export class CorredorDetalheComponent implements OnInit {
+export class CorredorEditarComponent implements OnInit {
 
   public corredor: Corredor = new Corredor();
   public idCorredor: number;
   public responsaveisDisponiveis: Usuario[] = [];
+  public selectedFile: File | null = null;
   public responsavelSelecionado: Usuario | null = null;
 
   constructor(
@@ -44,7 +45,9 @@ export class CorredorDetalheComponent implements OnInit {
       (corredor) => {
         this.corredor = corredor;
         if (corredor.responsaveis && corredor.responsaveis.length > 0) {
-          this.responsavelSelecionado = corredor.responsaveis[0];
+          this.responsavelSelecionado = this.responsaveisDisponiveis.find(
+            r => r.id === corredor.responsaveis[0].id
+          ) || null;
         }
       },
       (erro) => {
@@ -58,6 +61,11 @@ export class CorredorDetalheComponent implements OnInit {
     this.usuarioService.buscarTodos().subscribe(
       (responsaveis) => {
         this.responsaveisDisponiveis = responsaveis;
+        if (this.corredor.responsaveis && this.corredor.responsaveis.length > 0) {
+          this.responsavelSelecionado = responsaveis.find(
+            r => r.id === this.corredor.responsaveis[0].id
+          ) || null;
+        }
       },
       (erro) => {
         console.error('Erro ao carregar responsáveis:', erro);
@@ -66,68 +74,53 @@ export class CorredorDetalheComponent implements OnInit {
     );
   }
 
-  salvar(): void {
+  atualizar(): void {
     if (!this.corredor.nome || !this.responsavelSelecionado) {
       Swal.fire('Preencha todos os campos obrigatórios!', '', 'warning');
       return;
     }
 
-    // Atualiza o array de responsáveis com o responsável selecionado
-    this.corredor.responsaveis = [this.responsavelSelecionado];
-
-    if (this.idCorredor) {
-      this.alterar();
-    } else {
-      this.inserir();
-    }
-  }
-
-  public inserir(): void {
-    console.log('Corredor a ser enviado:', this.corredor);
+    console.log('Corredor a ser atualizado:', this.corredor);
 
     const corredorMapeado = {
       ...this.corredor,
       responsaveis: [
         {
-          id: this.responsavelSelecionado!.id,
-          perfilAcesso: this.responsavelSelecionado!.perfilAcesso,
-          cpf: this.responsavelSelecionado!.cpf,
-          nome: this.responsavelSelecionado!.nome,
-          email: this.responsavelSelecionado!.email,
-          senha: this.responsavelSelecionado!.senha
+          id: this.responsavelSelecionado.id,
+          perfilAcesso: this.responsavelSelecionado.perfilAcesso,
+          cpf: this.responsavelSelecionado.cpf,
+          nome: this.responsavelSelecionado.nome,
+          email: this.responsavelSelecionado.email,
+          senha: this.responsavelSelecionado.senha
         }
       ]
     };
 
-    this.corredorService.criarCorredor(corredorMapeado)
+    this.corredorService.atualizarCorredor(this.idCorredor!, corredorMapeado)
       .pipe(
         catchError((error: HttpErrorResponse) => {
-          console.error('Erro ao salvar o corredor:', error);
-          Swal.fire('Erro ao salvar o corredor!', error.error.message || 'Erro desconhecido', 'error');
+          console.error('Erro ao atualizar o corredor:', error);
+          Swal.fire('Erro ao atualizar o corredor!', error.error?.mensagem || error.message || 'Erro desconhecido', 'error');
           return throwError(error);
         })
       )
       .subscribe(
-        () => {
-          Swal.fire('Corredor salvo com sucesso!', '', 'success');
-          this.voltar();
+        (resposta) => {
+          Swal.fire('Corredor atualizado com sucesso!', '', 'success');
+          if (this.selectedFile) {
+            this.uploadImagem(resposta.id);
+          } else {
+            this.voltar();
+          }
         }
       );
   }
 
-  private alterar(): void {
-    this.corredorService.atualizarCorredor(this.idCorredor!, this.corredor).subscribe(
-      () => {
-        Swal.fire('Corredor atualizado com sucesso!', '', 'success');
-        this.voltar();
-      },
-      (erro) => {
-        Swal.fire('Erro ao atualizar o corredor!', erro.error.mensagem, 'error');
-      }
-    );
-  }
-
   public voltar(): void {
     this.router.navigate(['corredor']);
+  }
+
+  uploadImagem(id: number): void {
+    // Implementação do upload da imagem
   }
 }

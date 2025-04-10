@@ -1,0 +1,117 @@
+<!-- Cabeçalho -->
+<div class="flex items-center gap-2 mb-8">
+  <i class="material-icons text-gray-600">arrow_forward</i>
+  <div>
+    <div class="text-gray-500">Produtos</div>
+    <div class="text-2xl font-bold">Cadastro</div>
+  </div>
+</div>
+
+<!-- Card do Formulário -->
+<div class="bg-white rounded-lg shadow-sm p-8 max-w-3xl mx-auto">
+  <h2 class="text-xl font-medium text-gray-700 mb-6">{{ idProduto ? 'Editar' : 'Cadastrar' }} produto</h2>
+
+  <form (ngSubmit)="salvar($event)" class="space-y-6">
+    <!-- Código de Barras -->
+    <div>
+      <label for="codigoBarras" class="block text-sm font-medium text-gray-700 mb-1">Código de Barras</label>
+      <input
+        id="codigoBarras"
+        type="text"
+        [(ngModel)]="produto.codigoBarras"
+        name="codigoBarras"
+        class="block w-full px-4 py-3 bg-gray-100 border border-gray-200 rounded-md"
+        placeholder="Digite o código de barras"
+        required
+      />
+    </div>
+
+    <!-- Descrição -->
+    <div>
+      <label for="descricao" class="block text-sm font-medium text-gray-700 mb-1">Descrição</label>
+      <input
+        id="descricao"
+        type="text"
+        [(ngModel)]="produto.descricao"
+        name="descricao"
+        class="block w-full px-4 py-3 bg-gray-100 border border-gray-200 rounded-md"
+        placeholder="Digite a descrição do produto"
+        required
+      />
+    </div>
+
+    <!-- Marca -->
+    <div>
+      <label for="marca" class="block text-sm font-medium text-gray-700 mb-1">Marca</label>
+      <input
+        id="marca"
+        type="text"
+        [(ngModel)]="produto.marca"
+        name="marca"
+        class="block w-full px-4 py-3 bg-gray-100 border border-gray-200 rounded-md"
+        placeholder="Digite a marca do produto"
+      />
+    </div>
+
+    <!-- Unidade de Medida -->
+    <div>
+      <label for="unidadeMedida" class="block text-sm font-medium text-gray-700 mb-1">Unidade de Medida</label>
+      <input
+        id="unidadeMedida"
+        type="text"
+        [(ngModel)]="produto.unidadeMedida"
+        name="unidadeMedida"
+        class="block w-full px-4 py-3 bg-gray-100 border border-gray-200 rounded-md"
+        placeholder="Digite a unidade de medida"
+      />
+    </div>
+
+    <!-- Quantidade -->
+    <div>
+      <label for="quantidade" class="block text-sm font-medium text-gray-700 mb-1">Quantidade</label>
+      <input
+        id="quantidade"
+        type="number"
+        [(ngModel)]="produto.quantidade"
+        name="quantidade"
+        class="block w-full px-4 py-3 bg-gray-100 border border-gray-200 rounded-md"
+        placeholder="Digite a quantidade"
+        required
+      />
+    </div>
+
+    <!-- Fornecedor (select) -->
+    <div>
+      <label for="fornecedor" class="block text-sm font-medium text-gray-700 mb-1">Fornecedor</label>
+      <select
+        id="fornecedor"
+        [(ngModel)]="fornecedorSelecionado"
+        name="fornecedor"
+        class="block w-full px-4 py-3 bg-gray-100 border border-gray-200 rounded-md"
+        required
+      >
+        <option value="" disabled selected>Selecione um fornecedor</option>
+        <option *ngFor="let fornecedor of fornecedores" [value]="fornecedor.id">
+          {{ fornecedor.nome }}
+        </option>
+      </select>
+    </div>
+
+    <!-- Botões -->
+    <div class="flex justify-center gap-4 mt-8">
+      <button
+        type="button"
+        (click)="voltar()"
+        class="px-8 py-3 bg-gray-200 text-gray-700 font-medium rounded-full hover:bg-gray-300 transition-colors duration-200"
+      >
+        Voltar
+      </button>
+      <button
+        type="submit"
+        class="px-8 py-3 bg-blue-800 text-white font-medium rounded-full hover:bg-blue-900 transition-colors duration-200"
+      >
+        Salvar
+      </button>
+    </div>
+  </form>
+</div>

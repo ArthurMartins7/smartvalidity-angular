@@ -1,0 +1,136 @@
+  <!-- Cabeçalho -->
+  <header class="mb-8">
+    <nav class="flex items-center gap-2">
+      <i class="material-icons text-gray-600">arrow_back</i>
+      <div>
+        <span class="text-gray-500">Fornecedores</span>
+        <h1 class="text-2xl font-bold">Cadastro</h1>
+      </div>
+    </nav>
+  </header>
+
+  <section class="max-w-4xl mx-auto mt-6">
+    <!-- Tabs -->
+    <div class="flex border-b border-gray-200 mb-4">
+      <button type="button"
+        (click)="secaoAtiva = 'dadosGerais'"
+        [class.bg-white]="secaoAtiva === 'dadosGerais'"
+        [class.border-b-2]="secaoAtiva === 'dadosGerais'"
+        [class.border-blue-500]="secaoAtiva === 'dadosGerais'"
+        [class.text-blue-600]="secaoAtiva === 'dadosGerais'"
+        [class.bg-gray-100]="secaoAtiva !== 'dadosGerais'"
+        [class.text-gray-600]="secaoAtiva !== 'dadosGerais'"
+        class="px-6 py-2 font-medium text-sm border-t border-l border-r rounded-t-lg transition-colors">
+        Dados Gerais
+      </button>
+      <button type="button"
+        (click)="secaoAtiva = 'endereco'"
+        [class.bg-white]="secaoAtiva === 'endereco'"
+        [class.border-b-2]="secaoAtiva === 'endereco'"
+        [class.border-blue-500]="secaoAtiva === 'endereco'"
+        [class.text-blue-600]="secaoAtiva === 'endereco'"
+        [class.bg-gray-100]="secaoAtiva !== 'endereco'"
+        [class.text-gray-600]="secaoAtiva !== 'endereco'"
+        class="px-6 py-2 font-medium text-sm border-t border-l border-r rounded-t-lg transition-colors ml-1">
+        Endereço
+      </button>
+    </div>
+
+    <!-- Formulário -->
+    <div>
+      <form (ngSubmit)="salvar($event)" class="bg-white shadow-md rounded-lg p-6">
+        <!-- Conteúdo das Tabs -->
+        <div class="bg-white rounded-lg">
+          <!-- Tab Dados Gerais -->
+          <div *ngIf="secaoAtiva === 'dadosGerais'" class="space-y-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div class="form-group sm:col-span-2">
+                <label for="cnpj" class="block text-sm font-medium text-gray-900 mb-1">CNPJ:</label>
+                <input [(ngModel)]="fornecedor.cnpj" type="text" id="cnpj" name="cnpj"
+                  class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+              </div>
+
+              <div class="form-group">
+                <label for="nome" class="block text-sm font-medium text-gray-900 mb-1">Nome:</label>
+                <input [(ngModel)]="fornecedor.nome" type="text" id="nome" name="nome"
+                  class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+              </div>
+
+              <div class="form-group">
+                <label for="telefone" class="block text-sm font-medium text-gray-900 mb-1">Telefone:</label>
+                <input [(ngModel)]="fornecedor.telefone" type="text" id="telefone" name="telefone"
+                  class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+              </div>
+            </div>
+          </div>
+
+          <!-- Tab Endereço -->
+          <div *ngIf="secaoAtiva === 'endereco'" class="space-y-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div class="form-group sm:col-span-2">
+                <label for="cep" class="block text-sm font-medium text-gray-900 mb-1">CEP:</label>
+                <input [(ngModel)]="fornecedor.endereco.cep" type="text" id="cep" name="cep"
+                  class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+              </div>
+
+              <div class="form-group sm:col-span-2">
+                <label for="logradouro" class="block text-sm font-medium text-gray-900 mb-1">Logradouro:</label>
+                <input [(ngModel)]="fornecedor.endereco.logradouro" type="text" id="logradouro" name="logradouro"
+                  class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+              </div>
+
+              <div class="form-group">
+                <label for="numero" class="block text-sm font-medium text-gray-900 mb-1">Número:</label>
+                <input [(ngModel)]="fornecedor.endereco.numero" type="text" id="numero" name="numero"
+                  class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+              </div>
+
+              <div class="form-group">
+                <label for="complemento" class="block text-sm font-medium text-gray-900 mb-1">Complemento:</label>
+                <input [(ngModel)]="fornecedor.endereco.complemento" type="text" id="complemento" name="complemento"
+                  class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+              </div>
+
+              <div class="form-group">
+                <label for="bairro" class="block text-sm font-medium text-gray-900 mb-1">Bairro:</label>
+                <input [(ngModel)]="fornecedor.endereco.bairro" type="text" id="bairro" name="bairro"
+                  class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+              </div>
+
+              <div class="form-group">
+                <label for="cidade" class="block text-sm font-medium text-gray-900 mb-1">Cidade:</label>
+                <input [(ngModel)]="fornecedor.endereco.cidade" type="text" id="cidade" name="cidade"
+                  class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+              </div>
+
+              <div class="form-group">
+                <label for="estado" class="block text-sm font-medium text-gray-900 mb-1">Estado:</label>
+                <input [(ngModel)]="fornecedor.endereco.estado" type="text" id="estado" name="estado"
+                  class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+              </div>
+
+              <div class="form-group">
+                <label for="pais" class="block text-sm font-medium text-gray-900 mb-1">País:</label>
+                <input [(ngModel)]="fornecedor.endereco.pais" type="text" id="pais" name="pais"
+                  class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Botões de Ação -->
+        <div class="flex justify-center gap-4 mt-6">
+          <button type="button" (click)="voltar()"
+            class="px-8 py-2 text-lg font-medium text-white bg-gray-500 rounded-full min-w-[140px]
+            transition duration-300 ease-in-out hover:bg-gray-600 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2">
+            Voltar
+          </button>
+          <button type="submit"
+            class="px-8 py-2 text-lg font-medium text-white bg-blue-800 rounded-full min-w-[140px]
+            transition duration-300 ease-in-out hover:bg-blue-900 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+            Salvar
+          </button>
+        </div>
+      </form>
+    </div>
+  </section>

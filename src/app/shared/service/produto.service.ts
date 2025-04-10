@@ -1,9 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { ProdutoDTO } from '../model/dto/produto.dto';
-import { ProdutoSeletor } from '../model/seletor/produto.seletor';
-// import { Page } from '../model/page';
+import { Produto } from '../model/entity/produto';
 
 @Injectable({
   providedIn: 'root',
@@ -13,20 +11,24 @@ export class ProdutoService {
 
   constructor(private httpClient: HttpClient) {}
 
-  listarTodos(): Observable<ProdutoDTO[]> {
-    return this.httpClient.get<ProdutoDTO[]>(this.API);
+  listarTodos(): Observable<Produto[]> {
+    return this.httpClient.get<Produto[]>(this.API);
   }
 
-  buscarPorId(id: number): Observable<ProdutoDTO> {
-    return this.httpClient.get<ProdutoDTO>(`${this.API}/${id}`);
+  listarPorCategoria(categoriaId: number): Observable<Produto[]> {
+    return this.httpClient.get<Produto[]>(`${this.API}/categoria/${categoriaId}`);
   }
 
-  criarProduto(novoProduto: ProdutoDTO): Observable<ProdutoDTO> {
-    return this.httpClient.post<ProdutoDTO>(this.API, novoProduto);
+  buscarPorId(id: number): Observable<Produto> {
+    return this.httpClient.get<Produto>(`${this.API}/${id}`);
   }
 
-  atualizarProduto(id: number, produtoAtualizado: ProdutoDTO): Observable<ProdutoDTO> {
-    return this.httpClient.put<ProdutoDTO>(`${this.API}/${id}`, produtoAtualizado);
+  criarProduto(novoProduto: Produto): Observable<Produto> {
+    return this.httpClient.post<Produto>(this.API, novoProduto);
+  }
+
+  atualizarProduto(id: number, produtoAtualizado: Produto): Observable<Produto> {
+    return this.httpClient.put<Produto>(`${this.API}/${id}`, produtoAtualizado);
   }
 
   excluirProduto(id: number): Observable<void> {

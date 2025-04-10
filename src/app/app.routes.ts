@@ -4,6 +4,8 @@ import { RegisterComponent } from './core/auth/pages/register/register/register.
 import { CorredorListagemComponent } from './components/corredor/corredor-listagem/corredor-listagem.component';
 import { CorredorDetalheComponent } from './components/corredor/corredor-detalhe/corredor-detalhe.component';
 import { ProdutoListagemComponent } from './components/produto/produto-listagem/produto-listagem.component';
+import { MuralListagemComponent } from './components/mural/mural-listagem/mural-listagem.component';
+import { MuralDetalheComponent } from './components/mural/mural-detalhe/mural-detalhe.component';
 import { EntradaEstoqueComponent } from './components/entrada-estoque/entrada-estoque.component';
 import { CorredorEditarComponent } from './components/corredor/corredor-editar/corredor-editar/corredor-editar.component';
 import { FornecedorListagemComponent } from './components/fornecedor/fornecedor-listagem/fornecedor-listagem/fornecedor-listagem.component';
@@ -24,6 +26,11 @@ export const routes: Routes = [
   { path: 'fornecedor-detalhe', component: FornecedorDetalheComponent },
   { path: 'fornecedor-editar/:id', component: FornecedorEditarComponent },
   { path: 'entrada-estoque', component: EntradaEstoqueComponent },
+
+  // Catch all route
+  { path: 'corredor-detalhe', component: CorredorDetalheComponent },
+  { path: 'mural-listagem', component: MuralListagemComponent },
+  { path: 'mural-detalhe/:id', component: MuralDetalheComponent },
   { path: 'categoria-detalhe', component: CategoriaDetalheComponent },
 
 ];

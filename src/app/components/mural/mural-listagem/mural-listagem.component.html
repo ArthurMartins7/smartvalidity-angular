@@ -1,0 +1,631 @@
+<div class="container mx-auto p-4">
+  <!-- Cabeçalho com navegação -->
+  <div class="mb-6">
+    <div class="flex items-center mb-2">
+      <button class="text-blue-600 mr-3" routerLink="/dashboard">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+        </svg>
+      </button>
+      <div>
+        <h5 class="text-gray-500 text-sm">Mural</h5>
+        <h2 class="text-xl font-bold" *ngIf="activeTab === 'proximo'">Produtos próximos do vencimento</h2>
+        <h2 class="text-xl font-bold" *ngIf="activeTab === 'hoje'">Produtos que vencem hoje</h2>
+        <h2 class="text-xl font-bold" *ngIf="activeTab === 'vencido'">Produtos vencidos</h2>
+      </div>
+    </div>
+    <div class="w-full h-1 mt-2"
+      [ngClass]="{
+        'bg-yellow-500': activeTab === 'proximo',
+        'bg-red-500': activeTab === 'hoje',
+        'bg-black': activeTab === 'vencido'
+      }"></div>
+  </div>
+
+  <!-- Tabs -->
+  <div class="flex mb-6 items-center justify-between">
+    <div class="flex space-x-4">
+      <button
+        (click)="setActiveTab('proximo')"
+        [class.bg-yellow-500]="activeTab === 'proximo'"
+        [class.bg-gray-500]="activeTab !== 'proximo'"
+        class="px-4 py-2 rounded-lg text-white font-medium transition-colors">
+        Próximos a Vencer
+      </button>
+      <button
+        (click)="setActiveTab('hoje')"
+        [class.bg-red-500]="activeTab === 'hoje'"
+        [class.bg-gray-500]="activeTab !== 'hoje'"
+        class="px-4 py-2 rounded-lg text-white font-medium transition-colors">
+        Vencem Hoje
+      </button>
+      <button
+        (click)="setActiveTab('vencido')"
+        [class.bg-black]="activeTab === 'vencido'"
+        [class.bg-gray-500]="activeTab !== 'vencido'"
+        class="px-4 py-2 rounded-lg text-white font-medium transition-colors">
+        Vencidos
+      </button>
+    </div>
+
+    <!-- Search and sorting moved to the right -->
+    <div class="flex items-center space-x-3">
+      <!-- Buscador -->
+      <div class="search-box relative w-64 md:w-80">
+        <input
+          type="text"
+          [(ngModel)]="searchTerm"
+          (input)="applyFilter()"
+          placeholder="Buscar produto por nome"
+          class="pl-10 pr-10 py-2 border border-gray-300 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
+        <div class="absolute left-3 top-2.5">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
+        </div>
+        <button (click)="openFilterModal()" class="absolute right-3 top-2.5 text-gray-400 hover:text-gray-600">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+          </svg>
+        </button>
+      </div>
+
+      <!-- Ordenação -->
+      <div class="sort-controls whitespace-nowrap">
+        <div class="relative">
+          <button
+            class="px-4 py-2 border border-gray-300 rounded-lg flex items-center bg-white"
+            (click)="toggleSortOrder()"
+          >
+            <span class="text-sm font-medium">{{ sortDirection === 'asc' ? 'A a Z' : 'Z a A' }}</span>
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Botão Inspecionar -->
+      <button
+        (click)="marcarSelecionadosComoInspecionados()"
+        [disabled]="!hasSelectedItems()"
+        [class.opacity-50]="!hasSelectedItems()"
+        [class.cursor-not-allowed]="!hasSelectedItems()"
+        class="flex items-center bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors focus:outline-none">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+        </svg>
+        Inspecionar
+      </button>
+    </div>
+  </div>
+
+  <!-- Search bar, filters and actions - removing duplicate search -->
+  <div class="mb-4">
+    <!-- Filtros aplicados -->
+    <div class="flex mb-3" *ngIf="hasAppliedFilters()">
+      <div class="selected-filters text-sm text-gray-600">
+        <span *ngIf="advancedFilters.marca">
+          Marca: <strong>{{advancedFilters.marca}}</strong>
+          <button class="ml-1 text-red-600" (click)="clearFilter('marca')">×</button>
+        </span>
+        <span *ngIf="advancedFilters.dataVencimento.startDate || advancedFilters.dataVencimento.endDate" class="ml-2">
+          Período:
+          <strong>
+            {{advancedFilters.dataVencimento.startDate ? (advancedFilters.dataVencimento.startDate | date:'shortDate') : 'Início'}}
+            até
+            {{advancedFilters.dataVencimento.endDate ? (advancedFilters.dataVencimento.endDate | date:'shortDate') : 'Fim'}}
+          </strong>
+          <button class="ml-1 text-red-600" (click)="clearDateFilter()">×</button>
+        </span>
+        <span *ngIf="advancedFilters.corredor" class="ml-2">
+          Corredor: <strong>{{advancedFilters.corredor}}</strong>
+          <button class="ml-1 text-red-600" (click)="clearFilter('corredor')">×</button>
+        </span>
+        <span *ngIf="advancedFilters.categoria" class="ml-2">
+          Categoria: <strong>{{advancedFilters.categoria}}</strong>
+          <button class="ml-1 text-red-600" (click)="clearFilter('categoria')">×</button>
+        </span>
+        <span *ngIf="advancedFilters.fornecedor" class="ml-2">
+          Fornecedor: <strong>{{advancedFilters.fornecedor}}</strong>
+          <button class="ml-1 text-red-600" (click)="clearFilter('fornecedor')">×</button>
+        </span>
+        <span *ngIf="advancedFilters.lote" class="ml-2">
+          Lote: <strong>{{advancedFilters.lote}}</strong>
+          <button class="ml-1 text-red-600" (click)="clearFilter('lote')">×</button>
+        </span>
+        <button *ngIf="hasAppliedFilters()"
+          class="ml-3 text-blue-600 text-sm underline"
+          (click)="resetAllFilters()">Limpar todos</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Exibe apenas o contador de itens selecionados, sem o botão de inspecionar -->
+  <div *ngIf="hasSelectedItems()" class="flex items-center space-x-4 py-2 px-4 bg-gray-100 rounded-lg mb-4">
+    <span class="text-gray-600">{{ getSelectedItemsCount() }} item(s) selecionado(s)</span>
+  </div>
+
+  <!-- Filter Modal -->
+  <div *ngIf="showFilterModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 z-10 flex justify-center items-center">
+    <div class="bg-white rounded-lg shadow-lg p-0 w-full max-w-4xl max-h-[80vh] flex flex-col">
+      <!-- Modal Header -->
+      <div class="flex justify-between items-center p-4 border-b border-gray-200">
+        <h3 class="text-lg font-bold">Filtros Avançados</h3>
+        <button (click)="closeFilterModal()" class="text-gray-400 hover:text-gray-600">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+
+      <!-- Modal Body with Scrollable Content -->
+      <div class="flex-1 overflow-y-auto p-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <!-- Left Column - Product Filters -->
+          <div>
+            <h4 class="text-md font-semibold text-gray-700 mb-3 pb-1 border-b border-gray-200">Informações do Produto</h4>
+            <div class="space-y-4">
+              <!-- Corredor -->
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Corredor</label>
+                <div class="relative dropdown-container">
+                  <input
+                    type="text"
+                    [(ngModel)]="advancedFilters.corredor"
+                    (input)="filterCorredorOptions(advancedFilters.corredor)"
+                    (focus)="showCorredorDropdown = true"
+                    class="w-full rounded-lg border-gray-300 py-2 pl-3 pr-16 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="Digite ou selecione um corredor"
+                  >
+                  <div class="absolute inset-y-0 right-0 flex items-center pr-2">
+                    <button
+                      type="button"
+                      class="text-gray-500 hover:text-gray-700 px-1.5"
+                      (click)="searchCorredores($event)"
+                      title="Buscar corredores">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                      </svg>
+                    </button>
+                    <button
+                      type="button"
+                      class="text-gray-500 hover:text-gray-700 px-1.5"
+                      (click)="toggleCorredorDropdown($event)"
+                      title="Expandir/recolher lista">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                      </svg>
+                    </button>
+                  </div>
+                  <div *ngIf="showCorredorDropdown"
+                       class="absolute mt-1 w-full bg-white border border-gray-300 rounded-md shadow-lg z-10 max-h-60 overflow-auto">
+                    <div *ngIf="filteredCorredores.length === 0" class="py-2 px-3 text-sm text-gray-500">
+                      Nenhum corredor encontrado com "{{advancedFilters.corredor}}".
+                      Mostrando todos os corredores disponíveis.
+                    </div>
+                    <div *ngFor="let corredor of filteredCorredores"
+                         (click)="selectCorredor(corredor)"
+                         class="px-3 py-2 text-sm hover:bg-gray-100 cursor-pointer">
+                      {{corredor}}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Categoria -->
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Categoria</label>
+                <div class="relative dropdown-container">
+                  <input
+                    type="text"
+                    [(ngModel)]="advancedFilters.categoria"
+                    (input)="filterCategoriaOptions(advancedFilters.categoria)"
+                    (focus)="showCategoriaDropdown = true"
+                    class="w-full rounded-lg border-gray-300 py-2 pl-3 pr-16 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="Digite ou selecione uma categoria"
+                  >
+                  <div class="absolute inset-y-0 right-0 flex items-center pr-2">
+                    <button
+                      type="button"
+                      class="text-gray-500 hover:text-gray-700 px-1.5"
+                      (click)="searchCategorias($event)"
+                      title="Buscar categorias">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                      </svg>
+                    </button>
+                    <button
+                      type="button"
+                      class="text-gray-500 hover:text-gray-700 px-1.5"
+                      (click)="toggleCategoriaDropdown($event)"
+                      title="Expandir/recolher lista">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                      </svg>
+                    </button>
+                  </div>
+                  <div *ngIf="showCategoriaDropdown"
+                       class="absolute mt-1 w-full bg-white border border-gray-300 rounded-md shadow-lg z-10 max-h-60 overflow-auto">
+                    <div *ngIf="filteredCategorias.length === 0" class="py-2 px-3 text-sm text-gray-500">
+                      Nenhuma categoria encontrada com "{{advancedFilters.categoria}}".
+                      Mostrando todas as categorias disponíveis.
+                    </div>
+                    <div *ngFor="let categoria of filteredCategorias"
+                         (click)="selectCategoria(categoria)"
+                         class="px-3 py-2 text-sm hover:bg-gray-100 cursor-pointer">
+                      {{categoria}}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Fornecedor -->
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Fornecedor</label>
+                <div class="relative dropdown-container">
+                  <input
+                    type="text"
+                    [(ngModel)]="advancedFilters.fornecedor"
+                    (input)="filterFornecedorOptions(advancedFilters.fornecedor)"
+                    (focus)="showFornecedorDropdown = true"
+                    class="w-full rounded-lg border-gray-300 py-2 pl-3 pr-16 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="Digite ou selecione um fornecedor"
+                  >
+                  <div class="absolute inset-y-0 right-0 flex items-center pr-2">
+                    <button
+                      type="button"
+                      class="text-gray-500 hover:text-gray-700 px-1.5"
+                      (click)="searchFornecedores($event)"
+                      title="Buscar fornecedores">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                      </svg>
+                    </button>
+                    <button
+                      type="button"
+                      class="text-gray-500 hover:text-gray-700 px-1.5"
+                      (click)="toggleFornecedorDropdown($event)"
+                      title="Expandir/recolher lista">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                      </svg>
+                    </button>
+                  </div>
+                  <div *ngIf="showFornecedorDropdown"
+                       class="absolute mt-1 w-full bg-white border border-gray-300 rounded-md shadow-lg z-10 max-h-60 overflow-auto">
+                    <div *ngIf="filteredFornecedores.length === 0" class="py-2 px-3 text-sm text-gray-500">
+                      Nenhum fornecedor encontrado com "{{advancedFilters.fornecedor}}".
+                      Mostrando todos os fornecedores disponíveis.
+                    </div>
+                    <div *ngFor="let fornecedor of filteredFornecedores"
+                         (click)="selectFornecedor(fornecedor)"
+                         class="px-3 py-2 text-sm hover:bg-gray-100 cursor-pointer">
+                      {{fornecedor}}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Marca -->
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Marca</label>
+                <div class="relative dropdown-container">
+                  <input
+                    type="text"
+                    [(ngModel)]="advancedFilters.marca"
+                    (input)="filterBrandOptions(advancedFilters.marca)"
+                    (focus)="showMarcaDropdown = true"
+                    class="w-full rounded-lg border-gray-300 py-2 pl-3 pr-16 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="Digite ou selecione uma marca"
+                  >
+                  <div class="absolute inset-y-0 right-0 flex items-center pr-2">
+                    <button
+                      type="button"
+                      class="text-gray-500 hover:text-gray-700 px-1.5"
+                      (click)="searchBrands($event)"
+                      title="Buscar marcas">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                      </svg>
+                    </button>
+                    <button
+                      type="button"
+                      class="text-gray-500 hover:text-gray-700 px-1.5"
+                      (click)="toggleMarcaDropdown($event)"
+                      title="Expandir/recolher lista">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                      </svg>
+                    </button>
+                  </div>
+                  <div *ngIf="showMarcaDropdown"
+                       class="absolute mt-1 w-full bg-white border border-gray-300 rounded-md shadow-lg z-10 max-h-60 overflow-auto">
+                    <div *ngIf="filteredBrands.length === 0" class="py-2 px-3 text-sm text-gray-500">
+                      Nenhuma marca encontrada com "{{advancedFilters.marca}}".
+                      Mostrando todas as marcas disponíveis.
+                    </div>
+                    <div *ngFor="let marca of filteredBrands"
+                         (click)="selectBrand(marca)"
+                         class="px-3 py-2 text-sm hover:bg-gray-100 cursor-pointer">
+                      {{marca}}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Lote -->
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Lote</label>
+                <div class="relative dropdown-container">
+                  <input
+                    type="text"
+                    [(ngModel)]="advancedFilters.lote"
+                    (input)="filterLoteOptions(advancedFilters.lote)"
+                    (focus)="showLoteDropdown = true"
+                    class="w-full rounded-lg border-gray-300 py-2 pl-3 pr-16 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="Digite ou selecione um lote"
+                  >
+                  <div class="absolute inset-y-0 right-0 flex items-center pr-2">
+                    <button
+                      type="button"
+                      class="text-gray-500 hover:text-gray-700 px-1.5"
+                      (click)="searchLotes($event)"
+                      title="Buscar lotes">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                      </svg>
+                    </button>
+                    <button
+                      type="button"
+                      class="text-gray-500 hover:text-gray-700 px-1.5"
+                      (click)="toggleLoteDropdown($event)"
+                      title="Expandir/recolher lista">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                      </svg>
+                    </button>
+                  </div>
+                  <div *ngIf="showLoteDropdown"
+                       class="absolute mt-1 w-full bg-white border border-gray-300 rounded-md shadow-lg z-10 max-h-60 overflow-auto">
+                    <div *ngIf="filteredLotes.length === 0" class="py-2 px-3 text-sm text-gray-500">
+                      Nenhum lote encontrado com "{{advancedFilters.lote}}".
+                      Mostrando todos os lotes disponíveis.
+                    </div>
+                    <div *ngFor="let lote of filteredLotes"
+                         (click)="selectLote(lote)"
+                         class="px-3 py-2 text-sm hover:bg-gray-100 cursor-pointer">
+                      {{lote}}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right Column - Date Filters -->
+          <div>
+            <h4 class="text-md font-semibold text-gray-700 mb-3 pb-1 border-b border-gray-200">Filtros por Data</h4>
+            <div class="space-y-4">
+              <!-- Data de Vencimento -->
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Data de Vencimento</label>
+                <div class="grid grid-cols-2 gap-3">
+                  <div>
+                    <label class="text-xs text-gray-500 mb-1">De:</label>
+                    <input
+                      type="date"
+                      [(ngModel)]="advancedFilters.dataVencimento.startDate"
+                      class="w-full rounded-lg border-gray-300 py-2 px-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
+                  </div>
+                  <div>
+                    <label class="text-xs text-gray-500 mb-1">Até:</label>
+                    <input
+                      type="date"
+                      [(ngModel)]="advancedFilters.dataVencimento.endDate"
+                      class="w-full rounded-lg border-gray-300 py-2 px-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
+                  </div>
+                </div>
+              </div>
+
+              <!-- Data de Fabricação -->
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Data de Fabricação</label>
+                <div class="grid grid-cols-2 gap-3">
+                  <div>
+                    <label class="text-xs text-gray-500 mb-1">De:</label>
+                    <input
+                      type="date"
+                      [(ngModel)]="advancedFilters.dataFabricacao.startDate"
+                      class="w-full rounded-lg border-gray-300 py-2 px-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
+                  </div>
+                  <div>
+                    <label class="text-xs text-gray-500 mb-1">Até:</label>
+                    <input
+                      type="date"
+                      [(ngModel)]="advancedFilters.dataFabricacao.endDate"
+                      class="w-full rounded-lg border-gray-300 py-2 px-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
+                  </div>
+                </div>
+              </div>
+
+              <!-- Data de Recebimento -->
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Data de Recebimento</label>
+                <div class="grid grid-cols-2 gap-3">
+                  <div>
+                    <label class="text-xs text-gray-500 mb-1">De:</label>
+                    <input
+                      type="date"
+                      [(ngModel)]="advancedFilters.dataRecebimento.startDate"
+                      class="w-full rounded-lg border-gray-300 py-2 px-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
+                  </div>
+                  <div>
+                    <label class="text-xs text-gray-500 mb-1">Até:</label>
+                    <input
+                      type="date"
+                      [(ngModel)]="advancedFilters.dataRecebimento.endDate"
+                      class="w-full rounded-lg border-gray-300 py-2 px-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="flex justify-end space-x-3 p-4 border-t border-gray-200">
+        <button
+          (click)="resetFilters()"
+          class="btn-secondary">
+          Limpar Filtros
+        </button>
+        <button
+          (click)="applyAdvancedFilters()"
+          class="btn-primary">
+          Aplicar Filtros
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de Inspeção -->
+  <div *ngIf="showInspecaoModal" class="fixed inset-0 z-50 overflow-y-auto">
+    <!-- Overlay que impede interação com elementos abaixo do modal -->
+    <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+      <!-- Fundo escuro com opacidade -->
+      <div class="fixed inset-0 transition-opacity" aria-hidden="true">
+        <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
+      </div>
+
+      <!-- Modal -->
+      <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+        <!-- Cabeçalho com título e botão de fechar -->
+        <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+          <div class="flex justify-between items-center mb-4">
+            <h3 class="text-lg leading-6 font-medium text-gray-900">
+              Motivo da inspeção
+            </h3>
+            <button
+              type="button"
+              (click)="closeInspecaoModal()"
+              class="bg-white rounded-md p-2 inline-flex items-center justify-center text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500">
+              <span class="sr-only">Fechar</span>
+              <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+
+          <div class="mt-2">
+            <p class="text-sm text-gray-500 mb-4">
+              Selecione o motivo da inspeção para os {{ itensSelecionados.length }} item(ns) selecionado(s):
+            </p>
+
+            <div class="space-y-2">
+              <div *ngFor="let motivo of motivosInspecao" class="flex items-center">
+                <input
+                  type="radio"
+                  [id]="'motivo-' + motivo"
+                  name="motivoInspecao"
+                  [value]="motivo"
+                  (change)="selecionarMotivo(motivo)"
+                  [checked]="motivoInspecao === motivo"
+                  class="h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500">
+                <label [for]="'motivo-' + motivo" class="ml-2 block text-sm text-gray-900">
+                  {{ motivo }}
+                </label>
+              </div>
+            </div>
+
+            <!-- Mensagem de erro se nenhum motivo for selecionado -->
+            <div *ngIf="motivoInspecaoError" class="mt-2 text-sm text-red-600">
+              {{ motivoInspecaoError }}
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+          <button
+            type="button"
+            (click)="confirmarInspecao()"
+            [disabled]="!motivoInspecao"
+            [class.opacity-50]="!motivoInspecao"
+            [class.cursor-not-allowed]="!motivoInspecao"
+            class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none sm:ml-3 sm:w-auto sm:text-sm">
+            Confirmar
+          </button>
+          <button
+            type="button"
+            (click)="closeInspecaoModal()"
+            class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
+            Cancelar
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Table -->
+  <div class="bg-white rounded-lg shadow-md overflow-hidden border border-gray-200">
+    <table class="min-w-full divide-y divide-gray-200">
+      <thead class="bg-gray-50">
+        <tr>
+          <th class="px-4 py-3 text-center w-10">
+            <input type="checkbox" (change)="selectAll($event)"
+              class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+          </th>
+          <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cód. de barras</th>
+          <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Lote</th>
+          <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Descrição</th>
+          <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Marca</th>
+          <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Data de vencimento</th>
+          <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider w-24">Inspecionado</th>
+          <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider w-24"></th>
+        </tr>
+      </thead>
+      <tbody class="bg-white divide-y divide-gray-200">
+        <tr *ngFor="let item of filteredItems" class="hover:bg-gray-50">
+          <td class="px-4 py-3 text-center">
+            <input type="checkbox" [(ngModel)]="item.selecionado"
+              class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+          </td>
+          <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900">{{item.produto?.codigoBarras}}</td>
+          <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900">{{item.lote}}</td>
+          <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900">{{item.produto?.descricao}}</td>
+          <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900">{{item.produto?.marca}}</td>
+          <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900">{{item.dataValidade | date:'dd/MM/yyyy HH:mm:ss'}}</td>
+          <td class="px-4 py-3 text-center">
+            <svg *ngIf="item.inspecionado" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-500 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+            </svg>
+            <svg *ngIf="!item.inspecionado" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-red-500 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </td>
+          <td class="px-4 py-3 text-center">
+            <button [routerLink]="['/mural-detalhe', item.id]" [queryParams]="{tab: activeTab}" class="text-gray-500 hover:text-gray-700 focus:outline-none">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+              </svg>
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Empty State -->
+  <div *ngIf="filteredItems.length === 0" class="text-center py-8">
+    <p class="text-gray-500">Nenhum item encontrado nesta categoria.</p>
+  </div>
+</div>

@@ -34,11 +34,6 @@ export class SidebarComponent {
     { id: 'blog', icon: 'article', label: 'Blog', route: '/blog' },
   ];
 
-  userOptions: MenuItem[] = [
-    { id: 'entrar', icon: 'account_circle', label: 'Entrar', route: '/' },
-    { id: 'idioma', icon: 'language', label: 'Português', route: '/idioma' },
-  ];
-
   constructor(private router: Router) {}
 
   toggleSidebar(): void {
@@ -49,6 +44,10 @@ export class SidebarComponent {
     this.activeMenuItem = itemId;
     if (route) {
       this.navigateTo(route);
+      // Fecha a sidebar se estiver em um dispositivo móvel
+      if (this.isMobile()) {
+        this.isSidebarOpen = false;
+      }
     }
   }
 
@@ -60,5 +59,9 @@ export class SidebarComponent {
     if (route) {
       this.router.navigate([route]);
     }
+  }
+
+  isMobile(): boolean {
+    return window.innerWidth < 768; // md breakpoint do Tailwind
   }
 }

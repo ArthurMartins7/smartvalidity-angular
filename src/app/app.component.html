@@ -2,6 +2,10 @@
 <app-sidebar *ngIf="!isAuthRoute()"></app-sidebar>
 
 <!-- Área principal da aplicação -->
-<div [ngClass]="{'ml-64': !isAuthRoute()}" class="p-6 pt-16">
+<div [ngClass]="{
+      'ml-64': !isAuthRoute() && sidebar?.isSidebarOpen && !isMobile(),
+      'ml-0': !isAuthRoute() && (!sidebar?.isSidebarOpen || isMobile())
+     }"
+     class="p-6 pt-16 transition-all duration-300">
   <router-outlet></router-outlet>
 </div>

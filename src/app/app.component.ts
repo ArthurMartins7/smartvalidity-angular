@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject } from '@angular/core';
+import { Component, inject, ViewChild } from '@angular/core';
 import { Router, RouterOutlet } from '@angular/router';
 import { SidebarComponent } from "./shared/ui/sidebar/sidebar.component";
 
@@ -12,6 +12,7 @@ import { SidebarComponent } from "./shared/ui/sidebar/sidebar.component";
 })
 export class AppComponent {
   title = 'smartvalidity-angular';
+  @ViewChild(SidebarComponent) sidebar?: SidebarComponent;
 
   private router = inject(Router);
 
@@ -20,4 +21,7 @@ export class AppComponent {
     return authRoutes.includes(this.router.url);
   }
 
+  isMobile(): boolean {
+    return window.innerWidth < 768; // md breakpoint do Tailwind
+  }
 }

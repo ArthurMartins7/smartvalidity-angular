@@ -42,13 +42,6 @@ export class CorredorListagemComponent implements OnInit, OnDestroy {
     this.buscarCorredores();
     this.buscarResponsaveis();
 
-    // Configurar o debounce para a busca em tempo real
-    this.searchSubject.pipe(
-      debounceTime(300),
-      distinctUntilChanged()
-    ).subscribe(() => {
-      this.buscarCorredores();
-    });
   }
 
   private buscarResponsaveis(): void {
@@ -191,6 +184,19 @@ export class CorredorListagemComponent implements OnInit, OnDestroy {
       }
     });
   }
+
+  exibirImagemGrande(imagemBase64: string) {
+    Swal.fire({
+      title: 'Imagem da Carta',
+      html: `<img src="data:image/jpeg;base64,${imagemBase64}" alt="Imagem da Carta" style="max-width: 100%; height: auto;">`,
+      width: '80%',
+      showCloseButton: true,
+      showConfirmButton: false,
+      background: '#fff',
+      padding: '20px'
+    });
+  }
+
 
   editar(corredorSelecionado: Corredor) {
     this.router.navigate(['/corredor-editar/', corredorSelecionado]);

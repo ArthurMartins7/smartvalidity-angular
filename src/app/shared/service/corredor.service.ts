@@ -17,6 +17,10 @@ export class CorredorService {
     private usuarioService: UsuarioService
   ) { }
 
+  uploadImagem(idCorredor: number, formData: FormData): Observable<any> {
+    return this.httpClient.post(`${this.API}/${idCorredor}/upload`, formData, { responseType: 'text' });
+  }
+
   criarCorredor(novoCorredor: Corredor): Observable<Corredor> {
     return this.httpClient.post<Corredor>(this.API, novoCorredor);
   }

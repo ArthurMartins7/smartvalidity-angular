@@ -37,7 +37,7 @@ export class FornecedorEditarComponent implements OnInit {
     }
   }
 
-  carregarFornecedor(id: number): void {
+  carregarFornecedor(id: string): void {
     this.fornecedorService.buscarPorId(id).subscribe({
       next: (fornecedor: Fornecedor) => {
         this.fornecedor = fornecedor;

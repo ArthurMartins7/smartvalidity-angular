@@ -3,7 +3,7 @@ import { Fornecedor } from "./fornecedor";
 import { ItemProduto } from "./itemProduto";
 
 export class Produto {
-    id: number;
+    id: string;
     codigoBarras: string;
     descricao: string;
     marca: string;
@@ -13,5 +13,4 @@ export class Produto {
     itensProduto: ItemProduto[];
     fornecedores: Fornecedor[];
     //alertas: Alerta[];
-
 }

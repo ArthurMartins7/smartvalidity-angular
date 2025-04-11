@@ -13,7 +13,7 @@ import Swal from 'sweetalert2';
 })
 export class CategoriaDetalheComponent implements OnInit {
   public categoria: Categoria = new Categoria();
-  public corredorId: number; // Armazena o ID do corredor
+  public corredorId: string; // Armazena o ID do corredor
 
   constructor(
     private categoriaService: CategoriaService,
@@ -22,7 +22,7 @@ export class CategoriaDetalheComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.corredorId = Number(this.route.snapshot.queryParamMap.get('corredorId'));
+    this.corredorId = this.route.snapshot.queryParamMap.get('corredorId') || '';
     this.categoria.corredor = { id: this.corredorId };
   }
 

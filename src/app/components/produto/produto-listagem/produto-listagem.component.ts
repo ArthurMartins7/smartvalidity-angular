@@ -26,12 +26,22 @@ export class ProdutoListagemComponent implements OnInit{
   public produtos: Produto[] = [];
   public Fornecedor = new Fornecedor();
   public fornecedores: Fornecedor[] = [];
-  public categoriaId: number | null = null;
+  public categoriaId: string | null = null;
 
   ngOnInit(): void {
+    this.buscarFornecedores();
     this.route.queryParams.subscribe(params => {
-      this.categoriaId = params['categoriaId'] ? Number(params['categoriaId']) : null;
-      this.buscarProdutos();
+      const categoriaIdParam = params['categoriaId'];
+      console.log('Raw category ID from params:', categoriaIdParam);
+
+      if (categoriaIdParam) {
+        this.categoriaId = categoriaIdParam;
+        console.log('Category ID:', this.categoriaId);
+        this.buscarProdutos();
+      } else {
+        this.categoriaId = null;
+        this.buscarProdutos();
+      }
     });
   }
 
@@ -49,25 +59,41 @@ export class ProdutoListagemComponent implements OnInit{
 
   public buscarProdutos() {
     if (this.categoriaId) {
-      this.produtoService.listarPorCategoria(this.categoriaId).subscribe(
-        (resultado) => {
+      console.log('Fetching products for category ID:', this.categoriaId);
+      this.produtoService.listarPorCategoria(this.categoriaId.toString()).subscribe({
+        next: (resultado) => {
+          console.log('Products received from API:', resultado);
           this.produtos = resultado;
-          console.log(this.produtos);
+          // Load suppliers for each product
+          this.produtos.forEach(produto => {
+            if (produto.fornecedores && produto.fornecedores.length > 0) {
+              console.log('Product suppliers:', produto.fornecedores);
+            }
+          });
         },
-        (erro) => {
-          console.error('Erro ao consultar produtos da categoria', erro.error.mensagem);
+        error: (erro) => {
+          console.error('Error fetching products by category:', erro);
+          console.error('Error details:', erro.error?.mensagem || erro.message);
         }
-      );
+      });
     } else {
-      this.produtoService.listarTodos().subscribe(
-        (resultado) => {
+      console.log('Fetching all products');
+      this.produtoService.listarTodos().subscribe({
+        next: (resultado) => {
+          console.log('All products received from API:', resultado);
           this.produtos = resultado;
-          console.log(this.produtos);
+          // Load suppliers for each product
+          this.produtos.forEach(produto => {
+            if (produto.fornecedores && produto.fornecedores.length > 0) {
+              console.log('Product suppliers:', produto.fornecedores);
+            }
+          });
         },
-        (erro) => {
-          console.error('Erro ao consultar todos os produtos', erro.error.mensagem);
+        error: (erro) => {
+          console.error('Error fetching all products:', erro);
+          console.error('Error details:', erro.error?.mensagem || erro.message);
         }
-      );
+      });
     }
   }
 
@@ -96,6 +122,10 @@ export class ProdutoListagemComponent implements OnInit{
   }
 
   public adicionarProduto() {
-    this.router.navigate(['produto-detalhe']);
+    if (this.categoriaId) {
+      this.router.navigate(['produto-detalhe'], { queryParams: { categoriaId: this.categoriaId } });
+    } else {
+      this.router.navigate(['produto-detalhe']);
+    }
   }
 }

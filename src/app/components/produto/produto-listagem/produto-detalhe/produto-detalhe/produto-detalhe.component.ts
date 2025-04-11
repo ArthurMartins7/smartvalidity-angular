@@ -17,9 +17,10 @@ import { CommonModule } from '@angular/common';
 export class ProdutoDetalheComponent implements OnInit {
 
   public produto: Produto = new Produto();
-  public idProduto: number;
+  public idProduto: string;
   public fornecedores: Fornecedor[] = [];
-  public fornecedorSelecionado: number;
+  public fornecedorSelecionado: string;
+  public categoriaId: string | null = null;
 
   constructor(
     private produtoService: ProdutoService,
@@ -34,6 +35,22 @@ export class ProdutoDetalheComponent implements OnInit {
       this.idProduto = params['id'];
       if (this.idProduto) {
         this.buscarProduto();
+      }
+    });
+
+    this.route.queryParams.subscribe(params => {
+      this.categoriaId = params['categoriaId'] || null;
+      console.log('Category ID from params:', this.categoriaId);
+
+      if (this.categoriaId) {
+        // If we have a category ID, create a basic category object
+        this.produto.categoria = {
+          id: this.categoriaId,
+          nome: '',
+          corredor: { id: '' },
+          produtos: []
+        };
+        console.log('Product category set:', this.produto.categoria);
       }
     });
   }
@@ -64,34 +81,58 @@ export class ProdutoDetalheComponent implements OnInit {
   salvar(event: Event): void {
     event.preventDefault();
 
+    // Cria um objeto simplificado do produto para enviar ao backend
+    const produtoParaSalvar = {
+      codigoBarras: this.produto.codigoBarras,
+      descricao: this.produto.descricao,
+      marca: this.produto.marca,
+      unidadeMedida: this.produto.unidadeMedida,
+      quantidade: this.produto.quantidade,
+      fornecedores: [] as any[],
+      categoria: null as any
+    };
+
+    // Adiciona o fornecedor se selecionado
     if (this.fornecedorSelecionado) {
-      const fornecedorSelecionado = this.fornecedores.find(f => f.id === this.fornecedorSelecionado);
-      if (fornecedorSelecionado) {
-        this.produto.fornecedores = [fornecedorSelecionado];
-      }
+      produtoParaSalvar.fornecedores = [{
+        id: this.fornecedorSelecionado
+      }];
     }
 
+    // Adiciona a categoria se existir
+    if (this.categoriaId) {
+      produtoParaSalvar.categoria = {
+        id: this.categoriaId
+      };
+    }
+
+    console.log('Dados do produto antes de salvar:', JSON.stringify(produtoParaSalvar, null, 2));
+
     if (this.idProduto) {
-      this.atualizar();
+      this.atualizar(produtoParaSalvar);
     } else {
-      this.inserir();
+      this.inserir(produtoParaSalvar);
     }
   }
 
-  inserir(): void {
-    this.produtoService.criarProduto(this.produto).subscribe(
-      () => {
+  inserir(produtoParaSalvar: any): void {
+    console.log('Criando produto com os dados:', JSON.stringify(produtoParaSalvar, null, 2));
+    this.produtoService.criarProduto(produtoParaSalvar).subscribe({
+      next: (response) => {
+        console.log('Produto criado com sucesso:', response);
         Swal.fire('Produto salvo com sucesso!', '', 'success');
         this.voltar();
       },
-      (erro) => {
-        Swal.fire('Erro ao salvar o produto: ' + erro.error, 'error');
+      error: (erro) => {
+        console.error('Erro ao criar produto:', erro);
+        console.error('Detalhes do erro:', JSON.stringify(erro, null, 2));
+        Swal.fire('Erro ao salvar o produto', erro.error?.mensagem || 'Erro desconhecido', 'error');
       }
-    );
+    });
   }
 
-  atualizar(): void {
-    this.produtoService.atualizarProduto(this.idProduto, this.produto).subscribe(
+  atualizar(produtoParaSalvar: any): void {
+    this.produtoService.atualizarProduto(this.idProduto, produtoParaSalvar).subscribe(
       () => {
         Swal.fire('Produto atualizado com sucesso!', '', 'success');
         this.voltar();

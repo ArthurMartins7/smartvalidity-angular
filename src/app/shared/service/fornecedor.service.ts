@@ -21,11 +21,11 @@ export class FornecedorService {
     return this.httpClient.get<Fornecedor[]>(this.API);
   }
 
-  buscarPorId(id: number): Observable<Fornecedor> {
+  buscarPorId(id: string): Observable<Fornecedor> {
     return this.httpClient.get<Fornecedor>(`${this.API}/${id}`);
   }
 
-   listarComSeletor(seletor: FornecedorSeletor): Observable<Fornecedor[]> {
+  listarComSeletor(seletor: FornecedorSeletor): Observable<Fornecedor[]> {
     return this.httpClient.post<Fornecedor[]>(`${this.API}/filtro`, seletor);
   }
 
@@ -37,15 +37,15 @@ export class FornecedorService {
     return this.httpClient.post<number>(this.API + '/contar', seletor);
   }
 
-  atualizarFornecedor(id: number, fornecedorAtualizado: Fornecedor): Observable<Fornecedor> {
+  atualizarFornecedor(id: string, fornecedorAtualizado: Fornecedor): Observable<Fornecedor> {
     return this.httpClient.put<Fornecedor>(`${this.API}/${id}`, fornecedorAtualizado);
   }
 
-  excluirFornecedor(id: number): Observable<void> {
+  excluirFornecedor(id: string): Observable<void> {
     return this.httpClient.delete<void>(`${this.API}/${id}`);
   }
 
-  buscarCorredoresPorFornecedor(fornecedorId: number): Observable<Corredor[]> {
+  buscarCorredoresPorFornecedor(fornecedorId: string): Observable<Corredor[]> {
     return this.httpClient.get<Corredor[]>(`${this.API}/${fornecedorId}/corredores`);
   }
 }

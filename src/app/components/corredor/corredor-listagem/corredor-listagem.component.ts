@@ -7,7 +7,7 @@ import { Categoria } from '../../../shared/model/entity/categoria';
 import { Router } from '@angular/router';
 import Swal from 'sweetalert2';
 import { Subject } from 'rxjs';
-import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
+import { debounceTime, distinctUntilChanged, takeUntil } from 'rxjs/operators';
 import { CommonModule } from '@angular/common';
 import { CorredorSeletor } from '../../../shared/model/seletor/corredor.seletor';
 import { Usuario } from '../../../shared/model/entity/usuario.model';
@@ -23,6 +23,7 @@ export class CorredorListagemComponent implements OnInit, OnDestroy {
   private categoriaService = inject(CategoriaService);
   private corredorService = inject(CorredorService);
   private router = inject(Router);
+  private destroy$ = new Subject<void>();
 
   public seletor: CorredorSeletor = new CorredorSeletor();
   public corredores: Corredor[] = [];
@@ -39,9 +40,21 @@ export class CorredorListagemComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.seletor.pagina = 1;
     this.seletor.limite = this.itensPorPagina;
+
+    // Configurar o observador do searchSubject para realizar a busca após um tempo
+    this.searchSubject.pipe(
+      debounceTime(500), // Aguarda 500ms após o último evento
+      distinctUntilChanged(), // Ignora se o valor não mudou
+      takeUntil(this.destroy$)
+    ).subscribe(termo => {
+      // Atualiza o seletor com o termo de busca
+      this.seletor.nome = termo;
+      // Realiza a busca
+      this.buscarCorredores();
+    });
+
     this.buscarCorredores();
     this.buscarResponsaveis();
-
   }
 
   private buscarResponsaveis(): void {
@@ -117,13 +130,16 @@ export class CorredorListagemComponent implements OnInit, OnDestroy {
     this.seletor.pagina = 1;
 
     // Atualizar o seletor com os filtros
-    this.seletor.nome = this.filtroNome;
+    this.filtroNome = this.seletor.nome; // Sincronizar os valores
     this.seletor.responsavelId = this.filtroResponsavel?.id || null;
 
     console.log('Seletor atualizado:', this.seletor);
 
     // Buscar corredores com os novos filtros
     this.buscarCorredores();
+
+    // Fechar o modal de filtros após aplicar
+    this.mostrarFiltros = false;
   }
 
   public limparFiltros() {
@@ -210,11 +226,13 @@ export class CorredorListagemComponent implements OnInit, OnDestroy {
     this.router.navigate(['/categoria-detalhe'], { queryParams: { corredorId: corredor.id } });
   }
 
-  public irParaProdutoListagem(categoriaId: number) {
+  public irParaProdutoListagem(categoriaId: string) {
     this.router.navigate(['/produto-listagem'], { queryParams: { categoriaId } });
   }
 
   ngOnDestroy() {
+    this.destroy$.next();
+    this.destroy$.complete();
     this.searchSubject.complete();
   }
 }

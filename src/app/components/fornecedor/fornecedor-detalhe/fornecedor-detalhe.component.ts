@@ -18,7 +18,7 @@ import { Endereco } from '../../../shared/model/entity/endereco';
 export class FornecedorDetalheComponent implements OnInit {
 
   public fornecedor: Fornecedor = new Fornecedor();
-  public idFornecedor: number;
+  public idFornecedor: string;
   public secaoAtiva: 'dadosGerais' | 'endereco' = 'dadosGerais';
   public buscandoCep: boolean = false;
 

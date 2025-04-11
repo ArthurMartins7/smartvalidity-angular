@@ -1,5 +1,5 @@
 export class Endereco{
-  id: number;
+  id: string;
   logradouro: string;
   numero: string;
   complemento: string;
@@ -8,5 +8,4 @@ export class Endereco{
   estado: string;
   pais: string;
   cep: string;
-
 }

@@ -34,7 +34,7 @@ export class CorredorDetalheComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    this.idCorredor = Number(this.activatedRoute.snapshot.paramMap.get('id'));
+    this.idCorredor = Number(this.activatedRoute.snapshot.paramMap.get('id')) || 0;
     if (this.idCorredor) {
       this.carregarCorredor();
     }

@@ -33,7 +33,7 @@ export class CorredorEditarComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    this.idCorredor = Number(this.activatedRoute.snapshot.paramMap.get('id'));
+    this.idCorredor = Number(this.activatedRoute.snapshot.paramMap.get('id')) || 0;
     if (this.idCorredor) {
       this.carregarCorredor();
     }
@@ -96,7 +96,7 @@ export class CorredorEditarComponent implements OnInit {
       ]
     };
 
-    this.corredorService.atualizarCorredor(this.idCorredor!, corredorMapeado)
+    this.corredorService.atualizarCorredor(this.idCorredor, corredorMapeado)
       .pipe(
         catchError((error: HttpErrorResponse) => {
           console.error('Erro ao atualizar o corredor:', error);
@@ -121,6 +121,25 @@ export class CorredorEditarComponent implements OnInit {
   }
 
   uploadImagem(id: number): void {
-    // Implementação do upload da imagem
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*';
+    input.onchange = (event: any) => {
+      const file = event.target.files[0];
+      if (file) {
+        const formData = new FormData();
+        formData.append('file', file);
+        this.corredorService.uploadImagem(id, formData).subscribe(
+          () => {
+            this.carregarCorredor();
+          },
+          (erro) => {
+            console.error('Erro ao fazer upload da imagem:', erro);
+            Swal.fire('Erro!', 'Não foi possível fazer upload da imagem.', 'error');
+          }
+        );
+      }
+    };
+    input.click();
   }
 }

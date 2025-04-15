@@ -75,10 +75,24 @@ export class CorredorListagemComponent implements OnInit, OnDestroy {
   }
 
   public buscarCorredores() {
-    console.log('Buscando corredores com seletor:', this.seletor);
+    console.log('Buscando corredores com seletor:', {
+      nome: this.seletor.nome,
+      responsavel: this.seletor.responsavel,
+      responsavelId: this.seletor.responsavelId,
+      pagina: this.seletor.pagina,
+      limite: this.seletor.limite
+    });
+    
     this.corredorService.listarComSeletor(this.seletor).subscribe(
       (resultado) => {
-        console.log('Resultado da busca:', resultado);
+        console.log('Resultado da busca:', {
+          quantidadeCorredores: resultado.length,
+          corredores: resultado.map(c => ({
+            id: c.id,
+            nome: c.nome,
+            responsaveis: c.responsaveis
+          }))
+        });
         this.corredores = resultado;
         this.calcularTotalPaginas();
       },
@@ -130,10 +144,25 @@ export class CorredorListagemComponent implements OnInit, OnDestroy {
     this.seletor.pagina = 1;
 
     // Atualizar o seletor com os filtros
-    this.filtroNome = this.seletor.nome; // Sincronizar os valores
-    this.seletor.responsavelId = this.filtroResponsavel?.id || null;
+    this.seletor.nome = this.filtroNome;
+    
+    // Limpar os filtros de responsável se não houver seleção
+    if (!this.filtroResponsavel) {
+      this.seletor.responsavel = '';
+      this.seletor.responsavelId = null;
+    } else {
+      // Atualizar com o responsável selecionado
+      this.seletor.responsavel = this.filtroResponsavel.nome;
+      this.seletor.responsavelId = this.filtroResponsavel.id;
+    }
 
-    console.log('Seletor atualizado:', this.seletor);
+    console.log('Seletor atualizado:', {
+      nome: this.seletor.nome,
+      responsavel: this.seletor.responsavel,
+      responsavelId: this.seletor.responsavelId,
+      pagina: this.seletor.pagina,
+      limite: this.seletor.limite
+    });
 
     // Buscar corredores com os novos filtros
     this.buscarCorredores();
@@ -146,7 +175,9 @@ export class CorredorListagemComponent implements OnInit, OnDestroy {
     this.filtroNome = '';
     this.filtroResponsavel = null;
     this.seletor.nome = '';
+    this.seletor.responsavel = '';
     this.seletor.responsavelId = null;
+    this.seletor.pagina = 1;
     this.buscarCorredores();
   }
 
@@ -215,7 +246,7 @@ export class CorredorListagemComponent implements OnInit, OnDestroy {
 
 
   editar(corredorSelecionado: Corredor) {
-    this.router.navigate(['/corredor-editar/', corredorSelecionado]);
+    this.router.navigate(['/corredor-editar/', corredorSelecionado.id]);
   }
 
   public adicionarCorredor() {

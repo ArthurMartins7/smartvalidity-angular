@@ -27,7 +27,6 @@ export class FornecedorListagemComponent implements OnInit, OnDestroy {
   public mostrarFiltros: boolean = false;
   public filtroTelefone: string = '';
   public filtroCnpj: string = '';
-  public filtroDescricaoProduto: string = '';
   private searchSubject = new Subject<string>();
 
   constructor(
@@ -149,7 +148,6 @@ export class FornecedorListagemComponent implements OnInit, OnDestroy {
   public aplicarFiltros() {
     this.seletor.telefone = this.filtroTelefone;
     this.seletor.cnpj = this.filtroCnpj;
-    this.seletor.descricaoProduto = this.filtroDescricaoProduto;
     this.seletor.pagina = 1;
     this.buscarFornecedores();
     this.mostrarFiltros = false;
@@ -158,10 +156,8 @@ export class FornecedorListagemComponent implements OnInit, OnDestroy {
   public limparFiltros() {
     this.filtroTelefone = '';
     this.filtroCnpj = '';
-    this.filtroDescricaoProduto = '';
     this.seletor.telefone = '';
     this.seletor.cnpj = '';
-    this.seletor.descricaoProduto = '';
     this.seletor.pagina = 1;
     this.buscarFornecedores();
     this.mostrarFiltros = false;

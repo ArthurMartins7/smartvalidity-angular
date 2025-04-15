@@ -4,7 +4,6 @@ export class FornecedorSeletor extends BaseSeletor {
   nome: string = '';
   telefone: string = '';
   cnpj: string = '';
-  descricaoProduto: string = '';
   override pagina: number = 1;
   override limite: number = 5;
   logradouro: string;

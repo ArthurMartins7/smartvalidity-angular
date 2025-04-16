@@ -83,12 +83,23 @@ export class ProdutoListagemComponent implements OnInit{
       this.produtoService.listarPorCategoria(this.categoriaId.toString()).subscribe({
         next: (resultado) => {
           console.log('Products received from API:', resultado);
-          this.produtos = resultado;
-          // Load suppliers for each product
-          this.produtos.forEach(produto => {
-            if (produto.fornecedores && produto.fornecedores.length > 0) {
-              console.log('Product suppliers:', produto.fornecedores);
+          // Criar uma nova instância para cada produto e seus fornecedores
+          this.produtos = resultado.map(produto => {
+            const novoProduto = { ...produto };
+            if (novoProduto.fornecedores && novoProduto.fornecedores.length > 0) {
+              // Garantir que cada fornecedor seja uma cópia independente
+              novoProduto.fornecedores = novoProduto.fornecedores.map(fornecedor => {
+                const novoFornecedor = new Fornecedor();
+                novoFornecedor.id = fornecedor.id;
+                novoFornecedor.nome = fornecedor.nome;
+                novoFornecedor.telefone = fornecedor.telefone;
+                novoFornecedor.cnpj = fornecedor.cnpj;
+                novoFornecedor.endereco = fornecedor.endereco;
+                novoFornecedor.produtos = [];
+                return novoFornecedor;
+              });
             }
+            return novoProduto;
           });
         },
         error: (erro) => {
@@ -101,12 +112,23 @@ export class ProdutoListagemComponent implements OnInit{
       this.produtoService.listarTodos().subscribe({
         next: (resultado) => {
           console.log('All products received from API:', resultado);
-          this.produtos = resultado;
-          // Load suppliers for each product
-          this.produtos.forEach(produto => {
-            if (produto.fornecedores && produto.fornecedores.length > 0) {
-              console.log('Product suppliers:', produto.fornecedores);
+          // Criar uma nova instância para cada produto e seus fornecedores
+          this.produtos = resultado.map(produto => {
+            const novoProduto = { ...produto };
+            if (novoProduto.fornecedores && novoProduto.fornecedores.length > 0) {
+              // Garantir que cada fornecedor seja uma cópia independente
+              novoProduto.fornecedores = novoProduto.fornecedores.map(fornecedor => {
+                const novoFornecedor = new Fornecedor();
+                novoFornecedor.id = fornecedor.id;
+                novoFornecedor.nome = fornecedor.nome;
+                novoFornecedor.telefone = fornecedor.telefone;
+                novoFornecedor.cnpj = fornecedor.cnpj;
+                novoFornecedor.endereco = fornecedor.endereco;
+                novoFornecedor.produtos = [];
+                return novoFornecedor;
+              });
             }
+            return novoProduto;
           });
         },
         error: (erro) => {

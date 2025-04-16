@@ -146,6 +146,15 @@ export class ProdutoDetalheComponent implements OnInit {
   }
 
   voltar(): void {
-    this.router.navigate(['/produto-listagem']);
+    if (this.categoriaId) {
+      this.router.navigate(['/produto-listagem'], { 
+        queryParams: { 
+          categoriaId: this.categoriaId,
+          categoriaNome: this.categoriaNome 
+        } 
+      });
+    } else {
+      this.router.navigate(['/produto-listagem']);
+    }
   }
 }

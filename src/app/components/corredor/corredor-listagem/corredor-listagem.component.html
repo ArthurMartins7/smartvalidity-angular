@@ -124,7 +124,7 @@
         <ul class="list-none p-0">
           @for (categoria of corredor.categorias; track categoria.id) {
             <li class="py-1 text-gray-600 hover:bg-gray-200 cursor-pointer"
-            (click)="irParaProdutoListagem(categoria.id)">{{ categoria.nome }}</li>
+            (click)="irParaProdutoListagem(categoria.id, categoria.nome)">{{ categoria.nome }}</li>
           }
         </ul>
       </div>

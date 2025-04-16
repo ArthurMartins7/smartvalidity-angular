@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { Produto } from '../../../../../shared/model/entity/produto';
 import { ProdutoService } from '../../../../../shared/service/produto.service';
 import { FornecedorService } from '../../../../../shared/service/fornecedor.service';
+import { CategoriaService } from '../../../../../shared/service/categoria.service';
 import { Fornecedor } from '../../../../../shared/model/entity/fornecedor';
 import { ActivatedRoute, Router } from '@angular/router';
 import Swal from 'sweetalert2';
@@ -21,10 +22,12 @@ export class ProdutoDetalheComponent implements OnInit {
   public fornecedores: Fornecedor[] = [];
   public fornecedorSelecionado: string;
   public categoriaId: string | null = null;
+  public categoriaNome: string = '';
 
   constructor(
     private produtoService: ProdutoService,
     private fornecedorService: FornecedorService,
+    private categoriaService: CategoriaService,
     private router: Router,
     private route: ActivatedRoute
   ) { }
@@ -40,17 +43,16 @@ export class ProdutoDetalheComponent implements OnInit {
 
     this.route.queryParams.subscribe(params => {
       this.categoriaId = params['categoriaId'] || null;
-      console.log('Category ID from params:', this.categoriaId);
+      this.categoriaNome = params['categoriaNome'] || '';
 
       if (this.categoriaId) {
         // If we have a category ID, create a basic category object
         this.produto.categoria = {
           id: this.categoriaId,
-          nome: '',
+          nome: this.categoriaNome,
           corredor: { id: '' },
           produtos: []
         };
-        console.log('Product category set:', this.produto.categoria);
       }
     });
   }

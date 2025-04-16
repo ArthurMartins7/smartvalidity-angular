@@ -257,8 +257,13 @@ export class CorredorListagemComponent implements OnInit, OnDestroy {
     this.router.navigate(['/categoria-detalhe'], { queryParams: { corredorId: corredor.id } });
   }
 
-  public irParaProdutoListagem(categoriaId: string) {
-    this.router.navigate(['/produto-listagem'], { queryParams: { categoriaId } });
+  public irParaProdutoListagem(categoriaId: string, categoriaNome: string) {
+    this.router.navigate(['/produto-listagem'], { 
+      queryParams: { 
+        categoriaId,
+        categoriaNome 
+      } 
+    });
   }
 
   ngOnDestroy() {

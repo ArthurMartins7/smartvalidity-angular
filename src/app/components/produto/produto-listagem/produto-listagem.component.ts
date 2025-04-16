@@ -6,6 +6,7 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { Fornecedor } from '../../../shared/model/entity/fornecedor';
 import { Produto } from '../../../shared/model/entity/produto';
 import { ProdutoService } from '../../../shared/service/produto.service';
+import { CategoriaService } from '../../../shared/service/categoria.service';
 import Swal from 'sweetalert2';
 
 @Component({
@@ -19,6 +20,7 @@ export class ProdutoListagemComponent implements OnInit{
 
   private fornecedorService = inject(FornecedorService);
   private produtoService = inject(ProdutoService);
+  private categoriaService = inject(CategoriaService);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
 
@@ -27,19 +29,21 @@ export class ProdutoListagemComponent implements OnInit{
   public Fornecedor = new Fornecedor();
   public fornecedores: Fornecedor[] = [];
   public categoriaId: string | null = null;
+  public categoriaNome: string = '';
 
   ngOnInit(): void {
     this.buscarFornecedores();
     this.route.queryParams.subscribe(params => {
       const categoriaIdParam = params['categoriaId'];
-      console.log('Raw category ID from params:', categoriaIdParam);
+      const categoriaNomeParam = params['categoriaNome'];
 
       if (categoriaIdParam) {
         this.categoriaId = categoriaIdParam;
-        console.log('Category ID:', this.categoriaId);
+        this.categoriaNome = categoriaNomeParam || '';
         this.buscarProdutos();
       } else {
         this.categoriaId = null;
+        this.categoriaNome = '';
         this.buscarProdutos();
       }
     });
@@ -55,6 +59,22 @@ export class ProdutoListagemComponent implements OnInit{
         console.error('Erro ao consultar todos os fornecedores', erro.error.mensagem);
       }
     );
+  }
+
+  public buscarCategoria(): void {
+    if (this.categoriaId) {
+      console.log('Buscando detalhes da categoria:', this.categoriaId);
+      this.categoriaService.buscarPorId(Number(this.categoriaId)).subscribe({
+        next: (categoria) => {
+          console.log('Categoria encontrada:', categoria);
+          this.categoriaNome = categoria.nome;
+        },
+        error: (erro) => {
+          console.error('Erro ao buscar categoria:', erro);
+          Swal.fire('Erro', 'Não foi possível carregar a categoria', 'error');
+        }
+      });
+    }
   }
 
   public buscarProdutos() {
@@ -123,7 +143,12 @@ export class ProdutoListagemComponent implements OnInit{
 
   public adicionarProduto() {
     if (this.categoriaId) {
-      this.router.navigate(['produto-detalhe'], { queryParams: { categoriaId: this.categoriaId } });
+      this.router.navigate(['produto-detalhe'], { 
+        queryParams: { 
+          categoriaId: this.categoriaId,
+          categoriaNome: this.categoriaNome 
+        } 
+      });
     } else {
       this.router.navigate(['produto-detalhe']);
     }

@@ -30,6 +30,7 @@ export class ProdutoListagemComponent implements OnInit{
   public fornecedores: Fornecedor[] = [];
   public categoriaId: string | null = null;
   public categoriaNome: string = '';
+  public categoria: any;
 
   ngOnInit(): void {
     this.buscarFornecedores();
@@ -64,10 +65,11 @@ export class ProdutoListagemComponent implements OnInit{
   public buscarCategoria(): void {
     if (this.categoriaId) {
       console.log('Buscando detalhes da categoria:', this.categoriaId);
-      this.categoriaService.buscarPorId(Number(this.categoriaId)).subscribe({
+      this.categoriaService.buscarPorId(this.categoriaId).subscribe({
         next: (categoria) => {
           console.log('Categoria encontrada:', categoria);
           this.categoriaNome = categoria.nome;
+          this.categoria = categoria;
         },
         error: (erro) => {
           console.error('Erro ao buscar categoria:', erro);
@@ -165,14 +167,68 @@ export class ProdutoListagemComponent implements OnInit{
 
   public adicionarProduto() {
     if (this.categoriaId) {
-      this.router.navigate(['produto-detalhe'], { 
-        queryParams: { 
+      this.router.navigate(['produto-detalhe'], {
+        queryParams: {
           categoriaId: this.categoriaId,
-          categoriaNome: this.categoriaNome 
-        } 
+          categoriaNome: this.categoriaNome
+        }
       });
     } else {
       this.router.navigate(['produto-detalhe']);
+    }
+  }
+
+  public editarCategoria() {
+    if (this.categoriaId) {
+      this.categoriaService.buscarPorId(this.categoriaId).subscribe({
+        next: (categoria) => {
+          // Buscar o ID do corredor da categoria atual
+          const corredorId = categoria.corredor?.id || '2'; // Usando '2' como fallback baseado na imagem que você mostrou
+
+          console.log('Navegando para edição com:', {
+            categoriaId: this.categoriaId,
+            corredorId: corredorId
+          });
+
+          this.router.navigate(['/categoria-detalhe'], {
+            queryParams: {
+              id: this.categoriaId,
+              corredorId: corredorId
+            }
+          });
+        },
+        error: (erro) => {
+          console.error('Erro ao buscar categoria:', erro);
+          Swal.fire('Erro', 'Não foi possível carregar a categoria', 'error');
+        }
+      });
+    }
+  }
+
+  public excluirCategoria() {
+    if (this.categoriaId) {
+      const id = this.categoriaId;
+      Swal.fire({
+        title: 'Deseja realmente excluir a categoria?',
+        text: 'Todos os produtos desta categoria serão removidos!',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Sim, excluir!',
+        cancelButtonText: 'Cancelar'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          this.categoriaService.excluirCategoria(id).subscribe({
+            next: () => {
+              Swal.fire('Excluído!', 'A categoria foi removida com sucesso.', 'success');
+              this.router.navigate(['/corredor']);
+            },
+            error: (erro) => {
+              console.error('Erro ao excluir categoria:', erro);
+              Swal.fire('Erro!', 'Não foi possível excluir a categoria: ' + (erro.error?.mensagem || erro.message), 'error');
+            }
+          });
+        }
+      });
     }
   }
 }

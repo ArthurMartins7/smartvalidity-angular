@@ -16,7 +16,7 @@ export class CategoriaService {
     return this.httpClient.get<Categoria[]>(this.API);
   }
 
-  buscarPorId(id: number): Observable<Categoria> {
+  buscarPorId(id: string): Observable<Categoria> {
     return this.httpClient.get<Categoria>(`${this.API}/${id}`);
   }
 
@@ -24,11 +24,11 @@ export class CategoriaService {
     return this.httpClient.post<Categoria>(this.API, novaCategoria);
   }
 
-  atualizarCategoria(id: number, categoriaAtualizada: Categoria): Observable<Categoria> {
+  atualizarCategoria(id: string, categoriaAtualizada: Categoria): Observable<Categoria> {
     return this.httpClient.put<Categoria>(`${this.API}/${id}`, categoriaAtualizada);
   }
 
-  excluirCategoria(id: number): Observable<void> {
+  excluirCategoria(id: string): Observable<void> {
     return this.httpClient.delete<void>(`${this.API}/${id}`);
   }
 }

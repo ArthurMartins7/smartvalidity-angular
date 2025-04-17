@@ -3,14 +3,14 @@
   <i class="material-icons text-gray-600">arrow_back</i>
   <div>
     <div class="text-gray-500">Categorias</div>
-    <div class="text-2xl font-bold">{{ isEdicao ? 'Edição' : 'Cadastro' }}</div>
+    <div class="text-2xl font-bold">Edição</div>
   </div>
 </div>
 
 <section class="max-w-2xl mx-auto mt-6">
   <div class="flex justify-center">
     <form (ngSubmit)="salvar($event)" class="w-full bg-white shadow-md rounded-lg p-6">
-      <h2 class="mb-4 text-xl font-bold text-gray-900 text-center">{{ isEdicao ? 'Editar Categoria' : 'Cadastrar uma nova Categoria' }}</h2>
+      <h2 class="mb-4 text-xl font-bold text-gray-900 text-center">Editar Categoria</h2>
 
       <div class="space-y-4">
         <div class="w-full">
@@ -32,7 +32,7 @@
           class="px-8 py-2 text-lg font-medium text-white bg-blue-800 rounded-full min-w-[140px]
           transition duration-300 ease-in-out hover:bg-blue-900 hover:shadow-md
           focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
-          {{ isEdicao ? 'Atualizar' : 'Salvar' }}
+          Salvar
         </button>
       </div>
     </form>

@@ -29,10 +29,20 @@
       </div>
     </div>
 
-    <div class="mb-4">
+    <div class="mb-4 flex gap-4">
       <button (click)="adicionarProduto()" class="bg-white hover:bg-gray-50 text-gray-800 px-4 py-2 rounded-full flex items-center transition-all transform hover:scale-105 shadow-sm hover:shadow-md border border-gray-200">
         <span class="mr-2 text-xl font-semibold">+</span>
         <span class="font-medium">Adicionar Produto</span>
+      </button>
+
+      <button *ngIf="categoriaId" (click)="editarCategoria()" class="bg-white hover:bg-gray-50 text-gray-800 px-4 py-2 rounded-full flex items-center transition-all transform hover:scale-105 shadow-sm hover:shadow-md border border-gray-200">
+        <img src="/icons/edit.png" alt="Editar" class="w-5 h-5 mr-2">
+        <span class="font-medium">Editar Categoria</span>
+      </button>
+
+      <button *ngIf="categoriaId" (click)="excluirCategoria()" class="bg-white hover:bg-gray-50 text-gray-800 px-4 py-2 rounded-full flex items-center transition-all transform hover:scale-105 shadow-sm hover:shadow-md border border-gray-200">
+        <img src="https://cdn-icons-png.flaticon.com/512/1214/1214428.png" alt="Excluir" class="w-5 h-5 mr-2">
+        <span class="font-medium">Excluir Categoria</span>
       </button>
     </div>
 

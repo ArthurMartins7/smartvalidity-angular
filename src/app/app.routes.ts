@@ -11,6 +11,7 @@ import { CategoriaDetalheComponent } from './components/categoria/categoria-deta
 import { FornecedorEditarComponent } from './components/fornecedor/fornecedor-editar/fornecedor-editar/fornecedor-editar.component';
 import { FornecedorDetalheComponent } from './components/fornecedor/fornecedor-detalhe/fornecedor-detalhe.component';
 import { ProdutoDetalheComponent } from './components/produto/produto-listagem/produto-detalhe/produto-detalhe/produto-detalhe.component';
+import { CategoriaEditarComponent } from './components/categoria/categoria-editar/categoria-editar/categoria-editar.component';
 
 export const routes: Routes = [
   { path: '', component: LoginComponent },
@@ -25,5 +26,6 @@ export const routes: Routes = [
   { path: 'fornecedor-editar/:id', component: FornecedorEditarComponent },
   { path: 'entrada-estoque', component: EntradaEstoqueComponent },
   { path: 'categoria-detalhe', component: CategoriaDetalheComponent },
+  { path: 'categoria-editar', component: CategoriaEditarComponent },
 
 ];

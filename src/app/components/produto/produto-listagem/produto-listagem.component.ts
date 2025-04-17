@@ -179,25 +179,33 @@ export class ProdutoListagemComponent implements OnInit{
   }
 
   public editarCategoria() {
-    if (this.categoriaId) {
-      this.categoriaService.buscarPorId(this.categoriaId).subscribe({
+    const categoriaId = this.categoriaId;
+    if (categoriaId) {
+      // Buscar a categoria primeiro
+      this.categoriaService.buscarPorId(categoriaId).subscribe({
         next: (categoria) => {
-          // Buscar o ID do corredor da categoria atual
-          const corredorId = categoria.corredor?.id || '2'; // Usando '2' como fallback baseado na imagem que você mostrou
+          console.log('Categoria encontrada:', categoria);
 
-          console.log('Navegando para edição com:', {
-            categoriaId: this.categoriaId,
-            corredorId: corredorId
-          });
+          // Buscar o ID do corredor da categoria
+          this.categoriaService.buscarCorredorDaCategoria(categoriaId).subscribe({
+            next: (corredorId: number) => {
+              console.log('ID do corredor encontrado:', corredorId);
 
-          this.router.navigate(['/categoria-detalhe'], {
-            queryParams: {
-              id: this.categoriaId,
-              corredorId: corredorId
+              // Navegar para a edição com o ID da categoria e do corredor
+              this.router.navigate(['/categoria-detalhe'], {
+                queryParams: {
+                  id: categoriaId,
+                  corredorId: corredorId.toString()
+                }
+              });
+            },
+            error: (erro: any) => {
+              console.error('Erro ao buscar corredor:', erro);
+              Swal.fire('Erro', 'Não foi possível carregar o corredor', 'error');
             }
           });
         },
-        error: (erro) => {
+        error: (erro: any) => {
           console.error('Erro ao buscar categoria:', erro);
           Swal.fire('Erro', 'Não foi possível carregar a categoria', 'error');
         }

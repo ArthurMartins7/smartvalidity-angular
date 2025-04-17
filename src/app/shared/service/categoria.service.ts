@@ -31,4 +31,8 @@ export class CategoriaService {
   excluirCategoria(id: string): Observable<void> {
     return this.httpClient.delete<void>(`${this.API}/${id}`);
   }
+
+  buscarCorredorDaCategoria(id: string): Observable<number> {
+    return this.httpClient.get<number>(`${this.API}/${id}/corredor`);
+  }
 }

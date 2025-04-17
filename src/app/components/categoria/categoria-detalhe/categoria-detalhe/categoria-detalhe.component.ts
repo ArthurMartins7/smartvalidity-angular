@@ -46,8 +46,8 @@ export class CategoriaDetalheComponent implements OnInit {
           console.log('Categoria recebida do backend:', categoria);
           this.categoria = categoria;
 
-          // Se não temos o corredor, usar o ID da URL
-          if (this.corredorId) {
+          // Manter o ID do corredor existente
+          if (!this.categoria.corredor?.id && this.corredorId) {
             console.log('Usando corredorId da URL:', this.corredorId);
             this.categoria.corredor = { id: this.corredorId };
           }
@@ -94,7 +94,9 @@ export class CategoriaDetalheComponent implements OnInit {
       return;
     }
 
+    // Usar o ID do corredor da URL, que é o valor correto
     if (!this.corredorId) {
+      console.error('ID do corredor não encontrado na URL');
       Swal.fire('Erro', 'ID do corredor não encontrado', 'error');
       return;
     }

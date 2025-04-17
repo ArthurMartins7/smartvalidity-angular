@@ -24,6 +24,7 @@ export class CorredorEditarComponent implements OnInit {
   public responsaveisDisponiveis: Usuario[] = [];
   public selectedFile: File | null = null;
   public responsavelSelecionado: Usuario | null = null;
+  public imagePreview: string | ArrayBuffer | null = null;
 
   constructor(
     private corredorService: CorredorService,
@@ -40,10 +41,31 @@ export class CorredorEditarComponent implements OnInit {
     this.carregarResponsaveis();
   }
 
+  onFileSelected(event: any) {
+    const file: File = event.target.files[0];
+    if (file && file.size <= 10 * 1024 * 1024) {
+      this.selectedFile = file;
+      const reader = new FileReader();
+      reader.onload = () => {
+        this.imagePreview = reader.result;
+        this.corredor.imagemEmBase64 = reader.result as string;
+      };
+      reader.readAsDataURL(file);
+    } else {
+      alert('Tamanho de arquivo não permitido! Máximo: 10MB.');
+      this.selectedFile = null;
+      this.imagePreview = null;
+      this.corredor.imagemEmBase64 = null;
+    }
+  }
+
   public carregarCorredor(): void {
     this.corredorService.buscarPorId(this.idCorredor).subscribe(
       (corredor) => {
         this.corredor = corredor;
+        if (corredor.imagemEmBase64) {
+          this.imagePreview = corredor.imagemEmBase64;
+        }
         if (corredor.responsaveis && corredor.responsaveis.length > 0) {
           this.responsavelSelecionado = this.responsaveisDisponiveis.find(
             r => r.id === corredor.responsaveis[0].id
@@ -80,8 +102,6 @@ export class CorredorEditarComponent implements OnInit {
       return;
     }
 
-    console.log('Corredor a ser atualizado:', this.corredor);
-
     const corredorMapeado = {
       ...this.corredor,
       responsaveis: [
@@ -93,7 +113,8 @@ export class CorredorEditarComponent implements OnInit {
           email: this.responsavelSelecionado.email,
           senha: this.responsavelSelecionado.senha
         }
-      ]
+      ],
+      imagemEmBase64: this.corredor.imagemEmBase64
     };
 
     this.corredorService.atualizarCorredor(this.idCorredor, corredorMapeado)
@@ -107,39 +128,12 @@ export class CorredorEditarComponent implements OnInit {
       .subscribe(
         (resposta) => {
           Swal.fire('Corredor atualizado com sucesso!', '', 'success');
-          if (this.selectedFile) {
-            this.uploadImagem(resposta.id);
-          } else {
-            this.voltar();
-          }
+          this.voltar();
         }
       );
   }
 
   public voltar(): void {
     this.router.navigate(['corredor']);
-  }
-
-  uploadImagem(id: number): void {
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = 'image/*';
-    input.onchange = (event: any) => {
-      const file = event.target.files[0];
-      if (file) {
-        const formData = new FormData();
-        formData.append('file', file);
-        this.corredorService.uploadImagem(id, formData).subscribe(
-          () => {
-            this.carregarCorredor();
-          },
-          (erro) => {
-            console.error('Erro ao fazer upload da imagem:', erro);
-            Swal.fire('Erro!', 'Não foi possível fazer upload da imagem.', 'error');
-          }
-        );
-      }
-    };
-    input.click();
   }
 }

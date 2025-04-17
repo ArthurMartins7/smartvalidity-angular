@@ -30,6 +30,7 @@ export class CepService {
     return this.httpClient.get<any>(`${this.API_VIACEP}/${cep}/json`)
       .pipe(
         map(resposta => {
+          console.log('resposta: ' + resposta.pais)
           // Verifica se a resposta contém um erro
           if (resposta.erro) {
             throw new Error('CEP não encontrado');

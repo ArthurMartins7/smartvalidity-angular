@@ -17,7 +17,7 @@ export const routes: Routes = [
   { path: 'register', component: RegisterComponent },
   { path: 'corredor', component: CorredorListagemComponent },
   { path: 'corredor-detalhe', component: CorredorDetalheComponent },
-  { path: 'corredor-editar', component: CorredorEditarComponent },
+  { path: 'corredor-editar/:id', component: CorredorEditarComponent },
   { path: 'produto-listagem', component: ProdutoListagemComponent },
   { path: 'produto-detalhe', component: ProdutoDetalheComponent },
   { path: 'fornecedor-listagem', component: FornecedorListagemComponent },

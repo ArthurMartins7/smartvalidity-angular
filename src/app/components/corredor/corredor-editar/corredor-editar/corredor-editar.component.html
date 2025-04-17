@@ -1,5 +1,5 @@
- <!-- Cabeçalho -->
- <header class="mb-8">
+<!-- Cabeçalho -->
+<header class="mb-8">
   <nav class="flex items-center gap-2">
     <i class="material-icons text-gray-600">arrow_back</i>
     <div>
@@ -15,7 +15,26 @@
     <form class="w-full bg-white shadow-md rounded-lg p-6">
       <h2 class="mb-4 text-xl font-bold text-gray-900 text-center">Editar Corredor</h2>
 
-      <div class="grid gap-4 sm:grid-cols-2 sm:gap-4">
+      <div class="space-y-4">
+        <!-- File Input Section -->
+        <div class="w-full">
+          <label for="imagem" class="block mb-1.5 text-sm font-medium text-gray-900">
+            Imagem do Corredor:
+          </label>
+          <div class="flex flex-col items-center justify-center w-full">
+            <label for="imagem" class="flex flex-col items-center justify-center w-full h-24 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100">
+              <div class="flex flex-col items-center justify-center">
+                <i class="material-icons text-gray-400 text-3xl">cloud_upload</i>
+                <p class="text-sm text-gray-500 mt-1">Clique para fazer upload</p>
+              </div>
+              <input type="file" id="imagem" class="hidden" (change)="onFileSelected($event)">
+            </label>
+          </div>
+          <div *ngIf="imagePreview" class="mt-4 flex justify-center">
+            <img [src]="imagePreview" alt="Pré-visualização" class="w-24 h-24 object-cover rounded-lg shadow-md">
+          </div>
+        </div>
+
         <div class="w-full">
           <label for="nomeCorredor" class="block mb-1.5 text-sm font-medium text-gray-900">
             Nome do Corredor:

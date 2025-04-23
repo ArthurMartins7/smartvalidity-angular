@@ -74,16 +74,6 @@
                 class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 placeholder="Digite o CNPJ">
             </div>
-
-            <!-- Filtro de Descrição do Produto -->
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Descrição do Produto</label>
-              <input
-                type="text"
-                [(ngModel)]="filtroDescricaoProduto"
-                class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                placeholder="Digite a descrição">
-            </div>
           </div>
 
           <!-- Botões de Ação -->
@@ -135,7 +125,6 @@
             <th class="border border-gray-300 p-2 text-left">Telefone</th>
             <th class="border border-gray-300 p-2 text-left">CNPJ</th>
             <th class="border border-gray-300 p-2 text-left">Endereço</th>
-            <th class="border border-gray-300 p-2 text-left">Produtos</th>
             <th class="border border-gray-300 p-2 text-center">Ações</th>
           </tr>
         </thead>
@@ -147,16 +136,6 @@
             <td class="p-2">
               {{ fornecedor.endereco.logradouro }}, {{ fornecedor.endereco.numero }} -
               {{ fornecedor.endereco.bairro }}, {{ fornecedor.endereco.cidade }}/{{ fornecedor.endereco.estado }}
-            </td>
-            <td class="p-2">
-              <span *ngIf="fornecedor.produtos && fornecedor.produtos.length > 0">
-                <span *ngFor="let produto of fornecedor.produtos; let i = index">
-                  {{ produto.descricao || 'Produto sem descrição' }}<span *ngIf="i < fornecedor.produtos.length - 1">, </span>
-                </span>
-              </span>
-              <span *ngIf="!fornecedor.produtos || fornecedor.produtos.length === 0" class="text-gray-500">
-                Nenhum produto
-              </span>
             </td>
             <td class="p-2 text-center flex justify-center space-x-4">
               <button (click)="editar(fornecedor)" class="text-gray-600 hover:text-blue-500 flex items-center gap-1" title="Editar fornecedor">

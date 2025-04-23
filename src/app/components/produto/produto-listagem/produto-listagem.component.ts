@@ -6,6 +6,7 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { Fornecedor } from '../../../shared/model/entity/fornecedor';
 import { Produto } from '../../../shared/model/entity/produto';
 import { ProdutoService } from '../../../shared/service/produto.service';
+import { CategoriaService } from '../../../shared/service/categoria.service';
 import Swal from 'sweetalert2';
 
 @Component({
@@ -19,6 +20,7 @@ export class ProdutoListagemComponent implements OnInit{
 
   private fornecedorService = inject(FornecedorService);
   private produtoService = inject(ProdutoService);
+  private categoriaService = inject(CategoriaService);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
 
@@ -26,12 +28,25 @@ export class ProdutoListagemComponent implements OnInit{
   public produtos: Produto[] = [];
   public Fornecedor = new Fornecedor();
   public fornecedores: Fornecedor[] = [];
-  public categoriaId: number | null = null;
+  public categoriaId: string | null = null;
+  public categoriaNome: string = '';
+  public categoria: any;
 
   ngOnInit(): void {
+    this.buscarFornecedores();
     this.route.queryParams.subscribe(params => {
-      this.categoriaId = params['categoriaId'] ? Number(params['categoriaId']) : null;
-      this.buscarProdutos();
+      const categoriaIdParam = params['categoriaId'];
+      const categoriaNomeParam = params['categoriaNome'];
+
+      if (categoriaIdParam) {
+        this.categoriaId = categoriaIdParam;
+        this.categoriaNome = categoriaNomeParam || '';
+        this.buscarProdutos();
+      } else {
+        this.categoriaId = null;
+        this.categoriaNome = '';
+        this.buscarProdutos();
+      }
     });
   }
 
@@ -47,27 +62,82 @@ export class ProdutoListagemComponent implements OnInit{
     );
   }
 
+  public buscarCategoria(): void {
+    if (this.categoriaId) {
+      console.log('Buscando detalhes da categoria:', this.categoriaId);
+      this.categoriaService.buscarPorId(this.categoriaId).subscribe({
+        next: (categoria) => {
+          console.log('Categoria encontrada:', categoria);
+          this.categoriaNome = categoria.nome;
+          this.categoria = categoria;
+        },
+        error: (erro) => {
+          console.error('Erro ao buscar categoria:', erro);
+          Swal.fire('Erro', 'Não foi possível carregar a categoria', 'error');
+        }
+      });
+    }
+  }
+
   public buscarProdutos() {
     if (this.categoriaId) {
-      this.produtoService.listarPorCategoria(this.categoriaId).subscribe(
-        (resultado) => {
-          this.produtos = resultado;
-          console.log(this.produtos);
+      console.log('Fetching products for category ID:', this.categoriaId);
+      this.produtoService.listarPorCategoria(this.categoriaId.toString()).subscribe({
+        next: (resultado) => {
+          console.log('Products received from API:', resultado);
+          // Criar uma nova instância para cada produto e seus fornecedores
+          this.produtos = resultado.map(produto => {
+            const novoProduto = { ...produto };
+            if (novoProduto.fornecedores && novoProduto.fornecedores.length > 0) {
+              // Garantir que cada fornecedor seja uma cópia independente
+              novoProduto.fornecedores = novoProduto.fornecedores.map(fornecedor => {
+                const novoFornecedor = new Fornecedor();
+                novoFornecedor.id = fornecedor.id;
+                novoFornecedor.nome = fornecedor.nome;
+                novoFornecedor.telefone = fornecedor.telefone;
+                novoFornecedor.cnpj = fornecedor.cnpj;
+                novoFornecedor.endereco = fornecedor.endereco;
+                novoFornecedor.produtos = [];
+                return novoFornecedor;
+              });
+            }
+            return novoProduto;
+          });
         },
-        (erro) => {
-          console.error('Erro ao consultar produtos da categoria', erro.error.mensagem);
+        error: (erro) => {
+          console.error('Error fetching products by category:', erro);
+          console.error('Error details:', erro.error?.mensagem || erro.message);
         }
-      );
+      });
     } else {
-      this.produtoService.listarTodos().subscribe(
-        (resultado) => {
-          this.produtos = resultado;
-          console.log(this.produtos);
+      console.log('Fetching all products');
+      this.produtoService.listarTodos().subscribe({
+        next: (resultado) => {
+          console.log('All products received from API:', resultado);
+          // Criar uma nova instância para cada produto e seus fornecedores
+          this.produtos = resultado.map(produto => {
+            const novoProduto = { ...produto };
+            if (novoProduto.fornecedores && novoProduto.fornecedores.length > 0) {
+              // Garantir que cada fornecedor seja uma cópia independente
+              novoProduto.fornecedores = novoProduto.fornecedores.map(fornecedor => {
+                const novoFornecedor = new Fornecedor();
+                novoFornecedor.id = fornecedor.id;
+                novoFornecedor.nome = fornecedor.nome;
+                novoFornecedor.telefone = fornecedor.telefone;
+                novoFornecedor.cnpj = fornecedor.cnpj;
+                novoFornecedor.endereco = fornecedor.endereco;
+                novoFornecedor.produtos = [];
+                return novoFornecedor;
+              });
+            }
+            return novoProduto;
+          });
         },
-        (erro) => {
-          console.error('Erro ao consultar todos os produtos', erro.error.mensagem);
+        error: (erro) => {
+          console.error('Error fetching all products:', erro);
+          console.error('Error details:', erro.error?.mensagem || erro.message);
         }
-      );
+      });
     }
   }
 
@@ -96,6 +166,77 @@ export class ProdutoListagemComponent implements OnInit{
   }
 
   public adicionarProduto() {
-    this.router.navigate(['produto-detalhe']);
+    if (this.categoriaId) {
+      this.router.navigate(['produto-detalhe'], {
+        queryParams: {
+          categoriaId: this.categoriaId,
+          categoriaNome: this.categoriaNome
+        }
+      });
+    } else {
+      this.router.navigate(['produto-detalhe']);
+    }
+  }
+
+  public editarCategoria() {
+    const categoriaId = this.categoriaId;
+    if (categoriaId) {
+      // Buscar a categoria primeiro
+      this.categoriaService.buscarPorId(categoriaId).subscribe({
+        next: (categoria) => {
+          console.log('Categoria encontrada:', categoria);
+
+          // Buscar o ID do corredor da categoria
+          this.categoriaService.buscarCorredorDaCategoria(categoriaId).subscribe({
+            next: (corredorId: number) => {
+              console.log('ID do corredor encontrado:', corredorId);
+
+              // Navegar para a edição com o ID da categoria e do corredor
+              this.router.navigate(['/categoria-detalhe'], {
+                queryParams: {
+                  id: categoriaId,
+                  corredorId: corredorId.toString()
+                }
+              });
+            },
+            error: (erro: any) => {
+              console.error('Erro ao buscar corredor:', erro);
+              Swal.fire('Erro', 'Não foi possível carregar o corredor', 'error');
+            }
+          });
+        },
+        error: (erro: any) => {
+          console.error('Erro ao buscar categoria:', erro);
+          Swal.fire('Erro', 'Não foi possível carregar a categoria', 'error');
+        }
+      });
+    }
+  }
+
+  public excluirCategoria() {
+    if (this.categoriaId) {
+      const id = this.categoriaId;
+      Swal.fire({
+        title: 'Deseja realmente excluir a categoria?',
+        text: 'Todos os produtos desta categoria serão removidos!',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Sim, excluir!',
+        cancelButtonText: 'Cancelar'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          this.categoriaService.excluirCategoria(id).subscribe({
+            next: () => {
+              Swal.fire('Excluído!', 'A categoria foi removida com sucesso.', 'success');
+              this.router.navigate(['/corredor']);
+            },
+            error: (erro) => {
+              console.error('Erro ao excluir categoria:', erro);
+              Swal.fire('Erro!', 'Não foi possível excluir a categoria: ' + (erro.error?.mensagem || erro.message), 'error');
+            }
+          });
+        }
+      });
+    }
   }
 }

@@ -107,7 +107,12 @@
     @for (corredor of corredores; track corredor.id) {
     <div class="flex-1 p-3 bg-white rounded-lg shadow-lg max-w-xs flex flex-col h-[350px]">
       <div class="mb-2">
-        <img src="https://th.bing.com/th/id/OIP.jdq2ZppaEGHTVIFsQBeXLQHaE8?rs=1&pid=ImgDetMain" alt="Descrição da imagem" class="w-full h-24 object-cover rounded-t-lg" />
+        <img
+          *ngIf="corredor.imagemEmBase64"
+          [src]="corredor.imagemEmBase64"
+          alt="Imagem do Corredor"
+          class="w-full h-24 object-cover rounded-t-lg"
+        />
       </div>
       <div class="flex items-center justify-between mb-2">
         <h3 class="text-lg font-bold text-gray-800">{{ corredor.nome }}</h3>
@@ -119,7 +124,7 @@
         <ul class="list-none p-0">
           @for (categoria of corredor.categorias; track categoria.id) {
             <li class="py-1 text-gray-600 hover:bg-gray-200 cursor-pointer"
-            (click)="irParaProdutoListagem(categoria.id)">{{ categoria.nome }}</li>
+            (click)="irParaProdutoListagem(categoria.id, categoria.nome)">{{ categoria.nome }}</li>
           }
         </ul>
       </div>

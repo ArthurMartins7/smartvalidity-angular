@@ -6,4 +6,11 @@ export class Corredor{
   nome: string;
   responsaveis: Usuario[];
   categorias: Categoria[];
+  imagemEmBase64: string | null;
+
+  constructor() {
+    this.responsaveis = [];
+    this.categorias = [];
+    this.imagemEmBase64 = null;
+  }
 }

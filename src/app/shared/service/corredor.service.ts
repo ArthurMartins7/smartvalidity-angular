@@ -17,6 +17,10 @@ export class CorredorService {
     private usuarioService: UsuarioService
   ) { }
 
+  uploadImagem(idCorredor: number, formData: FormData): Observable<any> {
+    return this.httpClient.post(`${this.API}/${idCorredor}/upload`, formData, { responseType: 'text' });
+  }
+
   criarCorredor(novoCorredor: Corredor): Observable<Corredor> {
     return this.httpClient.post<Corredor>(this.API, novoCorredor);
   }
@@ -30,7 +34,24 @@ export class CorredorService {
   }
 
   listarComSeletor(seletor: CorredorSeletor): Observable<Corredor[]> {
-    return this.httpClient.post<Corredor[]>(`${this.API}/filtro`, seletor);
+    console.log('Enviando seletor para o backend:', {
+      url: `${this.API}/filtro`,
+      seletor: {
+        nome: seletor.nome,
+        responsavel: seletor.responsavel,
+        responsavelId: seletor.responsavelId,
+        pagina: seletor.pagina,
+        limite: seletor.limite
+      }
+    });
+
+    // Garantir que o responsavelId seja enviado como string
+    const seletorEnviado = {
+      ...seletor,
+      responsavelId: seletor.responsavelId ? String(seletor.responsavelId) : null
+    };
+
+    return this.httpClient.post<Corredor[]>(`${this.API}/filtro`, seletorEnviado);
   }
 
   contarTotalRegistros(seletor: CorredorSeletor): Observable<number> {

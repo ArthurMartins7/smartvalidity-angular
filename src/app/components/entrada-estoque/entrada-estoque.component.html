@@ -19,10 +19,12 @@
         <select
           [(ngModel)]="formData.produto"
           name="produto"
-          class="block w-full px-4 py-3 bg-gray-100 border border-gray-200 rounded-md appearance-none focus:outline-none focus:ring-2 focus:ring-blue-500">
+          class="block w-full px-4 py-3 bg-gray-100 border border-gray-200 rounded-md appearance-none focus:outline-none focus:ring-2 focus:ring-blue-500"
+          required>
           <option value="" disabled selected>Selecione um produto</option>
-          <option value="produto1">Produto 1</option>
-          <option value="produto2">Produto 2</option>
+          <option *ngFor="let produto of produtos" [value]="produto.id">
+            {{ produto.descricao }} ({{ produto.codigoBarras }})
+          </option>
         </select>
         <button type="button" class="absolute right-2 top-1/2 -translate-y-1/2">
           <i class="material-icons text-gray-500">add_circle_outline</i>
@@ -30,24 +32,15 @@
       </div>
     </div>
 
-    <!-- Lote e Quantidade -->
-    <div class="grid grid-cols-2 gap-4">
-      <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1">Lote:</label>
-        <input
-          type="text"
-          [(ngModel)]="formData.lote"
-          name="lote"
-          class="block w-full px-4 py-3 bg-gray-100 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-      </div>
-      <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1">Quantidade:</label>
-        <input
-          type="number"
-          [(ngModel)]="formData.quantidade"
-          name="quantidade"
-          class="block w-full px-4 py-3 bg-gray-100 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-      </div>
+    <!-- Lote -->
+    <div>
+      <label class="block text-sm font-medium text-gray-700 mb-1">Lote:</label>
+      <input
+        type="text"
+        [(ngModel)]="formData.lote"
+        name="lote"
+        class="block w-full px-4 py-3 bg-gray-100 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+        required>
     </div>
 
     <!-- Data de recebimento -->
@@ -58,7 +51,8 @@
           type="date"
           [(ngModel)]="formData.dataRecebimento"
           name="dataRecebimento"
-          class="block w-full px-4 py-3 bg-gray-100 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+          class="block w-full px-4 py-3 bg-gray-100 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          required>
         <i class="material-icons absolute right-3 top-1/2 -translate-y-1/2 text-gray-500">calendar_today</i>
       </div>
     </div>
@@ -72,7 +66,8 @@
             type="date"
             [(ngModel)]="formData.dataFabricacao"
             name="dataFabricacao"
-            class="block w-full px-4 py-3 bg-gray-100 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+            class="block w-full px-4 py-3 bg-gray-100 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            required>
           <i class="material-icons absolute right-3 top-1/2 -translate-y-1/2 text-gray-500">calendar_today</i>
         </div>
       </div>
@@ -83,17 +78,30 @@
             type="date"
             [(ngModel)]="formData.dataVencimento"
             name="dataVencimento"
-            class="block w-full px-4 py-3 bg-gray-100 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+            class="block w-full px-4 py-3 bg-gray-100 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            required>
           <i class="material-icons absolute right-3 top-1/2 -translate-y-1/2 text-gray-500">calendar_today</i>
         </div>
       </div>
     </div>
 
-    <!-- Botão Salvar -->
-    <div class="flex justify-center mt-8">
+    <!-- Botões -->
+    <div class="flex justify-center gap-4 mt-8">
+      <button
+        type="button"
+        (click)="voltar()"
+        class="px-8 py-2 text-lg font-medium text-white bg-gray-500 rounded-full min-w-[140px]
+        transition duration-300 ease-in-out hover:bg-gray-600 hover:shadow-md
+        focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
+      >
+        Voltar
+      </button>
       <button
         type="submit"
-        class="px-8 py-3 bg-blue-800 text-white font-medium rounded-full hover:bg-blue-900 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+        class="px-8 py-2 text-lg font-medium text-white bg-blue-800 rounded-full min-w-[140px]
+        transition duration-300 ease-in-out hover:bg-blue-900 hover:shadow-md
+        focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+      >
         Salvar
       </button>
     </div>

@@ -4,7 +4,7 @@ import { CategoriaDTO } from "./categoria.dto";
 // import { AlertaDTO } from "./alerta.dto";
 
 export class ProdutoDTO {
-  id!: number;
+  id!: string;
   codigoBarras!: string;
   descricao!: string;
   marca!: string;

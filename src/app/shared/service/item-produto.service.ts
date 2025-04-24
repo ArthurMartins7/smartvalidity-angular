@@ -17,11 +17,11 @@ export class ItemProdutoService {
     return this.httpClient.get<ItemProdutoDTO[]>(this.API);
   }
 
-  buscarPorId(id: number): Observable<ItemProdutoDTO> {
+  buscarPorId(id: string): Observable<ItemProdutoDTO> {
     return this.httpClient.get<ItemProdutoDTO>(`${this.API}/${id}`);
   }
 
-  buscarPorProduto(produtoId: number): Observable<ItemProdutoDTO[]> {
+  buscarPorProduto(produtoId: string): Observable<ItemProdutoDTO[]> {
     return this.httpClient.get<ItemProdutoDTO[]>(`${this.API}/produto/${produtoId}`);
   }
 
@@ -29,11 +29,11 @@ export class ItemProdutoService {
     return this.httpClient.post<ItemProdutoDTO>(this.API, novoItemProduto);
   }
 
-  atualizarItemProduto(id: number, itemProdutoAtualizado: ItemProdutoDTO): Observable<ItemProdutoDTO> {
+  atualizarItemProduto(id: string, itemProdutoAtualizado: ItemProdutoDTO): Observable<ItemProdutoDTO> {
     return this.httpClient.put<ItemProdutoDTO>(`${this.API}/${id}`, itemProdutoAtualizado);
   }
 
-  excluirItemProduto(id: number): Observable<void> {
+  excluirItemProduto(id: string): Observable<void> {
     return this.httpClient.delete<void>(`${this.API}/${id}`);
   }
 }

@@ -33,33 +33,38 @@ export class ProdutoListagemComponent implements OnInit{
   public categoria: any;
 
   ngOnInit(): void {
-    this.buscarFornecedores();
-    this.route.queryParams.subscribe(params => {
-      const categoriaIdParam = params['categoriaId'];
-      const categoriaNomeParam = params['categoriaNome'];
+    this.buscarFornecedores().then(() => {
+      this.route.queryParams.subscribe(params => {
+        const categoriaIdParam = params['categoriaId'];
+        const categoriaNomeParam = params['categoriaNome'];
 
-      if (categoriaIdParam) {
-        this.categoriaId = categoriaIdParam;
-        this.categoriaNome = categoriaNomeParam || '';
-        this.buscarProdutos();
-      } else {
-        this.categoriaId = null;
-        this.categoriaNome = '';
-        this.buscarProdutos();
-      }
+        if (categoriaIdParam) {
+          this.categoriaId = categoriaIdParam;
+          this.categoriaNome = categoriaNomeParam || '';
+          this.buscarProdutos();
+        } else {
+          this.categoriaId = null;
+          this.categoriaNome = '';
+          this.buscarProdutos();
+        }
+      });
     });
   }
 
   public buscarFornecedores() {
-    this.fornecedorService.listarTodos().subscribe(
-      (resultado) => {
-        this.fornecedores = resultado;
-        console.log(this.fornecedores);
-      },
-      (erro) => {
-        console.error('Erro ao consultar todos os fornecedores', erro.error.mensagem);
-      }
-    );
+    return new Promise<void>((resolve) => {
+      this.fornecedorService.listarTodos().subscribe(
+        (resultado) => {
+          this.fornecedores = resultado;
+          console.log('Fornecedores carregados:', this.fornecedores);
+          resolve();
+        },
+        (erro) => {
+          console.error('Erro ao consultar todos os fornecedores', erro.error.mensagem);
+          resolve();
+        }
+      );
+    });
   }
 
   public buscarCategoria(): void {
@@ -91,18 +96,28 @@ export class ProdutoListagemComponent implements OnInit{
             if (novoProduto.fornecedores && novoProduto.fornecedores.length > 0) {
               // Garantir que cada fornecedor seja uma cópia independente
               novoProduto.fornecedores = novoProduto.fornecedores.map(fornecedor => {
+                // Se o fornecedor for um número ou string, buscar o fornecedor completo
+                if (typeof fornecedor === 'number' || typeof fornecedor === 'string') {
+                  const fornecedorId = Number(fornecedor); // Converte para número
+                  const fornecedorCompleto = this.fornecedores.find(f => Number(f.id) === fornecedorId);
+                  if (fornecedorCompleto) {
+                    const novoFornecedor = new Fornecedor();
+                    Object.assign(novoFornecedor, fornecedorCompleto);
+                    novoFornecedor.produtos = [];
+                    return novoFornecedor;
+                  }
+                  return null; // Retorna null se não encontrar o fornecedor
+                }
+                // Se já for um objeto fornecedor, criar uma cópia
                 const novoFornecedor = new Fornecedor();
-                novoFornecedor.id = fornecedor.id;
-                novoFornecedor.nome = fornecedor.nome;
-                novoFornecedor.telefone = fornecedor.telefone;
-                novoFornecedor.cnpj = fornecedor.cnpj;
-                novoFornecedor.endereco = fornecedor.endereco;
+                Object.assign(novoFornecedor, fornecedor);
                 novoFornecedor.produtos = [];
                 return novoFornecedor;
-              });
+              }).filter(f => f !== null); // Remove os fornecedores null
             }
             return novoProduto;
           });
+          console.log('Produtos processados:', this.produtos);
         },
         error: (erro) => {
           console.error('Error fetching products by category:', erro);
@@ -120,18 +135,28 @@ export class ProdutoListagemComponent implements OnInit{
             if (novoProduto.fornecedores && novoProduto.fornecedores.length > 0) {
               // Garantir que cada fornecedor seja uma cópia independente
               novoProduto.fornecedores = novoProduto.fornecedores.map(fornecedor => {
+                // Se o fornecedor for um número ou string, buscar o fornecedor completo
+                if (typeof fornecedor === 'number' || typeof fornecedor === 'string') {
+                  const fornecedorId = Number(fornecedor); // Converte para número
+                  const fornecedorCompleto = this.fornecedores.find(f => Number(f.id) === fornecedorId);
+                  if (fornecedorCompleto) {
+                    const novoFornecedor = new Fornecedor();
+                    Object.assign(novoFornecedor, fornecedorCompleto);
+                    novoFornecedor.produtos = [];
+                    return novoFornecedor;
+                  }
+                  return null; // Retorna null se não encontrar o fornecedor
+                }
+                // Se já for um objeto fornecedor, criar uma cópia
                 const novoFornecedor = new Fornecedor();
-                novoFornecedor.id = fornecedor.id;
-                novoFornecedor.nome = fornecedor.nome;
-                novoFornecedor.telefone = fornecedor.telefone;
-                novoFornecedor.cnpj = fornecedor.cnpj;
-                novoFornecedor.endereco = fornecedor.endereco;
+                Object.assign(novoFornecedor, fornecedor);
                 novoFornecedor.produtos = [];
                 return novoFornecedor;
-              });
+              }).filter(f => f !== null); // Remove os fornecedores null
             }
             return novoProduto;
           });
+          console.log('Produtos processados:', this.produtos);
         },
         error: (erro) => {
           console.error('Error fetching all products:', erro);

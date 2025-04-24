@@ -70,7 +70,7 @@
             <td class="border p-2">
               <span *ngIf="produto.fornecedores && produto.fornecedores.length > 0">
                 <span *ngFor="let fornecedor of produto.fornecedores; let i = index">
-                  {{ fornecedor.nome }}<span *ngIf="i < produto.fornecedores.length - 1">, </span>
+                  {{ fornecedor?.nome || '' }}<span *ngIf="i < produto.fornecedores.length - 1">, </span>
                 </span>
               </span>
               <span *ngIf="!produto.fornecedores || produto.fornecedores.length === 0" class="text-gray-500">

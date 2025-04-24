@@ -48,14 +48,12 @@ export class CorredorDetalheComponent implements OnInit {
       const reader = new FileReader();
       reader.onload = () => {
         this.imagePreview = reader.result;
-        this.corredor.imagemEmBase64 = reader.result as string;
       };
       reader.readAsDataURL(file);
     } else {
       alert('Tamanho de arquivo não permitido! Máximo: 10MB.');
       this.selectedFile = null;
       this.imagePreview = null;
-      this.corredor.imagemEmBase64 = null;
     }
   }
 
@@ -122,8 +120,25 @@ export class CorredorDetalheComponent implements OnInit {
       )
       .subscribe(
         (resposta) => {
-          Swal.fire('Corredor salvo com sucesso!', '', 'success');
-          this.voltar();
+          if (this.selectedFile) {
+            const formData = new FormData();
+            formData.append('imagem', this.selectedFile);
+
+            this.corredorService.uploadImagem(resposta.id, formData).subscribe({
+              next: () => {
+                Swal.fire('Corredor salvo com sucesso!', '', 'success');
+                this.voltar();
+              },
+              error: (erro) => {
+                console.error('Erro ao fazer upload da imagem:', erro);
+                Swal.fire('Erro ao fazer upload da imagem!', erro.error?.mensagem || erro.message || 'Erro desconhecido', 'error');
+                this.voltar();
+              }
+            });
+          } else {
+            Swal.fire('Corredor salvo com sucesso!', '', 'success');
+            this.voltar();
+          }
         }
       );
   }

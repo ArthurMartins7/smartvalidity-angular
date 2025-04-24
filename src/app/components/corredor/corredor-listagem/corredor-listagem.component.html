@@ -109,7 +109,7 @@
       <div class="mb-2">
         <img
           *ngIf="corredor.imagemEmBase64"
-          [src]="corredor.imagemEmBase64"
+          [src]="'data:image/jpeg;base64,' + corredor.imagemEmBase64"
           alt="Imagem do Corredor"
           class="w-full h-24 object-cover rounded-t-lg"
         />

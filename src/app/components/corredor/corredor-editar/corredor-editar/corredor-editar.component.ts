@@ -49,14 +49,12 @@ export class CorredorEditarComponent implements OnInit {
       const reader = new FileReader();
       reader.onload = () => {
         this.imagePreview = reader.result;
-        this.corredor.imagemEmBase64 = reader.result as string;
       };
       reader.readAsDataURL(file);
     } else {
       alert('Tamanho de arquivo não permitido! Máximo: 10MB.');
       this.selectedFile = null;
       this.imagePreview = null;
-      this.corredor.imagemEmBase64 = null;
     }
   }
 
@@ -65,7 +63,7 @@ export class CorredorEditarComponent implements OnInit {
       (corredor) => {
         this.corredor = corredor;
         if (corredor.imagemEmBase64) {
-          this.imagePreview = corredor.imagemEmBase64;
+          this.imagePreview = 'data:image/jpeg;base64,' + corredor.imagemEmBase64;
         }
         if (corredor.responsaveis && corredor.responsaveis.length > 0) {
           this.responsavelSelecionado = this.responsaveisDisponiveis.find(
@@ -113,10 +111,10 @@ export class CorredorEditarComponent implements OnInit {
           email: this.responsavelSelecionado.email,
           senha: this.responsavelSelecionado.senha
         }
-      ],
-      imagemEmBase64: this.corredor.imagemEmBase64
+      ]
     };
 
+    // Primeiro atualiza os dados do corredor
     this.corredorService.atualizarCorredor(this.idCorredor, corredorMapeado)
       .pipe(
         catchError((error: HttpErrorResponse) => {
@@ -125,12 +123,29 @@ export class CorredorEditarComponent implements OnInit {
           return throwError(error);
         })
       )
-      .subscribe(
-        (resposta) => {
-          Swal.fire('Corredor atualizado com sucesso!', '', 'success');
-          this.voltar();
+      .subscribe({
+        next: (resposta) => {
+          // Se houver uma nova imagem selecionada, faz o upload
+          if (this.selectedFile) {
+            const formData = new FormData();
+            formData.append('imagem', this.selectedFile);
+
+            this.corredorService.uploadImagem(this.idCorredor, formData).subscribe({
+              next: () => {
+                Swal.fire('Corredor atualizado com sucesso!', '', 'success');
+                this.voltar();
+              },
+              error: (erro) => {
+                console.error('Erro ao fazer upload da imagem:', erro);
+                Swal.fire('Erro ao fazer upload da imagem!', erro.error?.mensagem || erro.message || 'Erro desconhecido', 'error');
+              }
+            });
+          } else {
+            Swal.fire('Corredor atualizado com sucesso!', '', 'success');
+            this.voltar();
+          }
         }
-      );
+      });
   }
 
   public voltar(): void {

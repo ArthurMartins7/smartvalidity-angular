@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, inject, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { FornecedorService } from '../../../shared/service/fornecedor.service';
-import { Router, ActivatedRoute } from '@angular/router';
+import { Router, ActivatedRoute, RouterModule } from '@angular/router';
 import { Fornecedor } from '../../../shared/model/entity/fornecedor';
 import { Produto } from '../../../shared/model/entity/produto';
 import { ProdutoService } from '../../../shared/service/produto.service';
@@ -12,7 +12,7 @@ import Swal from 'sweetalert2';
 @Component({
   selector: 'app-produto-listagem',
   standalone: true,
-  imports: [FormsModule, CommonModule],
+  imports: [FormsModule, CommonModule, RouterModule],
   templateUrl: './produto-listagem.component.html',
   styleUrl: './produto-listagem.component.css'
 })
@@ -263,5 +263,13 @@ export class ProdutoListagemComponent implements OnInit{
         }
       });
     }
+  }
+
+  irParaEntradaEstoque(produto: Produto) {
+    this.router.navigate(['/entrada-estoque'], {
+      queryParams: {
+        produtoId: produto.id
+      }
+    });
   }
 }

@@ -108,7 +108,6 @@ export class ProdutoListagemComponent implements OnInit, OnDestroy {
       this.fornecedorService.listarTodos().subscribe(
         (resultado) => {
           this.fornecedores = resultado;
-          console.log('Fornecedores carregados:', this.fornecedores);
           resolve();
         },
         (erro) => {
@@ -121,10 +120,8 @@ export class ProdutoListagemComponent implements OnInit, OnDestroy {
 
   public buscarCategoria(): void {
     if (this.categoriaId) {
-      console.log('Buscando detalhes da categoria:', this.categoriaId);
       this.categoriaService.buscarPorId(this.categoriaId).subscribe({
         next: (categoria) => {
-          console.log('Categoria encontrada:', categoria);
           this.categoriaNome = categoria.nome;
           this.categoria = categoria;
         },
@@ -137,30 +134,22 @@ export class ProdutoListagemComponent implements OnInit, OnDestroy {
   }
 
   public buscarProdutos() {
-    console.log('Buscando produtos com seletor:', this.seletor);
-
     if (this.categoriaId) {
       this.produtoService.listarPorCategoria(this.categoriaId.toString()).subscribe({
         next: (resultado) => {
-          console.log('Products received from API:', resultado);
-          // Aplicar filtros localmente
           this.aplicarFiltrosLocalmente(resultado);
         },
         error: (erro) => {
           console.error('Error fetching products by category:', erro);
-          console.error('Error details:', erro.error?.mensagem || erro.message);
         }
       });
     } else {
       this.produtoService.listarTodos().subscribe({
         next: (resultado) => {
-          console.log('All products received from API:', resultado);
-          // Aplicar filtros localmente
           this.aplicarFiltrosLocalmente(resultado);
         },
         error: (erro) => {
           console.error('Error fetching all products:', erro);
-          console.error('Error details:', erro.error?.mensagem || erro.message);
         }
       });
     }
@@ -244,8 +233,6 @@ export class ProdutoListagemComponent implements OnInit, OnDestroy {
       }
       return novoProduto;
     });
-    
-    console.log('Produtos processados:', this.produtos);
   }
 
   public onSearchInput(): void {
@@ -263,24 +250,16 @@ export class ProdutoListagemComponent implements OnInit, OnDestroy {
   }
 
   public aplicarFiltros() {
-    console.log('Aplicando filtros...');
-
-    // Resetar para a primeira página ao aplicar filtros
     this.seletor.pagina = 1;
 
-    // Atualizar o seletor com os filtros
     this.seletor.codigoBarras = this.filtroCodigoBarras;
     this.seletor.descricao = this.filtroDescricao;
     this.seletor.marca = this.filtroMarca;
     this.seletor.unidadeMedida = this.filtroUnidadeMedida;
     this.seletor.fornecedorId = this.filtroFornecedor ? this.filtroFornecedor.id : null;
 
-    console.log('Seletor atualizado:', this.seletor);
-
-    // Buscar produtos com os novos filtros
     this.buscarProdutos();
 
-    // Fechar o modal de filtros após aplicar
     this.mostrarFiltros = false;
   }
 

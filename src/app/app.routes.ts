@@ -12,6 +12,7 @@ import { FornecedorEditarComponent } from './components/fornecedor/fornecedor-ed
 import { FornecedorDetalheComponent } from './components/fornecedor/fornecedor-detalhe/fornecedor-detalhe.component';
 import { ProdutoDetalheComponent } from './components/produto/produto-listagem/produto-detalhe/produto-detalhe/produto-detalhe.component';
 import { CategoriaEditarComponent } from './components/categoria/categoria-editar/categoria-editar/categoria-editar.component';
+import { ProdutoEditarComponent } from './components/produto/produto-editar/produto-editar/produto-editar.component';
 
 export const routes: Routes = [
   { path: '', component: LoginComponent },
@@ -21,6 +22,7 @@ export const routes: Routes = [
   { path: 'corredor-editar/:id', component: CorredorEditarComponent },
   { path: 'produto-listagem', component: ProdutoListagemComponent },
   { path: 'produto-detalhe', component: ProdutoDetalheComponent },
+  { path: 'produto-editar', component: ProdutoEditarComponent },
   { path: 'fornecedor-listagem', component: FornecedorListagemComponent },
   { path: 'fornecedor-detalhe', component: FornecedorDetalheComponent },
   { path: 'fornecedor-editar/:id', component: FornecedorEditarComponent },

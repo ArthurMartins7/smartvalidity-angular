@@ -36,9 +36,10 @@ export class CorredorEditarComponent implements OnInit {
   ngOnInit(): void {
     this.idCorredor = Number(this.activatedRoute.snapshot.paramMap.get('id')) || 0;
     if (this.idCorredor) {
-      this.carregarCorredor();
+      this.carregarResponsaveis().then(() => {
+        this.carregarCorredor();
+      });
     }
-    this.carregarResponsaveis();
   }
 
   onFileSelected(event: any) {
@@ -79,21 +80,20 @@ export class CorredorEditarComponent implements OnInit {
     );
   }
 
-  public carregarResponsaveis(): void {
-    this.usuarioService.buscarTodos().subscribe(
-      (responsaveis) => {
-        this.responsaveisDisponiveis = responsaveis;
-        if (this.corredor.responsaveis && this.corredor.responsaveis.length > 0) {
-          this.responsavelSelecionado = responsaveis.find(
-            r => r.id === this.corredor.responsaveis[0].id
-          ) || null;
+  public carregarResponsaveis(): Promise<void> {
+    return new Promise((resolve, reject) => {
+      this.usuarioService.buscarTodos().subscribe(
+        (responsaveis) => {
+          this.responsaveisDisponiveis = responsaveis;
+          resolve();
+        },
+        (erro) => {
+          console.error('Erro ao carregar responsáveis:', erro);
+          Swal.fire('Erro', 'Não foi possível carregar os responsáveis!', 'error');
+          reject(erro);
         }
-      },
-      (erro) => {
-        console.error('Erro ao carregar responsáveis:', erro);
-        Swal.fire('Erro', 'Não foi possível carregar os responsáveis!', 'error');
-      }
-    );
+      );
+    });
   }
 
   atualizar(): void {

@@ -27,7 +27,7 @@
     <!-- Cabeçalho do card -->
     <div class="bg-gray-50 p-4 border-b">
       <div class="flex items-center justify-between">
-        <h3 class="text-lg font-bold text-gray-800">{{ item.produto?.descricao }}</h3>
+        <h3 class="text-lg font-bold text-gray-800">{{ item.produto.descricao }}</h3>
         <div class="px-3 py-1 rounded-full text-xs font-semibold"
              [ngClass]="{
                'bg-yellow-100 text-yellow-800': item.status === 'proximo',
@@ -48,12 +48,12 @@
         <div>
           <div class="mb-4">
             <h4 class="text-sm font-semibold text-gray-500 mb-1">CÓDIGO DE BARRAS</h4>
-            <p class="font-medium text-gray-900">{{ item.produto?.codigoBarras }}</p>
+            <p class="font-medium text-gray-900">{{ item.produto.codigoBarras }}</p>
           </div>
 
           <div class="mb-4">
             <h4 class="text-sm font-semibold text-gray-500 mb-1">MARCA</h4>
-            <p class="font-medium text-gray-900">{{ item.produto?.marca }}</p>
+            <p class="font-medium text-gray-900">{{ item.produto.marca }}</p>
           </div>
 
           <div class="mb-4">
@@ -80,7 +80,7 @@
 
           <div class="mb-4">
             <h4 class="text-sm font-semibold text-gray-500 mb-1">UNIDADE DE MEDIDA</h4>
-            <p class="font-medium text-gray-900">{{ item.produto?.unidadeMedida }}</p>
+            <p class="font-medium text-gray-900">{{ item.produto.unidadeMedida }}</p>
           </div>
 
           <div>

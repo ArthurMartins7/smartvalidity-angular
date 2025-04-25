@@ -11,11 +11,12 @@ import { debounceTime, distinctUntilChanged, takeUntil } from 'rxjs/operators';
 import { CommonModule } from '@angular/common';
 import { CorredorSeletor } from '../../../shared/model/seletor/corredor.seletor';
 import { Usuario } from '../../../shared/model/entity/usuario.model';
+import { DragDropModule } from '@angular/cdk/drag-drop';
 
 @Component({
   selector: 'app-corredor-listagem',
   standalone: true,
-  imports: [FormsModule, CommonModule],
+  imports: [FormsModule, CommonModule, DragDropModule],
   templateUrl: './corredor-listagem.component.html',
   styleUrl: './corredor-listagem.component.css'
 })
@@ -82,7 +83,7 @@ export class CorredorListagemComponent implements OnInit, OnDestroy {
       pagina: this.seletor.pagina,
       limite: this.seletor.limite
     });
-    
+
     this.corredorService.listarComSeletor(this.seletor).subscribe(
       (resultado) => {
         console.log('Resultado da busca:', {
@@ -145,7 +146,7 @@ export class CorredorListagemComponent implements OnInit, OnDestroy {
 
     // Atualizar o seletor com os filtros
     this.seletor.nome = this.filtroNome;
-    
+
     // Limpar os filtros de responsável se não houver seleção
     if (!this.filtroResponsavel) {
       this.seletor.responsavel = '';
@@ -258,11 +259,11 @@ export class CorredorListagemComponent implements OnInit, OnDestroy {
   }
 
   public irParaProdutoListagem(categoriaId: string, categoriaNome: string) {
-    this.router.navigate(['/produto-listagem'], { 
-      queryParams: { 
+    this.router.navigate(['/produto-listagem'], {
+      queryParams: {
         categoriaId,
-        categoriaNome 
-      } 
+        categoriaNome
+      }
     });
   }
 

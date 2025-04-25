@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { Produto } from '../model/entity/produto';
 import { tap } from 'rxjs/operators';
+import { ProdutoSeletor } from '../model/seletor/produto.seletor';
 
 @Injectable({
   providedIn: 'root',
@@ -40,6 +41,19 @@ export class ProdutoService {
       })
     );
   }
+
+    listarComSeletor(seletor: ProdutoSeletor): Observable<Produto[]> {
+      return this.httpClient.post<Produto[]>(`${this.API}/filtro`, seletor);
+    }
+
+    contarPaginas(seletor: ProdutoSeletor): Observable<number> {
+      return this.httpClient.post<number>(`${this.API}/total-paginas`, seletor);
+    }
+
+    contarTotalRegistros(seletor: ProdutoSeletor): Observable<number> {
+      return this.httpClient.post<number>(this.API + '/contar', seletor);
+    }
+
 
   criarProduto(novoProduto: Produto): Observable<Produto> {
     console.log('Enviando produto para criação:', novoProduto);

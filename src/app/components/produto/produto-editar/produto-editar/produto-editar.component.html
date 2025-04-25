@@ -1,22 +1,24 @@
 <!-- Cabeçalho -->
-<div class="flex items-center gap-2 mb-8">
-  <i class="material-icons text-gray-600">arrow_forward</i>
-  <div>
-    <div class="text-gray-500">Produtos</div>
-    <div class="text-2xl font-bold">Cadastro</div>
-  </div>
-</div>
+<header class="mb-8">
+  <nav class="flex items-center gap-2">
+    <i class="material-icons text-gray-600">arrow_back</i>
+    <div>
+      <div class="text-2xl font-bold">{{ produto.descricao }}</div>
+      <div class="text-gray-500">Editar</div>
+    </div>
+  </nav>
+</header>
 
 <!-- Card do Formulário -->
 <div class="bg-white rounded-lg shadow-sm p-8 max-w-3xl mx-auto">
-  <h2 class="text-xl font-medium text-gray-700 mb-6">{{ idProduto ? 'Editar' : 'Cadastrar' }} produto</h2>
+  <h2 class="text-xl font-medium text-gray-700 mb-6">Editar produto</h2>
 
   <!-- Categoria Selecionada -->
   <div *ngIf="categoriaNome" class="mb-4 text-lg font-medium text-gray-700">
     Categoria: {{ categoriaNome }}
   </div>
 
-  <form (ngSubmit)="salvar($event)" class="space-y-6">
+  <form (ngSubmit)="atualizar($event)" class="space-y-6">
     <!-- Código de Barras -->
     <div>
       <label for="codigoBarras" class="block text-sm font-medium text-gray-700 mb-1">Código de Barras</label>
@@ -86,25 +88,20 @@
     </div>
 
     <!-- Fornecedor (select) -->
-    <div class="relative">
+    <div>
       <label for="fornecedor" class="block text-sm font-medium text-gray-700 mb-1">Fornecedor</label>
-      <div class="relative">
-        <select
-          id="fornecedor"
-          [(ngModel)]="fornecedorSelecionado"
-          name="fornecedor"
-          class="block w-full px-4 py-3 bg-gray-100 border border-gray-200 rounded-md appearance-none focus:outline-none focus:ring-2 focus:ring-blue-500"
-          required
-        >
-          <option value="" disabled selected>Selecione um fornecedor</option>
-          <option *ngFor="let fornecedor of fornecedores" [value]="fornecedor.id">
-            {{ fornecedor.nome }}
-          </option>
-        </select>
-        <button type="button" class="absolute right-2 top-1/2 -translate-y-1/2">
-          <i class="material-icons text-gray-500">add_circle_outline</i>
-        </button>
-      </div>
+      <select
+        id="fornecedor"
+        [(ngModel)]="fornecedorSelecionado"
+        name="fornecedor"
+        class="block w-full px-4 py-3 bg-gray-100 border border-gray-200 rounded-md"
+        required
+      >
+        <option value="" disabled selected>Selecione um fornecedor</option>
+        <option *ngFor="let fornecedor of fornecedores" [value]="fornecedor.id">
+          {{ fornecedor.nome }}
+        </option>
+      </select>
     </div>
 
     <!-- Botões -->
@@ -112,17 +109,13 @@
       <button
         type="button"
         (click)="voltar()"
-        class="px-8 py-2 text-lg font-medium text-white bg-gray-500 rounded-full min-w-[140px]
-        transition duration-300 ease-in-out hover:bg-gray-600 hover:shadow-md
-        focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
+        class="px-8 py-3 bg-gray-200 text-gray-700 font-medium rounded-full hover:bg-gray-300 transition-colors duration-200"
       >
         Voltar
       </button>
       <button
         type="submit"
-        class="px-8 py-2 text-lg font-medium text-white bg-blue-800 rounded-full min-w-[140px]
-        transition duration-300 ease-in-out hover:bg-blue-900 hover:shadow-md
-        focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+        class="px-8 py-3 bg-blue-800 text-white font-medium rounded-full hover:bg-blue-900 transition-colors duration-200"
       >
         Salvar
       </button>

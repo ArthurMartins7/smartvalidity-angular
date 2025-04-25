@@ -24,6 +24,7 @@ export class CorredorEditarComponent implements OnInit {
   public responsaveisDisponiveis: Usuario[] = [];
   public selectedFile: File | null = null;
   public responsavelSelecionado: Usuario | null = null;
+  public imagePreview: string | ArrayBuffer | null = null;
 
   constructor(
     private corredorService: CorredorService,
@@ -33,17 +34,37 @@ export class CorredorEditarComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    this.idCorredor = Number(this.activatedRoute.snapshot.paramMap.get('id'));
+    this.idCorredor = Number(this.activatedRoute.snapshot.paramMap.get('id')) || 0;
     if (this.idCorredor) {
-      this.carregarCorredor();
+      this.carregarResponsaveis().then(() => {
+        this.carregarCorredor();
+      });
     }
-    this.carregarResponsaveis();
+  }
+
+  onFileSelected(event: any) {
+    const file: File = event.target.files[0];
+    if (file && file.size <= 10 * 1024 * 1024) {
+      this.selectedFile = file;
+      const reader = new FileReader();
+      reader.onload = () => {
+        this.imagePreview = reader.result;
+      };
+      reader.readAsDataURL(file);
+    } else {
+      alert('Tamanho de arquivo não permitido! Máximo: 10MB.');
+      this.selectedFile = null;
+      this.imagePreview = null;
+    }
   }
 
   public carregarCorredor(): void {
     this.corredorService.buscarPorId(this.idCorredor).subscribe(
       (corredor) => {
         this.corredor = corredor;
+        if (corredor.imagemEmBase64) {
+          this.imagePreview = 'data:image/jpeg;base64,' + corredor.imagemEmBase64;
+        }
         if (corredor.responsaveis && corredor.responsaveis.length > 0) {
           this.responsavelSelecionado = this.responsaveisDisponiveis.find(
             r => r.id === corredor.responsaveis[0].id
@@ -57,21 +78,20 @@ export class CorredorEditarComponent implements OnInit {
     );
   }
 
-  public carregarResponsaveis(): void {
-    this.usuarioService.buscarTodos().subscribe(
-      (responsaveis) => {
-        this.responsaveisDisponiveis = responsaveis;
-        if (this.corredor.responsaveis && this.corredor.responsaveis.length > 0) {
-          this.responsavelSelecionado = responsaveis.find(
-            r => r.id === this.corredor.responsaveis[0].id
-          ) || null;
+  public carregarResponsaveis(): Promise<void> {
+    return new Promise((resolve, reject) => {
+      this.usuarioService.buscarTodos().subscribe(
+        (responsaveis) => {
+          this.responsaveisDisponiveis = responsaveis;
+          resolve();
+        },
+        (erro) => {
+          console.error('Erro ao carregar responsáveis:', erro);
+          Swal.fire('Erro', 'Não foi possível carregar os responsáveis!', 'error');
+          reject(erro);
         }
-      },
-      (erro) => {
-        console.error('Erro ao carregar responsáveis:', erro);
-        Swal.fire('Erro', 'Não foi possível carregar os responsáveis!', 'error');
-      }
-    );
+      );
+    });
   }
 
   atualizar(): void {
@@ -79,8 +99,6 @@ export class CorredorEditarComponent implements OnInit {
       Swal.fire('Preencha todos os campos obrigatórios!', '', 'warning');
       return;
     }
-
-    console.log('Corredor a ser atualizado:', this.corredor);
 
     const corredorMapeado = {
       ...this.corredor,
@@ -96,7 +114,8 @@ export class CorredorEditarComponent implements OnInit {
       ]
     };
 
-    this.corredorService.atualizarCorredor(this.idCorredor!, corredorMapeado)
+    // Primeiro atualiza os dados do corredor
+    this.corredorService.atualizarCorredor(this.idCorredor, corredorMapeado)
       .pipe(
         catchError((error: HttpErrorResponse) => {
           console.error('Erro ao atualizar o corredor:', error);
@@ -104,23 +123,32 @@ export class CorredorEditarComponent implements OnInit {
           return throwError(error);
         })
       )
-      .subscribe(
-        (resposta) => {
-          Swal.fire('Corredor atualizado com sucesso!', '', 'success');
+      .subscribe({
+        next: (resposta) => {
+          // Se houver uma nova imagem selecionada, faz o upload
           if (this.selectedFile) {
-            this.uploadImagem(resposta.id);
+            const formData = new FormData();
+            formData.append('imagem', this.selectedFile);
+
+            this.corredorService.uploadImagem(this.idCorredor, formData).subscribe({
+              next: () => {
+                Swal.fire('Corredor atualizado com sucesso!', '', 'success');
+                this.voltar();
+              },
+              error: (erro) => {
+                console.error('Erro ao fazer upload da imagem:', erro);
+                Swal.fire('Erro ao fazer upload da imagem!', erro.error?.mensagem || erro.message || 'Erro desconhecido', 'error');
+              }
+            });
           } else {
+            Swal.fire('Corredor atualizado com sucesso!', '', 'success');
             this.voltar();
           }
         }
-      );
+      });
   }
 
   public voltar(): void {
     this.router.navigate(['corredor']);
-  }
-
-  uploadImagem(id: number): void {
-    // Implementação do upload da imagem
   }
 }

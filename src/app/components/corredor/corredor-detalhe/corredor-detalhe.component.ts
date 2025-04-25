@@ -23,6 +23,8 @@ export class CorredorDetalheComponent implements OnInit {
   public idCorredor: number;
   public responsaveisDisponiveis: Usuario[] = [];
   public responsavelSelecionado: Usuario | null = null;
+  public selectedFile: File | null = null;
+  public imagePreview: string | ArrayBuffer | null = null;
 
   constructor(
     private corredorService: CorredorService,
@@ -32,11 +34,27 @@ export class CorredorDetalheComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    this.idCorredor = Number(this.activatedRoute.snapshot.paramMap.get('id'));
+    this.idCorredor = Number(this.activatedRoute.snapshot.paramMap.get('id')) || 0;
     if (this.idCorredor) {
       this.carregarCorredor();
     }
     this.carregarResponsaveis();
+  }
+
+  onFileSelected(event: any) {
+    const file: File = event.target.files[0];
+    if (file && file.size <= 10 * 1024 * 1024) {
+      this.selectedFile = file;
+      const reader = new FileReader();
+      reader.onload = () => {
+        this.imagePreview = reader.result;
+      };
+      reader.readAsDataURL(file);
+    } else {
+      alert('Tamanho de arquivo não permitido! Máximo: 10MB.');
+      this.selectedFile = null;
+      this.imagePreview = null;
+    }
   }
 
   public carregarCorredor(): void {
@@ -72,34 +90,27 @@ export class CorredorDetalheComponent implements OnInit {
       return;
     }
 
-    // Atualiza o array de responsáveis com o responsável selecionado
-    this.corredor.responsaveis = [this.responsavelSelecionado];
+    // Limpa os campos do Spring Security do responsável
+    const responsavelLimpo = {
+      id: this.responsavelSelecionado.id,
+      perfilAcesso: this.responsavelSelecionado.perfilAcesso,
+      cpf: this.responsavelSelecionado.cpf,
+      nome: this.responsavelSelecionado.nome,
+      email: this.responsavelSelecionado.email,
+      senha: this.responsavelSelecionado.senha
+    };
+
+    this.corredor.responsaveis = [responsavelLimpo];
 
     if (this.idCorredor) {
-      this.alterar();
+      this.atualizar();
     } else {
       this.inserir();
     }
   }
 
   public inserir(): void {
-    console.log('Corredor a ser enviado:', this.corredor);
-
-    const corredorMapeado = {
-      ...this.corredor,
-      responsaveis: [
-        {
-          id: this.responsavelSelecionado!.id,
-          perfilAcesso: this.responsavelSelecionado!.perfilAcesso,
-          cpf: this.responsavelSelecionado!.cpf,
-          nome: this.responsavelSelecionado!.nome,
-          email: this.responsavelSelecionado!.email,
-          senha: this.responsavelSelecionado!.senha
-        }
-      ]
-    };
-
-    this.corredorService.criarCorredor(corredorMapeado)
+    this.corredorService.criarCorredor(this.corredor)
       .pipe(
         catchError((error: HttpErrorResponse) => {
           console.error('Erro ao salvar o corredor:', error);
@@ -108,21 +119,38 @@ export class CorredorDetalheComponent implements OnInit {
         })
       )
       .subscribe(
-        () => {
-          Swal.fire('Corredor salvo com sucesso!', '', 'success');
-          this.voltar();
+        (resposta) => {
+          if (this.selectedFile) {
+            const formData = new FormData();
+            formData.append('imagem', this.selectedFile);
+
+            this.corredorService.uploadImagem(resposta.id, formData).subscribe({
+              next: () => {
+                Swal.fire('Corredor salvo com sucesso!', '', 'success');
+                this.voltar();
+              },
+              error: (erro) => {
+                console.error('Erro ao fazer upload da imagem:', erro);
+                Swal.fire('Erro ao fazer upload da imagem!', erro.error?.mensagem || erro.message || 'Erro desconhecido', 'error');
+                this.voltar();
+              }
+            });
+          } else {
+            Swal.fire('Corredor salvo com sucesso!', '', 'success');
+            this.voltar();
+          }
         }
       );
   }
 
-  private alterar(): void {
+  private atualizar(): void {
     this.corredorService.atualizarCorredor(this.idCorredor!, this.corredor).subscribe(
-      () => {
+      (resposta) => {
         Swal.fire('Corredor atualizado com sucesso!', '', 'success');
         this.voltar();
       },
       (erro) => {
-        Swal.fire('Erro ao atualizar o corredor!', erro.error.mensagem, 'error');
+        Swal.fire('Erro ao atualizar o corredor!', erro.error.mensagem || 'Erro desconhecido', 'error');
       }
     );
   }

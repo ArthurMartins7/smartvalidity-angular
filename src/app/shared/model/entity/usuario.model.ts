@@ -7,4 +7,13 @@ export class Usuario {
   nome: string;
   email: string;
   senha: string;
+
+  // Campos do Spring Security que não devem ser serializados
+  authorities?: any[];
+  enabled?: boolean;
+  accountNonExpired?: boolean;
+  credentialsNonExpired?: boolean;
+  accountNonLocked?: boolean;
+  password?: string;
+  username?: string;
 }

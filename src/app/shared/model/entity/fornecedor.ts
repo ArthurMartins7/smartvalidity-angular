@@ -2,8 +2,7 @@ import { Endereco } from "./endereco";
 import { Produto } from "./produto";
 
 export class Fornecedor{
-
-  id: number;
+  id: string;
   nome: string;
   telefone: string;
   cnpj: string;

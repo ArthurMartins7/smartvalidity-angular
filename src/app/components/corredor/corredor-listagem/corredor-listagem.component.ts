@@ -7,15 +7,16 @@ import { Categoria } from '../../../shared/model/entity/categoria';
 import { Router } from '@angular/router';
 import Swal from 'sweetalert2';
 import { Subject } from 'rxjs';
-import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
+import { debounceTime, distinctUntilChanged, takeUntil } from 'rxjs/operators';
 import { CommonModule } from '@angular/common';
 import { CorredorSeletor } from '../../../shared/model/seletor/corredor.seletor';
 import { Usuario } from '../../../shared/model/entity/usuario.model';
+import { DragDropModule } from '@angular/cdk/drag-drop';
 
 @Component({
   selector: 'app-corredor-listagem',
   standalone: true,
-  imports: [FormsModule, CommonModule],
+  imports: [FormsModule, CommonModule, DragDropModule],
   templateUrl: './corredor-listagem.component.html',
   styleUrl: './corredor-listagem.component.css'
 })
@@ -23,6 +24,7 @@ export class CorredorListagemComponent implements OnInit, OnDestroy {
   private categoriaService = inject(CategoriaService);
   private corredorService = inject(CorredorService);
   private router = inject(Router);
+  private destroy$ = new Subject<void>();
 
   public seletor: CorredorSeletor = new CorredorSeletor();
   public corredores: Corredor[] = [];
@@ -39,16 +41,21 @@ export class CorredorListagemComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.seletor.pagina = 1;
     this.seletor.limite = this.itensPorPagina;
-    this.buscarCorredores();
-    this.buscarResponsaveis();
 
-    // Configurar o debounce para a busca em tempo real
+    // Configurar o observador do searchSubject para realizar a busca após um tempo
     this.searchSubject.pipe(
-      debounceTime(300),
-      distinctUntilChanged()
-    ).subscribe(() => {
+      debounceTime(500), // Aguarda 500ms após o último evento
+      distinctUntilChanged(), // Ignora se o valor não mudou
+      takeUntil(this.destroy$)
+    ).subscribe(termo => {
+      // Atualiza o seletor com o termo de busca
+      this.seletor.nome = termo;
+      // Realiza a busca
       this.buscarCorredores();
     });
+
+    this.buscarCorredores();
+    this.buscarResponsaveis();
   }
 
   private buscarResponsaveis(): void {
@@ -69,10 +76,24 @@ export class CorredorListagemComponent implements OnInit, OnDestroy {
   }
 
   public buscarCorredores() {
-    console.log('Buscando corredores com seletor:', this.seletor);
+    console.log('Buscando corredores com seletor:', {
+      nome: this.seletor.nome,
+      responsavel: this.seletor.responsavel,
+      responsavelId: this.seletor.responsavelId,
+      pagina: this.seletor.pagina,
+      limite: this.seletor.limite
+    });
+
     this.corredorService.listarComSeletor(this.seletor).subscribe(
       (resultado) => {
-        console.log('Resultado da busca:', resultado);
+        console.log('Resultado da busca:', {
+          quantidadeCorredores: resultado.length,
+          corredores: resultado.map(c => ({
+            id: c.id,
+            nome: c.nome,
+            responsaveis: c.responsaveis
+          }))
+        });
         this.corredores = resultado;
         this.calcularTotalPaginas();
       },
@@ -125,19 +146,39 @@ export class CorredorListagemComponent implements OnInit, OnDestroy {
 
     // Atualizar o seletor com os filtros
     this.seletor.nome = this.filtroNome;
-    this.seletor.responsavelId = this.filtroResponsavel?.id || null;
 
-    console.log('Seletor atualizado:', this.seletor);
+    // Limpar os filtros de responsável se não houver seleção
+    if (!this.filtroResponsavel) {
+      this.seletor.responsavel = '';
+      this.seletor.responsavelId = null;
+    } else {
+      // Atualizar com o responsável selecionado
+      this.seletor.responsavel = this.filtroResponsavel.nome;
+      this.seletor.responsavelId = this.filtroResponsavel.id;
+    }
+
+    console.log('Seletor atualizado:', {
+      nome: this.seletor.nome,
+      responsavel: this.seletor.responsavel,
+      responsavelId: this.seletor.responsavelId,
+      pagina: this.seletor.pagina,
+      limite: this.seletor.limite
+    });
 
     // Buscar corredores com os novos filtros
     this.buscarCorredores();
+
+    // Fechar o modal de filtros após aplicar
+    this.mostrarFiltros = false;
   }
 
   public limparFiltros() {
     this.filtroNome = '';
     this.filtroResponsavel = null;
     this.seletor.nome = '';
+    this.seletor.responsavel = '';
     this.seletor.responsavelId = null;
+    this.seletor.pagina = 1;
     this.buscarCorredores();
   }
 
@@ -192,8 +233,21 @@ export class CorredorListagemComponent implements OnInit, OnDestroy {
     });
   }
 
+  exibirImagemGrande(imagemBase64: string) {
+    Swal.fire({
+      title: 'Imagem da Carta',
+      html: `<img src="data:image/jpeg;base64,${imagemBase64}" alt="Imagem da Carta" style="max-width: 100%; height: auto;">`,
+      width: '80%',
+      showCloseButton: true,
+      showConfirmButton: false,
+      background: '#fff',
+      padding: '20px'
+    });
+  }
+
+
   editar(corredorSelecionado: Corredor) {
-    this.router.navigate(['/corredor-editar/', corredorSelecionado]);
+    this.router.navigate(['/corredor-editar/', corredorSelecionado.id]);
   }
 
   public adicionarCorredor() {
@@ -204,11 +258,18 @@ export class CorredorListagemComponent implements OnInit, OnDestroy {
     this.router.navigate(['/categoria-detalhe'], { queryParams: { corredorId: corredor.id } });
   }
 
-  public irParaProdutoListagem(categoriaId: number) {
-    this.router.navigate(['/produto-listagem'], { queryParams: { categoriaId } });
+  public irParaProdutoListagem(categoriaId: string, categoriaNome: string) {
+    this.router.navigate(['/produto-listagem'], {
+      queryParams: {
+        categoriaId,
+        categoriaNome
+      }
+    });
   }
 
   ngOnDestroy() {
+    this.destroy$.next();
+    this.destroy$.complete();
     this.searchSubject.complete();
   }
 }

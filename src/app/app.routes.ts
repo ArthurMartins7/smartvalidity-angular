@@ -13,15 +13,18 @@ import { CategoriaDetalheComponent } from './components/categoria/categoria-deta
 import { FornecedorEditarComponent } from './components/fornecedor/fornecedor-editar/fornecedor-editar/fornecedor-editar.component';
 import { FornecedorDetalheComponent } from './components/fornecedor/fornecedor-detalhe/fornecedor-detalhe.component';
 import { ProdutoDetalheComponent } from './components/produto/produto-listagem/produto-detalhe/produto-detalhe/produto-detalhe.component';
+import { CategoriaEditarComponent } from './components/categoria/categoria-editar/categoria-editar/categoria-editar.component';
+import { ProdutoEditarComponent } from './components/produto/produto-editar/produto-editar/produto-editar.component';
 
 export const routes: Routes = [
   { path: '', component: LoginComponent },
   { path: 'register', component: RegisterComponent },
   { path: 'corredor', component: CorredorListagemComponent },
   { path: 'corredor-detalhe', component: CorredorDetalheComponent },
-  { path: 'corredor-editar', component: CorredorEditarComponent },
+  { path: 'corredor-editar/:id', component: CorredorEditarComponent },
   { path: 'produto-listagem', component: ProdutoListagemComponent },
   { path: 'produto-detalhe', component: ProdutoDetalheComponent },
+  { path: 'produto-editar', component: ProdutoEditarComponent },
   { path: 'fornecedor-listagem', component: FornecedorListagemComponent },
   { path: 'fornecedor-detalhe', component: FornecedorDetalheComponent },
   { path: 'fornecedor-editar/:id', component: FornecedorEditarComponent },
@@ -32,5 +35,6 @@ export const routes: Routes = [
   { path: 'mural-listagem', component: MuralListagemComponent },
   { path: 'mural-detalhe/:id', component: MuralDetalheComponent },
   { path: 'categoria-detalhe', component: CategoriaDetalheComponent },
+  { path: 'categoria-editar', component: CategoriaEditarComponent },
 
 ];

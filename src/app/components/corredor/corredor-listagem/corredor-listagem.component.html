@@ -34,7 +34,11 @@
     </div>
 
     <!-- Popup de Filtros -->
-    <div *ngIf="mostrarFiltros" class="absolute z-10 mt-2 w-80 bg-white rounded-lg shadow-lg border border-gray-200">
+    <div *ngIf="mostrarFiltros"
+         cdkDrag
+         cdkDragBoundary=".p-3"
+         cdkDragHandle
+         class="absolute z-10 mt-2 w-80 bg-white rounded-lg shadow-lg border border-gray-200 cursor-move">
       <div class="p-4">
         <div class="flex justify-between items-center mb-4">
           <h3 class="text-lg font-semibold">Filtros</h3>
@@ -107,7 +111,12 @@
     @for (corredor of corredores; track corredor.id) {
     <div class="flex-1 p-3 bg-white rounded-lg shadow-lg max-w-xs flex flex-col h-[350px]">
       <div class="mb-2">
-        <img src="https://th.bing.com/th/id/OIP.jdq2ZppaEGHTVIFsQBeXLQHaE8?rs=1&pid=ImgDetMain" alt="Descrição da imagem" class="w-full h-24 object-cover rounded-t-lg" />
+        <img
+          *ngIf="corredor.imagemEmBase64"
+          [src]="'data:image/jpeg;base64,' + corredor.imagemEmBase64"
+          alt="Imagem do Corredor"
+          class="w-full h-24 object-cover rounded-t-lg"
+        />
       </div>
       <div class="flex items-center justify-between mb-2">
         <h3 class="text-lg font-bold text-gray-800">{{ corredor.nome }}</h3>
@@ -119,7 +128,7 @@
         <ul class="list-none p-0">
           @for (categoria of corredor.categorias; track categoria.id) {
             <li class="py-1 text-gray-600 hover:bg-gray-200 cursor-pointer"
-            (click)="irParaProdutoListagem(categoria.id)">{{ categoria.nome }}</li>
+            (click)="irParaProdutoListagem(categoria.id, categoria.nome)">{{ categoria.nome }}</li>
           }
         </ul>
       </div>

@@ -423,6 +423,10 @@ export class ProdutoListagemComponent implements OnInit, OnDestroy {
     });
   }
 
+  public voltar(): void {
+    this.router.navigate(['/corredor']);
+  }
+
   ngOnDestroy() {
     this.destroy$.next();
     this.destroy$.complete();

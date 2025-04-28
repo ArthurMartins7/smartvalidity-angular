@@ -2,7 +2,7 @@
 <div class="flex items-center gap-2 mb-8">
   <i class="material-icons text-gray-600">arrow_forward</i>
   <div>
-    <div class="text-gray-500">Produtos</div>
+    <div class="text-gray-500">{{ categoriaNome || 'Produtos' }}</div>
     <div class="text-2xl font-bold">Cadastro</div>
   </div>
 </div>
@@ -10,11 +10,6 @@
 <!-- Card do Formulário -->
 <div class="bg-white rounded-lg shadow-sm p-8 max-w-3xl mx-auto">
   <h2 class="text-xl font-medium text-gray-700 mb-6">{{ idProduto ? 'Editar' : 'Cadastrar' }} produto</h2>
-
-  <!-- Categoria Selecionada -->
-  <div *ngIf="categoriaNome" class="mb-4 text-lg font-medium text-gray-700">
-    Categoria: {{ categoriaNome }}
-  </div>
 
   <form (ngSubmit)="salvar($event)" class="space-y-6">
     <!-- Código de Barras -->
@@ -25,7 +20,7 @@
         type="text"
         [(ngModel)]="produto.codigoBarras"
         name="codigoBarras"
-        class="block w-full px-4 py-3 bg-gray-100 border border-gray-200 rounded-md"
+        class="block w-full px-4 py-3 bg-gray-100 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
         placeholder="Digite o código de barras"
         required
       />
@@ -39,7 +34,7 @@
         type="text"
         [(ngModel)]="produto.descricao"
         name="descricao"
-        class="block w-full px-4 py-3 bg-gray-100 border border-gray-200 rounded-md"
+        class="block w-full px-4 py-3 bg-gray-100 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
         placeholder="Digite a descrição do produto"
         required
       />
@@ -53,7 +48,7 @@
         type="text"
         [(ngModel)]="produto.marca"
         name="marca"
-        class="block w-full px-4 py-3 bg-gray-100 border border-gray-200 rounded-md"
+        class="block w-full px-4 py-3 bg-gray-100 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
         placeholder="Digite a marca do produto"
       />
     </div>
@@ -66,7 +61,7 @@
         type="text"
         [(ngModel)]="produto.unidadeMedida"
         name="unidadeMedida"
-        class="block w-full px-4 py-3 bg-gray-100 border border-gray-200 rounded-md"
+        class="block w-full px-4 py-3 bg-gray-100 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
         placeholder="Digite a unidade de medida"
       />
     </div>
@@ -79,7 +74,7 @@
         type="number"
         [(ngModel)]="produto.quantidade"
         name="quantidade"
-        class="block w-full px-4 py-3 bg-gray-100 border border-gray-200 rounded-md"
+        class="block w-full px-4 py-3 bg-gray-100 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
         placeholder="Digite a quantidade"
         required
       />

@@ -2,7 +2,7 @@ import { Categoria } from './categoria';
 import { Usuario } from './usuario.model';
 
 export class Corredor{
-  id: number;
+  id: string;
   nome: string;
   responsaveis: Usuario[];
   categorias: Categoria[];

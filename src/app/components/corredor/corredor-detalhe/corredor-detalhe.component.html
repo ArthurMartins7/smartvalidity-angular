@@ -51,7 +51,7 @@
             <select [(ngModel)]="responsavelSelecionado" name="responsavelCorredor" id="responsavelCorredor"
               class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg p-2.5
               focus:ring-2 focus:ring-blue-500 focus:border-blue-500" required>
-              <option [ngValue]="null">Selecione um responsável</option>
+              <option [ngValue]="">Selecione um responsável</option>
               <option *ngFor="let responsavel of responsaveisDisponiveis" [ngValue]="responsavel">
                 {{ responsavel.nome }}
               </option>

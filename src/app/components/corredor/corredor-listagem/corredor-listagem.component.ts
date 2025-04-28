@@ -211,7 +211,7 @@ export class CorredorListagemComponent implements OnInit, OnDestroy {
 
   excluir(corredorSelecionado: Corredor) {
     Swal.fire({
-      title: 'Deseja realmente excluir o corredor?',
+      title: 'Deseja realmente excluir o corredor ' + '"'+corredorSelecionado.nome+'"' + ' ?',
       text: 'Essa ação não poderá ser desfeita!',
       icon: 'warning',
       showCancelButton: true,

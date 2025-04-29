@@ -602,7 +602,7 @@
           <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900">{{item.lote}}</td>
           <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900">{{item.produto?.descricao}}</td>
           <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900">{{item.produto?.marca}}</td>
-          <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900">{{item.dataValidade | date:'dd/MM/yyyy HH:mm:ss'}}</td>
+          <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900">{{item.dataValidade | date:'dd/MM/yyyy HH:mm'}}</td>
           <td class="px-4 py-3 text-center">
             <svg *ngIf="item.inspecionado" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-500 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
               <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />

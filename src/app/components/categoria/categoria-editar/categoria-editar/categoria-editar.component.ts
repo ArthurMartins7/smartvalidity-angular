@@ -63,6 +63,6 @@ export class CategoriaEditarComponent implements OnInit {
   }
 
   voltar(): void {
-    this.router.navigate(['/corredor']);
+    this.router.navigate(['/produto-listagem']);
   }
 }

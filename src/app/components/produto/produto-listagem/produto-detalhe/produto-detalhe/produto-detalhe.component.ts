@@ -122,13 +122,32 @@ export class ProdutoDetalheComponent implements OnInit {
     this.produtoService.criarProduto(produtoParaSalvar).subscribe({
       next: (response) => {
         console.log('Produto criado com sucesso:', response);
-        Swal.fire('Produto salvo com sucesso!', '', 'success');
+        Swal.fire({
+          title: 'Sucesso!',
+          text: 'Produto salvo com sucesso!',
+          icon: 'success',
+          confirmButtonText: 'OK'
+        });
         this.voltar();
       },
       error: (erro) => {
         console.error('Erro ao criar produto:', erro);
         console.error('Detalhes do erro:', JSON.stringify(erro, null, 2));
-        Swal.fire('Erro ao salvar o produto', erro.error?.mensagem || 'Erro desconhecido', 'error');
+        
+        let mensagemErro = 'Ocorreu um erro ao salvar o produto.';
+        
+        if (erro.error?.codigoBarras) {
+          mensagemErro = erro.error.codigoBarras;
+        } else if (erro.error?.mensagem) {
+          mensagemErro = erro.error.mensagem;
+        }
+
+        Swal.fire({
+          title: 'Erro ao salvar produto',
+          text: 'Código de barras formato EAN13 inválido!',
+          icon: 'error',
+          confirmButtonText: 'OK'
+        });
       }
     });
   }

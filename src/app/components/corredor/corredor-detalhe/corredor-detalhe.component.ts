@@ -20,7 +20,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 export class CorredorDetalheComponent implements OnInit {
 
   public corredor: Corredor = new Corredor();
-  public idCorredor: number;
+  public idCorredor: string;
   public responsaveisDisponiveis: Usuario[] = [];
   public responsavelSelecionado: Usuario | null = null;
   public selectedFile: File | null = null;
@@ -34,10 +34,8 @@ export class CorredorDetalheComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    this.idCorredor = Number(this.activatedRoute.snapshot.paramMap.get('id')) || 0;
-    if (this.idCorredor) {
-      this.carregarCorredor();
-    }
+    //this.idCorredor = String(this.activatedRoute.snapshot.paramMap.get('id'));
+
     this.carregarResponsaveis();
   }
 

@@ -1,17 +1,12 @@
 <!-- Cabeçalho -->
 <div class="flex items-center gap-2 mb-8">
-  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6 text-gray-600">
-    <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
-  </svg>
+  <button (click)="voltar()" class="text-gray-600 hover:text-gray-800">
+    <i class="material-icons">arrow_back</i>
+  </button>
   <div>
-    <div class="text-gray-500">Produto</div>
+    <div class="text-gray-500">{{ categoriaNome || 'Produto' }}</div>
     <div class="text-2xl font-bold">Listagem</div>
   </div>
-</div>
-
-<!-- Categoria Selecionada -->
-<div *ngIf="categoriaNome" class="mb-4 text-lg font-medium text-gray-700">
-  Categoria: {{ categoriaNome }}
 </div>
 
 <!-- Conteúdo principal -->
@@ -162,7 +157,7 @@
     </div>
 
     <!-- Container da tabela -->
-    <div class="bg-white p-6 rounded-lg shadow">
+    <div class="bg-white p-6 rounded-lg shadow overflow-x-auto">
       <table class="w-full border-collapse border border-gray-300">
         <thead class="bg-gray-200">
           <tr>
@@ -172,17 +167,17 @@
             <th class="border border-gray-300 p-2 text-left">Unidade de Medida</th>
             <th class="border border-gray-300 p-2 text-left">Quantidade</th>
             <th class="border border-gray-300 p-2 text-left">Fornecedores</th>
-            <th class="border border-gray-300 p-2 text-center">Ações</th>
+            <th class="border border-gray-300 p-2 text-center w-32">Ações</th>
           </tr>
         </thead>
         <tbody>
           <tr *ngFor="let produto of produtos" class="border-b border-gray-300 hover:bg-gray-50">
             <td class="border border-gray-300 p-2">{{ produto.codigoBarras }}</td>
-            <td class="border border-gray-300 p-2">{{ produto.descricao }}</td>
-            <td class="border border-gray-300 p-2">{{ produto.marca }}</td>
-            <td class="border border-gray-300 p-2">{{ produto.unidadeMedida }}</td>
+            <td class="border border-gray-300 p-2 break-words max-w-xs">{{ produto.descricao }}</td>
+            <td class="border border-gray-300 p-2 break-words max-w-xs">{{ produto.marca }}</td>
+            <td class="border border-gray-300 p-2 break-words max-w-xs">{{ produto.unidadeMedida }}</td>
             <td class="border border-gray-300 p-2">{{ produto.quantidade }}</td>
-            <td class="border border-gray-300 p-2">
+            <td class="border border-gray-300 p-2 break-words max-w-xs">
               <span *ngIf="produto.fornecedores && produto.fornecedores.length > 0">
                 <span *ngFor="let fornecedor of produto.fornecedores; let i = index">
                   {{ fornecedor?.nome || 'Fornecedor ' + fornecedor?.id }}<span *ngIf="i < produto.fornecedores.length - 1">, </span>

@@ -17,7 +17,7 @@ export class CorredorService {
     private usuarioService: UsuarioService
   ) { }
 
-  uploadImagem(idCorredor: number, formData: FormData): Observable<any> {
+  uploadImagem(idCorredor: string, formData: FormData): Observable<any> {
     return this.httpClient.post(`${this.API}/${idCorredor}/upload`, formData, { responseType: 'text' });
   }
 
@@ -29,7 +29,7 @@ export class CorredorService {
     return this.httpClient.get<Array<Corredor>>(this.API);
   }
 
-  buscarPorId(id: number): Observable<Corredor> {
+  buscarPorId(id: string): Observable<Corredor> {
     return this.httpClient.get<Corredor>(`${this.API}/${id}`);
   }
 
@@ -62,11 +62,11 @@ export class CorredorService {
     return this.usuarioService.buscarTodos();
   }
 
-  atualizarCorredor(id: number, corredorAtualizado: Corredor): Observable<Corredor> {
+  atualizarCorredor(id: string, corredorAtualizado: Corredor): Observable<Corredor> {
     return this.httpClient.put<Corredor>(`${this.API}/${id}`, corredorAtualizado);
   }
 
-  excluirCorredor(id: number): Observable<void> {
+  excluirCorredor(id: string): Observable<void> {
     return this.httpClient.delete<void>(`${this.API}/${id}`);
   }
 }

@@ -11,6 +11,7 @@ import Swal from 'sweetalert2';
 import { Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged, takeUntil } from 'rxjs/operators';
 import { DragDropModule } from '@angular/cdk/drag-drop';
+import { CorredorService } from '../../../shared/service/corredor.service';
 
 @Component({
   selector: 'app-produto-listagem',
@@ -24,6 +25,7 @@ export class ProdutoListagemComponent implements OnInit, OnDestroy {
   private fornecedorService = inject(FornecedorService);
   private produtoService = inject(ProdutoService);
   private categoriaService = inject(CategoriaService);
+  private corredorService = inject(CorredorService);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
   private destroy$ = new Subject<void>();
@@ -352,22 +354,29 @@ export class ProdutoListagemComponent implements OnInit, OnDestroy {
         next: (categoria) => {
           console.log('Categoria encontrada:', categoria);
 
-          // Buscar o ID do corredor da categoria
-          this.categoriaService.buscarCorredorDaCategoria(categoriaId).subscribe({
-            next: (corredorId: number) => {
-              console.log('ID do corredor encontrado:', corredorId);
+          // Buscar todos os corredores para encontrar o que contém esta categoria
+          this.corredorService.listarTodos().subscribe({
+            next: (corredores) => {
+              // Encontrar o corredor que contém esta categoria
+              const corredorEncontrado = corredores.find(corredor => 
+                corredor.categorias.some(cat => cat.id === categoriaId)
+              );
 
-              // Navegar para a edição com o ID da categoria e do corredor
-              this.router.navigate(['/categoria-detalhe'], {
-                queryParams: {
-                  id: categoriaId,
-                  corredorId: corredorId.toString()
-                }
-              });
+              if (corredorEncontrado) {
+                // Navegar para a edição com o ID da categoria e do corredor
+                this.router.navigate(['/categoria-detalhe'], {
+                  queryParams: {
+                    id: categoriaId,
+                    corredorId: corredorEncontrado.id
+                  }
+                });
+              } else {
+                Swal.fire('Erro', 'Não foi possível encontrar o corredor desta categoria', 'error');
+              }
             },
-            error: (erro: any) => {
-              console.error('Erro ao buscar corredor:', erro);
-              Swal.fire('Erro', 'Não foi possível carregar o corredor', 'error');
+            error: (erro) => {
+              console.error('Erro ao buscar corredores:', erro);
+              Swal.fire('Erro', 'Não foi possível carregar os corredores', 'error');
             }
           });
         },
@@ -412,6 +421,10 @@ export class ProdutoListagemComponent implements OnInit, OnDestroy {
         produtoId: produto.id
       }
     });
+  }
+
+  public voltar(): void {
+    this.router.navigate(['/corredor']);
   }
 
   ngOnDestroy() {

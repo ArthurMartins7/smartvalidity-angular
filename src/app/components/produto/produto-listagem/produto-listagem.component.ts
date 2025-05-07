@@ -393,7 +393,6 @@ export class ProdutoListagemComponent implements OnInit, OnDestroy {
       const id = this.categoriaId;
       Swal.fire({
         title: 'Deseja realmente excluir a categoria?',
-        text: 'Todos os produtos desta categoria serão removidos!',
         icon: 'warning',
         showCancelButton: true,
         confirmButtonText: 'Sim, excluir!',
@@ -407,7 +406,12 @@ export class ProdutoListagemComponent implements OnInit, OnDestroy {
             },
             error: (erro) => {
               console.error('Erro ao excluir categoria:', erro);
-              Swal.fire('Erro!', 'Não foi possível excluir a categoria: ' + (erro.error?.mensagem || erro.message), 'error');
+              Swal.fire({
+                title: 'Erro ao excluir categoria',
+                text: 'Não é possivel excluir essa categoria pois possui um produto associado!',
+                icon: 'error',
+                confirmButtonText: 'OK'
+              });
             }
           });
         }

@@ -226,7 +226,12 @@ export class CorredorListagemComponent implements OnInit, OnDestroy {
             Swal.fire('Excluído!', 'O corredor foi removido com sucesso.', 'success');
           },
           erro => {
-            Swal.fire('Corredor possui categoria associada!', erro.error, 'error');
+            Swal.fire({
+              title: 'Erro ao excluir corredor',
+              text: 'Não é possivel excluir o corredor pois possui uma categoria associada!',
+              icon: 'error',
+              confirmButtonText: 'OK'
+            });
           }
         );
       }

@@ -93,7 +93,15 @@ export class FornecedorListagemComponent implements OnInit, OnDestroy {
             Swal.fire('Excluído!', 'O fornecedor foi removido com sucesso.', 'success');
           },
           (erro) => {
-            Swal.fire('Erro!', 'Não foi possível excluir o fornecedor.', 'error');
+            console.error('Erro ao excluir fornecedor:', erro);
+
+            // Mostrar mensagem personalizada para erro de exclusão
+            Swal.fire({
+              title: 'Erro ao excluir Fornecedor.',
+              text: 'Não é possivel excluir o fornecedor pois possui um produto associado!',
+              icon: 'error',
+              confirmButtonText: 'OK'
+            });
           }
         );
       }

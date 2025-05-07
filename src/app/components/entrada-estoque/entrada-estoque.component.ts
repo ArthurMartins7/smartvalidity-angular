@@ -22,8 +22,11 @@ export class EntradaEstoqueComponent implements OnInit {
     produto: '',
     lote: '',
     dataRecebimento: '',
+    horaRecebimento: '',
     dataFabricacao: '',
-    dataVencimento: ''
+    horaFabricacao: '',
+    dataVencimento: '',
+    horaVencimento: ''
   };
 
   produtos: Produto[] = [];
@@ -93,17 +96,17 @@ export class EntradaEstoqueComponent implements OnInit {
     }
 
     // Formatar as datas para o formato ISO
-    const formatarData = (data: string) => {
+    const formatarData = (data: string, hora: string) => {
       const [ano, mes, dia] = data.split('-');
-      return `${ano}-${mes}-${dia}T00:00:00`;
+      return `${ano}-${mes}-${dia}T${hora}:00`;
     };
 
     const itemProduto: ItemProdutoDTO = {
       lote: this.formData.lote,
       precoVenda: 0,
-      dataFabricacao: formatarData(this.formData.dataFabricacao),
-      dataVencimento: formatarData(this.formData.dataVencimento),
-      dataRecebimento: formatarData(this.formData.dataRecebimento),
+      dataFabricacao: formatarData(this.formData.dataFabricacao, this.formData.horaFabricacao),
+      dataVencimento: formatarData(this.formData.dataVencimento, this.formData.horaVencimento),
+      dataRecebimento: formatarData(this.formData.dataRecebimento, this.formData.horaRecebimento),
       produto: {
         id: produtoSelecionado.id,
         codigoBarras: produtoSelecionado.codigoBarras,
@@ -129,8 +132,11 @@ export class EntradaEstoqueComponent implements OnInit {
           produto: '',
           lote: '',
           dataRecebimento: '',
+          horaRecebimento: '',
           dataFabricacao: '',
-          dataVencimento: ''
+          horaFabricacao: '',
+          dataVencimento: '',
+          horaVencimento: ''
         };
         this.produtoSelecionado = null;
       },

@@ -1,0 +1,53 @@
+<!-- Container principal para exibir os filtros aplicados -->
+<div class="mb-4" *ngIf="hasAppliedFilters()">
+  <div class="flex mb-3">
+    <!-- Área que exibe todos os filtros selecionados -->
+    <div class="selected-filters text-sm text-gray-600">
+      <!-- Exibe o filtro de marca se estiver selecionado -->
+      <span *ngIf="filterService.getCurrentFilters().marca">
+        Marca: <strong>{{filterService.getCurrentFilters().marca}}</strong>
+        <button class="ml-1 text-red-600" (click)="onClearFilter('marca')">×</button>
+      </span>
+
+      <!-- Exibe o filtro de período de data se estiver selecionado -->
+      <span *ngIf="filterService.getCurrentFilters().dataVencimento.startDate || filterService.getCurrentFilters().dataVencimento.endDate" class="ml-2">
+        Período:
+        <strong>
+          {{filterService.getCurrentFilters().dataVencimento.startDate ? (filterService.getCurrentFilters().dataVencimento.startDate | date:'shortDate') : 'Início'}}
+          até
+          {{filterService.getCurrentFilters().dataVencimento.endDate ? (filterService.getCurrentFilters().dataVencimento.endDate | date:'shortDate') : 'Fim'}}
+        </strong>
+        <button class="ml-1 text-red-600" (click)="onClearDateFilter()">×</button>
+      </span>
+
+      <!-- Exibe o filtro de corredor se estiver selecionado -->
+      <span *ngIf="filterService.getCurrentFilters().corredor" class="ml-2">
+        Corredor: <strong>{{filterService.getCurrentFilters().corredor}}</strong>
+        <button class="ml-1 text-red-600" (click)="onClearFilter('corredor')">×</button>
+      </span>
+
+      <!-- Exibe o filtro de categoria se estiver selecionado -->
+      <span *ngIf="filterService.getCurrentFilters().categoria" class="ml-2">
+        Categoria: <strong>{{filterService.getCurrentFilters().categoria}}</strong>
+        <button class="ml-1 text-red-600" (click)="onClearFilter('categoria')">×</button>
+      </span>
+
+      <!-- Exibe o filtro de fornecedor se estiver selecionado -->
+      <span *ngIf="filterService.getCurrentFilters().fornecedor" class="ml-2">
+        Fornecedor: <strong>{{filterService.getCurrentFilters().fornecedor}}</strong>
+        <button class="ml-1 text-red-600" (click)="onClearFilter('fornecedor')">×</button>
+      </span>
+
+      <!-- Exibe o filtro de lote se estiver selecionado -->
+      <span *ngIf="filterService.getCurrentFilters().lote" class="ml-2">
+        Lote: <strong>{{filterService.getCurrentFilters().lote}}</strong>
+        <button class="ml-1 text-red-600" (click)="onClearFilter('lote')">×</button>
+      </span>
+
+      <!-- Botão para limpar todos os filtros de uma vez -->
+      <button *ngIf="hasAppliedFilters()"
+        class="ml-3 text-blue-600 text-sm underline"
+        (click)="onResetAllFilters()">Limpar todos</button>
+    </div>
+  </div>
+</div>

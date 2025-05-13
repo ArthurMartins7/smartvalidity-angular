@@ -1,20 +1,20 @@
 import { Routes } from '@angular/router';
+import { CategoriaDetalheComponent } from './components/categoria/categoria-detalhe/categoria-detalhe/categoria-detalhe.component';
+import { CategoriaEditarComponent } from './components/categoria/categoria-editar/categoria-editar/categoria-editar.component';
+import { CorredorDetalheComponent } from './components/corredor/corredor-detalhe/corredor-detalhe.component';
+import { CorredorEditarComponent } from './components/corredor/corredor-editar/corredor-editar/corredor-editar.component';
+import { CorredorListagemComponent } from './components/corredor/corredor-listagem/corredor-listagem.component';
+import { EntradaEstoqueComponent } from './components/entrada-estoque/entrada-estoque.component';
+import { FornecedorDetalheComponent } from './components/fornecedor/fornecedor-detalhe/fornecedor-detalhe.component';
+import { FornecedorEditarComponent } from './components/fornecedor/fornecedor-editar/fornecedor-editar/fornecedor-editar.component';
+import { FornecedorListagemComponent } from './components/fornecedor/fornecedor-listagem/fornecedor-listagem/fornecedor-listagem.component';
+import { MuralDetalheComponent } from './components/mural/mural-detalhe/mural-detalhe.component';
+import { MuralListagemComponent } from './components/mural/mural-listagem/mural-listagem.component';
+import { ProdutoEditarComponent } from './components/produto/produto-editar/produto-editar/produto-editar.component';
+import { ProdutoDetalheComponent } from './components/produto/produto-listagem/produto-detalhe/produto-detalhe/produto-detalhe.component';
+import { ProdutoListagemComponent } from './components/produto/produto-listagem/produto-listagem.component';
 import { LoginComponent } from './core/auth/pages/login/login/login.component';
 import { RegisterComponent } from './core/auth/pages/register/register/register.component';
-import { CorredorListagemComponent } from './components/corredor/corredor-listagem/corredor-listagem.component';
-import { CorredorDetalheComponent } from './components/corredor/corredor-detalhe/corredor-detalhe.component';
-import { ProdutoListagemComponent } from './components/produto/produto-listagem/produto-listagem.component';
-import { MuralListagemComponent } from './components/mural/mural-listagem/mural-listagem.component';
-import { MuralDetalheComponent } from './components/mural/mural-detalhe/mural-detalhe.component';
-import { EntradaEstoqueComponent } from './components/entrada-estoque/entrada-estoque.component';
-import { CorredorEditarComponent } from './components/corredor/corredor-editar/corredor-editar/corredor-editar.component';
-import { FornecedorListagemComponent } from './components/fornecedor/fornecedor-listagem/fornecedor-listagem/fornecedor-listagem.component';
-import { CategoriaDetalheComponent } from './components/categoria/categoria-detalhe/categoria-detalhe/categoria-detalhe.component';
-import { FornecedorEditarComponent } from './components/fornecedor/fornecedor-editar/fornecedor-editar/fornecedor-editar.component';
-import { FornecedorDetalheComponent } from './components/fornecedor/fornecedor-detalhe/fornecedor-detalhe.component';
-import { ProdutoDetalheComponent } from './components/produto/produto-listagem/produto-detalhe/produto-detalhe/produto-detalhe.component';
-import { CategoriaEditarComponent } from './components/categoria/categoria-editar/categoria-editar/categoria-editar.component';
-import { ProdutoEditarComponent } from './components/produto/produto-editar/produto-editar/produto-editar.component';
 
 export const routes: Routes = [
   { path: '', component: LoginComponent },
@@ -32,8 +32,11 @@ export const routes: Routes = [
 
   // Catch all route
   { path: 'corredor-detalhe', component: CorredorDetalheComponent },
+
+  // Rotas do Mural
   { path: 'mural-listagem', component: MuralListagemComponent },
   { path: 'mural-detalhe/:id', component: MuralDetalheComponent },
+
   { path: 'categoria-detalhe', component: CategoriaDetalheComponent },
   { path: 'categoria-editar', component: CategoriaEditarComponent },
 

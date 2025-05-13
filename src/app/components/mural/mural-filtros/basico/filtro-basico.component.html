@@ -1,0 +1,57 @@
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+  <!-- Buscador com largura maior -->
+  <div class="search-box relative w-full md:w-96 flex-grow">
+    <input
+      type="text"
+      [(ngModel)]="searchTerm"
+      (input)="onSearchInput($event)"
+      placeholder="Buscar produto por nome, código de barras ou marca"
+      class="pl-10 pr-10 py-3 border border-gray-300 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+    />
+    <div class="absolute left-3 top-3.5">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+      </svg>
+    </div>
+    <button (click)="onOpenFilterModal()" class="absolute right-3 top-3.5 text-gray-400 hover:text-gray-600">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+      </svg>
+    </button>
+  </div>
+
+  <div class="flex items-center space-x-3 justify-end">
+    <!-- Ordenação -->
+    <div class="sort-controls whitespace-nowrap">
+      <div class="relative">
+        <button
+          class="px-4 py-2 border border-gray-300 rounded-lg flex items-center bg-white"
+          (click)="onToggleSort()"
+        >
+          <span class="text-sm font-medium">{{ sortDirection === 'asc' ? 'A a Z' : 'Z a A' }}</span>
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Botão Inspecionar -->
+    <button
+      (click)="onInspectSelected()"
+      [disabled]="!hasSelectedItems"
+      [class.opacity-50]="!hasSelectedItems"
+      [class.cursor-not-allowed]="!hasSelectedItems"
+      class="flex items-center bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors focus:outline-none">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+      </svg>
+      Inspecionar
+    </button>
+  </div>
+</div>
+
+<!-- Contador de itens selecionados -->
+<div *ngIf="hasSelectedItems" class="flex items-center space-x-4 py-2 px-4 bg-gray-100 rounded-lg mt-2 mb-2">
+  <span class="text-gray-600">{{ selectedItemsCount }} item(s) selecionado(s)</span>
+</div>

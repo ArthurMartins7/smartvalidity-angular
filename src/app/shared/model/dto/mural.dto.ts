@@ -50,4 +50,6 @@ export interface MuralFiltroDTO {
   sortBy?: string;
   sortDirection?: 'asc' | 'desc';
   status?: 'proximo' | 'hoje' | 'vencido'; // Status da validade do produto
+  pagina?: number; // Página atual
+  limite?: number; // Quantidade de itens por página
 }

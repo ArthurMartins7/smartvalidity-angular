@@ -119,6 +119,20 @@ export class MuralService {
   getOpcoesFiltro(): Observable<FiltroOpcoes> {
     return this.httpClient.get<FiltroOpcoes>(`${this.API}/filtro-opcoes`);
   }
+
+  /**
+   * Obtém o número total de páginas com base no filtro
+   */
+  contarPaginas(filtro: MuralFiltroDTO): Observable<number> {
+    return this.httpClient.post<number>(`${this.API}/contar-paginas`, filtro);
+  }
+
+  /**
+   * Obtém o número total de registros com base no filtro
+   */
+  contarTotalRegistros(filtro: MuralFiltroDTO): Observable<number> {
+    return this.httpClient.post<number>(`${this.API}/contar-registros`, filtro);
+  }
 }
 
 //-----------------------------------------------------------------------
@@ -158,6 +172,16 @@ export class MuralFilterService {
   filterOptions$ = this.filterOptionsSubject.asObservable();
   sortField$ = this.sortFieldSubject.asObservable();
   sortDirection$ = this.sortDirectionSubject.asObservable();
+
+  // Serviço de filtros: Adicionar propriedades para paginação
+  private paginaAtualSubject = new BehaviorSubject<number>(1);
+  private itensPorPaginaSubject = new BehaviorSubject<number>(10);
+  private totalPaginasSubject = new BehaviorSubject<number>(1);
+
+  // Observables públicos para paginação
+  paginaAtual$ = this.paginaAtualSubject.asObservable();
+  itensPorPagina$ = this.itensPorPaginaSubject.asObservable();
+  totalPaginas$ = this.totalPaginasSubject.asObservable();
 
   constructor() {}
 
@@ -220,6 +244,8 @@ export class MuralFilterService {
     const searchTerm = this.searchTermSubject.value;
     const sortBy = this.sortFieldSubject.value;
     const sortDirection = this.sortDirectionSubject.value;
+    const pagina = this.paginaAtualSubject.value;
+    const limite = this.itensPorPaginaSubject.value;
 
     // Se o campo de ordenação for 'nome', precisamos mapear para 'descricao' no backend
     const mappedSortBy = sortBy === 'nome' ? 'descricao' : sortBy;
@@ -240,7 +266,9 @@ export class MuralFilterService {
       searchTerm: searchTerm || undefined,
       sortBy: mappedSortBy || undefined,
       sortDirection: sortDirection,
-      status: undefined
+      status: undefined,
+      pagina: pagina,
+      limite: limite
     };
   }
 
@@ -257,6 +285,21 @@ export class MuralFilterService {
       !!currentFilters.dataVencimento.startDate ||
       !!currentFilters.dataVencimento.endDate
     );
+  }
+
+  // Métodos para gerenciar paginação
+  updatePaginaAtual(pagina: number): void {
+    this.paginaAtualSubject.next(pagina);
+  }
+
+  updateItensPorPagina(itens: number): void {
+    this.itensPorPaginaSubject.next(itens);
+    // Reset para a primeira página quando muda o número de itens
+    this.paginaAtualSubject.next(1);
+  }
+
+  updateTotalPaginas(total: number): void {
+    this.totalPaginasSubject.next(total);
   }
 }
 

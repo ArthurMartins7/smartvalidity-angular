@@ -3,7 +3,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { Subscription, combineLatest } from 'rxjs';
-import { MuralListagemDTO } from '../../../shared/model/dto/mural.dto';
+import { MuralFiltroDTO, MuralListagemDTO } from '../../../shared/model/dto/mural.dto';
 import { MuralFilter, MuralFilterService, MuralSelecaoService, MuralService } from '../../../shared/service/mural.service';
 import { FiltroAvancadoComponent } from '../mural-filtros/avancado/filtro-avancado.component';
 import { FiltroBasicoComponent } from '../mural-filtros/basico/filtro-basico.component';
@@ -56,6 +56,19 @@ export class MuralListagemComponent implements OnInit, OnDestroy {
 
   /** Subscriptions para gerenciar unsubscribe */
   private subscriptions: Subscription[] = [];
+
+  /** Propriedades de paginação */
+  public totalPaginas: number = 1;
+  public opcoesItensPorPagina: number[] = [5, 10, 15, 20, 25, 50];
+
+  // Getters para acessar valores do filterService de forma mais limpa
+  public get paginaAtual(): number {
+    return this.filterService['paginaAtualSubject'].value;
+  }
+
+  public get itensPorPagina(): number {
+    return this.filterService['itensPorPaginaSubject'].value;
+  }
 
   constructor(
     private muralService: MuralService,
@@ -224,6 +237,9 @@ export class MuralListagemComponent implements OnInit, OnDestroy {
         break;
     }
 
+    // Calcular o total de páginas
+    this.calcularTotalPaginas(filtroDTO);
+
     const subscription = this.muralService.filtrarProdutos(filtroDTO).subscribe({
       next: (items) => {
         this.filteredItems = items.map(item => {
@@ -387,5 +403,56 @@ export class MuralListagemComponent implements OnInit, OnDestroy {
       replaceUrl: true
     });
     this.loadItems();
+  }
+
+  // Método para calcular o total de páginas
+  private calcularTotalPaginas(filtro: MuralFiltroDTO): void {
+    this.muralService.contarPaginas(filtro).subscribe({
+      next: (total) => {
+        this.filterService.updateTotalPaginas(total);
+        this.totalPaginas = total;
+      },
+      error: (erro) => {
+        console.error('Erro ao contar total de páginas:', erro);
+        this.totalPaginas = 1;
+      }
+    });
+  }
+
+  // Método para avançar para a próxima página
+  public avancarPagina(): void {
+    if (this.paginaAtual < this.totalPaginas) {
+      this.filterService.updatePaginaAtual(this.paginaAtual + 1);
+      this.applyFilters();
+    }
+  }
+
+  // Método para voltar para a página anterior
+  public voltarPagina(): void {
+    if (this.paginaAtual > 1) {
+      this.filterService.updatePaginaAtual(this.paginaAtual - 1);
+      this.applyFilters();
+    }
+  }
+
+  // Método para ir para uma página específica
+  public irParaPagina(pagina: number): void {
+    this.filterService.updatePaginaAtual(pagina);
+    this.applyFilters();
+  }
+
+  // Método para criar um array com os números das páginas
+  public criarArrayPaginas(): number[] {
+    const paginas = [];
+    for (let i = 1; i <= this.totalPaginas; i++) {
+      paginas.push(i);
+    }
+    return paginas;
+  }
+
+  // Método para alterar a quantidade de itens por página
+  public alterarItensPorPagina(quantidade: number): void {
+    this.filterService.updateItensPorPagina(quantidade);
+    this.applyFilters();
   }
 }

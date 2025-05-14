@@ -296,6 +296,10 @@ export class MuralListagemComponent implements OnInit, OnDestroy {
   toggleSortOrder(): void {
     const newDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';
     this.filterService.updateSortDirection(newDirection);
+    // Define o campo para ordenação como "nome" se não estiver definido
+    if (!this.sortField) {
+      this.filterService.updateSortField('nome');
+    }
   }
 
   /**

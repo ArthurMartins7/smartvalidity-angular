@@ -221,6 +221,9 @@ export class MuralFilterService {
     const sortBy = this.sortFieldSubject.value;
     const sortDirection = this.sortDirectionSubject.value;
 
+    // Se o campo de ordenação for 'nome', precisamos mapear para 'descricao' no backend
+    const mappedSortBy = sortBy === 'nome' ? 'descricao' : sortBy;
+
     return {
       corredor: filter.corredor || undefined,
       categoria: filter.categoria || undefined,
@@ -235,7 +238,7 @@ export class MuralFilterService {
       dataRecebimentoFim: filter.dataRecebimento?.endDate || undefined,
       inspecionado: filter.inspecionado,
       searchTerm: searchTerm || undefined,
-      sortBy: sortBy || undefined,
+      sortBy: mappedSortBy || undefined,
       sortDirection: sortDirection,
       status: undefined
     };

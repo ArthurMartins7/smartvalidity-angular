@@ -29,7 +29,13 @@ export class AuthenticationService {
     return this.httpClient.post<Usuario>(this.API + '/novo-usuario', usuario);
   }
 
+  public getCurrentUser(): Observable<Usuario> {
+    return this.httpClient.get<Usuario>(this.API + '/current-user');
+  }
+
   logout() {
     localStorage.removeItem('tokenUsuarioAutenticado');
+    sessionStorage.removeItem('usuarioEmail');
+    sessionStorage.removeItem('usuarioNome');
   }
 }

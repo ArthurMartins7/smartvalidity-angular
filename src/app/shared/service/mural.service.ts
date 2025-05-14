@@ -86,17 +86,35 @@ export class MuralService {
   }
 
   /**
+   * Obtém o nome do usuário atualmente logado
+   * @returns O nome do usuário ou 'Sistema' caso não esteja disponível
+   */
+  private getUsuarioAtual(): string {
+    const nome = sessionStorage.getItem('usuarioNome');
+    return nome || 'Sistema';
+  }
+
+  /**
    * Marca um item como inspecionado
    */
   marcarInspecionado(id: string, motivo?: string): Observable<MuralListagemDTO> {
-    return this.httpClient.put<MuralListagemDTO>(`${this.API}/inspecionar/${id}`, motivo ? { motivo } : {});
+    const payload = {
+      motivo: motivo || '',
+      usuarioInspecao: this.getUsuarioAtual()
+    };
+    return this.httpClient.put<MuralListagemDTO>(`${this.API}/inspecionar/${id}`, payload);
   }
 
   /**
    * Marca vários itens como inspecionados
    */
   marcarVariosInspecionados(ids: string[], motivo?: string): Observable<MuralListagemDTO[]> {
-    return this.httpClient.put<MuralListagemDTO[]>(`${this.API}/inspecionar-lote`, { ids, motivo });
+    const payload = {
+      ids: ids,
+      motivo: motivo || '',
+      usuarioInspecao: this.getUsuarioAtual()
+    };
+    return this.httpClient.put<MuralListagemDTO[]>(`${this.API}/inspecionar-lote`, payload);
   }
 
   /**

@@ -27,6 +27,8 @@ export interface MuralListagemDTO {
   status: 'proximo' | 'hoje' | 'vencido';
   inspecionado: boolean;
   motivoInspecao?: string;
+  usuarioInspecao?: string;
+  dataHoraInspecao?: Date;
   selecionado?: boolean; // Para controle de seleção no frontend
 }
 

@@ -1,9 +1,9 @@
 import { Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
+import Swal from 'sweetalert2';
 import { Usuario } from '../../../../../shared/model/entity/usuario.model';
 import { AuthenticationService } from '../../../services/auth.service';
-import Swal from 'sweetalert2';
-import { Router } from '@angular/router';
 
 
 @Component({
@@ -28,7 +28,9 @@ export class LoginComponent {
         Swal.fire('Sucesso', 'Usuário autenticado com sucesso', 'success');
         let token: string = jwt.body + '';
         localStorage.setItem('tokenUsuarioAutenticado', token);
-        this.verificarPerfilAcesso();
+
+        // Buscar o perfil completo do usuário atual
+        this.buscarPerfilUsuario();
       },
       error: (erro) => {
         var mensagem: string;
@@ -43,6 +45,27 @@ export class LoginComponent {
     });
   }
 
+  private buscarPerfilUsuario() {
+    this.authenticationService.getCurrentUser().subscribe({
+      next: (usuarioLogado) => {
+        // Armazenar o nome e email do usuário no sessionStorage
+        sessionStorage.setItem('usuarioEmail', usuarioLogado.email);
+        sessionStorage.setItem('usuarioNome', usuarioLogado.nome);
+
+        this.verificarPerfilAcesso();
+      },
+      error: (erro) => {
+        console.error('Erro ao obter perfil do usuário:', erro);
+        // Como fallback, salvar apenas o email que usou para login
+        sessionStorage.setItem('usuarioEmail', this.usuario.email);
+        // Como não conseguimos obter o nome, usar uma mensagem padrão
+        sessionStorage.setItem('usuarioNome', 'Usuário do Sistema');
+
+        this.verificarPerfilAcesso();
+      }
+    });
+  }
+
   realizarCadastro() {
     this.router.navigate(['/register']);
   }
@@ -50,5 +73,4 @@ export class LoginComponent {
   public verificarPerfilAcesso() {
     this.router.navigate(['/entrada-estoque']);
   }
-
 }

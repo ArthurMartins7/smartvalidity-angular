@@ -169,12 +169,20 @@ export class MuralListagemComponent implements OnInit, OnDestroy {
     const navigation = this.router.getCurrentNavigation();
     if (navigation?.extras.state && 'activeTab' in navigation.extras.state) {
       this.activeTab = navigation.extras.state['activeTab'] as 'proximo' | 'hoje' | 'vencido';
+      // Redefinir para a página 1 quando a aba muda
+      this.filterService.updatePaginaAtual(1);
       this.loadItems();
     } else {
       // Se não houver estado, verificamos os parâmetros da URL
       const subscription = this.route.queryParams.subscribe(params => {
         if (params['tab']) {
-          this.activeTab = params['tab'] as 'proximo' | 'hoje' | 'vencido';
+          const newTab = params['tab'] as 'proximo' | 'hoje' | 'vencido';
+          // Verificar se a aba mudou antes de redefinir a página
+          if (newTab !== this.activeTab) {
+            this.activeTab = newTab;
+            // Redefinir para a página 1 quando a aba muda
+            this.filterService.updatePaginaAtual(1);
+          }
         }
         this.loadItems();
       });
@@ -395,6 +403,10 @@ export class MuralListagemComponent implements OnInit, OnDestroy {
    */
   setActiveTab(tab: 'proximo' | 'hoje' | 'vencido'): void {
     this.activeTab = tab;
+
+    // Redefinir para a página 1 sempre que mudar de aba
+    this.filterService.updatePaginaAtual(1);
+
     // Atualiza a URL sem recarregar a página
     this.router.navigate([], {
       relativeTo: this.route,

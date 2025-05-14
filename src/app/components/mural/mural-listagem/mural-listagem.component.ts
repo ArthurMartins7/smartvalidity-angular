@@ -320,11 +320,28 @@ export class MuralListagemComponent implements OnInit, OnDestroy {
    * Callback quando a inspeção é confirmada
    */
   onInspecaoConfirmada(): void {
-    // Limpa a seleção
-    this.selecaoService.clearSelection();
+    try {
+      // Obtém o motivo da inspeção e os itens selecionados
+      this.selecaoService.confirmarInspecao(this.filteredItems).subscribe({
+        next: (itensAtualizados) => {
+          console.log('Itens inspecionados com sucesso:', itensAtualizados);
 
-    // Recarrega os itens
-    this.loadItems();
+          // Limpa a seleção
+          this.selecaoService.clearSelection();
+
+          // Fecha o modal
+          this.selecaoService.closeInspecaoModal();
+
+          // Recarrega os itens
+          this.loadItems();
+        },
+        error: (err) => {
+          console.error('Erro ao inspecionar itens:', err);
+        }
+      });
+    } catch (error) {
+      console.error('Erro ao confirmar inspeção:', error);
+    }
   }
 
   /**
@@ -338,7 +355,9 @@ export class MuralListagemComponent implements OnInit, OnDestroy {
    * Abre o modal para marcar itens selecionados como inspecionados
    */
   marcarSelecionadosComoInspecionados(): void {
-    // Implementado no template
+    if (this.hasSelectedItems()) {
+      this.selecaoService.openInspecaoModal();
+    }
   }
 
   /**

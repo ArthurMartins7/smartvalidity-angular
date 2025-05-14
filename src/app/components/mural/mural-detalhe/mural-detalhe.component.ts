@@ -82,11 +82,10 @@ export class MuralDetalheComponent implements OnInit {
     this.processandoInspecao = true;
 
     this.muralService.marcarInspecionado(this.itemId, this.motivoInspecao).subscribe({
-      next: () => {
-        // Atualiza o estado local
-        if (this.item) {
-          this.item.inspecionado = true;
-          this.item.motivoInspecao = this.motivoInspecao;
+      next: (item) => {
+        // Atualiza o estado local com o item retornado
+        if (item) {
+          this.item = item;
         }
 
         // Adiciona um pequeno atraso para permitir que o usuário veja a mudança
@@ -100,7 +99,12 @@ export class MuralDetalheComponent implements OnInit {
       },
       error: (err) => {
         console.error('Erro ao marcar item como inspecionado:', err);
-        this.error = 'Ocorreu um erro ao marcar o item como inspecionado. Por favor, tente novamente mais tarde.';
+        // Extrai a mensagem de erro da resposta se possível
+        if (err.error && err.error.message) {
+          this.error = err.error.message;
+        } else {
+          this.error = 'Ocorreu um erro ao marcar o item como inspecionado. Por favor, tente novamente mais tarde.';
+        }
         this.processandoInspecao = false;
       }
     });

@@ -4,3 +4,20 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Forçar o tema claro para as páginas de autenticação */
+.auth-page {
+  @apply bg-gray-50;
+  color-scheme: light;
+}
+
+.auth-page * {
+  color-scheme: light;
+}
+
+/* Garantir que os inputs em páginas de auth sempre usem o tema claro */
+.auth-page input,
+.auth-page select,
+.auth-page button {
+  color-scheme: light !important;
+}

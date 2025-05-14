@@ -2,12 +2,9 @@ import { CommonModule } from '@angular/common';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
-import { Subscription } from 'rxjs';
-import { MuralItem } from '../../../models/mural.model';
-import { MuralFilterHandlerService } from '../../../services/mural-filter-handler.service';
-import { MuralFilterService } from '../../../services/mural-filter.service';
-import { MuralSelecaoService } from '../../../services/mural-selecao.service';
-import { MuralService } from '../../../services/mural.service';
+import { Subscription, combineLatest } from 'rxjs';
+import { MuralListagemDTO } from '../../../shared/model/dto/mural.dto';
+import { MuralFilter, MuralFilterService, MuralSelecaoService, MuralService } from '../../../shared/service/mural.service';
 import { FiltroAvancadoComponent } from '../mural-filtros/avancado/filtro-avancado.component';
 import { FiltroBasicoComponent } from '../mural-filtros/basico/filtro-basico.component';
 import { FiltroTagsComponent } from '../mural-filtros/tags/filtro-tags.component';
@@ -32,11 +29,8 @@ import { MuralTabsComponent } from '../mural-tabs/mural-tabs.component';
 })
 export class MuralListagemComponent implements OnInit, OnDestroy {
   // -------------------- Propriedades Principais --------------------
-  /** Lista de todos os itens carregados */
-  items: MuralItem[] = [];
-
   /** Lista de itens filtrados atualmente visíveis */
-  filteredItems: MuralItem[] = [];
+  filteredItems: MuralListagemDTO[] = [];
 
   /** Aba ativa atual */
   activeTab: 'proximo' | 'hoje' | 'vencido' = 'proximo';
@@ -47,9 +41,15 @@ export class MuralListagemComponent implements OnInit, OnDestroy {
   /** Direção de ordenação atual */
   sortDirection: 'asc' | 'desc' = 'asc';
 
+  /** Campo de ordenação */
+  sortField: string = '';
+
   // -------------------- Controle de UI --------------------
   /** Visibilidade do modal de filtros avançados */
   showFilterModal: boolean = false;
+
+  /** Status de carregamento */
+  loading: boolean = false;
 
   /** IDs dos itens selecionados */
   private selectedIds: string[] = [];
@@ -60,7 +60,6 @@ export class MuralListagemComponent implements OnInit, OnDestroy {
   constructor(
     private muralService: MuralService,
     public filterService: MuralFilterService,
-    private filterHandler: MuralFilterHandlerService,
     private selecaoService: MuralSelecaoService,
     private route: ActivatedRoute,
     private router: Router
@@ -73,6 +72,27 @@ export class MuralListagemComponent implements OnInit, OnDestroy {
     this.initializeFromRouting();
     this.setupFilterSubscriptions();
     this.setupSelectionSubscription();
+    this.loadFilterOptions();
+  }
+
+  /**
+   * Carrega as opções para os filtros do backend
+   */
+  loadFilterOptions(): void {
+    const subscription = this.muralService.getOpcoesFiltro().subscribe({
+      next: (options) => {
+        this.filterService.updateFilterOptions({
+          availableBrands: options.marcas,
+          availableCorredores: options.corredores,
+          availableCategorias: options.categorias,
+          availableFornecedores: options.fornecedores,
+          availableLotes: options.lotes
+        });
+      },
+      error: (error) => console.error('Erro ao carregar opções de filtro:', error)
+    });
+
+    this.subscriptions.push(subscription);
   }
 
   /**
@@ -116,7 +136,7 @@ export class MuralListagemComponent implements OnInit, OnDestroy {
   /**
    * Handler para quando um item é selecionado individualmente
    */
-  onItemSelection(item: MuralItem, selected: boolean): void {
+  onItemSelection(item: MuralListagemDTO, selected: boolean): void {
     this.selecaoService.toggleItemSelection(item, selected);
   }
 
@@ -153,122 +173,83 @@ export class MuralListagemComponent implements OnInit, OnDestroy {
    * Configura as assinaturas para os filtros
    */
   private setupFilterSubscriptions(): void {
-    // Assinatura para o termo de pesquisa
-    const searchSubscription = this.filterService.searchTerm$.subscribe(term => {
-      this.searchTerm = term;
+    // Combinar todas as assinaturas de filtro em uma só
+    const subscription = combineLatest([
+      this.filterService.searchTerm$,
+      this.filterService.filters$,
+      this.filterService.sortField$,
+      this.filterService.sortDirection$
+    ]).subscribe(([searchTerm, filters, sortField, sortDirection]) => {
+      this.searchTerm = searchTerm;
+      this.sortField = sortField;
+      this.sortDirection = sortDirection;
+      // Aplicar filtros sempre que qualquer um dos valores mudar
       this.applyFilters();
-    });
-
-    // Assinatura para as mudanças nos filtros avançados
-    const filtersSubscription = this.filterService.filters$.subscribe(() => {
-      this.applyFilters();
-    });
-
-    this.subscriptions.push(searchSubscription, filtersSubscription);
-  }
-
-  /**
-   * Carrega os itens com base na aba ativa
-   */
-  loadItems(): void {
-    let serviceCall;
-    switch (this.activeTab) {
-      case 'proximo':
-        serviceCall = this.muralService.getProximosVencer();
-        break;
-      case 'hoje':
-        serviceCall = this.muralService.getVencemHoje();
-        break;
-      case 'vencido':
-        serviceCall = this.muralService.getVencidos();
-        break;
-    }
-
-    const subscription = serviceCall.subscribe({
-      next: (items) => {
-        // Garantir que todos os itens sejam exibidos, incluindo os inspecionados
-        // e que o valor de inspecionado esteja definido corretamente
-        this.items = items.map(item => {
-          if (item.inspecionado === undefined || item.inspecionado === null) {
-            item.inspecionado = false;
-          }
-          return item;
-        });
-
-        // Extrair opções de filtro
-        this.extractAvailableFilterOptions();
-
-        // Aplicar filtros atuais
-        this.applyFilters();
-      },
-      error: (error) => console.error(`Erro ao carregar itens de ${this.activeTab}:`, error)
     });
 
     this.subscriptions.push(subscription);
   }
 
   /**
-   * Extrai as opções disponíveis para os filtros a partir dos itens carregados
+   * Carrega os itens com base na aba ativa
    */
-  extractAvailableFilterOptions(): void {
-    const brands = new Set<string>();
-    const corredores = new Set<string>();
-    const categorias = new Set<string>();
-    const fornecedores = new Set<string>();
-    const lotes = new Set<string>();
-
-    this.items.forEach(item => {
-      if (item.produto?.marca) brands.add(item.produto.marca);
-      if (item.corredor) corredores.add(item.corredor);
-      if (item.categoria) categorias.add(item.categoria);
-      if (item.fornecedor) fornecedores.add(item.fornecedor);
-      if (item.lote) lotes.add(item.lote);
-    });
-
-    // Atualizar o service com as opções extraídas
-    this.filterService.updateFilterOptions({
-      availableBrands: Array.from(brands).sort(),
-      availableCorredores: Array.from(corredores).sort(),
-      availableCategorias: Array.from(categorias).sort(),
-      availableFornecedores: Array.from(fornecedores).sort(),
-      availableLotes: Array.from(lotes).sort()
-    });
+  loadItems(): void {
+    // Garantir que todos os filtros serão aplicados após carregar os itens
+    this.applyFilters();
   }
 
   /**
-   * Define a aba ativa e carrega os itens correspondentes
-   */
-  setActiveTab(tab: 'proximo' | 'hoje' | 'vencido'): void {
-    this.activeTab = tab;
-    // Atualiza a URL sem recarregar a página
-    this.router.navigate([], {
-      relativeTo: this.route,
-      queryParams: { tab: tab },
-      queryParamsHandling: 'merge',
-      replaceUrl: true
-    });
-    this.loadItems();
-  }
-
-  /**
-   * Aplica os filtros aos itens e atualiza a lista filtrada
+   * Aplica os filtros aos itens
    */
   applyFilters(): void {
-    // Usar o serviço de tratamento de filtros para aplicar todos os filtros
-    this.filteredItems = this.filterHandler.applyAllFilters(this.items, this.searchTerm);
+    this.loading = true;
 
-    // Ordenar os itens
-    this.sortItems();
+    // Converte o estado atual dos filtros para o DTO
+    const filtroDTO = this.filterService.toFilterDTO();
 
-    // Atualizar o estado de seleção após filtrar
-    this.updateItemSelectionState();
+    // Adiciona informação da aba ativa como um filtro adicional
+    // (não altera o estado do filtro, apenas para a requisição atual)
+    switch (this.activeTab) {
+      case 'proximo':
+        // Deixa como está, o backend filtrará para próximos a vencer
+        filtroDTO.status = 'proximo';
+        break;
+      case 'hoje':
+        // Adiciona filtro para itens que vencem hoje
+        filtroDTO.status = 'hoje';
+        break;
+      case 'vencido':
+        // Adiciona filtro para itens vencidos
+        filtroDTO.status = 'vencido';
+        break;
+    }
+
+    const subscription = this.muralService.filtrarProdutos(filtroDTO).subscribe({
+      next: (items) => {
+        this.filteredItems = items.map(item => {
+          if (item.inspecionado === undefined || item.inspecionado === null) {
+            item.inspecionado = false;
+          }
+          return item;
+        });
+
+        // Atualiza o estado de seleção dos itens
+        this.updateItemSelectionState();
+        this.loading = false;
+      },
+      error: (error) => {
+        console.error(`Erro ao filtrar itens de ${this.activeTab}:`, error);
+        this.loading = false;
+      }
+    });
+
+    this.subscriptions.push(subscription);
   }
 
   /**
-   * Atualiza o termo de pesquisa e aplica o filtro
+   * Manipula a alteração do termo de pesquisa
    */
   onSearchChange(term: string): void {
-    this.searchTerm = term;
     this.filterService.updateSearchTerm(term);
   }
 
@@ -290,60 +271,56 @@ export class MuralListagemComponent implements OnInit, OnDestroy {
    * Limpa um filtro específico
    */
   clearFilter(filterName: string): void {
-    this.filterService.clearFilter(filterName as any);
+    this.filterService.clearFilter(filterName as keyof MuralFilter);
   }
 
   /**
-   * Limpa o filtro de data de vencimento
+   * Limpa o filtro de data
    */
   clearDateFilter(): void {
     this.filterService.clearDateFilter('dataVencimento');
   }
 
   /**
-   * Limpa todos os filtros
+   * Reseta todos os filtros
    */
   resetAllFilters(): void {
     this.filterService.resetFilters();
-    this.searchTerm = '';
-    this.filterService.updateSearchTerm('');
+    this.filterService.updateSortField('');
+    this.filterService.updateSortDirection('asc');
   }
 
   /**
-   * Inverte a ordem de ordenação
+   * Alterna a direção de ordenação
    */
   toggleSortOrder(): void {
-    this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';
-    this.sortItems();
+    const newDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';
+    this.filterService.updateSortDirection(newDirection);
   }
 
   /**
-   * Ordena os itens filtrados
+   * Define o campo de ordenação
    */
-  sortItems(): void {
-    this.filteredItems = this.filterHandler.sortItems(this.filteredItems, this.sortDirection);
+  setSortField(field: string): void {
+    // Se clicar no mesmo campo, inverte a direção
+    if (this.sortField === field) {
+      this.toggleSortOrder();
+    } else {
+      // Se mudar o campo, define a direção como ascendente
+      this.filterService.updateSortField(field);
+      this.filterService.updateSortDirection('asc');
+    }
   }
 
   /**
-   * Ao confirmar a inspeção, atualiza os itens selecionados
+   * Callback quando a inspeção é confirmada
    */
   onInspecaoConfirmada(): void {
-    // Atualizar os itens após confirmação de inspeção
-    const selectedItems = this.selecaoService.getSelectedItems(this.items);
-
-    // Atualizar o estado de inspeção nos itens
-    this.items = this.items.map(item => {
-      if (selectedItems.some(selected => selected.id === item.id)) {
-        return { ...item, inspecionado: true };
-      }
-      return item;
-    });
-
-    // Limpar seleção
+    // Limpa a seleção
     this.selecaoService.clearSelection();
 
-    // Reaplicar filtros
-    this.applyFilters();
+    // Recarrega os itens
+    this.loadItems();
   }
 
   /**
@@ -354,23 +331,38 @@ export class MuralListagemComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Marca os itens selecionados como inspecionados
+   * Abre o modal para marcar itens selecionados como inspecionados
    */
   marcarSelecionadosComoInspecionados(): void {
-    this.selecaoService.openInspecaoModal();
+    // Implementado no template
   }
 
   /**
    * Verifica se há itens selecionados
    */
   hasSelectedItems(): boolean {
-    return this.selecaoService.hasSelectedItems();
+    return this.selectedIds.length > 0;
   }
 
   /**
-   * Obtém a contagem de itens selecionados
+   * Retorna o número de itens selecionados
    */
   getSelectedItemsCount(): number {
-    return this.selecaoService.getSelectedItemsCount();
+    return this.selectedIds.length;
+  }
+
+  /**
+   * Define a aba ativa e carrega os itens correspondentes
+   */
+  setActiveTab(tab: 'proximo' | 'hoje' | 'vencido'): void {
+    this.activeTab = tab;
+    // Atualiza a URL sem recarregar a página
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: { tab: tab },
+      queryParamsHandling: 'merge',
+      replaceUrl: true
+    });
+    this.loadItems();
   }
 }

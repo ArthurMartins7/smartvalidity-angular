@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, OnDestroy, OnInit, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Subscription } from 'rxjs';
-import { MuralSelecaoService } from '../../../services/mural-selecao.service';
+import { MuralSelecaoService } from '../../../shared/service/mural.service';
 
 @Component({
   selector: 'app-modal-inspecao',

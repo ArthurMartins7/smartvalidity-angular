@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Output } from '@angular/core';
-import { MuralFilter, MuralFilterService } from '../../../../services/mural-filter.service';
+import { MuralFilter, MuralFilterService } from '../../../../shared/service/mural.service';
 
 @Component({
   selector: 'app-filtro-tags',

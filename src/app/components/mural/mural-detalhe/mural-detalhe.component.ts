@@ -3,8 +3,8 @@ import { HttpClientModule } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
-import { MuralItem } from '../../../models/mural.model';
-import { MuralService } from '../../../services/mural.service';
+import { MuralListagemDTO } from '../../../shared/model/dto/mural.dto';
+import { MuralService } from '../../../shared/service/mural.service';
 
 @Component({
   selector: 'app-mural-detalhe',
@@ -15,7 +15,7 @@ import { MuralService } from '../../../services/mural.service';
 })
 export class MuralDetalheComponent implements OnInit {
   itemId: string = '';
-  item: MuralItem | null = null;
+  item: MuralListagemDTO | null = null;
   loading: boolean = true;
   error: string | null = null;
   activeTab: string = 'proximo';

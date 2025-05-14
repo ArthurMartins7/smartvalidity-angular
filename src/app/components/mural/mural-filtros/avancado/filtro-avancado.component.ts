@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, OnDestroy, OnInit, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Subscription } from 'rxjs';
-import { MuralFilter, MuralFilterOptions, MuralFilterService } from '../../../../services/mural-filter.service';
+import { MuralFilter, MuralFilterOptions, MuralFilterService } from '../../../../shared/service/mural.service';
 
 interface DateRange {
   startDate: string | null;

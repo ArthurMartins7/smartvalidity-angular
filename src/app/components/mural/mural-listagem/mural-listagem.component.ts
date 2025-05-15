@@ -5,6 +5,7 @@ import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { Subscription, combineLatest } from 'rxjs';
 import { MuralFiltroDTO, MuralListagemDTO } from '../../../shared/model/dto/mural.dto';
 import { MuralFilter, MuralFilterService, MuralSelecaoService, MuralService } from '../../../shared/service/mural.service';
+import { RelatorioService } from '../../../shared/service/relatorio.service';
 import { FiltroAvancadoComponent } from '../mural-filtros/avancado/filtro-avancado.component';
 import { FiltroBasicoComponent } from '../mural-filtros/basico/filtro-basico.component';
 import { FiltroTagsComponent } from '../mural-filtros/tags/filtro-tags.component';
@@ -74,6 +75,7 @@ export class MuralListagemComponent implements OnInit, OnDestroy {
     private muralService: MuralService,
     public filterService: MuralFilterService,
     private selecaoService: MuralSelecaoService,
+    private relatorioService: RelatorioService,
     private route: ActivatedRoute,
     private router: Router
   ) {}
@@ -475,5 +477,32 @@ export class MuralListagemComponent implements OnInit, OnDestroy {
   public alterarItensPorPagina(quantidade: number): void {
     this.filterService.updateItensPorPagina(quantidade);
     this.applyFilters();
+  }
+
+  /**
+   * Gera relatório Excel com os dados atualmente filtrados
+   */
+  gerarRelatorio(): void {
+    // Determina o título com base na aba ativa
+    let titulo = '';
+    switch (this.activeTab) {
+      case 'proximo':
+        titulo = 'Relatório de Produtos Próximos do Vencimento';
+        break;
+      case 'hoje':
+        titulo = 'Relatório de Produtos que Vencem Hoje';
+        break;
+      case 'vencido':
+        titulo = 'Relatório de Produtos Vencidos';
+        break;
+    }
+
+    // Adiciona informação dos filtros ao título se houver filtros aplicados
+    if (this.hasAppliedFilters()) {
+      titulo += ' (Filtrado)';
+    }
+
+    // Gera o relatório com os itens atualmente filtrados
+    this.relatorioService.gerarRelatorioExcel(this.filteredItems, titulo);
   }
 }

@@ -23,6 +23,7 @@ export class FiltroBasicoComponent {
   @Output() openFilterModal = new EventEmitter<void>();
   @Output() inspectSelected = new EventEmitter<void>();
   @Output() sortOptionSelected = new EventEmitter<{field: string, direction: 'asc' | 'desc'}>();
+  @Output() gerarRelatorio = new EventEmitter<void>();
 
   onSearchInput(event: Event): void {
     const input = event.target as HTMLInputElement;
@@ -58,5 +59,9 @@ export class FiltroBasicoComponent {
 
   onInspectSelected(): void {
     this.inspectSelected.emit();
+  }
+
+  onGerarRelatorio(): void {
+    this.gerarRelatorio.emit();
   }
 }

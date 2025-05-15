@@ -90,40 +90,6 @@
                 <option *ngFor="let lote of filterOptions.availableLotes" [value]="lote">{{ lote }}</option>
               </select>
             </div>
-
-            <!-- Status de Inspeção -->
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Status de Inspeção</label>
-              <div class="flex items-center space-x-4">
-                <label class="inline-flex items-center cursor-pointer">
-                  <input
-                    type="radio"
-                    [value]="null"
-                    [(ngModel)]="tempFilters.inspecionado"
-                    class="form-radio h-4 w-4 text-blue-600 focus:ring-blue-500"
-                  >
-                  <span class="ml-2 text-sm text-gray-700">Todos</span>
-                </label>
-                <label class="inline-flex items-center cursor-pointer">
-                  <input
-                    type="radio"
-                    [value]="true"
-                    [(ngModel)]="tempFilters.inspecionado"
-                    class="form-radio h-4 w-4 text-blue-600 focus:ring-blue-500"
-                  >
-                  <span class="ml-2 text-sm text-gray-700">Inspecionados</span>
-                </label>
-                <label class="inline-flex items-center cursor-pointer">
-                  <input
-                    type="radio"
-                    [value]="false"
-                    [(ngModel)]="tempFilters.inspecionado"
-                    class="form-radio h-4 w-4 text-blue-600 focus:ring-blue-500"
-                  >
-                  <span class="ml-2 text-sm text-gray-700">Não inspecionados</span>
-                </label>
-              </div>
-            </div>
           </div>
         </div>
       </div>

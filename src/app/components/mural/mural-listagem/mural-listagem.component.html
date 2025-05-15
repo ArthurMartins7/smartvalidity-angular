@@ -1,6 +1,6 @@
 <div class="container mx-auto p-4">
   <!-- Cabeçalho com navegação -->
-  <div class="mb-4">
+  <div class="mb-3">
     <div class="flex items-center mb-2">
       <button class="text-blue-600 mr-3" routerLink="/dashboard">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -22,8 +22,8 @@
       }"></div>
   </div>
 
-  <!-- Filtros rápidos posicionados acima das abas -->
-  <div class="mb-4">
+  <!-- Filtro rápido e pesquisa com botão de ordenação -->
+  <div class="mb-3">
     <app-filtro-basico
       [searchTerm]="searchTerm"
       [sortDirection]="sortDirection"
@@ -33,18 +33,34 @@
       (searchChange)="onSearchChange($event)"
       (toggleSort)="toggleSortOrder()"
       (openFilterModal)="openFilterModal()"
-      (inspectSelected)="marcarSelecionadosComoInspecionados()"
-      (sortOptionSelected)="onSortOptionSelected($event)"
-      (gerarRelatorio)="gerarRelatorio()">
+      (sortOptionSelected)="onSortOptionSelected($event)">
     </app-filtro-basico>
   </div>
 
-  <!-- Tabs -->
-  <div class="mb-4">
+  <!-- Tabs integradas com filtro de inspeção -->
+  <div class="flex flex-wrap justify-between items-center mb-3">
     <app-mural-tabs
       [activeTab]="activeTab"
       (tabChange)="setActiveTab($event)">
     </app-mural-tabs>
+
+    <!-- Filtro de Status de Inspeção inline -->
+    <div class="flex items-center bg-gray-50 px-4 py-2 rounded-lg border border-gray-200">
+      <div class="flex space-x-3">
+        <label class="inline-flex items-center cursor-pointer">
+          <input type="radio" class="form-radio h-4 w-4 text-yellow-500 rounded-full" name="statusInspecao" value="todos" [(ngModel)]="filtroInspecao" (change)="filtrarPorStatusInspecao('todos')">
+          <span class="ml-2 text-sm">Todos</span>
+        </label>
+        <label class="inline-flex items-center cursor-pointer">
+          <input type="radio" class="form-radio h-4 w-4 text-green-500 rounded-full" name="statusInspecao" value="inspecionados" [(ngModel)]="filtroInspecao" (change)="filtrarPorStatusInspecao('inspecionados')">
+          <span class="ml-2 text-sm">Inspecionados</span>
+        </label>
+        <label class="inline-flex items-center cursor-pointer">
+          <input type="radio" class="form-radio h-4 w-4 text-red-500 rounded-full" name="statusInspecao" value="naoInspecionados" [(ngModel)]="filtroInspecao" (change)="filtrarPorStatusInspecao('naoInspecionados')">
+          <span class="ml-2 text-sm">Não Inspecionados</span>
+        </label>
+      </div>
+    </div>
   </div>
 
   <!-- Filtros aplicados tags -->
@@ -104,9 +120,9 @@
     </table>
   </div>
 
-  <!-- Controles de Paginação -->
+  <!-- Controles unificados: paginação, relatório e inspeção -->
   <div *ngIf="filteredItems.length > 0" class="mt-4 flex justify-between items-center">
-    <!-- Seletor de itens por página com tamanho muito mais reduzido -->
+    <!-- Controles à esquerda: seletor de itens por página -->
     <div class="flex items-center whitespace-nowrap">
       <span class="text-sm text-gray-600 mr-2">Itens por página:</span>
       <select
@@ -120,7 +136,33 @@
       </select>
     </div>
 
-    <!-- Navegação de página mais compacta e elegante -->
+    <!-- Botões centrais: Relatório e Inspecionar -->
+    <div class="flex space-x-4">
+      <!-- Botão Gerar Relatório -->
+      <button
+        (click)="gerarRelatorio()"
+        class="flex items-center bg-green-600 text-white px-6 py-2 rounded-md hover:bg-green-700 transition-colors focus:outline-none">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+        </svg>
+        Relatório
+      </button>
+
+      <!-- Botão Inspecionar -->
+      <button
+        (click)="marcarSelecionadosComoInspecionados()"
+        [disabled]="!hasSelectedItems()"
+        [class.opacity-50]="!hasSelectedItems()"
+        [class.cursor-not-allowed]="!hasSelectedItems()"
+        class="flex items-center bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 transition-colors focus:outline-none">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+        </svg>
+        Inspecionar
+      </button>
+    </div>
+
+    <!-- Navegação de página à direita -->
     <div class="flex items-center space-x-2">
       <!-- Botão Anterior -->
       <button
@@ -132,48 +174,10 @@
         </svg>
       </button>
 
-      <!-- Primeira página sempre visível -->
-      <button
-        *ngIf="paginaAtual > 3"
-        (click)="irParaPagina(1)"
-        class="px-3 py-1 bg-gray-200 text-gray-700 rounded-lg hover:bg-blue-600 hover:text-white">
-        1
-      </button>
-
-      <!-- Indicador de páginas omitidas -->
-      <span *ngIf="paginaAtual > 3" class="text-gray-500">...</span>
-
-      <!-- Página anterior à atual (se não for a primeira) -->
-      <button
-        *ngIf="paginaAtual > 1"
-        (click)="irParaPagina(paginaAtual - 1)"
-        class="px-3 py-1 bg-gray-200 text-gray-700 rounded-lg hover:bg-blue-600 hover:text-white">
-        {{ paginaAtual - 1 }}
-      </button>
-
       <!-- Página atual -->
       <button
         class="px-3 py-1 bg-blue-500 text-white rounded-lg">
         {{ paginaAtual }}
-      </button>
-
-      <!-- Página seguinte à atual (se não for a última) -->
-      <button
-        *ngIf="paginaAtual < totalPaginas"
-        (click)="irParaPagina(paginaAtual + 1)"
-        class="px-3 py-1 bg-gray-200 text-gray-700 rounded-lg hover:bg-blue-600 hover:text-white">
-        {{ paginaAtual + 1 }}
-      </button>
-
-      <!-- Indicador de páginas omitidas -->
-      <span *ngIf="paginaAtual < totalPaginas - 2" class="text-gray-500">...</span>
-
-      <!-- Última página sempre visível (se não for a atual ou adjacente) -->
-      <button
-        *ngIf="paginaAtual < totalPaginas - 1"
-        (click)="irParaPagina(totalPaginas)"
-        class="px-3 py-1 bg-gray-200 text-gray-700 rounded-lg hover:bg-blue-600 hover:text-white">
-        {{ totalPaginas }}
       </button>
 
       <!-- Botão Próxima -->

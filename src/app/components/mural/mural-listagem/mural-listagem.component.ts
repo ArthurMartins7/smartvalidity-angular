@@ -45,6 +45,9 @@ export class MuralListagemComponent implements OnInit, OnDestroy {
   /** Campo de ordenação */
   sortField: string = '';
 
+  /** Status de filtro de inspeção */
+  filtroInspecao: 'todos' | 'inspecionados' | 'naoInspecionados' = 'todos';
+
   // -------------------- Controle de UI --------------------
   /** Visibilidade do modal de filtros avançados */
   showFilterModal: boolean = false;
@@ -246,6 +249,14 @@ export class MuralListagemComponent implements OnInit, OnDestroy {
         filtroDTO.status = 'vencido';
         break;
     }
+
+    // Adiciona filtro de status de inspeção, se aplicável
+    if (this.filtroInspecao === 'inspecionados') {
+      filtroDTO.inspecionado = true;
+    } else if (this.filtroInspecao === 'naoInspecionados') {
+      filtroDTO.inspecionado = false;
+    }
+    // Se for 'todos', não aplicamos filtro de inspeção
 
     // Calcular o total de páginas
     this.calcularTotalPaginas(filtroDTO);
@@ -504,5 +515,19 @@ export class MuralListagemComponent implements OnInit, OnDestroy {
 
     // Gera o relatório com os itens atualmente filtrados
     this.relatorioService.gerarRelatorioExcel(this.filteredItems, titulo);
+  }
+
+  /**
+   * Filtra os itens por status de inspeção
+   * @param status Status de inspeção a ser filtrado ('todos', 'inspecionados', 'naoInspecionados')
+   */
+  filtrarPorStatusInspecao(status: 'todos' | 'inspecionados' | 'naoInspecionados'): void {
+    this.filtroInspecao = status;
+
+    // Redefinir para a página 1 ao mudar o filtro
+    this.filterService.updatePaginaAtual(1);
+
+    // Aplicar os filtros
+    this.applyFilters();
   }
 }

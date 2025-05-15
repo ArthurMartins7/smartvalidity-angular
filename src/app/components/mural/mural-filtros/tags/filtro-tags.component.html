@@ -1,17 +1,17 @@
 <!-- Container principal para exibir os filtros aplicados -->
 <div class="mb-4" *ngIf="hasAppliedFilters()">
-  <div class="flex mb-3">
+  <div class="flex flex-wrap items-center mb-3">
     <!-- Área que exibe todos os filtros selecionados -->
-    <div class="selected-filters text-sm text-gray-600">
+    <div class="flex flex-wrap items-center text-sm text-gray-600">
       <!-- Exibe o filtro de marca se estiver selecionado -->
-      <span *ngIf="filterService.getCurrentFilters().marca">
-        Marca: <strong>{{filterService.getCurrentFilters().marca}}</strong>
+      <span *ngIf="filterService.getCurrentFilters().marca" class="inline-flex items-center mr-2 mb-1">
+        Marca: &nbsp;<strong>{{filterService.getCurrentFilters().marca}}</strong>
         <button class="ml-1 text-red-600" (click)="onClearFilter('marca')">×</button>
       </span>
 
       <!-- Exibe o filtro de período de data se estiver selecionado -->
-      <span *ngIf="filterService.getCurrentFilters().dataVencimento.startDate || filterService.getCurrentFilters().dataVencimento.endDate" class="ml-2">
-        Período:
+      <span *ngIf="filterService.getCurrentFilters().dataVencimento.startDate || filterService.getCurrentFilters().dataVencimento.endDate" class="inline-flex items-center mr-2 mb-1">
+        Período: &nbsp;
         <strong>
           {{filterService.getCurrentFilters().dataVencimento.startDate ? (filterService.getCurrentFilters().dataVencimento.startDate | date:'shortDate') : 'Início'}}
           até
@@ -21,32 +21,38 @@
       </span>
 
       <!-- Exibe o filtro de corredor se estiver selecionado -->
-      <span *ngIf="filterService.getCurrentFilters().corredor" class="ml-2">
-        Corredor: <strong>{{filterService.getCurrentFilters().corredor}}</strong>
+      <span *ngIf="filterService.getCurrentFilters().corredor" class="inline-flex items-center mr-2 mb-1">
+        Corredor: &nbsp;<strong>{{filterService.getCurrentFilters().corredor}}</strong>
         <button class="ml-1 text-red-600" (click)="onClearFilter('corredor')">×</button>
       </span>
 
       <!-- Exibe o filtro de categoria se estiver selecionado -->
-      <span *ngIf="filterService.getCurrentFilters().categoria" class="ml-2">
-        Categoria: <strong>{{filterService.getCurrentFilters().categoria}}</strong>
+      <span *ngIf="filterService.getCurrentFilters().categoria" class="inline-flex items-center mr-2 mb-1">
+        Categoria: &nbsp;<strong>{{filterService.getCurrentFilters().categoria}}</strong>
         <button class="ml-1 text-red-600" (click)="onClearFilter('categoria')">×</button>
       </span>
 
       <!-- Exibe o filtro de fornecedor se estiver selecionado -->
-      <span *ngIf="filterService.getCurrentFilters().fornecedor" class="ml-2">
-        Fornecedor: <strong>{{filterService.getCurrentFilters().fornecedor}}</strong>
+      <span *ngIf="filterService.getCurrentFilters().fornecedor" class="inline-flex items-center mr-2 mb-1">
+        Fornecedor: &nbsp;<strong>{{filterService.getCurrentFilters().fornecedor}}</strong>
         <button class="ml-1 text-red-600" (click)="onClearFilter('fornecedor')">×</button>
       </span>
 
       <!-- Exibe o filtro de lote se estiver selecionado -->
-      <span *ngIf="filterService.getCurrentFilters().lote" class="ml-2">
-        Lote: <strong>{{filterService.getCurrentFilters().lote}}</strong>
+      <span *ngIf="filterService.getCurrentFilters().lote" class="inline-flex items-center mr-2 mb-1">
+        Lote: &nbsp;<strong>{{filterService.getCurrentFilters().lote}}</strong>
         <button class="ml-1 text-red-600" (click)="onClearFilter('lote')">×</button>
+      </span>
+
+      <!-- Exibe o filtro de status de inspeção se estiver selecionado -->
+      <span *ngIf="filterService.getCurrentFilters().inspecionado !== null" class="inline-flex items-center mr-2 mb-1">
+        Status de Inspeção: &nbsp;<strong>{{filterService.getCurrentFilters().inspecionado ? 'Inspecionados' : 'Não Inspecionados'}}</strong>
+        <button class="ml-1 text-red-600" (click)="onClearFilter('inspecionado')">×</button>
       </span>
 
       <!-- Botão para limpar todos os filtros de uma vez -->
       <button *ngIf="hasAppliedFilters()"
-        class="ml-3 text-blue-600 text-sm underline"
+        class="inline-flex items-center text-blue-600 text-sm underline mr-2 mb-1"
         (click)="onResetAllFilters()">Limpar todos</button>
     </div>
   </div>

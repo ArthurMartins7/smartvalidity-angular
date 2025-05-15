@@ -27,12 +27,14 @@
     <app-filtro-basico
       [searchTerm]="searchTerm"
       [sortDirection]="sortDirection"
+      [sortField]="sortField"
       [hasSelectedItems]="hasSelectedItems()"
       [selectedItemsCount]="getSelectedItemsCount()"
       (searchChange)="onSearchChange($event)"
       (toggleSort)="toggleSortOrder()"
       (openFilterModal)="openFilterModal()"
-      (inspectSelected)="marcarSelecionadosComoInspecionados()">
+      (inspectSelected)="marcarSelecionadosComoInspecionados()"
+      (sortOptionSelected)="onSortOptionSelected($event)">
     </app-filtro-basico>
   </div>
 

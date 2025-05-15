@@ -26,13 +26,27 @@
       <div class="relative">
         <button
           class="px-4 py-2 border border-gray-300 rounded-lg flex items-center bg-white"
-          (click)="onToggleSort()"
+          (click)="toggleSortOptions()"
         >
-          <span class="text-sm font-medium">{{ sortDirection === 'asc' ? 'A a Z' : 'Z a A' }}</span>
+          <span class="text-sm font-medium">{{ getSortLabel() }}</span>
           <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
           </svg>
         </button>
+
+        <!-- Dropdown de opções de ordenação -->
+        <div *ngIf="showSortOptions" class="absolute right-0 mt-1 z-10 bg-white border border-gray-300 rounded-md shadow-lg w-64">
+          <div
+            class="px-4 py-2 text-sm hover:bg-gray-100 cursor-pointer"
+            (click)="onSelectSortOption('dataVencimento', 'asc')">
+            Mais próximo do vencimento
+          </div>
+          <div
+            class="px-4 py-2 text-sm hover:bg-gray-100 cursor-pointer"
+            (click)="onSelectSortOption('dataVencimento', 'desc')">
+            Mais distante do vencimento
+          </div>
+        </div>
       </div>
     </div>
 

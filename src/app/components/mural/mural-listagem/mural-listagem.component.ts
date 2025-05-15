@@ -341,6 +341,15 @@ export class MuralListagemComponent implements OnInit, OnDestroy {
   }
 
   /**
+   * Recebe a seleção de opção de ordenação do dropdown
+   */
+  onSortOptionSelected(option: {field: string, direction: 'asc' | 'desc'}): void {
+    this.filterService.updateSortField(option.field);
+    this.filterService.updateSortDirection(option.direction);
+    this.applyFilters();
+  }
+
+  /**
    * Callback quando a inspeção é confirmada
    */
   onInspecaoConfirmada(): void {

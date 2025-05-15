@@ -1,3 +1,18 @@
+/* Estilos para o modal backdrop */
+:host {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1000;
+  backdrop-filter: blur(1.5px);
+  background-color: rgba(107, 114, 128, 0.75);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
 /* Estilos para os dropdowns */
 .dropdown-container {
   position: relative;

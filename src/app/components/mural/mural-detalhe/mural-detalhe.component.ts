@@ -20,8 +20,9 @@ export class MuralDetalheComponent implements OnInit {
   error: string | null = null;
   activeTab: string = 'proximo';
   motivoInspecao: string = '';
+  motivoCustomizado: string = '';
   showMotivosDropdown: boolean = false;
-  motivosInspecao: string[] = ['Avaria/Quebra', 'Promoção'];
+  motivosInspecao: string[] = ['Avaria/Quebra', 'Promoção', 'Outro'];
   motivoError: string | null = null;
   processandoInspecao: boolean = false;
 
@@ -78,10 +79,19 @@ export class MuralDetalheComponent implements OnInit {
       return;
     }
 
+    // Validação para motivo customizado
+    if (this.motivoInspecao === 'Outro' && !this.motivoCustomizado) {
+      this.motivoError = 'Por favor, informe o motivo da inspeção.';
+      return;
+    }
+
     // Atualiza o status para processando
     this.processandoInspecao = true;
 
-    this.muralService.marcarInspecionado(this.itemId, this.motivoInspecao).subscribe({
+    // Se for motivo "Outro", usa o motivo customizado
+    const motivoFinal = this.motivoInspecao === 'Outro' ? this.motivoCustomizado : this.motivoInspecao;
+
+    this.muralService.marcarInspecionado(this.itemId, motivoFinal).subscribe({
       next: (item) => {
         // Atualiza o estado local com o item retornado
         if (item) {

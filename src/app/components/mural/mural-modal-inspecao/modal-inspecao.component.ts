@@ -17,6 +17,7 @@ export class ModalInspecaoComponent implements OnInit, OnDestroy {
   // Propriedades para controle do modal
   visible = false;
   motivoInspecao = '';
+  motivoCustomizado = '';
   motivoInspecaoError: string | null = null;
   motivosInspecao: string[] = [];
   itensSelecionadosCount = 0;
@@ -44,12 +45,22 @@ export class ModalInspecaoComponent implements OnInit, OnDestroy {
       motivo => this.motivoInspecao = motivo
     );
 
+    // Inscrever-se nas mudanças do motivo customizado
+    const motivoCustomizadoSubscription = this.selecaoService.motivoCustomizado$.subscribe(
+      motivo => this.motivoCustomizado = motivo
+    );
+
     // Inscrever-se nas mensagens de erro
     const errorSubscription = this.selecaoService.motivoInspecaoError$.subscribe(
       error => this.motivoInspecaoError = error
     );
 
-    this.subscriptions.push(visibilitySubscription, motivoSubscription, errorSubscription);
+    this.subscriptions.push(
+      visibilitySubscription,
+      motivoSubscription,
+      motivoCustomizadoSubscription,
+      errorSubscription
+    );
   }
 
   ngOnDestroy(): void {
@@ -87,5 +98,10 @@ export class ModalInspecaoComponent implements OnInit, OnDestroy {
     } catch (error) {
       console.error('Erro ao tentar confirmar inspeção:', error);
     }
+  }
+
+  onMotivoCustomizadoChange(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    this.selecaoService.atualizarMotivoCustomizado(input.value);
   }
 }

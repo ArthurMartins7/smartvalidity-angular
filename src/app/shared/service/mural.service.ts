@@ -332,15 +332,17 @@ export class MuralSelecaoService {
   private showInspecaoModalSubject = new BehaviorSubject<boolean>(false);
   private motivoInspecaoSubject = new BehaviorSubject<string>('');
   private motivoInspecaoErrorSubject = new BehaviorSubject<string | null>(null);
+  private motivoCustomizadoSubject = new BehaviorSubject<string>('');
 
   // Opções de motivos de inspeção
-  readonly motivosInspecao: string[] = ['Avaria/Quebra', 'Promoção'];
+  readonly motivosInspecao: string[] = ['Avaria/Quebra', 'Promoção', 'Outro'];
 
   // Observables públicos
   selectedItems$: Observable<string[]> = this.selectedItemsSubject.asObservable();
   showInspecaoModal$: Observable<boolean> = this.showInspecaoModalSubject.asObservable();
   motivoInspecao$: Observable<string> = this.motivoInspecaoSubject.asObservable();
   motivoInspecaoError$: Observable<string | null> = this.motivoInspecaoErrorSubject.asObservable();
+  motivoCustomizado$: Observable<string> = this.motivoCustomizadoSubject.asObservable();
 
   constructor(private muralService: MuralService) { }
 
@@ -404,17 +406,27 @@ export class MuralSelecaoService {
   closeInspecaoModal(): void {
     this.showInspecaoModalSubject.next(false);
     this.motivoInspecaoSubject.next('');
+    this.motivoCustomizadoSubject.next('');
     this.motivoInspecaoErrorSubject.next(null);
   }
 
   selecionarMotivo(motivo: string): void {
     this.motivoInspecaoSubject.next(motivo);
+    if (motivo !== 'Outro') {
+      this.motivoCustomizadoSubject.next('');
+    }
+    this.motivoInspecaoErrorSubject.next(null);
+  }
+
+  atualizarMotivoCustomizado(motivo: string): void {
+    this.motivoCustomizadoSubject.next(motivo);
     this.motivoInspecaoErrorSubject.next(null);
   }
 
   // Confirma a inspeção para os itens selecionados
   confirmarInspecao(items: MuralListagemDTO[]): Observable<MuralListagemDTO[]> {
     const motivoInspecao = this.motivoInspecaoSubject.value;
+    const motivoCustomizado = this.motivoCustomizadoSubject.value;
     const selectedIds = this.selectedItemsSubject.value;
 
     if (!motivoInspecao) {
@@ -422,7 +434,14 @@ export class MuralSelecaoService {
       throw new Error('Motivo de inspeção não selecionado');
     }
 
-    return this.muralService.marcarVariosInspecionados(selectedIds, motivoInspecao);
+    if (motivoInspecao === 'Outro' && !motivoCustomizado) {
+      this.motivoInspecaoErrorSubject.next('Por favor, informe o motivo da inspeção.');
+      throw new Error('Motivo de inspeção customizado não informado');
+    }
+
+    // Se for motivo "Outro", usamos o motivo customizado
+    const motivoFinal = motivoInspecao === 'Outro' ? motivoCustomizado : motivoInspecao;
+    return this.muralService.marcarVariosInspecionados(selectedIds, motivoFinal);
   }
 
   // Limpa a seleção

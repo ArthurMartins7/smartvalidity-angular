@@ -38,15 +38,62 @@
   </div>
 
   <!-- Tabs integradas com filtro de inspeção -->
-  <div class="flex flex-wrap justify-between items-center mb-3">
+  <div class="flex flex-wrap justify-between items-center gap-3 mb-4">
     <app-mural-tabs
       [activeTab]="activeTab"
       (tabChange)="setActiveTab($event)">
     </app-mural-tabs>
 
+    <!-- Botão "Ações em lote" com dropdown -->
+    <div class="relative order-last sm:order-none">
+      <button
+        (click)="toggleAcoesDropdown($event)"
+        data-dropdown-toggle
+        class="flex items-center bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors focus:outline-none">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" />
+        </svg>
+        Ações em lote
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+        </svg>
+      </button>
+
+      <!-- Dropdown Menu -->
+      <div
+        *ngIf="showAcoesDropdown"
+        data-dropdown-menu
+        class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-10 border border-gray-200 max-h-[calc(100vh-10rem)] overflow-y-auto">
+        <div class="py-1">
+          <button
+            (click)="gerarRelatorioSelecionados()"
+            [disabled]="!hasSelectedItems()"
+            [class.opacity-50]="!hasSelectedItems()"
+            [class.cursor-not-allowed]="!hasSelectedItems()"
+            class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+            <span class="whitespace-normal">Gerar relatório</span>
+          </button>
+          <button
+            (click)="marcarSelecionadosComoInspecionados()"
+            [disabled]="!hasSelectedItems()"
+            [class.opacity-50]="!hasSelectedItems()"
+            [class.cursor-not-allowed]="!hasSelectedItems()"
+            class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+            </svg>
+            <span class="whitespace-normal">Inspecionar</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
     <!-- Filtro de Status de Inspeção inline -->
-    <div class="flex items-center bg-gray-50 px-4 py-2 rounded-lg border border-gray-200">
-      <div class="flex space-x-3">
+    <div class="flex items-center bg-gray-50 px-4 py-2 rounded-lg border border-gray-200 w-full sm:w-auto">
+      <div class="flex flex-wrap gap-3">
         <label class="inline-flex items-center cursor-pointer">
           <input type="radio" class="form-radio h-4 w-4 text-yellow-500 rounded-full" name="statusInspecao" value="todos" [(ngModel)]="filtroInspecao" (change)="filtrarPorStatusInspecao('todos')">
           <span class="ml-2 text-sm">Todos</span>
@@ -134,32 +181,6 @@
           {{ opcao }}
         </option>
       </select>
-    </div>
-
-    <!-- Botões centrais: Relatório e Inspecionar -->
-    <div class="flex space-x-4">
-      <!-- Botão Gerar Relatório -->
-      <button
-        (click)="gerarRelatorio()"
-        class="flex items-center bg-green-600 text-white px-6 py-2 rounded-md hover:bg-green-700 transition-colors focus:outline-none">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-        </svg>
-        Relatório
-      </button>
-
-      <!-- Botão Inspecionar -->
-      <button
-        (click)="marcarSelecionadosComoInspecionados()"
-        [disabled]="!hasSelectedItems()"
-        [class.opacity-50]="!hasSelectedItems()"
-        [class.cursor-not-allowed]="!hasSelectedItems()"
-        class="flex items-center bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 transition-colors focus:outline-none">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-        </svg>
-        Inspecionar
-      </button>
     </div>
 
     <!-- Navegação de página à direita -->

@@ -1,6 +1,6 @@
-<div class="bg-white rounded-lg shadow-lg p-0 w-full max-w-4xl max-h-[80vh] flex flex-col">
+<div class="bg-white rounded-lg shadow-lg p-0 w-full max-w-4xl flex flex-col">
     <!-- Modal Header -->
-    <div class="flex justify-between items-center p-4 border-b border-gray-200">
+    <div class="flex justify-between items-center p-3 border-b border-gray-200">
       <h3 class="text-lg font-bold">Filtros Avançados</h3>
       <button (click)="closeModal()" class="text-gray-400 hover:text-gray-600">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -11,83 +11,183 @@
 
     <!-- Modal Body with Scrollable Content -->
     <div class="flex-1 overflow-y-auto p-4">
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <!-- Left Column - Product Filters -->
+      <div class="grid grid-cols-2 gap-x-6 gap-y-3">
+        <!-- Coluna Esquerda - Informações do Produto -->
         <div>
-          <h4 class="text-md font-semibold text-gray-700 mb-3 pb-1 border-b border-gray-200">Informações do Produto</h4>
-          <div class="space-y-4">
+          <h4 class="text-md font-semibold text-gray-700 mb-2 pb-1 border-b border-gray-200">Informações do Produto</h4>
+          <div class="space-y-3">
             <!-- Marca -->
-            <div>
+            <div class="relative">
               <label class="block text-sm font-medium text-gray-700 mb-1">Marca</label>
-              <select [(ngModel)]="tempFilters.marca" class="w-full rounded-lg border-gray-300 py-2 px-3 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                <option value="">Todas as marcas</option>
-                <option *ngFor="let brand of filterOptions.availableBrands" [value]="brand">{{ brand }}</option>
-              </select>
-            </div>
-
-            <!-- Corredor -->
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Corredor</label>
-              <select [(ngModel)]="tempFilters.corredor" class="w-full rounded-lg border-gray-300 py-2 px-3 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                <option value="">Todos os corredores</option>
-                <option *ngFor="let corredor of filterOptions.availableCorredores" [value]="corredor">{{ corredor }}</option>
-              </select>
-            </div>
-
-            <!-- Categoria -->
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Categoria</label>
-              <select [(ngModel)]="tempFilters.categoria" class="w-full rounded-lg border-gray-300 py-2 px-3 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                <option value="">Todas as categorias</option>
-                <option *ngFor="let categoria of filterOptions.availableCategorias" [value]="categoria">{{ categoria }}</option>
-              </select>
-            </div>
-          </div>
-        </div>
-
-        <!-- Right Column - Date & Additional Filters -->
-        <div>
-          <h4 class="text-md font-semibold text-gray-700 mb-3 pb-1 border-b border-gray-200">Período e Outros Filtros</h4>
-          <div class="space-y-4">
-            <!-- Data de Vencimento -->
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Período de Vencimento</label>
-              <div class="grid grid-cols-2 gap-2">
-                <div>
-                  <label class="block text-xs text-gray-500 mb-1">De</label>
-                  <input
-                    type="date"
-                    [(ngModel)]="tempFilters.dataVencimento.startDate"
-                    class="w-full rounded-lg border-gray-300 py-2 px-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  >
-                </div>
-                <div>
-                  <label class="block text-xs text-gray-500 mb-1">Até</label>
-                  <input
-                    type="date"
-                    [(ngModel)]="tempFilters.dataVencimento.endDate"
-                    class="w-full rounded-lg border-gray-300 py-2 px-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  >
+              <div class="relative">
+                <input
+                  type="text"
+                  [(ngModel)]="marcaSearchTerm"
+                  (input)="onMarcaSearch()"
+                  (focus)="showMarcaDropdown = true"
+                  (blur)="onBlurWithDelay('marca')"
+                  placeholder="Buscar ou selecionar marca"
+                  class="w-full rounded-lg border-gray-300 py-2 px-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                <div *ngIf="showMarcaDropdown && filteredBrands.length > 0" class="absolute z-10 mt-1 w-full bg-white shadow-lg rounded-md border border-gray-200 max-h-60 overflow-y-auto">
+                  <ul class="py-1 px-0 m-0 list-none">
+                    <li *ngIf="filteredBrands.length > 0"
+                        class="px-3 py-2 text-gray-500 text-sm cursor-pointer hover:bg-gray-100"
+                        (click)="selectOption('marca', '')">
+                      Todas as marcas
+                    </li>
+                    <li *ngFor="let brand of filteredBrands"
+                        class="px-3 py-2 text-sm cursor-pointer hover:bg-gray-100"
+                        (click)="selectOption('marca', brand)">
+                      {{ brand }}
+                    </li>
+                  </ul>
                 </div>
               </div>
             </div>
 
-            <!-- Fornecedor -->
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Fornecedor</label>
-              <select [(ngModel)]="tempFilters.fornecedor" class="w-full rounded-lg border-gray-300 py-2 px-3 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                <option value="">Todos os fornecedores</option>
-                <option *ngFor="let fornecedor of filterOptions.availableFornecedores" [value]="fornecedor">{{ fornecedor }}</option>
-              </select>
+            <!-- Corredor -->
+            <div class="relative">
+              <label class="block text-sm font-medium text-gray-700 mb-1">Corredor</label>
+              <div class="relative">
+                <input
+                  type="text"
+                  [(ngModel)]="corredorSearchTerm"
+                  (input)="onCorredorSearch()"
+                  (focus)="showCorredorDropdown = true"
+                  (blur)="onBlurWithDelay('corredor')"
+                  placeholder="Buscar ou selecionar corredor"
+                  class="w-full rounded-lg border-gray-300 py-2 px-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                <div *ngIf="showCorredorDropdown && filteredCorredores.length > 0" class="absolute z-10 mt-1 w-full bg-white shadow-lg rounded-md border border-gray-200 max-h-60 overflow-y-auto">
+                  <ul class="py-1 px-0 m-0 list-none">
+                    <li *ngIf="filteredCorredores.length > 0"
+                        class="px-3 py-2 text-gray-500 text-sm cursor-pointer hover:bg-gray-100"
+                        (click)="selectOption('corredor', '')">
+                      Todos os corredores
+                    </li>
+                    <li *ngFor="let corredor of filteredCorredores"
+                        class="px-3 py-2 text-sm cursor-pointer hover:bg-gray-100"
+                        (click)="selectOption('corredor', corredor)">
+                      {{ corredor }}
+                    </li>
+                  </ul>
+                </div>
+              </div>
             </div>
 
-            <!-- Lote -->
-            <div>
+            <!-- Categoria -->
+            <div class="relative">
+              <label class="block text-sm font-medium text-gray-700 mb-1">Categoria</label>
+              <div class="relative">
+                <input
+                  type="text"
+                  [(ngModel)]="categoriaSearchTerm"
+                  (input)="onCategoriaSearch()"
+                  (focus)="showCategoriaDropdown = true"
+                  (blur)="onBlurWithDelay('categoria')"
+                  placeholder="Buscar ou selecionar categoria"
+                  class="w-full rounded-lg border-gray-300 py-2 px-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                <div *ngIf="showCategoriaDropdown && filteredCategorias.length > 0" class="absolute z-10 mt-1 w-full bg-white shadow-lg rounded-md border border-gray-200 max-h-60 overflow-y-auto">
+                  <ul class="py-1 px-0 m-0 list-none">
+                    <li *ngIf="filteredCategorias.length > 0"
+                        class="px-3 py-2 text-gray-500 text-sm cursor-pointer hover:bg-gray-100"
+                        (click)="selectOption('categoria', '')">
+                      Todas as categorias
+                    </li>
+                    <li *ngFor="let categoria of filteredCategorias"
+                        class="px-3 py-2 text-sm cursor-pointer hover:bg-gray-100"
+                        (click)="selectOption('categoria', categoria)">
+                      {{ categoria }}
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Coluna Direita - Fornecedor, Lote e Período de Vencimento -->
+        <div>
+          <h4 class="text-md font-semibold text-gray-700 mb-2 pb-1 border-b border-gray-200">Outros Filtros</h4>
+          <div class="space-y-3">
+            <!-- Fornecedor (movido para coluna direita) -->
+            <div class="relative">
+              <label class="block text-sm font-medium text-gray-700 mb-1">Fornecedor</label>
+              <div class="relative">
+                <input
+                  type="text"
+                  [(ngModel)]="fornecedorSearchTerm"
+                  (input)="onFornecedorSearch()"
+                  (focus)="showFornecedorDropdown = true"
+                  (blur)="onBlurWithDelay('fornecedor')"
+                  placeholder="Buscar ou selecionar fornecedor"
+                  class="w-full rounded-lg border-gray-300 py-2 px-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                <div *ngIf="showFornecedorDropdown && filteredFornecedores.length > 0" class="absolute z-10 mt-1 w-full bg-white shadow-lg rounded-md border border-gray-200 max-h-60 overflow-y-auto">
+                  <ul class="py-1 px-0 m-0 list-none">
+                    <li *ngIf="filteredFornecedores.length > 0"
+                        class="px-3 py-2 text-gray-500 text-sm cursor-pointer hover:bg-gray-100"
+                        (click)="selectOption('fornecedor', '')">
+                      Todos os fornecedores
+                    </li>
+                    <li *ngFor="let fornecedor of filteredFornecedores"
+                        class="px-3 py-2 text-sm cursor-pointer hover:bg-gray-100"
+                        (click)="selectOption('fornecedor', fornecedor)">
+                      {{ fornecedor }}
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            <!-- Lote (movido para coluna direita) -->
+            <div class="relative">
               <label class="block text-sm font-medium text-gray-700 mb-1">Lote</label>
-              <select [(ngModel)]="tempFilters.lote" class="w-full rounded-lg border-gray-300 py-2 px-3 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                <option value="">Todos os lotes</option>
-                <option *ngFor="let lote of filterOptions.availableLotes" [value]="lote">{{ lote }}</option>
-              </select>
+              <div class="relative">
+                <input
+                  type="text"
+                  [(ngModel)]="loteSearchTerm"
+                  (input)="onLoteSearch()"
+                  (focus)="showLoteDropdown = true"
+                  (blur)="onBlurWithDelay('lote')"
+                  placeholder="Buscar ou selecionar lote"
+                  class="w-full rounded-lg border-gray-300 py-2 px-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                <div *ngIf="showLoteDropdown && filteredLotes.length > 0" class="absolute z-10 mt-1 w-full bg-white shadow-lg rounded-md border border-gray-200 max-h-60 overflow-y-auto">
+                  <ul class="py-1 px-0 m-0 list-none">
+                    <li *ngIf="filteredLotes.length > 0"
+                        class="px-3 py-2 text-gray-500 text-sm cursor-pointer hover:bg-gray-100"
+                        (click)="selectOption('lote', '')">
+                      Todos os lotes
+                    </li>
+                    <li *ngFor="let lote of filteredLotes"
+                        class="px-3 py-2 text-sm cursor-pointer hover:bg-gray-100"
+                        (click)="selectOption('lote', lote)">
+                      {{ lote }}
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            <!-- Período de Vencimento (após Fornecedor e Lote) -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Período de Vencimento - De</label>
+              <input
+                type="date"
+                [(ngModel)]="tempFilters.dataVencimento.startDate"
+                class="w-full rounded-lg border-gray-300 py-2 px-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Período de Vencimento - Até</label>
+              <input
+                type="date"
+                [(ngModel)]="tempFilters.dataVencimento.endDate"
+                class="w-full rounded-lg border-gray-300 py-2 px-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
             </div>
           </div>
         </div>
@@ -95,7 +195,7 @@
     </div>
 
     <!-- Modal Footer -->
-    <div class="flex justify-end space-x-3 p-4 border-t border-gray-200">
+    <div class="flex justify-end space-x-3 p-3 border-t border-gray-200">
       <button
         (click)="clearAllFilters()"
         class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
@@ -116,5 +216,5 @@
       >
         Aplicar Filtros
       </button>
-    </div>
   </div>
+</div>

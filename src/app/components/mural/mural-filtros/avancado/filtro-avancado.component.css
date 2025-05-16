@@ -31,6 +31,46 @@
   ring-color: #3b82f6;
 }
 
+/* Estilos para os dropdowns de pesquisa */
+.relative input {
+  width: 100%;
+  transition: all 0.2s;
+}
+
+.relative input:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
+}
+
+.relative ul {
+  max-height: 200px;
+  scrollbar-width: thin;
+}
+
+.relative ul li {
+  transition: background-color 0.15s;
+}
+
+.relative ul li:hover {
+  background-color: #f3f4f6;
+}
+
+/* Animação para os dropdowns */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.absolute {
+  animation: fadeIn 0.2s ease-out;
+}
+
 /* Botões de ação no footer */
 button {
   transition: background-color 0.2s;

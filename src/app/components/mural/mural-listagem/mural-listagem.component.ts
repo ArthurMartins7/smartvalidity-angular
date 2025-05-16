@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { Subscription, combineLatest } from 'rxjs';
@@ -48,9 +48,6 @@ export class MuralListagemComponent implements OnInit, OnDestroy {
   /** Status de filtro de inspeção */
   filtroInspecao: 'todos' | 'inspecionados' | 'naoInspecionados' = 'todos';
 
-  /** Controle de exibição do dropdown de ações em lote */
-  showAcoesDropdown: boolean = false;
-
   // -------------------- Controle de UI --------------------
   /** Visibilidade do modal de filtros avançados */
   showFilterModal: boolean = false;
@@ -83,8 +80,7 @@ export class MuralListagemComponent implements OnInit, OnDestroy {
     private selecaoService: MuralSelecaoService,
     private relatorioService: RelatorioService,
     private route: ActivatedRoute,
-    private router: Router,
-    private cdr: ChangeDetectorRef
+    private router: Router
   ) {}
 
   /**
@@ -552,73 +548,6 @@ export class MuralListagemComponent implements OnInit, OnDestroy {
 
     // Gera o relatório apenas com os itens selecionados
     this.relatorioService.gerarRelatorioExcel(itensSelecionados, titulo);
-
-    // Fecha o dropdown após a ação
-    this.showAcoesDropdown = false;
-  }
-
-  /**
-   * Alterna a visibilidade do dropdown de ações em lote
-   */
-  toggleAcoesDropdown(event: MouseEvent): void {
-    // Interrompe a propagação do evento para evitar que o listener de documento o capture
-    event.stopPropagation();
-
-    // Alterna o estado do dropdown
-    this.showAcoesDropdown = !this.showAcoesDropdown;
-
-    // Se o dropdown foi aberto, adiciona um evento de clique ao documento para fechá-lo quando clicar fora
-    if (this.showAcoesDropdown) {
-      setTimeout(() => {
-        // Adiciona o evento com um pequeno atraso para evitar que o clique atual o feche
-        document.addEventListener('click', this.handleDocumentClick);
-      }, 100);
-    }
-  }
-
-  /**
-   * Manipula cliques no documento para fechar o dropdown
-   */
-  private handleDocumentClick = (event: MouseEvent) => {
-    // Se o dropdown não estiver aberto, não fazer nada
-    if (!this.showAcoesDropdown) {
-      document.removeEventListener('click', this.handleDocumentClick);
-      return;
-    }
-
-    const target = event.target as HTMLElement;
-
-    // Verifica se o clique foi no botão ou no menu dropdown
-    const isInsideDropdown = this.isElementOrChildOf(target, '[data-dropdown-menu]');
-    const isInsideToggleButton = this.isElementOrChildOf(target, '[data-dropdown-toggle]');
-
-    // Se o clique não foi nem no botão nem no menu, fecha o dropdown
-    if (!isInsideDropdown && !isInsideToggleButton) {
-      this.showAcoesDropdown = false;
-      document.removeEventListener('click', this.handleDocumentClick);
-      this.cdr.detectChanges();
-    }
-  }
-
-  /**
-   * Verifica se um elemento é ou é filho de um elemento que corresponde ao seletor
-   */
-  private isElementOrChildOf(element: HTMLElement, selector: string): boolean {
-    // Verifica se o próprio elemento corresponde ao seletor
-    if (element.matches && element.matches(selector)) {
-      return true;
-    }
-
-    // Verifica se algum dos pais corresponde ao seletor
-    let parent = element.parentElement;
-    while (parent) {
-      if (parent.matches && parent.matches(selector)) {
-        return true;
-      }
-      parent = parent.parentElement;
-    }
-
-    return false;
   }
 
   /**

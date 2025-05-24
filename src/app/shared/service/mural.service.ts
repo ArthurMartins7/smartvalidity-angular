@@ -330,6 +330,7 @@ export class MuralFilterService {
 export class MuralSelecaoService {
   private selectedItemsSubject = new BehaviorSubject<string[]>([]);
   private showInspecaoModalSubject = new BehaviorSubject<boolean>(false);
+  private showAcoesModalSubject = new BehaviorSubject<boolean>(false);
   private motivoInspecaoSubject = new BehaviorSubject<string>('');
   private motivoInspecaoErrorSubject = new BehaviorSubject<string | null>(null);
   private motivoCustomizadoSubject = new BehaviorSubject<string>('');
@@ -340,6 +341,7 @@ export class MuralSelecaoService {
   // Observables públicos
   selectedItems$: Observable<string[]> = this.selectedItemsSubject.asObservable();
   showInspecaoModal$: Observable<boolean> = this.showInspecaoModalSubject.asObservable();
+  showAcoesModal$: Observable<boolean> = this.showAcoesModalSubject.asObservable();
   motivoInspecao$: Observable<string> = this.motivoInspecaoSubject.asObservable();
   motivoInspecaoError$: Observable<string | null> = this.motivoInspecaoErrorSubject.asObservable();
   motivoCustomizado$: Observable<string> = this.motivoCustomizadoSubject.asObservable();
@@ -397,7 +399,8 @@ export class MuralSelecaoService {
   // Controle do modal de inspeção
   openInspecaoModal(): void {
     if (!this.hasSelectedItems()) return;
-
+    // Fecha o modal de ações se estiver aberto
+    this.closeAcoesModal();
     this.motivoInspecaoSubject.next('');
     this.motivoInspecaoErrorSubject.next(null);
     this.showInspecaoModalSubject.next(true);
@@ -452,5 +455,17 @@ export class MuralSelecaoService {
   // Obtém os IDs dos itens selecionados
   getSelectedIds(): string[] {
     return this.selectedItemsSubject.value;
+  }
+
+  // Controle do modal de ações em lote
+  openAcoesModal(): void {
+    if (!this.hasSelectedItems()) return;
+    // Fecha o modal de inspeção se estiver aberto
+    this.closeInspecaoModal();
+    this.showAcoesModalSubject.next(true);
+  }
+
+  closeAcoesModal(): void {
+    this.showAcoesModalSubject.next(false);
   }
 }

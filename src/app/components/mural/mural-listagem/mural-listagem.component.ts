@@ -9,6 +9,7 @@ import { RelatorioService } from '../../../shared/service/relatorio.service';
 import { FiltroAvancadoComponent } from '../mural-filtros/avancado/filtro-avancado.component';
 import { FiltroBasicoComponent } from '../mural-filtros/basico/filtro-basico.component';
 import { FiltroTagsComponent } from '../mural-filtros/tags/filtro-tags.component';
+import { ModalAcoesComponent } from '../mural-modal-acoes/modal-acoes.component';
 import { ModalInspecaoComponent } from '../mural-modal-inspecao/modal-inspecao.component';
 import { MuralTabsComponent } from '../mural-tabs/mural-tabs.component';
 
@@ -23,7 +24,8 @@ import { MuralTabsComponent } from '../mural-tabs/mural-tabs.component';
     ModalInspecaoComponent,
     FiltroBasicoComponent,
     FiltroTagsComponent,
-    MuralTabsComponent
+    MuralTabsComponent,
+    ModalAcoesComponent
   ],
   templateUrl: './mural-listagem.component.html',
   styleUrls: ['./mural-listagem.component.css']
@@ -562,5 +564,31 @@ export class MuralListagemComponent implements OnInit, OnDestroy {
 
     // Aplicar os filtros
     this.applyFilters();
+  }
+
+  /**
+   * Abre o modal de ações em lote
+   */
+  abrirModalAcoes(): void {
+    if (this.hasSelectedItems()) {
+      this.selecaoService.openAcoesModal();
+    }
+  }
+
+  /**
+   * Handler para quando uma ação é selecionada no modal
+   */
+  onAcaoSelecionada(acao: 'relatorio' | 'inspecao'): void {
+    switch (acao) {
+      case 'relatorio':
+        this.gerarRelatorioSelecionados();
+        // Limpa a seleção após gerar o relatório
+        this.selecaoService.clearSelection();
+        break;
+      case 'inspecao':
+        this.marcarSelecionadosComoInspecionados();
+        // A limpeza da seleção será feita após a confirmação da inspeção
+        break;
+    }
   }
 }

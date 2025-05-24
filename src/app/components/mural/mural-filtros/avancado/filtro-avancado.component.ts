@@ -30,6 +30,17 @@ export class FiltroAvancadoComponent implements OnInit, OnDestroy {
     inspecionado: null
   };
 
+  // Filtros selecionados atualmente
+  selectedFilters: MuralFilter = {
+    marca: '',
+    corredor: '',
+    categoria: '',
+    fornecedor: '',
+    lote: '',
+    dataVencimento: { startDate: null, endDate: null },
+    inspecionado: null
+  };
+
   // Opções disponíveis para os filtros
   filterOptions: MuralFilterOptions = {
     availableBrands: [],
@@ -70,6 +81,7 @@ export class FiltroAvancadoComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     // Inicializa os filtros temporários com os valores atuais
     this.tempFilters = { ...this.filterService.getCurrentFilters() };
+    this.selectedFilters = { ...this.filterService.getCurrentFilters() };
 
     // Inicializa as datas para evitar problemas de formato
     if (this.tempFilters.dataVencimento.startDate) {
@@ -189,26 +201,31 @@ export class FiltroAvancadoComponent implements OnInit, OnDestroy {
     switch (field) {
       case 'marca':
         this.tempFilters.marca = value;
+        this.selectedFilters.marca = value;
         this.marcaSearchTerm = value;
         this.showMarcaDropdown = false;
         break;
       case 'corredor':
         this.tempFilters.corredor = value;
+        this.selectedFilters.corredor = value;
         this.corredorSearchTerm = value;
         this.showCorredorDropdown = false;
         break;
       case 'categoria':
         this.tempFilters.categoria = value;
+        this.selectedFilters.categoria = value;
         this.categoriaSearchTerm = value;
         this.showCategoriaDropdown = false;
         break;
       case 'fornecedor':
         this.tempFilters.fornecedor = value;
+        this.selectedFilters.fornecedor = value;
         this.fornecedorSearchTerm = value;
         this.showFornecedorDropdown = false;
         break;
       case 'lote':
         this.tempFilters.lote = value;
+        this.selectedFilters.lote = value;
         this.loteSearchTerm = value;
         this.showLoteDropdown = false;
         break;

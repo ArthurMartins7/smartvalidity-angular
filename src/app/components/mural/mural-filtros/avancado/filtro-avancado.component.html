@@ -14,12 +14,15 @@
       <div class="grid grid-cols-2 gap-x-6 gap-y-3">
         <!-- Coluna Esquerda - Informações do Produto -->
         <div>
-          <h4 class="text-md font-semibold text-gray-700 mb-2 pb-1 border-b border-gray-200">Informações do Produto</h4>
+          <h4 class="text-md font-semibold text-gray-700 mb-2 pb-1 border-b border-gray-200">Marca, Corredor e Categoria:</h4>
           <div class="space-y-3">
             <!-- Marca -->
             <div class="relative">
               <label class="block text-sm font-medium text-gray-700 mb-1">Marca</label>
-              <div class="relative">
+              <div class="select-input-container">
+                <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
+                </svg>
                 <input
                   type="text"
                   [(ngModel)]="marcaSearchTerm"
@@ -27,17 +30,16 @@
                   (focus)="showMarcaDropdown = true"
                   (blur)="onBlurWithDelay('marca')"
                   placeholder="Buscar ou selecionar marca"
-                  class="w-full rounded-lg border-gray-300 py-2 px-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
-                <div *ngIf="showMarcaDropdown && filteredBrands.length > 0" class="absolute z-10 mt-1 w-full bg-white shadow-lg rounded-md border border-gray-200 max-h-60 overflow-y-auto">
-                  <ul class="py-1 px-0 m-0 list-none">
+                <div *ngIf="showMarcaDropdown && filteredBrands.length > 0" class="absolute z-10 mt-1 w-full">
+                  <ul class="dropdown-list">
                     <li *ngIf="filteredBrands.length > 0"
-                        class="px-3 py-2 text-gray-500 text-sm cursor-pointer hover:bg-gray-100"
+                        class="text-gray-500"
                         (click)="selectOption('marca', '')">
                       Todas as marcas
                     </li>
                     <li *ngFor="let brand of filteredBrands"
-                        class="px-3 py-2 text-sm cursor-pointer hover:bg-gray-100"
+                        [class.selected]="brand === selectedFilters.marca"
                         (click)="selectOption('marca', brand)">
                       {{ brand }}
                     </li>
@@ -49,7 +51,10 @@
             <!-- Corredor -->
             <div class="relative">
               <label class="block text-sm font-medium text-gray-700 mb-1">Corredor</label>
-              <div class="relative">
+              <div class="select-input-container">
+                <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
+                </svg>
                 <input
                   type="text"
                   [(ngModel)]="corredorSearchTerm"
@@ -57,17 +62,16 @@
                   (focus)="showCorredorDropdown = true"
                   (blur)="onBlurWithDelay('corredor')"
                   placeholder="Buscar ou selecionar corredor"
-                  class="w-full rounded-lg border-gray-300 py-2 px-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
-                <div *ngIf="showCorredorDropdown && filteredCorredores.length > 0" class="absolute z-10 mt-1 w-full bg-white shadow-lg rounded-md border border-gray-200 max-h-60 overflow-y-auto">
-                  <ul class="py-1 px-0 m-0 list-none">
+                <div *ngIf="showCorredorDropdown && filteredCorredores.length > 0" class="absolute z-10 mt-1 w-full">
+                  <ul class="dropdown-list">
                     <li *ngIf="filteredCorredores.length > 0"
-                        class="px-3 py-2 text-gray-500 text-sm cursor-pointer hover:bg-gray-100"
+                        class="text-gray-500"
                         (click)="selectOption('corredor', '')">
                       Todos os corredores
                     </li>
                     <li *ngFor="let corredor of filteredCorredores"
-                        class="px-3 py-2 text-sm cursor-pointer hover:bg-gray-100"
+                        [class.selected]="corredor === selectedFilters.corredor"
                         (click)="selectOption('corredor', corredor)">
                       {{ corredor }}
                     </li>
@@ -79,7 +83,10 @@
             <!-- Categoria -->
             <div class="relative">
               <label class="block text-sm font-medium text-gray-700 mb-1">Categoria</label>
-              <div class="relative">
+              <div class="select-input-container">
+                <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
+                </svg>
                 <input
                   type="text"
                   [(ngModel)]="categoriaSearchTerm"
@@ -87,17 +94,16 @@
                   (focus)="showCategoriaDropdown = true"
                   (blur)="onBlurWithDelay('categoria')"
                   placeholder="Buscar ou selecionar categoria"
-                  class="w-full rounded-lg border-gray-300 py-2 px-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
-                <div *ngIf="showCategoriaDropdown && filteredCategorias.length > 0" class="absolute z-10 mt-1 w-full bg-white shadow-lg rounded-md border border-gray-200 max-h-60 overflow-y-auto">
-                  <ul class="py-1 px-0 m-0 list-none">
+                <div *ngIf="showCategoriaDropdown && filteredCategorias.length > 0" class="absolute z-10 mt-1 w-full">
+                  <ul class="dropdown-list">
                     <li *ngIf="filteredCategorias.length > 0"
-                        class="px-3 py-2 text-gray-500 text-sm cursor-pointer hover:bg-gray-100"
+                        class="text-gray-500"
                         (click)="selectOption('categoria', '')">
                       Todas as categorias
                     </li>
                     <li *ngFor="let categoria of filteredCategorias"
-                        class="px-3 py-2 text-sm cursor-pointer hover:bg-gray-100"
+                        [class.selected]="categoria === selectedFilters.categoria"
                         (click)="selectOption('categoria', categoria)">
                       {{ categoria }}
                     </li>
@@ -110,12 +116,15 @@
 
         <!-- Coluna Direita - Fornecedor, Lote e Período de Vencimento -->
         <div>
-          <h4 class="text-md font-semibold text-gray-700 mb-2 pb-1 border-b border-gray-200">Outros Filtros</h4>
+          <h4 class="text-md font-semibold text-gray-700 mb-2 pb-1 border-b border-gray-200">Fornecedor, Lote e Período de Vencimento:</h4>
           <div class="space-y-3">
-            <!-- Fornecedor (movido para coluna direita) -->
+            <!-- Fornecedor -->
             <div class="relative">
               <label class="block text-sm font-medium text-gray-700 mb-1">Fornecedor</label>
-              <div class="relative">
+              <div class="select-input-container">
+                <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
+                </svg>
                 <input
                   type="text"
                   [(ngModel)]="fornecedorSearchTerm"
@@ -123,17 +132,16 @@
                   (focus)="showFornecedorDropdown = true"
                   (blur)="onBlurWithDelay('fornecedor')"
                   placeholder="Buscar ou selecionar fornecedor"
-                  class="w-full rounded-lg border-gray-300 py-2 px-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
-                <div *ngIf="showFornecedorDropdown && filteredFornecedores.length > 0" class="absolute z-10 mt-1 w-full bg-white shadow-lg rounded-md border border-gray-200 max-h-60 overflow-y-auto">
-                  <ul class="py-1 px-0 m-0 list-none">
+                <div *ngIf="showFornecedorDropdown && filteredFornecedores.length > 0" class="absolute z-10 mt-1 w-full">
+                  <ul class="dropdown-list">
                     <li *ngIf="filteredFornecedores.length > 0"
-                        class="px-3 py-2 text-gray-500 text-sm cursor-pointer hover:bg-gray-100"
+                        class="text-gray-500"
                         (click)="selectOption('fornecedor', '')">
                       Todos os fornecedores
                     </li>
                     <li *ngFor="let fornecedor of filteredFornecedores"
-                        class="px-3 py-2 text-sm cursor-pointer hover:bg-gray-100"
+                        [class.selected]="fornecedor === selectedFilters.fornecedor"
                         (click)="selectOption('fornecedor', fornecedor)">
                       {{ fornecedor }}
                     </li>
@@ -142,10 +150,13 @@
               </div>
             </div>
 
-            <!-- Lote (movido para coluna direita) -->
+            <!-- Lote -->
             <div class="relative">
               <label class="block text-sm font-medium text-gray-700 mb-1">Lote</label>
-              <div class="relative">
+              <div class="select-input-container">
+                <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
+                </svg>
                 <input
                   type="text"
                   [(ngModel)]="loteSearchTerm"
@@ -153,17 +164,16 @@
                   (focus)="showLoteDropdown = true"
                   (blur)="onBlurWithDelay('lote')"
                   placeholder="Buscar ou selecionar lote"
-                  class="w-full rounded-lg border-gray-300 py-2 px-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
-                <div *ngIf="showLoteDropdown && filteredLotes.length > 0" class="absolute z-10 mt-1 w-full bg-white shadow-lg rounded-md border border-gray-200 max-h-60 overflow-y-auto">
-                  <ul class="py-1 px-0 m-0 list-none">
+                <div *ngIf="showLoteDropdown && filteredLotes.length > 0" class="absolute z-10 mt-1 w-full">
+                  <ul class="dropdown-list">
                     <li *ngIf="filteredLotes.length > 0"
-                        class="px-3 py-2 text-gray-500 text-sm cursor-pointer hover:bg-gray-100"
+                        class="text-gray-500"
                         (click)="selectOption('lote', '')">
                       Todos os lotes
                     </li>
                     <li *ngFor="let lote of filteredLotes"
-                        class="px-3 py-2 text-sm cursor-pointer hover:bg-gray-100"
+                        [class.selected]="lote === selectedFilters.lote"
                         (click)="selectOption('lote', lote)">
                       {{ lote }}
                     </li>

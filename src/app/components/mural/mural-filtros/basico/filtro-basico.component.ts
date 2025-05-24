@@ -49,7 +49,14 @@ export class FiltroBasicoComponent {
   }
 
   onSelectSortOption(field: string, direction: 'asc' | 'desc'): void {
-    this.sortOptionSelected.emit({field, direction});
+    if (field === 'dataVencimento') {
+      this.sortOptionSelected.emit({
+        field: field,
+        direction: direction
+      });
+    } else {
+      this.sortOptionSelected.emit({field, direction});
+    }
     this.showSortOptions = false;
   }
 

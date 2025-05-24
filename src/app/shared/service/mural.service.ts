@@ -266,7 +266,12 @@ export class MuralFilterService {
     const limite = this.itensPorPaginaSubject.value;
 
     // Se o campo de ordenação for 'nome', precisamos mapear para 'descricao' no backend
-    const mappedSortBy = sortBy === 'nome' ? 'descricao' : sortBy;
+    let mappedSortBy = sortBy;
+    if (sortBy === 'nome') {
+      mappedSortBy = 'descricao';
+    } else if (sortBy === 'dataVencimento') {
+      mappedSortBy = 'dataVencimento';  // Garantir que o campo está correto
+    }
 
     return {
       corredor: filter.corredor || undefined,
@@ -283,7 +288,7 @@ export class MuralFilterService {
       inspecionado: filter.inspecionado,
       searchTerm: searchTerm || undefined,
       sortBy: mappedSortBy || undefined,
-      sortDirection: sortDirection,
+      sortDirection: sortDirection || 'asc',  // Garantir um valor padrão
       status: undefined,
       pagina: pagina,
       limite: limite

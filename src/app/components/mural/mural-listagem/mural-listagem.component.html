@@ -207,5 +207,9 @@
   <app-modal-inspecao (inspecaoConfirmada)="onInspecaoConfirmada()"></app-modal-inspecao>
 
   <!-- Componente Modal de Ações -->
-  <app-modal-acoes (acaoSelecionada)="onAcaoSelecionada($event)"></app-modal-acoes>
+  <app-modal-acoes
+    [itensPaginaAtual]="filteredItems"
+    [totalItensAba]="totalItensAba"
+    (acaoSelecionada)="onAcaoSelecionada($event)">
+  </app-modal-acoes>
 </div>

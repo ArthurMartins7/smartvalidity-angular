@@ -66,6 +66,7 @@ export class MuralListagemComponent implements OnInit, OnDestroy {
   /** Propriedades de paginação */
   public totalPaginas: number = 1;
   public opcoesItensPorPagina: number[] = [5, 10, 15, 20, 25, 50];
+  public totalItensAba: number = 0;
 
   // Getters para acessar valores do filterService de forma mais limpa
   public get paginaAtual(): number {
@@ -236,7 +237,6 @@ export class MuralListagemComponent implements OnInit, OnDestroy {
     const filtroDTO = this.filterService.toFilterDTO();
 
     // Adiciona informação da aba ativa como um filtro adicional
-    // (não altera o estado do filtro, apenas para a requisição atual)
     switch (this.activeTab) {
       case 'proximo':
         // Deixa como está, o backend filtrará para próximos a vencer
@@ -258,10 +258,10 @@ export class MuralListagemComponent implements OnInit, OnDestroy {
     } else if (this.filtroInspecao === 'naoInspecionados') {
       filtroDTO.inspecionado = false;
     }
-    // Se for 'todos', não aplicamos filtro de inspeção
 
-    // Calcular o total de páginas
+    // Calcular o total de páginas e o total de itens
     this.calcularTotalPaginas(filtroDTO);
+    this.selecaoService.updateTotalItensAba(filtroDTO);
 
     const subscription = this.muralService.filtrarProdutos(filtroDTO).subscribe({
       next: (items) => {
@@ -443,14 +443,20 @@ export class MuralListagemComponent implements OnInit, OnDestroy {
 
   // Método para calcular o total de páginas
   private calcularTotalPaginas(filtro: MuralFiltroDTO): void {
-    this.muralService.contarPaginas(filtro).subscribe({
-      next: (total) => {
-        this.filterService.updateTotalPaginas(total);
-        this.totalPaginas = total;
+    // Primeiro obtém o total de registros
+    this.muralService.contarTotalRegistros(filtro).subscribe({
+      next: (totalRegistros) => {
+        // Atualiza o total de itens na aba
+        this.totalItensAba = totalRegistros;
+        // Calcula o total de páginas
+        this.totalPaginas = Math.ceil(totalRegistros / this.itensPorPagina);
+        this.filterService.updateTotalPaginas(this.totalPaginas);
       },
       error: (erro) => {
-        console.error('Erro ao contar total de páginas:', erro);
+        console.error('Erro ao contar total de registros:', erro);
         this.totalPaginas = 1;
+        this.totalItensAba = 0;
+        this.filterService.updateTotalPaginas(1);
       }
     });
   }
@@ -523,15 +529,67 @@ export class MuralListagemComponent implements OnInit, OnDestroy {
    * Gera relatório Excel apenas com os itens selecionados
    */
   gerarRelatorioSelecionados(): void {
-    // Obtém apenas os itens selecionados
     const itensSelecionados = this.filteredItems.filter(item => item.selecionado);
+    if (itensSelecionados.length === 0) return;
 
-    // Verificação já feita pelo atributo [disabled] no botão
-    if (itensSelecionados.length === 0) {
-      return;
-    }
+    const titulo = this.getTituloRelatorio('selecionados', itensSelecionados.length);
+    this.relatorioService.gerarRelatorioExcel(itensSelecionados, titulo);
+    this.selecaoService.clearSelection();
+  }
 
-    // Determina o título com base na aba ativa
+  /**
+   * Gera relatório Excel com os itens da página atual
+   */
+  private gerarRelatorioPaginaAtual(): void {
+    if (this.filteredItems.length === 0) return;
+
+    const titulo = this.getTituloRelatorio('pagina', this.filteredItems.length);
+    this.relatorioService.gerarRelatorioExcel(this.filteredItems, titulo);
+    this.selecaoService.clearSelection();
+  }
+
+  /**
+   * Gera relatório com todos os itens de todas as páginas
+   */
+  private gerarRelatorioTodosItens(): void {
+    // Obtém o filtro atual
+    const filtroDTO = this.filterService.toFilterDTO();
+
+    // Remove a paginação para obter todos os itens
+    filtroDTO.pagina = undefined;
+    filtroDTO.limite = undefined;
+
+    // Garante que o status da aba atual seja mantido
+    filtroDTO.status = this.activeTab;
+
+    // Primeiro obtém o total exato de itens
+    this.muralService.contarTotalRegistros(filtroDTO).subscribe({
+      next: (totalItens) => {
+        // Busca todos os itens e gera o relatório
+        this.muralService.filtrarProdutos(filtroDTO).subscribe({
+          next: (itens) => {
+            if (itens.length !== totalItens) {
+              console.warn(`Discrepância no número de itens: esperado ${totalItens}, recebido ${itens.length}`);
+            }
+            const titulo = this.getTituloRelatorio('todos', itens.length);
+            this.relatorioService.gerarRelatorioExcel(itens, titulo);
+            this.selecaoService.clearSelection();
+          },
+          error: (erro) => {
+            console.error('Erro ao gerar relatório com todos os itens:', erro);
+          }
+        });
+      },
+      error: (erro) => {
+        console.error('Erro ao contar total de registros:', erro);
+      }
+    });
+  }
+
+  /**
+   * Gera o título do relatório com base no tipo e quantidade de itens
+   */
+  private getTituloRelatorio(tipo: 'selecionados' | 'pagina' | 'todos', quantidade: number): string {
     let titulo = '';
     switch (this.activeTab) {
       case 'proximo':
@@ -545,11 +603,25 @@ export class MuralListagemComponent implements OnInit, OnDestroy {
         break;
     }
 
-    // Adiciona informação sobre seleção ao título
-    titulo += ` (${itensSelecionados.length} itens selecionados)`;
+    // Adiciona informação dos filtros ao título se houver filtros aplicados
+    if (this.hasAppliedFilters()) {
+      titulo += ' (Filtrado)';
+    }
 
-    // Gera o relatório apenas com os itens selecionados
-    this.relatorioService.gerarRelatorioExcel(itensSelecionados, titulo);
+    // Adiciona informação sobre a quantidade de itens
+    switch (tipo) {
+      case 'selecionados':
+        titulo += ` (${quantidade} item(ns) selecionado(s))`;
+        break;
+      case 'pagina':
+        titulo += ` (${quantidade} item(ns) da página atual)`;
+        break;
+      case 'todos':
+        titulo += ` (${quantidade} item(ns) no total)`;
+        break;
+    }
+
+    return titulo;
   }
 
   /**
@@ -578,16 +650,19 @@ export class MuralListagemComponent implements OnInit, OnDestroy {
   /**
    * Handler para quando uma ação é selecionada no modal
    */
-  onAcaoSelecionada(acao: 'relatorio' | 'inspecao'): void {
+  onAcaoSelecionada(acao: 'relatorio-selecionados' | 'relatorio-pagina' | 'relatorio-todos' | 'inspecao'): void {
     switch (acao) {
-      case 'relatorio':
+      case 'relatorio-selecionados':
         this.gerarRelatorioSelecionados();
-        // Limpa a seleção após gerar o relatório
-        this.selecaoService.clearSelection();
+        break;
+      case 'relatorio-pagina':
+        this.gerarRelatorioPaginaAtual();
+        break;
+      case 'relatorio-todos':
+        this.gerarRelatorioTodosItens();
         break;
       case 'inspecao':
         this.marcarSelecionadosComoInspecionados();
-        // A limpeza da seleção será feita após a confirmação da inspeção
         break;
     }
   }

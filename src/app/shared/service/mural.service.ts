@@ -334,6 +334,7 @@ export class MuralSelecaoService {
   private motivoInspecaoSubject = new BehaviorSubject<string>('');
   private motivoInspecaoErrorSubject = new BehaviorSubject<string | null>(null);
   private motivoCustomizadoSubject = new BehaviorSubject<string>('');
+  private totalItensAbaSubject = new BehaviorSubject<number>(0);
 
   // Opções de motivos de inspeção
   readonly motivosInspecao: string[] = ['Avaria/Quebra', 'Promoção', 'Outro'];
@@ -345,6 +346,7 @@ export class MuralSelecaoService {
   motivoInspecao$: Observable<string> = this.motivoInspecaoSubject.asObservable();
   motivoInspecaoError$: Observable<string | null> = this.motivoInspecaoErrorSubject.asObservable();
   motivoCustomizado$: Observable<string> = this.motivoCustomizadoSubject.asObservable();
+  totalItensAba$: Observable<number> = this.totalItensAbaSubject.asObservable();
 
   constructor(private muralService: MuralService) { }
 
@@ -353,12 +355,15 @@ export class MuralSelecaoService {
     this.selectedItemsSubject.next(items);
   }
 
-  // Seleciona ou desmarca todos os itens
+  // Seleciona ou desmarca todos os itens da página
   selectAll(items: MuralListagemDTO[], selected: boolean): void {
-    const ids = selected ?
-      items.map(item => item.id) :
-      [];
+    const ids = selected ? items.map(item => item.id) : [];
     this.selectedItemsSubject.next(ids);
+  }
+
+  // Seleciona todos os itens da aba atual
+  selectAllInTab(totalItens: number): void {
+    this.totalItensAbaSubject.next(totalItens);
   }
 
   // Alterna a seleção de um item
@@ -385,6 +390,11 @@ export class MuralSelecaoService {
   // Retorna o número de itens selecionados
   getSelectedItemsCount(): number {
     return this.selectedItemsSubject.value.length;
+  }
+
+  // Retorna o total de itens na aba atual
+  getTotalItensAba(): number {
+    return this.totalItensAbaSubject.value;
   }
 
   // Retorna os itens selecionados a partir de uma lista de todos os itens
@@ -467,5 +477,19 @@ export class MuralSelecaoService {
 
   closeAcoesModal(): void {
     this.showAcoesModalSubject.next(false);
+  }
+
+  // Atualiza o total de itens na aba atual
+  updateTotalItensAba(filtro: MuralFiltroDTO): void {
+    // Usa o método contarTotalRegistros para obter o número exato de itens
+    this.muralService.contarTotalRegistros(filtro).subscribe({
+      next: (total) => {
+        this.totalItensAbaSubject.next(total);
+      },
+      error: (erro) => {
+        console.error('Erro ao contar total de registros:', erro);
+        this.totalItensAbaSubject.next(0);
+      }
+    });
   }
 }

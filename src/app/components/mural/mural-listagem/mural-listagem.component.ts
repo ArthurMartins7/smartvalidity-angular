@@ -464,6 +464,8 @@ export class MuralListagemComponent implements OnInit, OnDestroy {
   // Método para avançar para a próxima página
   public avancarPagina(): void {
     if (this.paginaAtual < this.totalPaginas) {
+      // Limpa a seleção antes de mudar de página
+      this.selecaoService.clearSelection();
       this.filterService.updatePaginaAtual(this.paginaAtual + 1);
       this.applyFilters();
     }
@@ -472,6 +474,8 @@ export class MuralListagemComponent implements OnInit, OnDestroy {
   // Método para voltar para a página anterior
   public voltarPagina(): void {
     if (this.paginaAtual > 1) {
+      // Limpa a seleção antes de mudar de página
+      this.selecaoService.clearSelection();
       this.filterService.updatePaginaAtual(this.paginaAtual - 1);
       this.applyFilters();
     }
@@ -479,8 +483,12 @@ export class MuralListagemComponent implements OnInit, OnDestroy {
 
   // Método para ir para uma página específica
   public irParaPagina(pagina: number): void {
-    this.filterService.updatePaginaAtual(pagina);
-    this.applyFilters();
+    if (pagina !== this.paginaAtual) {
+      // Limpa a seleção antes de mudar de página
+      this.selecaoService.clearSelection();
+      this.filterService.updatePaginaAtual(pagina);
+      this.applyFilters();
+    }
   }
 
   // Método para criar um array com os números das páginas
@@ -494,6 +502,8 @@ export class MuralListagemComponent implements OnInit, OnDestroy {
 
   // Método para alterar a quantidade de itens por página
   public alterarItensPorPagina(quantidade: number): void {
+    // Limpa a seleção antes de mudar a quantidade de itens por página
+    this.selecaoService.clearSelection();
     this.filterService.updateItensPorPagina(quantidade);
     this.applyFilters();
   }

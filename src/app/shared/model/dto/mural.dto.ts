@@ -41,17 +41,19 @@ export interface MuralFiltroDTO {
   fornecedor?: string;
   marca?: string;
   lote?: string;
-  dataVencimentoInicio?: string; // ISO string
-  dataVencimentoFim?: string; // ISO string
-  dataFabricacaoInicio?: string; // ISO string
-  dataFabricacaoFim?: string; // ISO string
-  dataRecebimentoInicio?: string; // ISO string
-  dataRecebimentoFim?: string; // ISO string
-  inspecionado?: boolean | null;
+  dataVencimentoInicio?: string;
+  dataVencimentoFim?: string;
+  dataFabricacaoInicio?: string;
+  dataFabricacaoFim?: string;
+  dataRecebimentoInicio?: string;
+  dataRecebimentoFim?: string;
+  inspecionado?: boolean;
+  motivoInspecao?: string;
+  usuarioInspecao?: string;
   searchTerm?: string;
   sortBy?: string;
   sortDirection?: 'asc' | 'desc';
-  status?: 'proximo' | 'hoje' | 'vencido'; // Status da validade do produto
-  pagina?: number; // Página atual
-  limite?: number; // Quantidade de itens por página
+  status?: 'proximo' | 'hoje' | 'vencido';
+  pagina?: number;
+  limite?: number;
 }

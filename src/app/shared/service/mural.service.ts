@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { BehaviorSubject, Observable, of } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 import { MuralFiltroDTO, MuralListagemDTO } from '../model/dto/mural.dto';
 
 //-----------------------------------------------------------------------
@@ -39,7 +40,9 @@ export interface MuralFilter {
     startDate: string | null;
     endDate: string | null;
   };
-  inspecionado: boolean | null;
+  inspecionado: boolean | undefined;
+  motivoInspecao: string;
+  usuarioInspecao: string;
 }
 
 /**
@@ -51,6 +54,7 @@ export interface MuralFilterOptions {
   availableCategorias: string[];
   availableFornecedores: string[];
   availableLotes: string[];
+  availableUsuariosInspecao: string[];
 }
 
 //-----------------------------------------------------------------------
@@ -160,6 +164,8 @@ export class MuralService {
   providedIn: 'root'
 })
 export class MuralFilterService {
+  private readonly API = 'http://localhost:8080/smartvalidity/mural';
+
   // Estado inicial dos filtros
   private initialFilter: MuralFilter = {
     corredor: '',
@@ -168,7 +174,9 @@ export class MuralFilterService {
     marca: '',
     lote: '',
     dataVencimento: { startDate: null, endDate: null },
-    inspecionado: null
+    inspecionado: undefined,
+    motivoInspecao: '',
+    usuarioInspecao: ''
   };
 
   // Subjects para estado reativo
@@ -179,7 +187,8 @@ export class MuralFilterService {
     availableCorredores: [],
     availableCategorias: [],
     availableFornecedores: [],
-    availableLotes: []
+    availableLotes: [],
+    availableUsuariosInspecao: []
   });
   private sortFieldSubject = new BehaviorSubject<string>('');
   private sortDirectionSubject = new BehaviorSubject<'asc' | 'desc'>('asc');
@@ -201,7 +210,7 @@ export class MuralFilterService {
   itensPorPagina$ = this.itensPorPaginaSubject.asObservable();
   totalPaginas$ = this.totalPaginasSubject.asObservable();
 
-  constructor() {}
+  constructor(private httpClient: HttpClient) { }
 
   // Métodos para atualizar filtros
   updateFilters(filters: Partial<MuralFilter>): void {
@@ -237,9 +246,31 @@ export class MuralFilterService {
 
   // Limpar um filtro específico
   clearFilter(filterName: keyof MuralFilter): void {
-    if (filterName in this.initialFilter) {
-      const update = { [filterName]: this.initialFilter[filterName] } as Partial<MuralFilter>;
-      this.updateFilters(update);
+    if (filterName === 'dataVencimento') {
+      this.filtersSubject.next({
+        ...this.filtersSubject.value,
+        dataVencimento: { startDate: null, endDate: null }
+      });
+    } else if (filterName === 'inspecionado') {
+      this.filtersSubject.next({
+        ...this.filtersSubject.value,
+        inspecionado: undefined
+      });
+    } else if (filterName === 'motivoInspecao') {
+      this.filtersSubject.next({
+        ...this.filtersSubject.value,
+        motivoInspecao: ''
+      });
+    } else if (filterName === 'usuarioInspecao') {
+      this.filtersSubject.next({
+        ...this.filtersSubject.value,
+        usuarioInspecao: ''
+      });
+    } else {
+      this.filtersSubject.next({
+        ...this.filtersSubject.value,
+        [filterName]: ''
+      });
     }
   }
 
@@ -256,42 +287,43 @@ export class MuralFilterService {
     return this.filtersSubject.value;
   }
 
-  // Converte o modelo de filtro interno para o DTO que será enviado para o backend
+  /**
+   * Converte o modelo de filtro interno para o DTO que será enviado para o backend
+   */
   toFilterDTO(): MuralFiltroDTO {
-    const filter = this.getCurrentFilters();
+    const filters = this.filtersSubject.value;
     const searchTerm = this.searchTermSubject.value;
-    const sortBy = this.sortFieldSubject.value;
+    const sortField = this.sortFieldSubject.value;
     const sortDirection = this.sortDirectionSubject.value;
     const pagina = this.paginaAtualSubject.value;
     const limite = this.itensPorPaginaSubject.value;
 
-    // Se o campo de ordenação for 'nome', precisamos mapear para 'descricao' no backend
-    let mappedSortBy = sortBy;
-    if (sortBy === 'nome') {
-      mappedSortBy = 'descricao';
-    } else if (sortBy === 'dataVencimento') {
-      mappedSortBy = 'dataVencimento';  // Garantir que o campo está correto
-    }
-
     return {
-      corredor: filter.corredor || undefined,
-      categoria: filter.categoria || undefined,
-      fornecedor: filter.fornecedor || undefined,
-      marca: filter.marca || undefined,
-      lote: filter.lote || undefined,
-      dataVencimentoInicio: filter.dataVencimento.startDate || undefined,
-      dataVencimentoFim: filter.dataVencimento.endDate || undefined,
-      dataFabricacaoInicio: filter.dataFabricacao?.startDate || undefined,
-      dataFabricacaoFim: filter.dataFabricacao?.endDate || undefined,
-      dataRecebimentoInicio: filter.dataRecebimento?.startDate || undefined,
-      dataRecebimentoFim: filter.dataRecebimento?.endDate || undefined,
-      inspecionado: filter.inspecionado,
-      searchTerm: searchTerm || undefined,
-      sortBy: mappedSortBy || undefined,
-      sortDirection: sortDirection || 'asc',  // Garantir um valor padrão
-      status: undefined,
-      pagina: pagina,
-      limite: limite
+        corredor: filters.corredor || undefined,
+        categoria: filters.categoria || undefined,
+        fornecedor: filters.fornecedor || undefined,
+        marca: filters.marca || undefined,
+        lote: filters.lote || undefined,
+        dataVencimentoInicio: filters.dataVencimento.startDate ?
+            new Date(filters.dataVencimento.startDate).toISOString() : undefined,
+        dataVencimentoFim: filters.dataVencimento.endDate ?
+            new Date(filters.dataVencimento.endDate).toISOString() : undefined,
+        dataFabricacaoInicio: filters.dataFabricacao?.startDate ?
+            new Date(filters.dataFabricacao.startDate).toISOString() : undefined,
+        dataFabricacaoFim: filters.dataFabricacao?.endDate ?
+            new Date(filters.dataFabricacao.endDate).toISOString() : undefined,
+        dataRecebimentoInicio: filters.dataRecebimento?.startDate ?
+            new Date(filters.dataRecebimento.startDate).toISOString() : undefined,
+        dataRecebimentoFim: filters.dataRecebimento?.endDate ?
+            new Date(filters.dataRecebimento.endDate).toISOString() : undefined,
+        inspecionado: filters.inspecionado,
+        motivoInspecao: filters.motivoInspecao || undefined,
+        usuarioInspecao: filters.usuarioInspecao || undefined,
+        searchTerm: searchTerm || undefined,
+        sortBy: sortField || undefined,
+        sortDirection: sortDirection || undefined,
+        pagina: pagina,
+        limite: limite
     };
   }
 
@@ -304,9 +336,11 @@ export class MuralFilterService {
       !!currentFilters.categoria ||
       !!currentFilters.fornecedor ||
       !!currentFilters.lote ||
-      currentFilters.inspecionado !== null ||
+      currentFilters.inspecionado !== undefined ||
       !!currentFilters.dataVencimento.startDate ||
-      !!currentFilters.dataVencimento.endDate
+      !!currentFilters.dataVencimento.endDate ||
+      !!currentFilters.motivoInspecao ||
+      !!currentFilters.usuarioInspecao
     );
   }
 
@@ -323,6 +357,49 @@ export class MuralFilterService {
 
   updateTotalPaginas(total: number): void {
     this.totalPaginasSubject.next(total);
+  }
+
+  // Carrega as opções disponíveis para os filtros
+  loadFilterOptions(): void {
+    console.log('Carregando opções de filtro...');
+
+    // Primeiro, carregamos os usuários de inspeção
+    this.httpClient.get<string[]>(`${this.API}/usuarios-inspecao`).pipe(
+      catchError(error => {
+        console.error('Erro ao carregar usuários de inspeção:', error);
+        return of([]);
+      })
+    ).subscribe(usuarios => {
+      console.log('Usuários carregados:', usuarios);
+      const currentOptions = this.filterOptionsSubject.value;
+      this.filterOptionsSubject.next({
+        ...currentOptions,
+        availableUsuariosInspecao: usuarios
+      });
+    });
+
+    // Carrega as outras opções de filtro
+    this.httpClient.get<MuralFilterOptions>(`${this.API}/opcoes-filtro`).pipe(
+      catchError(error => {
+        console.error('Erro ao carregar opções de filtro:', error);
+        return of({
+          availableBrands: [],
+          availableCorredores: [],
+          availableCategorias: [],
+          availableFornecedores: [],
+          availableLotes: [],
+          availableUsuariosInspecao: []
+        });
+      })
+    ).subscribe(options => {
+      console.log('Outras opções carregadas:', options);
+      // Mantém a lista de usuários que já foi carregada
+      const currentOptions = this.filterOptionsSubject.value;
+      this.filterOptionsSubject.next({
+        ...options,
+        availableUsuariosInspecao: currentOptions.availableUsuariosInspecao
+      });
+    });
   }
 }
 

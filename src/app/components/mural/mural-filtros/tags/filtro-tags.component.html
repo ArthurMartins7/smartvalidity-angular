@@ -45,9 +45,21 @@
       </span>
 
       <!-- Exibe o filtro de status de inspeção se estiver selecionado -->
-      <span *ngIf="filterService.getCurrentFilters().inspecionado !== null" class="inline-flex items-center mr-2 mb-1">
+      <span *ngIf="filterService.getCurrentFilters().inspecionado !== undefined" class="inline-flex items-center mr-2 mb-1">
         Status de Inspeção: &nbsp;<strong>{{filterService.getCurrentFilters().inspecionado ? 'Inspecionados' : 'Não Inspecionados'}}</strong>
         <button class="ml-1 text-red-600" (click)="onClearFilter('inspecionado')">×</button>
+      </span>
+
+      <!-- Exibe o filtro de motivo de inspeção se estiver selecionado -->
+      <span *ngIf="filterService.getCurrentFilters().motivoInspecao" class="inline-flex items-center mr-2 mb-1">
+        Motivo da Inspeção: &nbsp;<strong>{{filterService.getCurrentFilters().motivoInspecao}}</strong>
+        <button class="ml-1 text-red-600" (click)="onClearFilter('motivoInspecao')">×</button>
+      </span>
+
+      <!-- Exibe o filtro de usuário que inspecionou se estiver selecionado -->
+      <span *ngIf="filterService.getCurrentFilters().usuarioInspecao" class="inline-flex items-center mr-2 mb-1">
+        Inspecionado por: &nbsp;<strong>{{filterService.getCurrentFilters().usuarioInspecao}}</strong>
+        <button class="ml-1 text-red-600" (click)="onClearFilter('usuarioInspecao')">×</button>
       </span>
 
       <!-- Botão para limpar todos os filtros de uma vez -->

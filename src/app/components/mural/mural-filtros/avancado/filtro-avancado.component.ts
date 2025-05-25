@@ -1,4 +1,5 @@
 import { CommonModule } from '@angular/common';
+import { HttpClientModule } from '@angular/common/http';
 import { Component, EventEmitter, OnDestroy, OnInit, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Subscription } from 'rxjs';
@@ -12,7 +13,7 @@ interface DateRange {
 @Component({
   selector: 'app-filtro-avancado',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, HttpClientModule],
   templateUrl: './filtro-avancado.component.html',
   styleUrls: ['./filtro-avancado.component.css']
 })
@@ -27,7 +28,9 @@ export class FiltroAvancadoComponent implements OnInit, OnDestroy {
     fornecedor: '',
     lote: '',
     dataVencimento: { startDate: null, endDate: null },
-    inspecionado: null
+    inspecionado: undefined,
+    motivoInspecao: '',
+    usuarioInspecao: ''
   };
 
   // Filtros selecionados atualmente
@@ -38,7 +41,9 @@ export class FiltroAvancadoComponent implements OnInit, OnDestroy {
     fornecedor: '',
     lote: '',
     dataVencimento: { startDate: null, endDate: null },
-    inspecionado: null
+    inspecionado: undefined,
+    motivoInspecao: '',
+    usuarioInspecao: ''
   };
 
   // Opções disponíveis para os filtros
@@ -47,7 +52,8 @@ export class FiltroAvancadoComponent implements OnInit, OnDestroy {
     availableCorredores: [],
     availableCategorias: [],
     availableFornecedores: [],
-    availableLotes: []
+    availableLotes: [],
+    availableUsuariosInspecao: []
   };
 
   // Variáveis para os termos de pesquisa
@@ -56,6 +62,7 @@ export class FiltroAvancadoComponent implements OnInit, OnDestroy {
   categoriaSearchTerm: string = '';
   fornecedorSearchTerm: string = '';
   loteSearchTerm: string = '';
+  usuarioInspecaoSearchTerm: string = '';
 
   // Variáveis para controlar a exibição dos dropdowns
   showMarcaDropdown: boolean = false;
@@ -63,6 +70,7 @@ export class FiltroAvancadoComponent implements OnInit, OnDestroy {
   showCategoriaDropdown: boolean = false;
   showFornecedorDropdown: boolean = false;
   showLoteDropdown: boolean = false;
+  showUsuarioInspecaoDropdown: boolean = false;
 
   // Listas filtradas para cada dropdown
   filteredBrands: string[] = [];
@@ -70,6 +78,7 @@ export class FiltroAvancadoComponent implements OnInit, OnDestroy {
   filteredCategorias: string[] = [];
   filteredFornecedores: string[] = [];
   filteredLotes: string[] = [];
+  filteredUsuariosInspecao: string[] = [];
 
   // Timers para o blur
   private dropdownTimers: { [key: string]: any } = {};
@@ -79,6 +88,9 @@ export class FiltroAvancadoComponent implements OnInit, OnDestroy {
   constructor(private filterService: MuralFilterService) {}
 
   ngOnInit(): void {
+    // Carrega as opções de filtro ao inicializar o componente
+    this.filterService.loadFilterOptions();
+
     // Inicializa os filtros temporários com os valores atuais
     this.tempFilters = { ...this.filterService.getCurrentFilters() };
     this.selectedFilters = { ...this.filterService.getCurrentFilters() };
@@ -94,6 +106,7 @@ export class FiltroAvancadoComponent implements OnInit, OnDestroy {
 
     // Assina para receber atualizações nas opções de filtro
     const optionsSub = this.filterService.filterOptions$.subscribe(options => {
+      console.log('Opções de filtro atualizadas:', options);
       this.filterOptions = options;
 
       // Inicializa as listas filtradas com todos os valores
@@ -102,6 +115,8 @@ export class FiltroAvancadoComponent implements OnInit, OnDestroy {
       this.filteredCategorias = [...this.filterOptions.availableCategorias];
       this.filteredFornecedores = [...this.filterOptions.availableFornecedores];
       this.filteredLotes = [...this.filterOptions.availableLotes];
+      this.filteredUsuariosInspecao = [...this.filterOptions.availableUsuariosInspecao];
+      console.log('Lista de usuários disponíveis:', this.filteredUsuariosInspecao);
 
       // Inicializa os termos de pesquisa com os valores atuais selecionados
       this.marcaSearchTerm = this.tempFilters.marca;
@@ -109,6 +124,7 @@ export class FiltroAvancadoComponent implements OnInit, OnDestroy {
       this.categoriaSearchTerm = this.tempFilters.categoria;
       this.fornecedorSearchTerm = this.tempFilters.fornecedor;
       this.loteSearchTerm = this.tempFilters.lote;
+      this.usuarioInspecaoSearchTerm = this.tempFilters.usuarioInspecao;
     });
 
     this.subscriptions.push(optionsSub);
@@ -194,6 +210,19 @@ export class FiltroAvancadoComponent implements OnInit, OnDestroy {
     }
   }
 
+  onUsuarioInspecaoSearch(): void {
+    const searchTerm = this.usuarioInspecaoSearchTerm.toLowerCase();
+    this.tempFilters.usuarioInspecao = this.usuarioInspecaoSearchTerm;
+
+    if (!searchTerm) {
+      this.filteredUsuariosInspecao = [...this.filterOptions.availableUsuariosInspecao];
+    } else {
+      this.filteredUsuariosInspecao = this.filterOptions.availableUsuariosInspecao.filter(
+        usuario => usuario.toLowerCase().includes(searchTerm)
+      );
+    }
+  }
+
   /**
    * Seleciona uma opção de um dropdown
    */
@@ -229,6 +258,12 @@ export class FiltroAvancadoComponent implements OnInit, OnDestroy {
         this.loteSearchTerm = value;
         this.showLoteDropdown = false;
         break;
+      case 'usuarioInspecao':
+        this.tempFilters.usuarioInspecao = value;
+        this.selectedFilters.usuarioInspecao = value;
+        this.usuarioInspecaoSearchTerm = value;
+        this.showUsuarioInspecaoDropdown = false;
+        break;
     }
   }
 
@@ -258,6 +293,9 @@ export class FiltroAvancadoComponent implements OnInit, OnDestroy {
           break;
         case 'lote':
           this.showLoteDropdown = false;
+          break;
+        case 'usuarioInspecao':
+          this.showUsuarioInspecaoDropdown = false;
           break;
       }
     }, 200);
@@ -299,7 +337,9 @@ export class FiltroAvancadoComponent implements OnInit, OnDestroy {
       fornecedor: '',
       lote: '',
       dataVencimento: { startDate: null, endDate: null },
-      inspecionado: null
+      inspecionado: undefined,
+      motivoInspecao: '',
+      usuarioInspecao: ''
     };
 
     // Limpa também os campos de pesquisa
@@ -308,6 +348,7 @@ export class FiltroAvancadoComponent implements OnInit, OnDestroy {
     this.categoriaSearchTerm = '';
     this.fornecedorSearchTerm = '';
     this.loteSearchTerm = '';
+    this.usuarioInspecaoSearchTerm = '';
 
     // Redefine as listas filtradas
     this.filteredBrands = [...this.filterOptions.availableBrands];
@@ -315,6 +356,7 @@ export class FiltroAvancadoComponent implements OnInit, OnDestroy {
     this.filteredCategorias = [...this.filterOptions.availableCategorias];
     this.filteredFornecedores = [...this.filterOptions.availableFornecedores];
     this.filteredLotes = [...this.filterOptions.availableLotes];
+    this.filteredUsuariosInspecao = [...this.filterOptions.availableUsuariosInspecao];
   }
 
   /**
@@ -331,7 +373,13 @@ export class FiltroAvancadoComponent implements OnInit, OnDestroy {
     if (filterName === 'dataVencimento') {
       this.tempFilters.dataVencimento = { startDate: null, endDate: null };
     } else if (filterName === 'inspecionado') {
-      this.tempFilters.inspecionado = null;
+      this.tempFilters.inspecionado = undefined;
+    } else if (filterName === 'motivoInspecao') {
+      this.tempFilters.motivoInspecao = '';
+    } else if (filterName === 'usuarioInspecao') {
+      this.tempFilters.usuarioInspecao = '';
+      this.usuarioInspecaoSearchTerm = '';
+      this.filteredUsuariosInspecao = [...this.filterOptions.availableUsuariosInspecao];
     } else {
       // Usando type casting para contornar o problema de tipagem
       (this.tempFilters as any)[filterName] = '';
@@ -372,9 +420,11 @@ export class FiltroAvancadoComponent implements OnInit, OnDestroy {
       !!this.tempFilters.categoria ||
       !!this.tempFilters.fornecedor ||
       !!this.tempFilters.lote ||
-      this.tempFilters.inspecionado !== null ||
+      this.tempFilters.inspecionado !== undefined ||
       !!this.tempFilters.dataVencimento.startDate ||
-      !!this.tempFilters.dataVencimento.endDate
+      !!this.tempFilters.dataVencimento.endDate ||
+      !!this.tempFilters.motivoInspecao ||
+      !!this.tempFilters.usuarioInspecao
     );
   }
 

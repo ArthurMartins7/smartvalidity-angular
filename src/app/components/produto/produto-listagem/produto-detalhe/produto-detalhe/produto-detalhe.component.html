@@ -7,23 +7,41 @@
   </div>
 </div>
 
+<!-- Modal do leitor de código de barras -->
+<div *ngIf="leitorAberto" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+  <div class="bg-white rounded-lg shadow-lg p-6 relative w-full max-w-md">
+    <button (click)="fecharLeitorCodigoBarras()" class="absolute top-2 right-2 text-gray-500 hover:text-gray-700">
+      <i class="material-icons">close</i>
+    </button>
+    <h3 class="text-lg font-semibold mb-4">Escaneie o código de barras</h3>
+    <div id="barcode-reader" style="width: 100%; min-height: 300px;"></div>
+    <div *ngIf="erroLeitura" class="text-red-600 mt-2">{{ erroLeitura }}</div>
+  </div>
+</div>
+
 <!-- Card do Formulário -->
 <div class="bg-white rounded-lg shadow-sm p-8 max-w-3xl mx-auto">
   <h2 class="text-xl font-medium text-gray-700 mb-6">{{ idProduto ? 'Editar' : 'Cadastrar' }} produto</h2>
 
   <form (ngSubmit)="salvar($event)" class="space-y-6">
     <!-- Código de Barras -->
-    <div>
+    <div class="relative">
       <label for="codigoBarras" class="block text-sm font-medium text-gray-700 mb-1">Código de Barras</label>
       <input
         id="codigoBarras"
         type="text"
         [(ngModel)]="produto.codigoBarras"
         name="codigoBarras"
-        class="block w-full px-4 py-3 bg-gray-100 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+        class="block w-full px-4 py-3 bg-gray-100 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 pr-12"
         placeholder="Digite o código de barras"
         required
       />
+      <button type="button"
+              (click)="abrirLeitorCodigoBarras()"
+              class="absolute right-2 top-[73%] -translate-y-1/2 text-blue-600 hover:text-blue-800 focus:outline-none"
+              title="Ler código de barras">
+        <i class="material-icons" style="font-size: 2rem;">qr_code_scanner</i>
+      </button>
     </div>
 
     <!-- Descrição -->

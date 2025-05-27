@@ -74,7 +74,7 @@ export class EntradaEstoqueComponent implements OnInit {
 
   onSubmit() {
     console.log('Form Data:', this.formData);
-    
+
     const camposVazios = [];
     if (!this.formData.produto) camposVazios.push('Produto');
     if (!this.formData.lote) camposVazios.push('Lote');
@@ -125,7 +125,7 @@ export class EntradaEstoqueComponent implements OnInit {
     console.log('ItemProduto a ser enviado:', JSON.stringify(itemProduto, null, 2));
 
     this.itemProdutoService.criarItemProduto(itemProduto).subscribe({
-      next: () => {
+      next: (response) => {
         Swal.fire('Sucesso', 'Entrada de estoque registrada com sucesso', 'success');
         // Limpar formulário ou redirecionar
         this.formData = {
@@ -139,6 +139,7 @@ export class EntradaEstoqueComponent implements OnInit {
           horaVencimento: ''
         };
         this.produtoSelecionado = null;
+        this.router.navigate(['/produto-listagem']);
       },
       error: (erro) => {
         console.error('Erro completo:', erro);
@@ -149,7 +150,7 @@ export class EntradaEstoqueComponent implements OnInit {
           headers: erro.headers,
           url: erro.url
         });
-        
+
         let mensagemErro = 'Não foi possível registrar a entrada de estoque';
         if (erro.error?.message) {
           mensagemErro = erro.error.message;

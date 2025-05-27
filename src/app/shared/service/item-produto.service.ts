@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { ItemProdutoDTO } from '../model/dto/item-Produto.dto'
@@ -25,8 +25,12 @@ export class ItemProdutoService {
     return this.httpClient.get<ItemProdutoDTO[]>(`${this.API}/produto/${produtoId}`);
   }
 
-  criarItemProduto(novoItemProduto: ItemProdutoDTO): Observable<ItemProdutoDTO> {
-    return this.httpClient.post<ItemProdutoDTO>(this.API, novoItemProduto);
+  criarItemProduto(novoItemProduto: ItemProdutoDTO): Observable<any> {
+    const headers = new HttpHeaders().set('Content-Type', 'application/json');
+    return this.httpClient.post(this.API, novoItemProduto, {
+      headers,
+      responseType: 'text'
+    });
   }
 
   atualizarItemProduto(id: string, itemProdutoAtualizado: ItemProdutoDTO): Observable<ItemProdutoDTO> {

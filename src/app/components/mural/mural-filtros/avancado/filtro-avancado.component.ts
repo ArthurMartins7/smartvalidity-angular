@@ -85,49 +85,33 @@ export class FiltroAvancadoComponent implements OnInit, OnDestroy {
 
   private subscriptions: Subscription[] = [];
 
-  constructor(private filterService: MuralFilterService) {}
+  constructor(private muralFilterService: MuralFilterService) {}
 
   ngOnInit(): void {
-    // Carrega as opções de filtro ao inicializar o componente
-    this.filterService.loadFilterOptions();
+    // Carregar as opções de filtro ao inicializar o componente
+    this.muralFilterService.loadFilterOptions();
 
-    // Inicializa os filtros temporários com os valores atuais
-    this.tempFilters = { ...this.filterService.getCurrentFilters() };
-    this.selectedFilters = { ...this.filterService.getCurrentFilters() };
+    // Inscrever-se para receber atualizações das opções de filtro
+    this.subscriptions.push(
+      this.muralFilterService.filterOptions$.subscribe(options => {
+        this.filterOptions = options;
+        // Inicializar as listas filtradas com todas as opções disponíveis
+        this.filteredBrands = [...this.filterOptions.availableBrands];
+        this.filteredCorredores = [...this.filterOptions.availableCorredores];
+        this.filteredCategorias = [...this.filterOptions.availableCategorias];
+        this.filteredFornecedores = [...this.filterOptions.availableFornecedores];
+        this.filteredLotes = [...this.filterOptions.availableLotes];
+        this.filteredUsuariosInspecao = [...this.filterOptions.availableUsuariosInspecao];
+      })
+    );
 
-    // Inicializa as datas para evitar problemas de formato
-    if (this.tempFilters.dataVencimento.startDate) {
-      this.tempFilters.dataVencimento.startDate = this.formatDateForInput(new Date(this.tempFilters.dataVencimento.startDate));
-    }
-
-    if (this.tempFilters.dataVencimento.endDate) {
-      this.tempFilters.dataVencimento.endDate = this.formatDateForInput(new Date(this.tempFilters.dataVencimento.endDate));
-    }
-
-    // Assina para receber atualizações nas opções de filtro
-    const optionsSub = this.filterService.filterOptions$.subscribe(options => {
-      console.log('Opções de filtro atualizadas:', options);
-      this.filterOptions = options;
-
-      // Inicializa as listas filtradas com todos os valores
-      this.filteredBrands = [...this.filterOptions.availableBrands];
-      this.filteredCorredores = [...this.filterOptions.availableCorredores];
-      this.filteredCategorias = [...this.filterOptions.availableCategorias];
-      this.filteredFornecedores = [...this.filterOptions.availableFornecedores];
-      this.filteredLotes = [...this.filterOptions.availableLotes];
-      this.filteredUsuariosInspecao = [...this.filterOptions.availableUsuariosInspecao];
-      console.log('Lista de usuários disponíveis:', this.filteredUsuariosInspecao);
-
-      // Inicializa os termos de pesquisa com os valores atuais selecionados
-      this.marcaSearchTerm = this.tempFilters.marca;
-      this.corredorSearchTerm = this.tempFilters.corredor;
-      this.categoriaSearchTerm = this.tempFilters.categoria;
-      this.fornecedorSearchTerm = this.tempFilters.fornecedor;
-      this.loteSearchTerm = this.tempFilters.lote;
-      this.usuarioInspecaoSearchTerm = this.tempFilters.usuarioInspecao;
-    });
-
-    this.subscriptions.push(optionsSub);
+    // Inscrever-se para receber os filtros atuais
+    this.subscriptions.push(
+      this.muralFilterService.filters$.subscribe(filters => {
+        this.selectedFilters = { ...filters };
+        this.tempFilters = { ...filters };
+      })
+    );
   }
 
   ngOnDestroy(): void {
@@ -306,14 +290,7 @@ export class FiltroAvancadoComponent implements OnInit, OnDestroy {
    */
   applyFilters(): void {
     // Aplica todos os filtros
-    this.filterService.updateFilters({
-      ...this.tempFilters,
-      // Não precisamos converter as datas, já que o serviço espera string
-      dataVencimento: {
-        startDate: this.tempFilters.dataVencimento.startDate,
-        endDate: this.tempFilters.dataVencimento.endDate
-      }
-    });
+    this.muralFilterService.updateFilters(this.tempFilters);
 
     // Fecha o modal
     this.closeModal();

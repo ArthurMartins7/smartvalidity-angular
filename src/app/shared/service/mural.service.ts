@@ -363,41 +363,42 @@ export class MuralFilterService {
   loadFilterOptions(): void {
     console.log('Carregando opções de filtro...');
 
-    // Primeiro, carregamos os usuários de inspeção
-    this.httpClient.get<string[]>(`${this.API}/usuarios-inspecao`).pipe(
-      catchError(error => {
-        console.error('Erro ao carregar usuários de inspeção:', error);
-        return of([]);
-      })
-    ).subscribe(usuarios => {
-      console.log('Usuários carregados:', usuarios);
-      const currentOptions = this.filterOptionsSubject.value;
-      this.filterOptionsSubject.next({
-        ...currentOptions,
-        availableUsuariosInspecao: usuarios
-      });
-    });
-
-    // Carrega as outras opções de filtro
-    this.httpClient.get<MuralFilterOptions>(`${this.API}/opcoes-filtro`).pipe(
+    // Carrega todas as opções de filtro em uma única chamada
+    this.httpClient.get<FiltroOpcoes>(`${this.API}/filtro-opcoes`).pipe(
       catchError(error => {
         console.error('Erro ao carregar opções de filtro:', error);
         return of({
-          availableBrands: [],
-          availableCorredores: [],
-          availableCategorias: [],
-          availableFornecedores: [],
-          availableLotes: [],
-          availableUsuariosInspecao: []
+          marcas: [],
+          corredores: [],
+          categorias: [],
+          fornecedores: [],
+          lotes: []
         });
       })
     ).subscribe(options => {
-      console.log('Outras opções carregadas:', options);
-      // Mantém a lista de usuários que já foi carregada
-      const currentOptions = this.filterOptionsSubject.value;
+      console.log('Opções carregadas:', options);
       this.filterOptionsSubject.next({
-        ...options,
-        availableUsuariosInspecao: currentOptions.availableUsuariosInspecao
+        availableBrands: options.marcas,
+        availableCorredores: options.corredores,
+        availableCategorias: options.categorias,
+        availableFornecedores: options.fornecedores,
+        availableLotes: options.lotes,
+        availableUsuariosInspecao: [] // Será preenchido na próxima chamada
+      });
+
+      // Após carregar as opções básicas, carrega os usuários de inspeção
+      this.httpClient.get<string[]>(`${this.API}/usuarios-inspecao`).pipe(
+        catchError(error => {
+          console.error('Erro ao carregar usuários de inspeção:', error);
+          return of([]);
+        })
+      ).subscribe(usuarios => {
+        console.log('Usuários carregados:', usuarios);
+        const currentOptions = this.filterOptionsSubject.value;
+        this.filterOptionsSubject.next({
+          ...currentOptions,
+          availableUsuariosInspecao: usuarios
+        });
       });
     });
   }

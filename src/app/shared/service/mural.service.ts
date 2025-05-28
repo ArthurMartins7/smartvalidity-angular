@@ -171,6 +171,7 @@ export class MuralService {
 })
 export class MuralFilterService {
   private readonly API = 'http://localhost:8080/smartvalidity/mural';
+  private readonly FILTER_STATE_KEY = 'muralFilterState';
 
   // Estado inicial dos filtros
   private initialFilter: MuralFilter = {
@@ -188,8 +189,8 @@ export class MuralFilterService {
   };
 
   // Subjects para estado reativo
-  private filtersSubject = new BehaviorSubject<MuralFilter>({...this.initialFilter});
-  private searchTermSubject = new BehaviorSubject<string>('');
+  private filtersSubject = new BehaviorSubject<MuralFilter>(this.loadFilterState());
+  private searchTermSubject = new BehaviorSubject<string>(this.loadSearchTerm());
   private filterOptionsSubject = new BehaviorSubject<MuralFilterOptions>({
     availableBrands: [],
     availableCorredores: [],
@@ -198,8 +199,8 @@ export class MuralFilterService {
     availableLotes: [],
     availableUsuariosInspecao: []
   });
-  private sortFieldSubject = new BehaviorSubject<string>('');
-  private sortDirectionSubject = new BehaviorSubject<'asc' | 'desc'>('asc');
+  private sortFieldSubject = new BehaviorSubject<string>(this.loadSortField());
+  private sortDirectionSubject = new BehaviorSubject<'asc' | 'desc'>(this.loadSortDirection());
 
   // Observables públicos
   filters$ = this.filtersSubject.asObservable();
@@ -222,19 +223,24 @@ export class MuralFilterService {
 
   // Métodos para atualizar filtros
   updateFilters(filters: Partial<MuralFilter>): void {
-    this.filtersSubject.next({
+    const newFilters = {
       ...this.filtersSubject.value,
       ...filters
-    });
+    };
+    this.filtersSubject.next(newFilters);
+    this.saveFilterState();
   }
 
   resetFilters(): void {
     this.filtersSubject.next({...this.initialFilter});
     this.searchTermSubject.next('');
+    this.saveFilterState();
+    sessionStorage.removeItem(this.FILTER_STATE_KEY);
   }
 
   updateSearchTerm(term: string): void {
     this.searchTermSubject.next(term);
+    this.saveFilterState();
   }
 
   updateFilterOptions(options: Partial<MuralFilterOptions>): void {
@@ -246,10 +252,12 @@ export class MuralFilterService {
 
   updateSortField(field: string): void {
     this.sortFieldSubject.next(field);
+    this.saveFilterState();
   }
 
   updateSortDirection(direction: 'asc' | 'desc'): void {
     this.sortDirectionSubject.next(direction);
+    this.saveFilterState();
   }
 
   // Limpar um filtro específico
@@ -415,6 +423,71 @@ export class MuralFilterService {
         });
       }
     });
+  }
+
+  // Métodos para persistência do estado
+  private saveFilterState(): void {
+    const state = {
+      filters: this.filtersSubject.value,
+      searchTerm: this.searchTermSubject.value,
+      sortField: this.sortFieldSubject.value,
+      sortDirection: this.sortDirectionSubject.value,
+      paginaAtual: this.paginaAtualSubject.value,
+      itensPorPagina: this.itensPorPaginaSubject.value
+    };
+    sessionStorage.setItem(this.FILTER_STATE_KEY, JSON.stringify(state));
+  }
+
+  private loadFilterState(): MuralFilter {
+    const stateStr = sessionStorage.getItem(this.FILTER_STATE_KEY);
+    if (stateStr) {
+      try {
+        const state = JSON.parse(stateStr);
+        return state.filters || {...this.initialFilter};
+      } catch {
+        return {...this.initialFilter};
+      }
+    }
+    return {...this.initialFilter};
+  }
+
+  private loadSearchTerm(): string {
+    const stateStr = sessionStorage.getItem(this.FILTER_STATE_KEY);
+    if (stateStr) {
+      try {
+        const state = JSON.parse(stateStr);
+        return state.searchTerm || '';
+      } catch {
+        return '';
+      }
+    }
+    return '';
+  }
+
+  private loadSortField(): string {
+    const stateStr = sessionStorage.getItem(this.FILTER_STATE_KEY);
+    if (stateStr) {
+      try {
+        const state = JSON.parse(stateStr);
+        return state.sortField || '';
+      } catch {
+        return '';
+      }
+    }
+    return '';
+  }
+
+  private loadSortDirection(): 'asc' | 'desc' {
+    const stateStr = sessionStorage.getItem(this.FILTER_STATE_KEY);
+    if (stateStr) {
+      try {
+        const state = JSON.parse(stateStr);
+        return state.sortDirection || 'asc';
+      } catch {
+        return 'asc';
+      }
+    }
+    return 'asc';
   }
 }
 

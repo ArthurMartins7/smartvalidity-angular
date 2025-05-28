@@ -175,10 +175,15 @@ export class MuralListagemComponent implements OnInit, OnDestroy {
   private initializeFromRouting(): void {
     // Primeiro verificamos se há um state com a aba ativa
     const navigation = this.router.getCurrentNavigation();
-    if (navigation?.extras.state && 'activeTab' in navigation.extras.state) {
-      this.activeTab = navigation.extras.state['activeTab'] as 'proximo' | 'hoje' | 'vencido';
-      // Redefinir para a página 1 quando a aba muda
-      this.filterService.updatePaginaAtual(1);
+    if (navigation?.extras.state) {
+      if ('activeTab' in navigation.extras.state) {
+        this.activeTab = navigation.extras.state['activeTab'] as 'proximo' | 'hoje' | 'vencido';
+
+        // Se não estamos preservando os filtros, resetamos para a página 1
+        if (!navigation.extras.state['preserveFilters']) {
+          this.filterService.updatePaginaAtual(1);
+        }
+      }
       this.loadItems();
     } else {
       // Se não houver estado, verificamos os parâmetros da URL

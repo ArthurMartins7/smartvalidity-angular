@@ -1,7 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable, of } from 'rxjs';
-import { catchError } from 'rxjs/operators';
+import { BehaviorSubject, Observable } from 'rxjs';
 import { MuralFiltroDTO, MuralListagemDTO } from '../model/dto/mural.dto';
 
 //-----------------------------------------------------------------------
@@ -143,6 +142,13 @@ export class MuralService {
   }
 
   /**
+   * Obtém lista de usuários para filtro
+   */
+  getUsuarios(): Observable<string[]> {
+    return this.httpClient.get<string[]>(`${this.API}/usuarios-inspecao`);
+  }
+
+  /**
    * Obtém o número total de páginas com base no filtro
    */
   contarPaginas(filtro: MuralFiltroDTO): Observable<number> {
@@ -174,6 +180,8 @@ export class MuralFilterService {
     marca: '',
     lote: '',
     dataVencimento: { startDate: null, endDate: null },
+    dataFabricacao: { startDate: null, endDate: null },
+    dataRecebimento: { startDate: null, endDate: null },
     inspecionado: undefined,
     motivoInspecao: '',
     usuarioInspecao: ''
@@ -276,10 +284,15 @@ export class MuralFilterService {
 
   // Limpar filtro de data
   clearDateFilter(dateFieldName: keyof MuralFilter): void {
+    const currentFilters = this.filtersSubject.value;
     if (dateFieldName === 'dataVencimento' || dateFieldName === 'dataFabricacao' || dateFieldName === 'dataRecebimento') {
-      const update = { [dateFieldName]: { startDate: null, endDate: null } } as Partial<MuralFilter>;
-      this.updateFilters(update);
+      if (dateFieldName === 'dataVencimento') {
+        currentFilters[dateFieldName] = { startDate: null, endDate: null };
+      } else {
+        currentFilters[dateFieldName] = undefined;
+      }
     }
+    this.filtersSubject.next(currentFilters);
   }
 
   // Obter o valor atual dos filtros
@@ -291,39 +304,39 @@ export class MuralFilterService {
    * Converte o modelo de filtro interno para o DTO que será enviado para o backend
    */
   toFilterDTO(): MuralFiltroDTO {
-    const filters = this.filtersSubject.value;
+    const currentFilters = this.filtersSubject.value;
     const searchTerm = this.searchTermSubject.value;
     const sortField = this.sortFieldSubject.value;
     const sortDirection = this.sortDirectionSubject.value;
-    const pagina = this.paginaAtualSubject.value;
-    const limite = this.itensPorPaginaSubject.value;
+    const paginaAtual = this.paginaAtualSubject.value;
+    const itensPorPagina = this.itensPorPaginaSubject.value;
+
+    const convertDate = (dateStr: string | null | undefined): string | undefined => {
+      if (!dateStr) return undefined;
+      const date = new Date(dateStr);
+      return date.toISOString();
+    };
 
     return {
-        corredor: filters.corredor || undefined,
-        categoria: filters.categoria || undefined,
-        fornecedor: filters.fornecedor || undefined,
-        marca: filters.marca || undefined,
-        lote: filters.lote || undefined,
-        dataVencimentoInicio: filters.dataVencimento.startDate ?
-            new Date(filters.dataVencimento.startDate).toISOString() : undefined,
-        dataVencimentoFim: filters.dataVencimento.endDate ?
-            new Date(filters.dataVencimento.endDate).toISOString() : undefined,
-        dataFabricacaoInicio: filters.dataFabricacao?.startDate ?
-            new Date(filters.dataFabricacao.startDate).toISOString() : undefined,
-        dataFabricacaoFim: filters.dataFabricacao?.endDate ?
-            new Date(filters.dataFabricacao.endDate).toISOString() : undefined,
-        dataRecebimentoInicio: filters.dataRecebimento?.startDate ?
-            new Date(filters.dataRecebimento.startDate).toISOString() : undefined,
-        dataRecebimentoFim: filters.dataRecebimento?.endDate ?
-            new Date(filters.dataRecebimento.endDate).toISOString() : undefined,
-        inspecionado: filters.inspecionado,
-        motivoInspecao: filters.motivoInspecao || undefined,
-        usuarioInspecao: filters.usuarioInspecao || undefined,
-        searchTerm: searchTerm || undefined,
-        sortBy: sortField || undefined,
-        sortDirection: sortDirection || undefined,
-        pagina: pagina,
-        limite: limite
+      corredor: currentFilters.corredor || undefined,
+      categoria: currentFilters.categoria || undefined,
+      fornecedor: currentFilters.fornecedor || undefined,
+      marca: currentFilters.marca || undefined,
+      lote: currentFilters.lote || undefined,
+      dataVencimentoInicio: convertDate(currentFilters.dataVencimento?.startDate),
+      dataVencimentoFim: convertDate(currentFilters.dataVencimento?.endDate),
+      dataFabricacaoInicio: convertDate(currentFilters.dataFabricacao?.startDate),
+      dataFabricacaoFim: convertDate(currentFilters.dataFabricacao?.endDate),
+      dataRecebimentoInicio: convertDate(currentFilters.dataRecebimento?.startDate),
+      dataRecebimentoFim: convertDate(currentFilters.dataRecebimento?.endDate),
+      inspecionado: currentFilters.inspecionado,
+      motivoInspecao: currentFilters.motivoInspecao || undefined,
+      usuarioInspecao: currentFilters.usuarioInspecao || undefined,
+      searchTerm: searchTerm || undefined,
+      sortBy: sortField || undefined,
+      sortDirection: sortDirection || undefined,
+      pagina: paginaAtual,
+      limite: itensPorPagina
     };
   }
 
@@ -337,8 +350,12 @@ export class MuralFilterService {
       !!currentFilters.fornecedor ||
       !!currentFilters.lote ||
       currentFilters.inspecionado !== undefined ||
-      !!currentFilters.dataVencimento.startDate ||
-      !!currentFilters.dataVencimento.endDate ||
+      !!currentFilters.dataVencimento?.startDate ||
+      !!currentFilters.dataVencimento?.endDate ||
+      !!currentFilters.dataFabricacao?.startDate ||
+      !!currentFilters.dataFabricacao?.endDate ||
+      !!currentFilters.dataRecebimento?.startDate ||
+      !!currentFilters.dataRecebimento?.endDate ||
       !!currentFilters.motivoInspecao ||
       !!currentFilters.usuarioInspecao
     );
@@ -361,45 +378,42 @@ export class MuralFilterService {
 
   // Carrega as opções disponíveis para os filtros
   loadFilterOptions(): void {
-    console.log('Carregando opções de filtro...');
-
-    // Carrega todas as opções de filtro em uma única chamada
-    this.httpClient.get<FiltroOpcoes>(`${this.API}/filtro-opcoes`).pipe(
-      catchError(error => {
-        console.error('Erro ao carregar opções de filtro:', error);
-        return of({
-          marcas: [],
-          corredores: [],
-          categorias: [],
-          fornecedores: [],
-          lotes: []
+    // Carregar opções de filtro do backend
+    this.httpClient.get<FiltroOpcoes>(`${this.API}/filtro-opcoes`).subscribe({
+      next: (opcoes) => {
+        this.updateFilterOptions({
+          availableBrands: opcoes.marcas,
+          availableCorredores: opcoes.corredores,
+          availableCategorias: opcoes.categorias,
+          availableFornecedores: opcoes.fornecedores,
+          availableLotes: opcoes.lotes
         });
-      })
-    ).subscribe(options => {
-      console.log('Opções carregadas:', options);
-      this.filterOptionsSubject.next({
-        availableBrands: options.marcas,
-        availableCorredores: options.corredores,
-        availableCategorias: options.categorias,
-        availableFornecedores: options.fornecedores,
-        availableLotes: options.lotes,
-        availableUsuariosInspecao: [] // Será preenchido na próxima chamada
-      });
+      },
+      error: (error) => {
+        console.error('Erro ao carregar opções de filtro:', error);
+        this.updateFilterOptions({
+          availableBrands: [],
+          availableCorredores: [],
+          availableCategorias: [],
+          availableFornecedores: [],
+          availableLotes: []
+        });
+      }
+    });
 
-      // Após carregar as opções básicas, carrega os usuários de inspeção
-      this.httpClient.get<string[]>(`${this.API}/usuarios-inspecao`).pipe(
-        catchError(error => {
-          console.error('Erro ao carregar usuários de inspeção:', error);
-          return of([]);
-        })
-      ).subscribe(usuarios => {
-        console.log('Usuários carregados:', usuarios);
-        const currentOptions = this.filterOptionsSubject.value;
-        this.filterOptionsSubject.next({
-          ...currentOptions,
+    // Carregar lista de usuários independentemente do resultado das outras opções
+    this.httpClient.get<string[]>(`${this.API}/usuarios-inspecao`).subscribe({
+      next: (usuarios) => {
+        this.updateFilterOptions({
           availableUsuariosInspecao: usuarios
         });
-      });
+      },
+      error: (error) => {
+        console.error('Erro ao carregar usuários:', error);
+        this.updateFilterOptions({
+          availableUsuariosInspecao: []
+        });
+      }
     });
   }
 }

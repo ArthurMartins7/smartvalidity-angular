@@ -201,6 +201,7 @@ export class MuralFilterService {
   });
   private sortFieldSubject = new BehaviorSubject<string>(this.loadSortField());
   private sortDirectionSubject = new BehaviorSubject<'asc' | 'desc'>(this.loadSortDirection());
+  private inspecaoFilterSubject = new BehaviorSubject<'todos' | 'inspecionados' | 'naoInspecionados'>(this.loadInspecaoFilter());
 
   // Observables públicos
   filters$ = this.filtersSubject.asObservable();
@@ -208,6 +209,7 @@ export class MuralFilterService {
   filterOptions$ = this.filterOptionsSubject.asObservable();
   sortField$ = this.sortFieldSubject.asObservable();
   sortDirection$ = this.sortDirectionSubject.asObservable();
+  inspecaoFilter$ = this.inspecaoFilterSubject.asObservable();
 
   // Serviço de filtros: Adicionar propriedades para paginação
   private paginaAtualSubject = new BehaviorSubject<number>(1);
@@ -229,13 +231,6 @@ export class MuralFilterService {
     };
     this.filtersSubject.next(newFilters);
     this.saveFilterState();
-  }
-
-  resetFilters(): void {
-    this.filtersSubject.next({...this.initialFilter});
-    this.searchTermSubject.next('');
-    this.saveFilterState();
-    sessionStorage.removeItem(this.FILTER_STATE_KEY);
   }
 
   updateSearchTerm(term: string): void {
@@ -433,20 +428,30 @@ export class MuralFilterService {
       sortField: this.sortFieldSubject.value,
       sortDirection: this.sortDirectionSubject.value,
       paginaAtual: this.paginaAtualSubject.value,
-      itensPorPagina: this.itensPorPaginaSubject.value
+      itensPorPagina: this.itensPorPaginaSubject.value,
+      inspecaoFilter: this.inspecaoFilterSubject.value,
+      lastUpdated: new Date().toISOString()
     };
-    sessionStorage.setItem(this.FILTER_STATE_KEY, JSON.stringify(state));
+    try {
+      sessionStorage.setItem(this.FILTER_STATE_KEY, JSON.stringify(state));
+    } catch (error) {
+      console.error('Erro ao salvar estado dos filtros:', error);
+    }
   }
 
   private loadFilterState(): MuralFilter {
-    const stateStr = sessionStorage.getItem(this.FILTER_STATE_KEY);
-    if (stateStr) {
-      try {
+    try {
+      const stateStr = sessionStorage.getItem(this.FILTER_STATE_KEY);
+      if (stateStr) {
         const state = JSON.parse(stateStr);
-        return state.filters || {...this.initialFilter};
-      } catch {
-        return {...this.initialFilter};
+        if (state.filters &&
+            typeof state.filters === 'object' &&
+            'dataVencimento' in state.filters) {
+          return state.filters;
+        }
       }
+    } catch (error) {
+      console.error('Erro ao carregar estado dos filtros:', error);
     }
     return {...this.initialFilter};
   }
@@ -488,6 +493,43 @@ export class MuralFilterService {
       }
     }
     return 'asc';
+  }
+
+  // Métodos para o filtro de inspeção
+  updateInspecaoFilter(status: 'todos' | 'inspecionados' | 'naoInspecionados'): void {
+    this.inspecaoFilterSubject.next(status);
+    this.saveFilterState();
+  }
+
+  getInspecaoFilter(): 'todos' | 'inspecionados' | 'naoInspecionados' {
+    return this.inspecaoFilterSubject.value;
+  }
+
+  private loadInspecaoFilter(): 'todos' | 'inspecionados' | 'naoInspecionados' {
+    try {
+      const stateStr = sessionStorage.getItem(this.FILTER_STATE_KEY);
+      if (stateStr) {
+        const state = JSON.parse(stateStr);
+        if (state.inspecaoFilter &&
+            ['todos', 'inspecionados', 'naoInspecionados'].includes(state.inspecaoFilter)) {
+          return state.inspecaoFilter;
+        }
+      }
+    } catch (error) {
+      console.error('Erro ao carregar estado do filtro de inspeção:', error);
+    }
+    return 'todos';
+  }
+
+  resetFilters(): void {
+    this.filtersSubject.next({...this.initialFilter});
+    this.searchTermSubject.next('');
+    this.sortFieldSubject.next('');
+    this.sortDirectionSubject.next('asc');
+    this.paginaAtualSubject.next(1);
+    this.itensPorPaginaSubject.next(10);
+    this.inspecaoFilterSubject.next('todos');
+    sessionStorage.removeItem(this.FILTER_STATE_KEY);
   }
 }
 

@@ -175,18 +175,27 @@ export class MuralListagemComponent implements OnInit, OnDestroy {
   private initializeFromRouting(): void {
     // Primeiro verificamos se há um state com a aba ativa
     const navigation = this.router.getCurrentNavigation();
-    if (navigation?.extras.state) {
-      if ('activeTab' in navigation.extras.state) {
-        this.activeTab = navigation.extras.state['activeTab'] as 'proximo' | 'hoje' | 'vencido';
+    const state = navigation?.extras?.state;
 
-        // Se não estamos preservando os filtros, resetamos para a página 1
-        if (!navigation.extras.state['preserveFilters']) {
-          this.filterService.updatePaginaAtual(1);
-        }
+    // Se houver state, verificamos a aba ativa e se devemos preservar os filtros
+    if (state) {
+      if ('activeTab' in state) {
+        this.activeTab = state['activeTab'] as 'proximo' | 'hoje' | 'vencido';
       }
+
+      // Se não estamos preservando os filtros explicitamente, resetamos
+      if (!state['preserveFilters']) {
+        this.filterService.resetFilters();
+        this.filterService.updatePaginaAtual(1);
+        this.filtroInspecao = 'todos'; // Reset do filtro de inspeção
+      } else {
+        // Restaurar o estado do filtro de inspeção
+        this.filtroInspecao = this.filterService.getInspecaoFilter();
+      }
+      // Se estamos preservando os filtros, mantemos o estado atual
       this.loadItems();
     } else {
-      // Se não houver estado, verificamos os parâmetros da URL
+      // Se não houver estado na navegação, verificamos os parâmetros da URL
       const subscription = this.route.queryParams.subscribe(params => {
         if (params['tab']) {
           const newTab = params['tab'] as 'proximo' | 'hoje' | 'vencido';
@@ -197,6 +206,8 @@ export class MuralListagemComponent implements OnInit, OnDestroy {
             this.filterService.updatePaginaAtual(1);
           }
         }
+        // Restaurar o estado do filtro de inspeção mesmo sem state
+        this.filtroInspecao = this.filterService.getInspecaoFilter();
         this.loadItems();
       });
       this.subscriptions.push(subscription);
@@ -654,6 +665,9 @@ export class MuralListagemComponent implements OnInit, OnDestroy {
 
     // Redefinir para a página 1 ao mudar o filtro
     this.filterService.updatePaginaAtual(1);
+
+    // Salvar o estado do filtro de inspeção
+    this.filterService.updateInspecaoFilter(status);
 
     // Aplicar os filtros
     this.applyFilters();

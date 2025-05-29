@@ -124,12 +124,12 @@ export class MuralDetalheComponent implements OnInit {
   }
 
   voltar(): void {
-    // Navega de volta para a listagem preservando os filtros
+    // Sempre navega de volta para a listagem preservando os filtros
     this.router.navigate(['/mural-listagem'], {
       queryParams: { tab: this.activeTab },
       state: {
         activeTab: this.activeTab,
-        preserveFilters: true // Indica que os filtros devem ser mantidos
+        preserveFilters: true // Sempre preserva os filtros
       }
     });
   }

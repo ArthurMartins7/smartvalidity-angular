@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { BehaviorSubject, Observable, of } from 'rxjs';
 import { MuralFiltroDTO, MuralListagemDTO } from '../model/dto/mural.dto';
 
 //-----------------------------------------------------------------------
@@ -160,6 +160,13 @@ export class MuralService {
    */
   contarTotalRegistros(filtro: MuralFiltroDTO): Observable<number> {
     return this.httpClient.post<number>(`${this.API}/contar-registros`, filtro);
+  }
+
+  buscarPorIds(ids: string[]): Observable<MuralListagemDTO[]> {
+    if (!ids || ids.length === 0) {
+      return of([]);
+    }
+    return this.httpClient.post<MuralListagemDTO[]>(`${this.API}/buscar-por-ids`, ids);
   }
 }
 
@@ -609,13 +616,9 @@ export class MuralSelecaoService {
     return this.totalItensAbaSubject.value;
   }
 
-  // Retorna os itens selecionados a partir de uma lista de todos os itens
-  getSelectedItems(allItems: MuralListagemDTO[] = []): MuralListagemDTO[] {
-    const selectedIds = this.getSelectedIds();
-    if (allItems && allItems.length > 0) {
-      return allItems.filter(item => selectedIds.includes(item.id));
-    }
-    return [];
+  // Retorna os itens selecionados
+  getSelectedItems(): Observable<MuralListagemDTO[]> {
+    return this.muralService.buscarPorIds(this.selectedItemsSubject.value);
   }
 
   // Controle do modal de inspeção

@@ -24,36 +24,29 @@ export class ModalAcoesComponent implements OnInit, OnDestroy {
   visible = false;
   itensSelecionadosCount = 0;
   itensPaginaCount = 0;
+  temItensInspecionados = false;
+  mensagemInspecao = '';
 
   private subscriptions: Subscription[] = [];
 
   constructor(private selecaoService: MuralSelecaoService) { }
 
   ngOnInit(): void {
-    // Inscrever-se nas mudanças de visibilidade do modal
-    const visibilitySubscription = this.selecaoService.showAcoesModal$.subscribe(
-      visible => {
-        this.visible = visible;
-        if (visible) {
-          this.atualizarContadores();
+    // Inscreve-se para receber atualizações do estado do modal
+    this.subscriptions.push(
+      this.selecaoService.showAcoesModal$.subscribe(
+        show => {
+          this.visible = show;
+          if (show) {
+            this.atualizarContadores();
+          }
         }
-      }
+      )
     );
-
-    // Inscrever-se nas mudanças de seleção
-    const selectionSubscription = this.selecaoService.selectedItems$.subscribe(
-      () => {
-        if (this.visible) {
-          this.atualizarContadores();
-        }
-      }
-    );
-
-    this.subscriptions.push(visibilitySubscription, selectionSubscription);
   }
 
   ngOnDestroy(): void {
-    // Cancelar todas as subscriptions ativas
+    // Cancela todas as inscrições ao destruir o componente
     this.subscriptions.forEach(sub => sub.unsubscribe());
   }
 
@@ -61,8 +54,34 @@ export class ModalAcoesComponent implements OnInit, OnDestroy {
    * Atualiza os contadores de itens
    */
   private atualizarContadores(): void {
-    this.itensSelecionadosCount = this.selecaoService.getSelectedItemsCount();
+    this.selecaoService.getSelectedItems().subscribe(items => {
+      this.itensSelecionadosCount = items.length;
+
+      // Verifica se há itens já inspecionados
+      const itensInspecionados = items.filter(item => item.inspecionado);
+      this.temItensInspecionados = itensInspecionados.length > 0;
+
+      if (this.temItensInspecionados) {
+        this.mensagemInspecao = `Existem ${itensInspecionados.length} produto(s) já inspecionado(s) no grupo que você selecionou. Desmarque estes produtos já inspecionados e tente inspecionar os outros produtos novamente.`;
+      } else {
+        this.mensagemInspecao = '';
+      }
+    });
+
     this.itensPaginaCount = this.itensPaginaAtual.length;
+  }
+
+  /**
+   * Seleciona uma ação e emite o evento
+   */
+  selecionarAcao(acao: AcaoTipo): void {
+    // Se for ação de inspeção e houver itens já inspecionados, não permite
+    if (acao === 'inspecao' && this.temItensInspecionados) {
+      return;
+    }
+
+    this.acaoSelecionada.emit(acao);
+    this.closeModal();
   }
 
   /**
@@ -70,24 +89,5 @@ export class ModalAcoesComponent implements OnInit, OnDestroy {
    */
   closeModal(): void {
     this.selecaoService.closeAcoesModal();
-  }
-
-  /**
-   * Seleciona uma ação e emite o evento
-   */
-  selecionarAcao(acao: AcaoTipo): void {
-    switch (acao) {
-      case 'relatorio-pagina':
-        // Seleciona temporariamente todos os itens da página
-        this.selecaoService.selectAll(this.itensPaginaAtual, true);
-        break;
-      case 'relatorio-todos':
-        // Atualiza o total de itens na aba
-        this.selecaoService.selectAllInTab(this.totalItensAba);
-        break;
-    }
-
-    this.acaoSelecionada.emit(acao);
-    this.closeModal();
   }
 }

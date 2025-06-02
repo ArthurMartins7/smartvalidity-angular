@@ -142,7 +142,7 @@ export class FiltroAvancadoComponent implements OnInit, OnDestroy {
   private loadInitialData(): void {
     console.log('Iniciando carregamento dos dados do filtro avançado...');
     this.isLoading = true;
-    
+
     // Carregar as opções de filtro
     this.muralFilterService.loadFilterOptions();
 
@@ -172,7 +172,7 @@ export class FiltroAvancadoComponent implements OnInit, OnDestroy {
         next: (options) => {
           console.log('Opções de filtro carregadas:', options);
           this.filterOptions = options;
-          
+
           // Inicializar as listas filtradas com todas as opções disponíveis
           this.filteredBrands = [...this.filterOptions.availableBrands];
           this.filteredCorredores = [...this.filterOptions.availableCorredores];
@@ -180,7 +180,7 @@ export class FiltroAvancadoComponent implements OnInit, OnDestroy {
           this.filteredFornecedores = [...this.filterOptions.availableFornecedores];
           this.filteredLotes = [...this.filterOptions.availableLotes];
           this.filteredUsuariosInspecao = [...this.filterOptions.availableUsuariosInspecao];
-          
+
           // Atualizar os campos de busca se já houver valores selecionados
           if (this.tempFilters.marca) this.searchTerms.marca = this.tempFilters.marca;
           if (this.tempFilters.corredor) this.searchTerms.corredor = this.tempFilters.corredor;
@@ -527,5 +527,55 @@ export class FiltroAvancadoComponent implements OnInit, OnDestroy {
         dateRange.endDate = dateRange.startDate;
       }
     }
+  }
+
+  // Adicionar métodos para abrir dropdowns de forma exclusiva
+  openCorredorDropdown(): void {
+    this.showCorredorDropdown = true;
+    this.showMarcaDropdown = false;
+    this.showCategoriaDropdown = false;
+    this.showFornecedorDropdown = false;
+    this.showLoteDropdown = false;
+    this.showUsuarioInspecaoDropdown = false;
+  }
+  openMarcaDropdown(): void {
+    this.showMarcaDropdown = true;
+    this.showCorredorDropdown = false;
+    this.showCategoriaDropdown = false;
+    this.showFornecedorDropdown = false;
+    this.showLoteDropdown = false;
+    this.showUsuarioInspecaoDropdown = false;
+  }
+  openCategoriaDropdown(): void {
+    this.showCategoriaDropdown = true;
+    this.showCorredorDropdown = false;
+    this.showMarcaDropdown = false;
+    this.showFornecedorDropdown = false;
+    this.showLoteDropdown = false;
+    this.showUsuarioInspecaoDropdown = false;
+  }
+  openFornecedorDropdown(): void {
+    this.showFornecedorDropdown = true;
+    this.showCorredorDropdown = false;
+    this.showMarcaDropdown = false;
+    this.showCategoriaDropdown = false;
+    this.showLoteDropdown = false;
+    this.showUsuarioInspecaoDropdown = false;
+  }
+  openLoteDropdown(): void {
+    this.showLoteDropdown = true;
+    this.showCorredorDropdown = false;
+    this.showMarcaDropdown = false;
+    this.showCategoriaDropdown = false;
+    this.showFornecedorDropdown = false;
+    this.showUsuarioInspecaoDropdown = false;
+  }
+  openUsuarioInspecaoDropdown(): void {
+    this.showUsuarioInspecaoDropdown = true;
+    this.showCorredorDropdown = false;
+    this.showMarcaDropdown = false;
+    this.showCategoriaDropdown = false;
+    this.showFornecedorDropdown = false;
+    this.showLoteDropdown = false;
   }
 }

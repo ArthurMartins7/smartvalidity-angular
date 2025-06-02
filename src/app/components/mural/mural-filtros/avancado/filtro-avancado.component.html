@@ -21,7 +21,7 @@
               <label class="block text-sm font-medium text-gray-600 mb-1">Corredor</label>
               <div class="relative">
                 <input type="text" class="input-field" [(ngModel)]="searchTerms.corredor"
-                       (input)="onCorredorSearch()" (focus)="showCorredorDropdown = true"
+                       (input)="onCorredorSearch()" (focus)="openCorredorDropdown()"
                        placeholder="Buscar corredor">
                 <div *ngIf="showCorredorDropdown && filteredCorredores.length > 0"
                      class="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg max-h-60 overflow-auto">
@@ -38,7 +38,7 @@
               <label class="block text-sm font-medium text-gray-600 mb-1">Categoria</label>
               <div class="relative">
                 <input type="text" class="input-field" [(ngModel)]="searchTerms.categoria"
-                       (input)="onCategoriaSearch()" (focus)="showCategoriaDropdown = true"
+                       (input)="onCategoriaSearch()" (focus)="openCategoriaDropdown()"
                        placeholder="Buscar categoria">
                 <div *ngIf="showCategoriaDropdown && filteredCategorias.length > 0"
                      class="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg max-h-60 overflow-auto">
@@ -55,7 +55,7 @@
               <label class="block text-sm font-medium text-gray-600 mb-1">Colaborador que Inspecionou</label>
               <div class="relative">
                 <input type="text" class="input-field" [(ngModel)]="searchTerms.colaborador"
-                       (input)="onColaboradorSearch()" (focus)="onColaboradorFocus()"
+                       (input)="onColaboradorSearch()" (focus)="openUsuarioInspecaoDropdown()"
                        placeholder="Buscar colaborador"
                        [disabled]="isLoading">
                 <div *ngIf="isLoading" class="absolute right-3 top-1/2 transform -translate-y-1/2">
@@ -91,7 +91,7 @@
               <label class="block text-sm font-medium text-gray-600 mb-1">Marca</label>
               <div class="relative">
                 <input type="text" class="input-field" [(ngModel)]="searchTerms.marca"
-                       (input)="onMarcaSearch()" (focus)="showMarcaDropdown = true"
+                       (input)="onMarcaSearch()" (focus)="openMarcaDropdown()"
                        placeholder="Buscar marca">
                 <div *ngIf="showMarcaDropdown && filteredBrands.length > 0"
                      class="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg max-h-60 overflow-auto">
@@ -108,7 +108,7 @@
               <label class="block text-sm font-medium text-gray-600 mb-1">Fornecedor</label>
               <div class="relative">
                 <input type="text" class="input-field" [(ngModel)]="searchTerms.fornecedor"
-                       (input)="onFornecedorSearch()" (focus)="showFornecedorDropdown = true"
+                       (input)="onFornecedorSearch()" (focus)="openFornecedorDropdown()"
                        placeholder="Buscar fornecedor">
                 <div *ngIf="showFornecedorDropdown && filteredFornecedores.length > 0"
                      class="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg max-h-60 overflow-auto">
@@ -125,7 +125,7 @@
               <label class="block text-sm font-medium text-gray-600 mb-1">Lote</label>
               <div class="relative">
                 <input type="text" class="input-field" [(ngModel)]="searchTerms.lote"
-                       (input)="onLoteSearch()" (focus)="showLoteDropdown = true"
+                       (input)="onLoteSearch()" (focus)="openLoteDropdown()"
                        placeholder="Buscar lote">
                 <div *ngIf="showLoteDropdown && filteredLotes.length > 0"
                      class="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg max-h-60 overflow-auto">

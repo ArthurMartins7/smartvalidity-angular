@@ -582,9 +582,11 @@ export class MuralListagemComponent implements OnInit, OnDestroy {
   private gerarRelatorioPaginaAtual(): void {
     if (this.filteredItems.length === 0) return;
 
+    const ids = this.filteredItems.map(item => item.id);
+
     this.relatorioService.gerarRelatorioMural(
-      'PAGINA',
-      null,
+      'SELECIONADOS',
+      ids,
       this.filterService.toFilterDTO(),
       this.activeTab
     ).subscribe({
@@ -602,10 +604,13 @@ export class MuralListagemComponent implements OnInit, OnDestroy {
    * Gera relatório com todos os itens de todas as páginas
    */
   private gerarRelatorioTodosItens(): void {
+    const filtro = this.filterService.toFilterDTO();
+    filtro.status = this.activeTab; // Garante que o status da aba está incluso
+
     this.relatorioService.gerarRelatorioMural(
       'TODOS',
       null,
-      this.filterService.toFilterDTO(),
+      filtro,
       this.activeTab
     ).subscribe({
       next: (response) => {

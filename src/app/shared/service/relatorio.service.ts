@@ -1,143 +1,74 @@
+import { HttpClient, HttpResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import * as ExcelJS from 'exceljs';
-import { saveAs } from 'file-saver';
-import { MuralListagemDTO } from '../model/dto/mural.dto';
+import { Observable } from 'rxjs';
+import { MuralFiltroDTO } from '../model/dto/mural.dto';
+
+/**
+ * URL base da API
+ * Em produção, usar URL relativa: '/smartvalidity'
+ * Em desenvolvimento, usar URL completa: 'http://localhost:8080/smartvalidity'
+ */
+const API_URL = 'http://localhost:8080/smartvalidity';
 
 @Injectable({
   providedIn: 'root'
 })
 export class RelatorioService {
+  private apiUrl: string;
 
-  constructor() { }
+  constructor(private http: HttpClient) {
+    this.apiUrl = `${API_URL}/mural`;
+  }
 
   /**
-   * Gera um relatório Excel a partir dos dados de mural
-   * @param items Itens do mural para incluir no relatório
-   * @param tituloRelatorio Título do relatório
+   * Gera relatório Excel do mural
+   * @param tipo Tipo do relatório (SELECIONADOS, PAGINA, TODOS)
+   * @param ids IDs dos itens selecionados (apenas para tipo SELECIONADOS)
+   * @param filtro Filtros aplicados
+   * @param status Status atual (proximo, hoje, vencido)
+   * @returns Observable do arquivo Excel
    */
-  async gerarRelatorioExcel(items: MuralListagemDTO[], tituloRelatorio: string): Promise<void> {
-    // Criar uma nova workbook
-    const workbook = new ExcelJS.Workbook();
-
-    // Adicionar uma planilha
-    const worksheet = workbook.addWorksheet('Relatório de Produtos');
-
-    // Configurar cabeçalho com título e data atual
-    worksheet.mergeCells('A1:G1');
-    const titleCell = worksheet.getCell('A1');
-    titleCell.value = tituloRelatorio;
-    titleCell.font = {
-      size: 16,
-      bold: true
+  gerarRelatorioMural(
+    tipo: 'SELECIONADOS' | 'PAGINA' | 'TODOS',
+    ids: string[] | null = null,
+    filtro: MuralFiltroDTO | null = null,
+    status: string | null = null
+  ): Observable<HttpResponse<Blob>> {
+    const request = {
+      tipo,
+      ids,
+      filtro,
+      status
     };
-    titleCell.alignment = { horizontal: 'center' };
 
-    worksheet.mergeCells('A2:G2');
-    const dateCell = worksheet.getCell('A2');
-    dateCell.value = `Gerado em: ${new Date().toLocaleString()}`;
-    dateCell.font = { italic: true };
-    dateCell.alignment = { horizontal: 'center' };
-
-    // Adicionar linha em branco para separação
-    worksheet.addRow([]);
-
-    // Adicionar cabeçalhos da tabela
-    const headers = [
-      'Código de Barras',
-      'Lote',
-      'Descrição',
-      'Marca',
-      'Data de Vencimento',
-      'Status',
-      'Inspecionado'
-    ];
-
-    const headerRow = worksheet.addRow(headers);
-    headerRow.eachCell((cell) => {
-      cell.fill = {
-        type: 'pattern',
-        pattern: 'solid',
-        fgColor: { argb: '4F81BD' }
-      };
-      cell.font = {
-        bold: true,
-        color: { argb: 'FFFFFF' }
-      };
+    return this.http.post(`${this.apiUrl}/relatorio`, request, {
+      observe: 'response',
+      responseType: 'blob'
     });
-
-    // Adicionar dados
-    items.forEach(item => {
-      const row = worksheet.addRow([
-        item.produto?.codigoBarras || '',
-        item.lote || '',
-        item.produto?.descricao || '',
-        item.produto?.marca || '',
-        item.dataValidade ? new Date(item.dataValidade).toLocaleString() : '',
-        this.getStatusFormatado(item.status),
-        item.inspecionado ? 'Sim' : 'Não'
-      ]);
-
-      // Colorir linha de acordo com o status
-      const statusCell = row.getCell(6);
-      statusCell.fill = {
-        type: 'pattern',
-        pattern: 'solid',
-        fgColor: {
-          argb: this.getStatusColor(item.status)
-        }
-      };
-    });
-
-    // Ajustar larguras das colunas para o conteúdo
-    if (worksheet.columns) {
-      for (const column of worksheet.columns) {
-        if (column) {
-          let maxLength = 0;
-          (column as ExcelJS.Column).eachCell({ includeEmpty: true }, cell => {
-            const columnLength = cell.value ? cell.value.toString().length : 10;
-            if (columnLength > maxLength) {
-              maxLength = columnLength;
-            }
-          });
-          column.width = Math.min(maxLength + 2, 50);
-        }
-      }
-    }
-
-    // Exportar para arquivo
-    const buffer = await workbook.xlsx.writeBuffer();
-    const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-    saveAs(blob, `relatorio_${this.formatarDataArquivo(new Date())}.xlsx`);
   }
 
   /**
-   * Formata a data para uso em nome de arquivo
+   * Faz o download do arquivo Excel
+   * @param response Resposta HTTP contendo o arquivo
+   * @param nomeArquivo Nome do arquivo para download
    */
-  private formatarDataArquivo(data: Date): string {
-    return data.toISOString().split('T')[0].replace(/-/g, '_');
-  }
-
-  /**
-   * Retorna o texto formatado do status
-   */
-  private getStatusFormatado(status: string): string {
-    switch (status) {
-      case 'proximo': return 'Próximo a vencer';
-      case 'hoje': return 'Vence hoje';
-      case 'vencido': return 'Vencido';
-      default: return status;
+  downloadArquivo(response: HttpResponse<Blob>, nomeArquivo: string = 'relatorio-mural.xlsx'): void {
+    const blob = response.body;
+    if (!blob) {
+      console.error('Arquivo não encontrado na resposta');
+      return;
     }
-  }
 
-  /**
-   * Retorna a cor para o status
-   */
-  private getStatusColor(status: string): string {
-    switch (status) {
-      case 'proximo': return 'FFF2CC'; // Amarelo claro
-      case 'hoje': return 'FCE4D6'; // Laranja claro
-      case 'vencido': return 'F8CBAD'; // Vermelho claro
-      default: return 'FFFFFF'; // Branco
-    }
+    // Criar URL do blob
+    const url = window.URL.createObjectURL(blob);
+
+    // Criar link temporário e simular clique
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = nomeArquivo;
+    link.click();
+
+    // Limpar URL
+    window.URL.revokeObjectURL(url);
   }
 }

@@ -534,27 +534,20 @@ export class MuralListagemComponent implements OnInit, OnDestroy {
    * Gera relatório Excel com os dados atualmente filtrados
    */
   gerarRelatorio(): void {
-    // Determina o título com base na aba ativa
-    let titulo = '';
-    switch (this.activeTab) {
-      case 'proximo':
-        titulo = 'Relatório de Produtos Próximos do Vencimento';
-        break;
-      case 'hoje':
-        titulo = 'Relatório de Produtos que Vencem Hoje';
-        break;
-      case 'vencido':
-        titulo = 'Relatório de Produtos Vencidos';
-        break;
-    }
-
-    // Adiciona informação dos filtros ao título se houver filtros aplicados
-    if (this.hasAppliedFilters()) {
-      titulo += ' (Filtrado)';
-    }
-
-    // Gera o relatório com os itens atualmente filtrados
-    this.relatorioService.gerarRelatorioExcel(this.filteredItems, titulo);
+    this.relatorioService.gerarRelatorioMural(
+      'PAGINA',
+      null,
+      this.filterService.toFilterDTO(),
+      this.activeTab
+    ).subscribe({
+      next: (response) => {
+        this.relatorioService.downloadArquivo(response);
+      },
+      error: (erro) => {
+        console.error('Erro ao gerar relatório:', erro);
+        // TODO: Mostrar mensagem de erro para o usuário
+      }
+    });
   }
 
   /**
@@ -564,9 +557,23 @@ export class MuralListagemComponent implements OnInit, OnDestroy {
     const itensSelecionados = this.filteredItems.filter(item => item.selecionado);
     if (itensSelecionados.length === 0) return;
 
-    const titulo = this.getTituloRelatorio('selecionados', itensSelecionados.length);
-    this.relatorioService.gerarRelatorioExcel(itensSelecionados, titulo);
-    this.selecaoService.clearSelection();
+    const ids = itensSelecionados.map(item => item.id);
+
+    this.relatorioService.gerarRelatorioMural(
+      'SELECIONADOS',
+      ids,
+      this.filterService.toFilterDTO(),
+      this.activeTab
+    ).subscribe({
+      next: (response) => {
+        this.relatorioService.downloadArquivo(response);
+        this.selecaoService.clearSelection();
+      },
+      error: (erro) => {
+        console.error('Erro ao gerar relatório:', erro);
+        // TODO: Mostrar mensagem de erro para o usuário
+      }
+    });
   }
 
   /**
@@ -575,85 +582,40 @@ export class MuralListagemComponent implements OnInit, OnDestroy {
   private gerarRelatorioPaginaAtual(): void {
     if (this.filteredItems.length === 0) return;
 
-    const titulo = this.getTituloRelatorio('pagina', this.filteredItems.length);
-    this.relatorioService.gerarRelatorioExcel(this.filteredItems, titulo);
-    this.selecaoService.clearSelection();
+    this.relatorioService.gerarRelatorioMural(
+      'PAGINA',
+      null,
+      this.filterService.toFilterDTO(),
+      this.activeTab
+    ).subscribe({
+      next: (response) => {
+        this.relatorioService.downloadArquivo(response);
+      },
+      error: (erro) => {
+        console.error('Erro ao gerar relatório:', erro);
+        // TODO: Mostrar mensagem de erro para o usuário
+      }
+    });
   }
 
   /**
    * Gera relatório com todos os itens de todas as páginas
    */
   private gerarRelatorioTodosItens(): void {
-    // Obtém o filtro atual
-    const filtroDTO = this.filterService.toFilterDTO();
-
-    // Remove a paginação para obter todos os itens
-    filtroDTO.pagina = undefined;
-    filtroDTO.limite = undefined;
-
-    // Garante que o status da aba atual seja mantido
-    filtroDTO.status = this.activeTab;
-
-    // Primeiro obtém o total exato de itens
-    this.muralService.contarTotalRegistros(filtroDTO).subscribe({
-      next: (totalItens) => {
-        // Busca todos os itens e gera o relatório
-        this.muralService.filtrarProdutos(filtroDTO).subscribe({
-          next: (itens) => {
-            if (itens.length !== totalItens) {
-              console.warn(`Discrepância no número de itens: esperado ${totalItens}, recebido ${itens.length}`);
-            }
-            const titulo = this.getTituloRelatorio('todos', itens.length);
-            this.relatorioService.gerarRelatorioExcel(itens, titulo);
-            this.selecaoService.clearSelection();
-          },
-          error: (erro) => {
-            console.error('Erro ao gerar relatório com todos os itens:', erro);
-          }
-        });
+    this.relatorioService.gerarRelatorioMural(
+      'TODOS',
+      null,
+      this.filterService.toFilterDTO(),
+      this.activeTab
+    ).subscribe({
+      next: (response) => {
+        this.relatorioService.downloadArquivo(response);
       },
       error: (erro) => {
-        console.error('Erro ao contar total de registros:', erro);
+        console.error('Erro ao gerar relatório:', erro);
+        // TODO: Mostrar mensagem de erro para o usuário
       }
     });
-  }
-
-  /**
-   * Gera o título do relatório com base no tipo e quantidade de itens
-   */
-  private getTituloRelatorio(tipo: 'selecionados' | 'pagina' | 'todos', quantidade: number): string {
-    let titulo = '';
-    switch (this.activeTab) {
-      case 'proximo':
-        titulo = 'Relatório de Produtos Próximos do Vencimento';
-        break;
-      case 'hoje':
-        titulo = 'Relatório de Produtos que Vencem Hoje';
-        break;
-      case 'vencido':
-        titulo = 'Relatório de Produtos Vencidos';
-        break;
-    }
-
-    // Adiciona informação dos filtros ao título se houver filtros aplicados
-    if (this.hasAppliedFilters()) {
-      titulo += ' (Filtrado)';
-    }
-
-    // Adiciona informação sobre a quantidade de itens
-    switch (tipo) {
-      case 'selecionados':
-        titulo += ` (${quantidade} item(ns) selecionado(s))`;
-        break;
-      case 'pagina':
-        titulo += ` (${quantidade} item(ns) da página atual)`;
-        break;
-      case 'todos':
-        titulo += ` (${quantidade} item(ns) no total)`;
-        break;
-    }
-
-    return titulo;
   }
 
   /**
@@ -683,7 +645,7 @@ export class MuralListagemComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Handler para quando uma ação é selecionada no modal
+   * Handler para ações selecionadas no modal de ações
    */
   onAcaoSelecionada(acao: 'relatorio-selecionados' | 'relatorio-pagina' | 'relatorio-todos' | 'inspecao'): void {
     switch (acao) {
@@ -700,5 +662,16 @@ export class MuralListagemComponent implements OnInit, OnDestroy {
         this.marcarSelecionadosComoInspecionados();
         break;
     }
+  }
+
+  cancelarSelecao(): void {
+    this.selecaoService.cancelarSelecaoBackend().subscribe({
+      next: () => {
+        this.selecaoService.clearSelection();
+      },
+      error: (err) => {
+        this.selecaoService.clearSelection();
+      }
+    });
   }
 }

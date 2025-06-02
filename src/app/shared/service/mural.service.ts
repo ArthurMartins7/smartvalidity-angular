@@ -168,6 +168,10 @@ export class MuralService {
     }
     return this.httpClient.post<MuralListagemDTO[]>(`${this.API}/buscar-por-ids`, ids);
   }
+
+  cancelarSelecao(ids: string[]): Observable<any> {
+    return this.httpClient.post(`${this.API}/cancelar-selecao`, ids);
+  }
 }
 
 //-----------------------------------------------------------------------
@@ -706,5 +710,10 @@ export class MuralSelecaoService {
         this.totalItensAbaSubject.next(0);
       }
     });
+  }
+
+  cancelarSelecaoBackend(): Observable<any> {
+    const ids = this.getSelectedIds();
+    return this.muralService.cancelarSelecao(ids);
   }
 }

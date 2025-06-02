@@ -28,3 +28,23 @@ button {
   --tw-ring-shadow: var(--tw-ring-inset) 0 0 0 calc(2px + var(--tw-ring-offset-width)) var(--tw-ring-color);
   box-shadow: var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow, 0 0 #0000);
 }
+
+.btn-desmarcar-inspecionados {
+  margin-top: 8px;
+  padding: 6px 16px;
+  background: #f3f4f6; /* bg-gray-100 */
+  color: #374151;      /* text-gray-700 */
+  border: 1px solid #d1d5db; /* border-gray-300 */
+  border-radius: 6px;
+  font-size: 0.95em;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s, border 0.2s;
+  box-shadow: none;
+}
+.btn-desmarcar-inspecionados:hover,
+.btn-desmarcar-inspecionados:focus {
+  background: #e5e7eb; /* bg-gray-200 */
+  border-color: #9ca3af; /* border-gray-400 */
+  color: #111827; /* text-gray-900 */
+}

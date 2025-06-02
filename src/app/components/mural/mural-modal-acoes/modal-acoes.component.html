@@ -86,6 +86,12 @@
               <!-- Mensagem de aviso para itens já inspecionados -->
               <div *ngIf="temItensInspecionados" class="text-sm text-red-600 mb-4">
                 {{ mensagemInspecao }}
+                <button
+                  type="button"
+                  (click)="desmarcarInspecionadosSelecionados()"
+                  class="btn-desmarcar-inspecionados">
+                  Clique aqui para desmarcar produtos já inspecionados
+                </button>
               </div>
 
               <button

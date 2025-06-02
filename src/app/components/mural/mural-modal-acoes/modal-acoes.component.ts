@@ -90,4 +90,11 @@ export class ModalAcoesComponent implements OnInit, OnDestroy {
   closeModal(): void {
     this.selecaoService.closeAcoesModal();
   }
+
+  desmarcarInspecionadosSelecionados(): void {
+    this.selecaoService.getSelectedItems().subscribe(items => {
+      this.selecaoService.desmarcarInspecionados(items);
+      this.atualizarContadores();
+    });
+  }
 }

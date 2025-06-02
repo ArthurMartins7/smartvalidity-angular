@@ -716,4 +716,9 @@ export class MuralSelecaoService {
     const ids = this.getSelectedIds();
     return this.muralService.cancelarSelecao(ids);
   }
+
+  desmarcarInspecionados(itens: MuralListagemDTO[]): void {
+    const idsNaoInspecionados = itens.filter(item => !item.inspecionado).map(item => item.id);
+    this.updateSelectedItems(idsNaoInspecionados);
+  }
 }

@@ -100,23 +100,29 @@ export class MuralService {
   /**
    * Marca um item como inspecionado
    */
-  marcarInspecionado(id: string, motivo?: string): Observable<MuralListagemDTO> {
-    const payload = {
-      motivo: motivo || '',
+  marcarInspecionado(id: string, motivo: string, motivoCustomizado?: string): Observable<MuralListagemDTO> {
+    const payload: any = {
+      motivo: motivo,
       usuarioInspecao: this.getUsuarioAtual()
     };
+    if (motivo === 'Outro') {
+      payload.motivoCustomizado = motivoCustomizado || '';
+    }
     return this.httpClient.put<MuralListagemDTO>(`${this.API}/inspecionar/${id}`, payload);
   }
 
   /**
    * Marca vários itens como inspecionados
    */
-  marcarVariosInspecionados(ids: string[], motivo?: string): Observable<MuralListagemDTO[]> {
-    const payload = {
+  marcarVariosInspecionados(ids: string[], motivo: string, motivoCustomizado?: string): Observable<MuralListagemDTO[]> {
+    const payload: any = {
       ids: ids,
-      motivo: motivo || '',
+      motivo: motivo,
       usuarioInspecao: this.getUsuarioAtual()
     };
+    if (motivo === 'Outro') {
+      payload.motivoCustomizado = motivoCustomizado || '';
+    }
     return this.httpClient.put<MuralListagemDTO[]>(`${this.API}/inspecionar-lote`, payload);
   }
 
@@ -671,9 +677,8 @@ export class MuralSelecaoService {
       throw new Error('Motivo de inspeção customizado não informado');
     }
 
-    // Se for motivo "Outro", usamos o motivo customizado
-    const motivoFinal = motivoInspecao === 'Outro' ? motivoCustomizado : motivoInspecao;
-    return this.muralService.marcarVariosInspecionados(selectedIds, motivoFinal);
+    // Se for motivo "Outro", envie o motivo customizado também
+    return this.muralService.marcarVariosInspecionados(selectedIds, motivoInspecao, motivoCustomizado);
   }
 
   // Limpa a seleção

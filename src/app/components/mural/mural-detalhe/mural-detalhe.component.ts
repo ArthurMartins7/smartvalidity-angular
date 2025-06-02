@@ -91,7 +91,7 @@ export class MuralDetalheComponent implements OnInit {
     // Se for motivo "Outro", usa o motivo customizado
     const motivoFinal = this.motivoInspecao === 'Outro' ? this.motivoCustomizado : this.motivoInspecao;
 
-    this.muralService.marcarInspecionado(this.itemId, motivoFinal).subscribe({
+    this.muralService.marcarInspecionado(this.itemId, this.motivoInspecao, this.motivoCustomizado).subscribe({
       next: (item) => {
         // Atualiza o estado local com o item retornado
         if (item) {

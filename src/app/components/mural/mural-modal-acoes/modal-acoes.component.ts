@@ -30,6 +30,7 @@ export class ModalAcoesComponent implements OnInit, OnDestroy {
   mensagemInspecao = '';
   selecoesMisturadas = false;
   mensagemSelecaoMisturada = '';
+  itensSelecionados: MuralListagemDTO[] = [];
 
   private subscriptions: Subscription[] = [];
 
@@ -59,11 +60,12 @@ export class ModalAcoesComponent implements OnInit, OnDestroy {
    */
   private atualizarContadores(): void {
     this.selecaoService.getSelectedItems().subscribe(items => {
+      this.itensSelecionados = items;
       this.itensSelecionadosCount = items.length;
       const itensInspecionados = items.filter(item => item.inspecionado);
       this.temItensInspecionados = itensInspecionados.length > 0;
       if (this.temItensInspecionados) {
-        this.mensagemInspecao = `Existe(m) ${itensInspecionados.length} produto(s) já inspecionado(s) no grupo que você selecionou. Desmarque este(s) produto(s) já inspecionado(s) e tente inspecionar os outros produtos novamente.`;
+        this.mensagemInspecao = `Existem ${itensInspecionados.length} produto(s) já inspecionado(s) no grupo que você selecionou. Desmarque este(s) produto(s) já inspecionado(s) e tente inspecionar os outros produtos novamente:`;
       } else {
         this.mensagemInspecao = '';
       }
@@ -115,5 +117,31 @@ export class ModalAcoesComponent implements OnInit, OnDestroy {
       this.selecaoService.updateSelectedItems(idsParaManter);
       this.atualizarContadores();
     });
+  }
+
+  /**
+   * Quantos itens selecionados pertencem à aba atual
+   */
+  get selecionadosNaAbaAtual(): number {
+    // nomeAba pode ser 'Próximos a vencer', 'Vencem hoje', 'Vencidos'
+    // status é 'proximo', 'hoje', 'vencido'
+    let statusAtual = '';
+    if (this.nomeAba === 'Próximos a vencer') statusAtual = 'proximo';
+    else if (this.nomeAba === 'Vencem hoje') statusAtual = 'hoje';
+    else if (this.nomeAba === 'Vencidos') statusAtual = 'vencido';
+    return this.itensSelecionados.filter(item => item.status === statusAtual).length;
+  }
+
+  /**
+   * Quantos itens selecionados pertencem a outras abas
+   */
+  get selecionadosOutrasAbas(): number {
+    // nomeAba pode ser 'Próximos a vencer', 'Vencem hoje', 'Vencidos'
+    // status é 'proximo', 'hoje', 'vencido'
+    let statusAtual = '';
+    if (this.nomeAba === 'Próximos a vencer') statusAtual = 'proximo';
+    else if (this.nomeAba === 'Vencem hoje') statusAtual = 'hoje';
+    else if (this.nomeAba === 'Vencidos') statusAtual = 'vencido';
+    return this.itensSelecionados.filter(item => item.status !== statusAtual).length;
   }
 }

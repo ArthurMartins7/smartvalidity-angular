@@ -19,6 +19,8 @@ export class ModalAcoesComponent implements OnInit, OnDestroy {
   @Output() acaoSelecionada = new EventEmitter<AcaoTipo>();
   @Input() itensPaginaAtual: MuralListagemDTO[] = [];
   @Input() totalItensAba: number = 0;
+  @Input() nomeAba: string = '';
+  @Input() numeroPaginaAtual: number = 1;
 
   // Propriedades para controle do modal
   visible = false;
@@ -26,6 +28,8 @@ export class ModalAcoesComponent implements OnInit, OnDestroy {
   itensPaginaCount = 0;
   temItensInspecionados = false;
   mensagemInspecao = '';
+  selecoesMisturadas = false;
+  mensagemSelecaoMisturada = '';
 
   private subscriptions: Subscription[] = [];
 
@@ -56,18 +60,24 @@ export class ModalAcoesComponent implements OnInit, OnDestroy {
   private atualizarContadores(): void {
     this.selecaoService.getSelectedItems().subscribe(items => {
       this.itensSelecionadosCount = items.length;
-
-      // Verifica se há itens já inspecionados
       const itensInspecionados = items.filter(item => item.inspecionado);
       this.temItensInspecionados = itensInspecionados.length > 0;
-
       if (this.temItensInspecionados) {
-        this.mensagemInspecao = `Existem ${itensInspecionados.length} produto(s) já inspecionado(s) no grupo que você selecionou. Desmarque estes produtos já inspecionados e tente inspecionar os outros produtos novamente.`;
+        this.mensagemInspecao = `Existe(m) ${itensInspecionados.length} produto(s) já inspecionado(s) no grupo que você selecionou. Desmarque este(s) produto(s) já inspecionado(s) e tente inspecionar os outros produtos novamente.`;
       } else {
         this.mensagemInspecao = '';
       }
+      // Lógica para seleção mista de abas (NÃO de páginas)
+      this.selecoesMisturadas = false;
+      this.mensagemSelecaoMisturada = '';
+      if (items.length > 0) {
+        const statusSet = new Set(items.map(item => item.status));
+        if (statusSet.size > 1) {
+          this.selecoesMisturadas = true;
+          this.mensagemSelecaoMisturada = 'Existem produtos selecionados de abas diferentes. As opções "Produtos da página atual" e "Todos os produtos da aba" só podem ser usadas quando todos os produtos selecionados pertencem à mesma aba.';
+        }
+      }
     });
-
     this.itensPaginaCount = this.itensPaginaAtual.length;
   }
 
@@ -94,6 +104,15 @@ export class ModalAcoesComponent implements OnInit, OnDestroy {
   desmarcarInspecionadosSelecionados(): void {
     this.selecaoService.getSelectedItems().subscribe(items => {
       this.selecaoService.desmarcarInspecionados(items);
+      this.atualizarContadores();
+    });
+  }
+
+  desmarcarOutrasPaginasAbas(): void {
+    this.selecaoService.getSelectedItems().subscribe(items => {
+      const idsPaginaAtual = this.itensPaginaAtual.map(item => item.id);
+      const idsParaManter = items.filter(item => idsPaginaAtual.includes(item.id)).map(item => item.id);
+      this.selecaoService.updateSelectedItems(idsParaManter);
       this.atualizarContadores();
     });
   }

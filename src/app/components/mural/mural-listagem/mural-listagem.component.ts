@@ -149,7 +149,6 @@ export class MuralListagemComponent implements OnInit, OnDestroy {
   selectAll(event: Event): void {
     const target = event.target as HTMLInputElement;
     const checked = target.checked;
-
     this.selecaoService.selectAll(this.filteredItems, checked);
     this.updateItemSelectionState();
   }
@@ -486,8 +485,6 @@ export class MuralListagemComponent implements OnInit, OnDestroy {
   // Método para avançar para a próxima página
   public avancarPagina(): void {
     if (this.paginaAtual < this.totalPaginas) {
-      // Limpa a seleção antes de mudar de página
-      this.selecaoService.clearSelection();
       this.filterService.updatePaginaAtual(this.paginaAtual + 1);
       this.applyFilters();
     }
@@ -496,8 +493,6 @@ export class MuralListagemComponent implements OnInit, OnDestroy {
   // Método para voltar para a página anterior
   public voltarPagina(): void {
     if (this.paginaAtual > 1) {
-      // Limpa a seleção antes de mudar de página
-      this.selecaoService.clearSelection();
       this.filterService.updatePaginaAtual(this.paginaAtual - 1);
       this.applyFilters();
     }
@@ -506,8 +501,6 @@ export class MuralListagemComponent implements OnInit, OnDestroy {
   // Método para ir para uma página específica
   public irParaPagina(pagina: number): void {
     if (pagina !== this.paginaAtual) {
-      // Limpa a seleção antes de mudar de página
-      this.selecaoService.clearSelection();
       this.filterService.updatePaginaAtual(pagina);
       this.applyFilters();
     }
@@ -524,8 +517,6 @@ export class MuralListagemComponent implements OnInit, OnDestroy {
 
   // Método para alterar a quantidade de itens por página
   public alterarItensPorPagina(quantidade: number): void {
-    // Limpa a seleção antes de mudar a quantidade de itens por página
-    this.selecaoService.clearSelection();
     this.filterService.updateItensPorPagina(quantidade);
     this.applyFilters();
   }
@@ -678,5 +669,20 @@ export class MuralListagemComponent implements OnInit, OnDestroy {
         this.selecaoService.clearSelection();
       }
     });
+  }
+
+  // Adicionar método para verificar se todos os itens da página estão selecionados
+  isAllSelectedOnPage(): boolean {
+    return this.filteredItems.length > 0 && this.filteredItems.every(item => this.selectedIds.includes(item.id));
+  }
+
+  /** Retorna o nome amigável da aba atual */
+  get nomeAbaAtual(): string {
+    switch (this.activeTab) {
+      case 'proximo': return 'Próximos a vencer';
+      case 'hoje': return 'Vencem hoje';
+      case 'vencido': return 'Vencidos';
+      default: return '';
+    }
   }
 }

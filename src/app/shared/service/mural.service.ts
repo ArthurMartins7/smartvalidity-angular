@@ -586,8 +586,14 @@ export class MuralSelecaoService {
 
   // Seleciona ou desmarca todos os itens da página
   selectAll(items: MuralListagemDTO[], selected: boolean): void {
-    const ids = selected ? items.map(item => item.id) : [];
-    this.selectedItemsSubject.next(ids);
+    const current = new Set(this.selectedItemsSubject.value);
+    const pageIds = items.map(item => item.id);
+    if (selected) {
+      pageIds.forEach(id => current.add(id));
+    } else {
+      pageIds.forEach(id => current.delete(id));
+    }
+    this.selectedItemsSubject.next(Array.from(current));
   }
 
   // Seleciona todos os itens da aba atual

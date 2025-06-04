@@ -770,6 +770,80 @@ export class MuralFilterService {
     this.inspecaoFilterSubject.next('todos');
     sessionStorage.removeItem(this.FILTER_STATE_KEY);
   }
+
+  /**
+   * Combina arrays de filtros existentes com novos, evitando duplicação.
+   * Responsabilidade: Lógica de negócio para combinação de filtros (Service Layer).
+   *
+   * @param currentArray Array de filtros atualmente aplicados
+   * @param newArray Array de novos filtros temporários
+   * @returns Array combinado sem duplicatas
+   */
+  combineArrayFilters(currentArray: string[], newArray: string[]): string[] {
+    if (!newArray || newArray.length === 0) {
+      return currentArray || [];
+    }
+
+    const combined = [...(currentArray || [])];
+
+    newArray.forEach(value => {
+      if (value && !combined.includes(value)) {
+        combined.push(value);
+      }
+    });
+
+    return combined;
+  }
+
+  /**
+   * Verifica se um filtro de data tem valores definidos.
+   * Responsabilidade: Validação de dados de filtros (Service Layer).
+   *
+   * @param dateFilter Filtro de data a ser verificado
+   * @returns true se tem valores definidos
+   */
+  hasDateValues(dateFilter: { startDate: string | null; endDate: string | null } | undefined): boolean {
+    return dateFilter != null &&
+           (dateFilter.startDate != null && dateFilter.startDate !== '' ||
+            dateFilter.endDate != null && dateFilter.endDate !== '');
+  }
+
+  /**
+   * Combina filtros existentes com novos de forma cumulativa.
+   * Responsabilidade: Lógica central de acúmulo de filtros (Service Layer).
+   *
+   * @param currentFilters Filtros atualmente aplicados
+   * @param tempFilters Novos filtros temporários
+   * @returns Filtros combinados
+   */
+  combineFilters(currentFilters: MuralFilter, tempFilters: MuralFilter): MuralFilter {
+    return {
+      // Arrays de filtros - combina valores existentes com novos (sem duplicação)
+      marca: this.combineArrayFilters(currentFilters.marca, tempFilters.marca),
+      corredor: this.combineArrayFilters(currentFilters.corredor, tempFilters.corredor),
+      categoria: this.combineArrayFilters(currentFilters.categoria, tempFilters.categoria),
+      fornecedor: this.combineArrayFilters(currentFilters.fornecedor, tempFilters.fornecedor),
+      lote: this.combineArrayFilters(currentFilters.lote, tempFilters.lote),
+      usuarioInspecao: this.combineArrayFilters(currentFilters.usuarioInspecao, tempFilters.usuarioInspecao),
+      motivoInspecao: this.combineArrayFilters(currentFilters.motivoInspecao, tempFilters.motivoInspecao),
+
+      // Filtros de data - aplicam novos valores se especificados, senão mantém atuais
+      dataVencimento: this.hasDateValues(tempFilters.dataVencimento)
+        ? tempFilters.dataVencimento
+        : currentFilters.dataVencimento,
+      dataFabricacao: this.hasDateValues(tempFilters.dataFabricacao)
+        ? tempFilters.dataFabricacao
+        : currentFilters.dataFabricacao,
+      dataRecebimento: this.hasDateValues(tempFilters.dataRecebimento)
+        ? tempFilters.dataRecebimento
+        : currentFilters.dataRecebimento,
+
+      // Filtro booleano - aplica novo valor se especificado, senão mantém atual
+      inspecionado: tempFilters.inspecionado !== undefined
+        ? tempFilters.inspecionado
+        : currentFilters.inspecionado
+    };
+  }
 }
 
 //-----------------------------------------------------------------------

@@ -81,6 +81,7 @@ export class FiltroAvancadoComponent implements OnInit, OnDestroy {
   showFornecedorDropdown: boolean = false;
   showLoteDropdown: boolean = false;
   showUsuarioInspecaoDropdown: boolean = false;
+  showMotivoInspecaoDropdown: boolean = false;
 
   // Listas filtradas para cada dropdown
   filteredBrands: string[] = [];
@@ -115,6 +116,7 @@ export class FiltroAvancadoComponent implements OnInit, OnDestroy {
       this.showFornecedorDropdown = false;
       this.showLoteDropdown = false;
       this.showUsuarioInspecaoDropdown = false;
+      this.showMotivoInspecaoDropdown = false;
     }
   }
 
@@ -146,25 +148,9 @@ export class FiltroAvancadoComponent implements OnInit, OnDestroy {
     // Carregar as opções de filtro
     this.muralFilterService.loadFilterOptions();
 
-    // Inscrever-se para receber os filtros atuais
-    this.subscriptions.push(
-      this.muralFilterService.filters$.subscribe({
-        next: (filters) => {
-          console.log('Filtros atualizados:', filters);
-          // Garantir que os objetos de data existam
-          this.tempFilters = {
-            ...filters,
-            dataVencimento: filters.dataVencimento || { startDate: null, endDate: null },
-            dataFabricacao: filters.dataFabricacao || { startDate: null, endDate: null },
-            dataRecebimento: filters.dataRecebimento || { startDate: null, endDate: null }
-          };
-        },
-        error: (error) => {
-          console.error('Erro ao carregar filtros:', error);
-          this.isLoading = false;
-        }
-      })
-    );
+    // IMPORTANTE: tempFilters deve começar vazio a cada abertura do modal
+    // Só os filtros aplicados (que aparecem nas tags) devem ser persistidos
+    this.tempFilters = this.initializeFilters();
 
     // Inscrever-se para receber atualizações das opções de filtro
     this.subscriptions.push(
@@ -181,25 +167,15 @@ export class FiltroAvancadoComponent implements OnInit, OnDestroy {
           this.filteredLotes = [...this.filterOptions.availableLotes];
           this.filteredUsuariosInspecao = [...this.filterOptions.availableUsuariosInspecao];
 
-          // Atualizar os campos de busca se já houver valores selecionados
-          if (this.tempFilters.marca && this.tempFilters.marca.length > 0) {
-            this.searchTerms.marca = this.tempFilters.marca.join(', ');
-          }
-          if (this.tempFilters.corredor && this.tempFilters.corredor.length > 0) {
-            this.searchTerms.corredor = this.tempFilters.corredor.join(', ');
-          }
-          if (this.tempFilters.categoria && this.tempFilters.categoria.length > 0) {
-            this.searchTerms.categoria = this.tempFilters.categoria.join(', ');
-          }
-          if (this.tempFilters.fornecedor && this.tempFilters.fornecedor.length > 0) {
-            this.searchTerms.fornecedor = this.tempFilters.fornecedor.join(', ');
-          }
-          if (this.tempFilters.lote && this.tempFilters.lote.length > 0) {
-            this.searchTerms.lote = this.tempFilters.lote.join(', ');
-          }
-          if (this.tempFilters.usuarioInspecao && this.tempFilters.usuarioInspecao.length > 0) {
-            this.searchTerms.colaborador = this.tempFilters.usuarioInspecao.join(', ');
-          }
+          // Limpar campos de busca - começar sempre vazio
+          this.searchTerms = {
+            marca: '',
+            corredor: '',
+            categoria: '',
+            fornecedor: '',
+            lote: '',
+            colaborador: ''
+          };
 
           this.isLoading = false;
         },
@@ -306,51 +282,90 @@ export class FiltroAvancadoComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Seleciona uma opção de um dropdown
+   * Seleciona uma opção de um dropdown e atualiza os filtros temporários.
+   * Responsabilidade: Controle da seleção de filtros temporários (Component Layer).
+   *
+   * Este método apenas atualiza os filtros temporários - eles só serão aplicados
+   * definitivamente quando o usuário clicar em "Aplicar filtros".
    */
   selectOption(field: string, value: string): void {
     switch (field) {
       case 'marca':
         if (!this.tempFilters.marca.includes(value)) {
           this.tempFilters.marca = [...this.tempFilters.marca, value];
+          this.updateSearchTermDisplay('marca');
         }
-        this.searchTerms.marca = value;
         this.showMarcaDropdown = false;
         break;
       case 'corredor':
         if (!this.tempFilters.corredor.includes(value)) {
           this.tempFilters.corredor = [...this.tempFilters.corredor, value];
+          this.updateSearchTermDisplay('corredor');
         }
-        this.searchTerms.corredor = value;
         this.showCorredorDropdown = false;
         break;
       case 'categoria':
         if (!this.tempFilters.categoria.includes(value)) {
           this.tempFilters.categoria = [...this.tempFilters.categoria, value];
+          this.updateSearchTermDisplay('categoria');
         }
-        this.searchTerms.categoria = value;
         this.showCategoriaDropdown = false;
         break;
       case 'fornecedor':
         if (!this.tempFilters.fornecedor.includes(value)) {
           this.tempFilters.fornecedor = [...this.tempFilters.fornecedor, value];
+          this.updateSearchTermDisplay('fornecedor');
         }
-        this.searchTerms.fornecedor = value;
         this.showFornecedorDropdown = false;
         break;
       case 'lote':
         if (!this.tempFilters.lote.includes(value)) {
           this.tempFilters.lote = [...this.tempFilters.lote, value];
+          this.updateSearchTermDisplay('lote');
         }
-        this.searchTerms.lote = value;
         this.showLoteDropdown = false;
         break;
       case 'usuarioInspecao':
         if (!this.tempFilters.usuarioInspecao.includes(value)) {
           this.tempFilters.usuarioInspecao = [...this.tempFilters.usuarioInspecao, value];
+          this.updateSearchTermDisplay('usuarioInspecao');
         }
-        this.searchTerms.colaborador = value;
         this.showUsuarioInspecaoDropdown = false;
+        break;
+      case 'motivoInspecao':
+        if (!this.tempFilters.motivoInspecao.includes(value)) {
+          this.tempFilters.motivoInspecao = [...this.tempFilters.motivoInspecao, value];
+        }
+        this.showMotivoInspecaoDropdown = false;
+        break;
+    }
+  }
+
+  /**
+   * Atualiza o campo de busca para mostrar os valores selecionados.
+   * Responsabilidade: Atualização da apresentação visual (Component Helper Method).
+   *
+   * @param field Campo que teve valores selecionados
+   */
+  private updateSearchTermDisplay(field: string): void {
+    switch (field) {
+      case 'marca':
+        this.searchTerms.marca = this.tempFilters.marca.join(', ');
+        break;
+      case 'corredor':
+        this.searchTerms.corredor = this.tempFilters.corredor.join(', ');
+        break;
+      case 'categoria':
+        this.searchTerms.categoria = this.tempFilters.categoria.join(', ');
+        break;
+      case 'fornecedor':
+        this.searchTerms.fornecedor = this.tempFilters.fornecedor.join(', ');
+        break;
+      case 'lote':
+        this.searchTerms.lote = this.tempFilters.lote.join(', ');
+        break;
+      case 'usuarioInspecao':
+        this.searchTerms.colaborador = this.tempFilters.usuarioInspecao.join(', ');
         break;
     }
   }
@@ -387,35 +402,44 @@ export class FiltroAvancadoComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Aplica os filtros temporários ao serviço
+   * Aplica os filtros temporários ao serviço de forma cumulativa.
+   * Responsabilidade: Controle da aplicação de filtros (Component Layer).
+   * Delega toda lógica de negócio para o service layer seguindo padrão MVC.
    */
   applyFilters(): void {
-    this.muralFilterService.updateFilters(this.tempFilters);
+    // Obtém filtros atualmente aplicados
+    const currentFilters = this.muralFilterService.getCurrentFilters();
+
+    // Delega para o service a lógica de combinação (Service Layer responsibility)
+    const combinedFilters = this.muralFilterService.combineFilters(currentFilters, this.tempFilters);
+
+    // Aplica os filtros combinados ao service
+    this.muralFilterService.updateFilters(combinedFilters);
+
     this.closeModal();
   }
 
   /**
-   * Cancela as alterações e fecha o modal
-   */
-  cancelFilters(): void {
-    this.closeModal();
-  }
-
-  /**
-   * Limpa todos os filtros temporários
+   * Limpa todos os filtros temporários.
+   * Responsabilidade: Reset do estado temporário de filtros (Component Layer).
+   *
+   * IMPORTANTE: Este método limpa apenas os filtros temporários do modal,
+   * não afeta os filtros já aplicados (que aparecem nas tags).
    */
   clearAllFilters(): void {
     this.tempFilters = this.initializeFilters();
 
     // Limpa também os campos de pesquisa
-    this.searchTerms.corredor = '';
-    this.searchTerms.categoria = '';
-    this.searchTerms.marca = '';
-    this.searchTerms.fornecedor = '';
-    this.searchTerms.lote = '';
-    this.searchTerms.colaborador = '';
+    this.searchTerms = {
+      corredor: '',
+      categoria: '',
+      marca: '',
+      fornecedor: '',
+      lote: '',
+      colaborador: ''
+    };
 
-    // Redefine as listas filtradas
+    // Redefine as listas filtradas para mostrar todas as opções
     this.filteredBrands = [...this.filterOptions.availableBrands];
     this.filteredCorredores = [...this.filterOptions.availableCorredores];
     this.filteredCategorias = [...this.filterOptions.availableCategorias];
@@ -502,7 +526,8 @@ export class FiltroAvancadoComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Verifica se há algum filtro temporário aplicado
+   * Verifica se há algum filtro temporário aplicado.
+   * Responsabilidade: Helper method para controle de apresentação (Component Layer).
    */
   hasTempFilters(): boolean {
     return (
@@ -512,29 +537,18 @@ export class FiltroAvancadoComponent implements OnInit, OnDestroy {
       (this.tempFilters.fornecedor && this.tempFilters.fornecedor.length > 0) ||
       (this.tempFilters.lote && this.tempFilters.lote.length > 0) ||
       this.tempFilters.inspecionado !== undefined ||
-      !!this.tempFilters.dataVencimento?.startDate ||
-      !!this.tempFilters.dataVencimento?.endDate ||
-      !!this.tempFilters.dataFabricacao?.startDate ||
-      !!this.tempFilters.dataFabricacao?.endDate ||
-      !!this.tempFilters.dataRecebimento?.startDate ||
-      !!this.tempFilters.dataRecebimento?.endDate ||
+      // Usa o service para validação de datas (delegando responsabilidade)
+      this.muralFilterService.hasDateValues(this.tempFilters.dataVencimento) ||
+      this.muralFilterService.hasDateValues(this.tempFilters.dataFabricacao) ||
+      this.muralFilterService.hasDateValues(this.tempFilters.dataRecebimento) ||
       (this.tempFilters.motivoInspecao && this.tempFilters.motivoInspecao.length > 0) ||
       (this.tempFilters.usuarioInspecao && this.tempFilters.usuarioInspecao.length > 0)
     );
   }
 
   /**
-   * Formata uma data para o formato esperado pelos inputs date (YYYY-MM-DD)
-   */
-  private formatDateForInput(date: Date): string {
-    // Adiciona zeros à esquerda se necessário
-    const pad = (num: number) => num.toString().padStart(2, '0');
-
-    return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
-  }
-
-  /**
-   * Inicializa um campo de data com valores nulos
+   * Inicializa um campo de data com valores nulos.
+   * Responsabilidade: Helper method para inicialização de estruturas de dados (Component Layer).
    */
   initializeDateField(): DateRange {
     return {
@@ -545,7 +559,7 @@ export class FiltroAvancadoComponent implements OnInit, OnDestroy {
 
   /**
    * Atualiza um campo de data específico nos filtros temporários.
-   * Responsabilidade: Controle da lógica de apresentação de campos de data (Component Layer).
+   * Responsabilidade: Controle da apresentação de campos de data (Component Layer).
    * Garante que o valor da data seja armazenado exatamente como digitado pelo usuário.
    *
    * @param fieldName Nome do campo de data
@@ -574,11 +588,12 @@ export class FiltroAvancadoComponent implements OnInit, OnDestroy {
 
   /**
    * Valida o intervalo de datas, garantindo que a data final não seja menor que a inicial.
-   * Responsabilidade: Validação de dados de entrada no lado do cliente (Component Layer).
+   * Responsabilidade: Validação simples de apresentação no lado do cliente (Component Layer).
+   * Validações de negócio complexas devem ser feitas no service layer.
    *
    * @param fieldName Nome do campo de data a ser validado
    */
-  validateDateRange(fieldName: 'dataVencimento' | 'dataFabricacao' | 'dataRecebimento'): void {
+  private validateDateRange(fieldName: 'dataVencimento' | 'dataFabricacao' | 'dataRecebimento'): void {
     // Para dataVencimento, sempre existe - validação direta
     if (fieldName === 'dataVencimento') {
       const dateRange = this.tempFilters.dataVencimento;
@@ -611,7 +626,7 @@ export class FiltroAvancadoComponent implements OnInit, OnDestroy {
     }
   }
 
-  // Adicionar métodos para abrir dropdowns de forma exclusiva
+  // Métodos para abrir dropdowns de forma exclusiva - Responsabilidade: Controle de UI (Component Layer)
   openCorredorDropdown(): void {
     this.showCorredorDropdown = true;
     this.showMarcaDropdown = false;
@@ -619,7 +634,9 @@ export class FiltroAvancadoComponent implements OnInit, OnDestroy {
     this.showFornecedorDropdown = false;
     this.showLoteDropdown = false;
     this.showUsuarioInspecaoDropdown = false;
+    this.showMotivoInspecaoDropdown = false;
   }
+
   openMarcaDropdown(): void {
     this.showMarcaDropdown = true;
     this.showCorredorDropdown = false;
@@ -627,7 +644,9 @@ export class FiltroAvancadoComponent implements OnInit, OnDestroy {
     this.showFornecedorDropdown = false;
     this.showLoteDropdown = false;
     this.showUsuarioInspecaoDropdown = false;
+    this.showMotivoInspecaoDropdown = false;
   }
+
   openCategoriaDropdown(): void {
     this.showCategoriaDropdown = true;
     this.showCorredorDropdown = false;
@@ -635,7 +654,9 @@ export class FiltroAvancadoComponent implements OnInit, OnDestroy {
     this.showFornecedorDropdown = false;
     this.showLoteDropdown = false;
     this.showUsuarioInspecaoDropdown = false;
+    this.showMotivoInspecaoDropdown = false;
   }
+
   openFornecedorDropdown(): void {
     this.showFornecedorDropdown = true;
     this.showCorredorDropdown = false;
@@ -643,7 +664,9 @@ export class FiltroAvancadoComponent implements OnInit, OnDestroy {
     this.showCategoriaDropdown = false;
     this.showLoteDropdown = false;
     this.showUsuarioInspecaoDropdown = false;
+    this.showMotivoInspecaoDropdown = false;
   }
+
   openLoteDropdown(): void {
     this.showLoteDropdown = true;
     this.showCorredorDropdown = false;
@@ -651,7 +674,9 @@ export class FiltroAvancadoComponent implements OnInit, OnDestroy {
     this.showCategoriaDropdown = false;
     this.showFornecedorDropdown = false;
     this.showUsuarioInspecaoDropdown = false;
+    this.showMotivoInspecaoDropdown = false;
   }
+
   openUsuarioInspecaoDropdown(): void {
     this.showUsuarioInspecaoDropdown = true;
     this.showCorredorDropdown = false;
@@ -659,5 +684,16 @@ export class FiltroAvancadoComponent implements OnInit, OnDestroy {
     this.showCategoriaDropdown = false;
     this.showFornecedorDropdown = false;
     this.showLoteDropdown = false;
+    this.showMotivoInspecaoDropdown = false;
+  }
+
+  openMotivoInspecaoDropdown(): void {
+    this.showMotivoInspecaoDropdown = true;
+    this.showCorredorDropdown = false;
+    this.showMarcaDropdown = false;
+    this.showCategoriaDropdown = false;
+    this.showFornecedorDropdown = false;
+    this.showLoteDropdown = false;
+    this.showUsuarioInspecaoDropdown = false;
   }
 }

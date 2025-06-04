@@ -254,15 +254,12 @@ export class MuralListagemComponent implements OnInit, OnDestroy {
     // Adiciona informação da aba ativa como um filtro adicional
     switch (this.activeTab) {
       case 'proximo':
-        // Deixa como está, o backend filtrará para próximos a vencer
         filtroDTO.status = 'proximo';
         break;
       case 'hoje':
-        // Adiciona filtro para itens que vencem hoje
         filtroDTO.status = 'hoje';
         break;
       case 'vencido':
-        // Adiciona filtro para itens vencidos
         filtroDTO.status = 'vencido';
         break;
     }
@@ -273,6 +270,14 @@ export class MuralListagemComponent implements OnInit, OnDestroy {
     } else if (this.filtroInspecao === 'naoInspecionados') {
       filtroDTO.inspecionado = false;
     }
+
+    // --- INÍCIO DO AJUSTE DE ORDENAÇÃO PARA ABA VENCIDOS ---
+    let sortDirectionToSend = this.sortDirection;
+    if (this.activeTab === 'vencido' && this.sortField === 'dataVencimento') {
+      sortDirectionToSend = this.sortDirection === 'asc' ? 'desc' : 'asc';
+    }
+    filtroDTO.sortDirection = sortDirectionToSend;
+    // --- FIM DO AJUSTE DE ORDENAÇÃO ---
 
     // Calcular o total de páginas e o total de itens
     this.calcularTotalPaginas(filtroDTO);

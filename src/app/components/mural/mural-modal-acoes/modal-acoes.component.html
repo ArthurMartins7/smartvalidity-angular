@@ -36,7 +36,7 @@
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M21 12c0 4.97-4.03 9-9 9s-9-4.03-9-9 4.03-9 9-9 9 4.03 9 9z" />
             </svg>
             <span>
-              Existem <b>{{ selecionadosOutrasAbas }}</b> produtos selecionados de diferentes <b>abas</b> da tabela ({{ selecionadosNaAbaAtual }} nesta aba, {{ itensSelecionadosCount }} no total). O botão de gerar relatórios com "<b>Todos os produtos da aba</b>", mais abaixo, só funcionará se os produtos selecionados forem da mesma aba:
+              Existem <b>{{ selecionadosOutrasAbas }}</b> produtos selecionados de diferentes <b>abas</b> da tabela ({{ selecionadosNaAbaAtual }} selecionados na aba  atual ({{ nomeAba }}), {{ itensSelecionadosCount }} produtos no total. O botão de gerar relatórios com "<b>Todos os produtos da aba</b>", mais abaixo, só funcionará se os produtos selecionados forem da mesma aba:
             </span>
           </div>
           <div *ngIf="selecoesMisturadas" class="mb-4">
@@ -107,7 +107,7 @@
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2" />
                 </svg>
                 <div class="text-left flex-1">
-                  <span class="text-sm font-medium text-gray-900 block">Todos os produtos da aba {{ nomeAba }}</span>
+                  <span class="text-sm font-medium text-gray-900 block">Todos os produtos da aba {{ nomeAba }} (Sujeito aos filtros aplicados)</span>
                   <span class="text-xs text-gray-500">{{ totalItensAba }} produto(s) no total</span>
                 </div>
               </button>

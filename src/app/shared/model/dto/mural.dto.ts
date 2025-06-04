@@ -36,20 +36,34 @@ export interface MuralListagemDTO {
  * DTO para os filtros do mural de validade
  */
 export interface MuralFiltroDTO {
+  // Novos campos para múltiplos valores
+  corredores?: string[];
+  categorias?: string[];
+  fornecedores?: string[];
+  marcas?: string[];
+  lotes?: string[];
+  motivosInspecao?: string[];
+  usuariosInspecao?: string[];
+
+  // Campos legados para compatibilidade
   corredor?: string;
   categoria?: string;
   fornecedor?: string;
   marca?: string;
   lote?: string;
+  motivoInspecao?: string;
+  usuarioInspecao?: string;
+
+  // Campos de data
   dataVencimentoInicio?: string;
   dataVencimentoFim?: string;
   dataFabricacaoInicio?: string;
   dataFabricacaoFim?: string;
   dataRecebimentoInicio?: string;
   dataRecebimentoFim?: string;
+
+  // Outros campos
   inspecionado?: boolean;
-  motivoInspecao?: string;
-  usuarioInspecao?: string;
   searchTerm?: string;
   sortBy?: string;
   sortDirection?: 'asc' | 'desc';

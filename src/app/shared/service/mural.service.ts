@@ -22,26 +22,26 @@ export interface FiltroOpcoes {
  * Interface para o estado do filtro aplicado
  */
 export interface MuralFilter {
-  corredor: string;
-  categoria: string;
-  fornecedor: string;
-  marca: string;
-  lote: string;
+  corredor: string[];
+  categoria: string[];
+  fornecedor: string[];
+  marca: string[];
+  lote: string[];
   dataVencimento: {
     startDate: string | null;
     endDate: string | null;
   };
-  dataFabricacao?: {
+  dataFabricacao: {
     startDate: string | null;
     endDate: string | null;
-  };
-  dataRecebimento?: {
+  } | undefined;
+  dataRecebimento: {
     startDate: string | null;
     endDate: string | null;
-  };
+  } | undefined;
   inspecionado: boolean | undefined;
-  motivoInspecao: string;
-  usuarioInspecao: string;
+  motivoInspecao: string[];
+  usuarioInspecao: string[];
 }
 
 /**
@@ -192,17 +192,17 @@ export class MuralFilterService {
 
   // Estado inicial dos filtros
   private initialFilter: MuralFilter = {
-    corredor: '',
-    categoria: '',
-    fornecedor: '',
-    marca: '',
-    lote: '',
+    corredor: [],
+    categoria: [],
+    fornecedor: [],
+    marca: [],
+    lote: [],
     dataVencimento: { startDate: null, endDate: null },
-    dataFabricacao: { startDate: null, endDate: null },
-    dataRecebimento: { startDate: null, endDate: null },
+    dataFabricacao: undefined,
+    dataRecebimento: undefined,
     inspecionado: undefined,
-    motivoInspecao: '',
-    usuarioInspecao: ''
+    motivoInspecao: [],
+    usuarioInspecao: []
   };
 
   // Subjects para estado reativo
@@ -272,34 +272,82 @@ export class MuralFilterService {
     this.saveFilterState();
   }
 
-  // Limpar um filtro específico
+  // Método para adicionar um filtro cumulativo
+  addFilter(filterName: keyof MuralFilter, value: string): void {
+    const currentFilters = this.filtersSubject.value;
+
+    if (filterName === 'marca' || filterName === 'corredor' || filterName === 'categoria' ||
+        filterName === 'fornecedor' || filterName === 'lote' ||
+        filterName === 'motivoInspecao' || filterName === 'usuarioInspecao') {
+
+      const currentArray = currentFilters[filterName] as string[];
+      if (!currentArray.includes(value)) {
+        const newFilters = {
+          ...currentFilters,
+          [filterName]: [...currentArray, value]
+        };
+        this.filtersSubject.next(newFilters);
+        this.saveFilterState();
+      }
+    }
+  }
+
+  // Método para remover um valor específico de um filtro array
+  removeFilterValue(filterName: keyof MuralFilter, value: string): void {
+    const currentFilters = this.filtersSubject.value;
+
+    if (filterName === 'marca' || filterName === 'corredor' || filterName === 'categoria' ||
+        filterName === 'fornecedor' || filterName === 'lote' ||
+        filterName === 'motivoInspecao' || filterName === 'usuarioInspecao') {
+
+      const currentArray = currentFilters[filterName] as string[];
+      const newArray = currentArray.filter(item => item !== value);
+
+      const newFilters = {
+        ...currentFilters,
+        [filterName]: newArray
+      };
+      this.filtersSubject.next(newFilters);
+      this.saveFilterState();
+    }
+  }
+
   clearFilter(filterName: keyof MuralFilter): void {
+    const currentFilters = this.filtersSubject.value;
+
     if (filterName === 'dataVencimento') {
       this.filtersSubject.next({
-        ...this.filtersSubject.value,
+        ...currentFilters,
         dataVencimento: { startDate: null, endDate: null }
+      });
+    } else if (filterName === 'dataFabricacao' || filterName === 'dataRecebimento') {
+      this.filtersSubject.next({
+        ...currentFilters,
+        [filterName]: undefined
       });
     } else if (filterName === 'inspecionado') {
       this.filtersSubject.next({
-        ...this.filtersSubject.value,
+        ...currentFilters,
         inspecionado: undefined
       });
     } else if (filterName === 'motivoInspecao') {
       this.filtersSubject.next({
-        ...this.filtersSubject.value,
-        motivoInspecao: ''
+        ...currentFilters,
+        motivoInspecao: []
       });
     } else if (filterName === 'usuarioInspecao') {
       this.filtersSubject.next({
-        ...this.filtersSubject.value,
-        usuarioInspecao: ''
+        ...currentFilters,
+        usuarioInspecao: []
       });
     } else {
+      // Para campos de array (marca, corredor, categoria, fornecedor, lote)
       this.filtersSubject.next({
-        ...this.filtersSubject.value,
-        [filterName]: ''
+        ...currentFilters,
+        [filterName]: []
       });
     }
+    this.saveFilterState();
   }
 
   // Limpar filtro de data
@@ -313,6 +361,131 @@ export class MuralFilterService {
       }
     }
     this.filtersSubject.next(currentFilters);
+    this.saveFilterState();
+  }
+
+  /**
+   * Limpa um filtro de data específico.
+   * Responsabilidade: Gerenciamento de estado de filtros de data (Service Layer).
+   *
+   * @param dateFieldName Nome do campo de data a ser limpo
+   */
+  clearSpecificDateFilter(dateFieldName: 'dataVencimento' | 'dataFabricacao' | 'dataRecebimento'): void {
+    const currentFilters = this.filtersSubject.value;
+
+    if (dateFieldName === 'dataVencimento') {
+      currentFilters.dataVencimento = { startDate: null, endDate: null };
+    } else {
+      currentFilters[dateFieldName] = undefined;
+    }
+
+    this.filtersSubject.next(currentFilters);
+    this.saveFilterState();
+  }
+
+  /**
+   * Obtém lista de filtros de data aplicados com informações formatadas.
+   * Responsabilidade: Transformação de dados para apresentação (Service Layer).
+   *
+   * @returns Array com informações dos filtros de data aplicados
+   */
+  getAppliedDateFilters(): Array<{
+    type: 'dataVencimento' | 'dataFabricacao' | 'dataRecebimento';
+    label: string;
+    startDate: string | null;
+    endDate: string | null;
+    displayText: string;
+  }> {
+    const filters = this.filtersSubject.value;
+    const dateFilters: Array<{
+      type: 'dataVencimento' | 'dataFabricacao' | 'dataRecebimento';
+      label: string;
+      startDate: string | null;
+      endDate: string | null;
+      displayText: string;
+    }> = [];
+
+    /**
+     * Formatação de data com garantia ABSOLUTA de preservação do valor original.
+     * Esta função NUNCA altera os valores das datas escolhidas pelo usuário.
+     *
+     * @param dateStr Valor exato inserido pelo usuário no formato yyyy-mm-dd
+     * @returns Data formatada em dd/mm/yyyy preservando valores exatos
+     */
+    const formatDateExact = (dateStr: string | null): string => {
+      // Se não há valor, retorna vazio
+      if (!dateStr || dateStr.trim() === '') {
+        return '';
+      }
+
+      // Remove qualquer parte de tempo se existir (mas preserva a data)
+      const cleanDateStr = dateStr.split('T')[0].trim();
+
+      // Validação de formato yyyy-mm-dd (exatamente 10 caracteres)
+      if (cleanDateStr.length === 10 && /^\d{4}-\d{2}-\d{2}$/.test(cleanDateStr)) {
+        // Divisão direta por posição para evitar qualquer ambiguidade
+        const year = cleanDateStr.substring(0, 4);
+        const month = cleanDateStr.substring(5, 7);
+        const day = cleanDateStr.substring(8, 10);
+
+        // Montagem direta sem validações de data que podem alterar valores
+        return `${day}/${month}/${year}`;
+      }
+
+      // Se não está no formato esperado, retorna o valor original inalterado
+      return dateStr;
+    };
+
+    // Processa cada tipo de filtro de data
+    const dateFilterConfigs = [
+      {
+        condition: filters.dataVencimento && (filters.dataVencimento.startDate || filters.dataVencimento.endDate),
+        type: 'dataVencimento' as const,
+        label: 'Período de Vencimento',
+        data: filters.dataVencimento
+      },
+      {
+        condition: filters.dataFabricacao && (filters.dataFabricacao.startDate || filters.dataFabricacao.endDate),
+        type: 'dataFabricacao' as const,
+        label: 'Data de Fabricação',
+        data: filters.dataFabricacao
+      },
+      {
+        condition: filters.dataRecebimento && (filters.dataRecebimento.startDate || filters.dataRecebimento.endDate),
+        type: 'dataRecebimento' as const,
+        label: 'Data de Recebimento',
+        data: filters.dataRecebimento
+      }
+    ];
+
+    for (const config of dateFilterConfigs) {
+      if (config.condition && config.data) {
+        const startFormatted = formatDateExact(config.data.startDate);
+        const endFormatted = formatDateExact(config.data.endDate);
+
+        // Monta o texto de exibição
+        let displayText = '';
+        if (startFormatted && endFormatted) {
+          displayText = `${startFormatted} até ${endFormatted}`;
+        } else if (startFormatted && !endFormatted) {
+          displayText = `${startFormatted} até Fim`;
+        } else if (!startFormatted && endFormatted) {
+          displayText = `Início até ${endFormatted}`;
+        } else {
+          displayText = 'Período não definido';
+        }
+
+        dateFilters.push({
+          type: config.type,
+          label: config.label,
+          startDate: config.data.startDate,
+          endDate: config.data.endDate,
+          displayText
+        });
+      }
+    }
+
+    return dateFilters;
   }
 
   // Obter o valor atual dos filtros
@@ -321,40 +494,86 @@ export class MuralFilterService {
   }
 
   /**
-   * Converte o modelo de filtro interno para o DTO que será enviado para o backend
+   * Converte o estado atual dos filtros para o formato DTO esperado pelo backend.
+   * Responsabilidade: Transformação de dados do modelo de view para o modelo de dados.
+   * Arquitetura MVC: Service layer - conversão entre modelos.
+   *
+   * @returns DTO formatado para envio ao backend
    */
   toFilterDTO(): MuralFiltroDTO {
-    const currentFilters = this.filtersSubject.value;
+    const filters = this.filtersSubject.value;
     const searchTerm = this.searchTermSubject.value;
     const sortField = this.sortFieldSubject.value;
     const sortDirection = this.sortDirectionSubject.value;
     const paginaAtual = this.paginaAtualSubject.value;
     const itensPorPagina = this.itensPorPaginaSubject.value;
+    const inspecaoFilter = this.inspecaoFilterSubject.value;
 
+    /**
+     * Função auxiliar para converter data string para formato LocalDateTime do backend.
+     * Responsabilidade: Formatação de dados para comunicação com API.
+     */
     const convertDate = (dateStr: string | null | undefined): string | undefined => {
       if (!dateStr) return undefined;
-      const date = new Date(dateStr);
-      return date.toISOString();
+
+      try {
+        // Se já está no formato ISO, só adiciona o tempo se necessário
+        if (dateStr.includes('T')) {
+          return dateStr;
+        }
+
+        // Se está no formato yyyy-mm-dd, adiciona o horário apropriado
+        if (dateStr.match(/^\d{4}-\d{2}-\d{2}$/)) {
+          return dateStr + 'T00:00:00';
+        }
+
+        // Tenta fazer o parse da data para garantir que é válida
+        const date = new Date(dateStr);
+        if (isNaN(date.getTime())) {
+          console.warn('Data inválida:', dateStr);
+          return undefined;
+        }
+
+        return date.toISOString();
+      } catch (error) {
+        console.error('Erro ao converter data:', dateStr, error);
+        return undefined;
+      }
     };
 
     return {
-      corredor: currentFilters.corredor || undefined,
-      categoria: currentFilters.categoria || undefined,
-      fornecedor: currentFilters.fornecedor || undefined,
-      marca: currentFilters.marca || undefined,
-      lote: currentFilters.lote || undefined,
-      dataVencimentoInicio: convertDate(currentFilters.dataVencimento?.startDate),
-      dataVencimentoFim: convertDate(currentFilters.dataVencimento?.endDate),
-      dataFabricacaoInicio: convertDate(currentFilters.dataFabricacao?.startDate),
-      dataFabricacaoFim: convertDate(currentFilters.dataFabricacao?.endDate),
-      dataRecebimentoInicio: convertDate(currentFilters.dataRecebimento?.startDate),
-      dataRecebimentoFim: convertDate(currentFilters.dataRecebimento?.endDate),
-      inspecionado: currentFilters.inspecionado,
-      motivoInspecao: currentFilters.motivoInspecao || undefined,
-      usuarioInspecao: currentFilters.usuarioInspecao || undefined,
-      searchTerm: searchTerm || undefined,
-      sortBy: sortField || undefined,
-      sortDirection: sortDirection || undefined,
+      // Novos campos para múltiplos valores (arrays)
+      marcas: filters.marca && filters.marca.length > 0 ? filters.marca : undefined,
+      corredores: filters.corredor && filters.corredor.length > 0 ? filters.corredor : undefined,
+      categorias: filters.categoria && filters.categoria.length > 0 ? filters.categoria : undefined,
+      fornecedores: filters.fornecedor && filters.fornecedor.length > 0 ? filters.fornecedor : undefined,
+      lotes: filters.lote && filters.lote.length > 0 ? filters.lote : undefined,
+      motivosInspecao: filters.motivoInspecao && filters.motivoInspecao.length > 0 ? filters.motivoInspecao : undefined,
+      usuariosInspecao: filters.usuarioInspecao && filters.usuarioInspecao.length > 0 ? filters.usuarioInspecao : undefined,
+
+      // Campos legados para compatibilidade - pega o primeiro valor ou string vazia
+      marca: filters.marca && filters.marca.length > 0 ? filters.marca[0] : '',
+      corredor: filters.corredor && filters.corredor.length > 0 ? filters.corredor[0] : '',
+      categoria: filters.categoria && filters.categoria.length > 0 ? filters.categoria[0] : '',
+      fornecedor: filters.fornecedor && filters.fornecedor.length > 0 ? filters.fornecedor[0] : '',
+      lote: filters.lote && filters.lote.length > 0 ? filters.lote[0] : '',
+      motivoInspecao: filters.motivoInspecao && filters.motivoInspecao.length > 0 ? filters.motivoInspecao[0] : '',
+      usuarioInspecao: filters.usuarioInspecao && filters.usuarioInspecao.length > 0 ? filters.usuarioInspecao[0] : '',
+
+      // Campos de data com validação melhorada
+      dataVencimentoInicio: convertDate(filters.dataVencimento?.startDate),
+      dataVencimentoFim: convertDate(filters.dataVencimento?.endDate),
+      dataFabricacaoInicio: convertDate(filters.dataFabricacao?.startDate),
+      dataFabricacaoFim: convertDate(filters.dataFabricacao?.endDate),
+      dataRecebimentoInicio: convertDate(filters.dataRecebimento?.startDate),
+      dataRecebimentoFim: convertDate(filters.dataRecebimento?.endDate),
+
+      // Aplicar filtro de inspeção corretamente
+      inspecionado: inspecaoFilter === 'todos' ? undefined :
+                   inspecaoFilter === 'inspecionados' ? true : false,
+      searchTerm: searchTerm,
+      sortBy: sortField,
+      sortDirection: sortDirection,
       pagina: paginaAtual,
       limite: itensPorPagina
     };
@@ -362,22 +581,25 @@ export class MuralFilterService {
 
   // Verifica se há filtros aplicados
   hasAppliedFilters(): boolean {
-    const currentFilters = this.filtersSubject.value;
+    const filters = this.filtersSubject.value;
+    const searchTerm = this.searchTermSubject.value;
+
     return (
-      !!currentFilters.marca ||
-      !!currentFilters.corredor ||
-      !!currentFilters.categoria ||
-      !!currentFilters.fornecedor ||
-      !!currentFilters.lote ||
-      currentFilters.inspecionado !== undefined ||
-      !!currentFilters.dataVencimento?.startDate ||
-      !!currentFilters.dataVencimento?.endDate ||
-      !!currentFilters.dataFabricacao?.startDate ||
-      !!currentFilters.dataFabricacao?.endDate ||
-      !!currentFilters.dataRecebimento?.startDate ||
-      !!currentFilters.dataRecebimento?.endDate ||
-      !!currentFilters.motivoInspecao ||
-      !!currentFilters.usuarioInspecao
+      (filters.marca && filters.marca.length > 0) ||
+      (filters.corredor && filters.corredor.length > 0) ||
+      (filters.categoria && filters.categoria.length > 0) ||
+      (filters.fornecedor && filters.fornecedor.length > 0) ||
+      (filters.lote && filters.lote.length > 0) ||
+      filters.inspecionado !== undefined ||
+      !!filters.dataVencimento?.startDate ||
+      !!filters.dataVencimento?.endDate ||
+      !!filters.dataFabricacao?.startDate ||
+      !!filters.dataFabricacao?.endDate ||
+      !!filters.dataRecebimento?.startDate ||
+      !!filters.dataRecebimento?.endDate ||
+      (filters.motivoInspecao && filters.motivoInspecao.length > 0) ||
+      (filters.usuarioInspecao && filters.usuarioInspecao.length > 0) ||
+      !!searchTerm
     );
   }
 

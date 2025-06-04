@@ -331,6 +331,7 @@ export class MuralListagemComponent implements OnInit, OnDestroy {
    */
   clearFilter(filterName: string): void {
     this.filterService.clearFilter(filterName as keyof MuralFilter);
+    this.applyFilters();
   }
 
   /**
@@ -338,6 +339,20 @@ export class MuralListagemComponent implements OnInit, OnDestroy {
    */
   clearDateFilter(): void {
     this.filterService.clearDateFilter('dataVencimento');
+    this.applyFilters();
+  }
+
+  /**
+   * Limpa um filtro de data específico.
+   * Responsabilidade: Controle de eventos de interface (Component Layer).
+   *
+   * @param dateType Tipo do filtro de data a ser limpo
+   */
+  clearSpecificDateFilter(dateType: string): void {
+    if (dateType === 'dataVencimento' || dateType === 'dataFabricacao' || dateType === 'dataRecebimento') {
+      this.filterService.clearSpecificDateFilter(dateType as 'dataVencimento' | 'dataFabricacao' | 'dataRecebimento');
+      this.applyFilters();
+    }
   }
 
   /**
@@ -689,5 +704,10 @@ export class MuralListagemComponent implements OnInit, OnDestroy {
       case 'vencido': return 'Vencidos';
       default: return '';
     }
+  }
+
+  onRemoveFilterValue(event: {filterName: string, value: string}): void {
+    this.filterService.removeFilterValue(event.filterName as keyof MuralFilter, event.value);
+    this.applyFilters();
   }
 }

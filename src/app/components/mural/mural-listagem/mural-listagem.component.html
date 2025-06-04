@@ -65,7 +65,9 @@
   <app-filtro-tags
     (clearFilter)="clearFilter($event)"
     (clearDateFilter)="clearDateFilter()"
-    (resetAllFilters)="resetAllFilters()">
+    (clearSpecificDateFilter)="clearSpecificDateFilter($event)"
+    (resetAllFilters)="resetAllFilters()"
+    (removeFilterValue)="onRemoveFilterValue($event)">
   </app-filtro-tags>
 
 

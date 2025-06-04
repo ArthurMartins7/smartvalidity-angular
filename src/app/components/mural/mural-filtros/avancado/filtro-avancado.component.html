@@ -160,14 +160,14 @@
                 <div>
                   <label class="block text-xs text-gray-500 mb-1">De</label>
                   <input type="date" class="date-input"
-                         [ngModel]="(tempFilters.dataRecebimento || {startDate: null}).startDate"
-                         (ngModelChange)="(tempFilters.dataRecebimento || (tempFilters.dataRecebimento = {startDate: null, endDate: null})).startDate = $event">
+                         [ngModel]="tempFilters.dataRecebimento?.startDate"
+                         (ngModelChange)="updateDateField('dataRecebimento', 'startDate', $event)">
                 </div>
                 <div>
                   <label class="block text-xs text-gray-500 mb-1">Até</label>
                   <input type="date" class="date-input"
-                         [ngModel]="(tempFilters.dataRecebimento || {endDate: null}).endDate"
-                         (ngModelChange)="(tempFilters.dataRecebimento || (tempFilters.dataRecebimento = {startDate: null, endDate: null})).endDate = $event">
+                         [ngModel]="tempFilters.dataRecebimento?.endDate"
+                         (ngModelChange)="updateDateField('dataRecebimento', 'endDate', $event)">
                 </div>
               </div>
             </div>
@@ -179,14 +179,14 @@
                 <div>
                   <label class="block text-xs text-gray-500 mb-1">De</label>
                   <input type="date" class="date-input"
-                         [ngModel]="(tempFilters.dataFabricacao || {startDate: null}).startDate"
-                         (ngModelChange)="(tempFilters.dataFabricacao || (tempFilters.dataFabricacao = {startDate: null, endDate: null})).startDate = $event">
+                         [ngModel]="tempFilters.dataFabricacao?.startDate"
+                         (ngModelChange)="updateDateField('dataFabricacao', 'startDate', $event)">
                 </div>
                 <div>
                   <label class="block text-xs text-gray-500 mb-1">Até</label>
                   <input type="date" class="date-input"
-                         [ngModel]="(tempFilters.dataFabricacao || {endDate: null}).endDate"
-                         (ngModelChange)="(tempFilters.dataFabricacao || (tempFilters.dataFabricacao = {startDate: null, endDate: null})).endDate = $event">
+                         [ngModel]="tempFilters.dataFabricacao?.endDate"
+                         (ngModelChange)="updateDateField('dataFabricacao', 'endDate', $event)">
                 </div>
               </div>
             </div>
@@ -198,14 +198,14 @@
                 <div>
                   <label class="block text-xs text-gray-500 mb-1">De</label>
                   <input type="date" class="date-input"
-                         [ngModel]="(tempFilters.dataVencimento || {startDate: null}).startDate"
-                         (ngModelChange)="(tempFilters.dataVencimento || (tempFilters.dataVencimento = {startDate: null, endDate: null})).startDate = $event">
+                         [ngModel]="tempFilters.dataVencimento.startDate"
+                         (ngModelChange)="updateDateField('dataVencimento', 'startDate', $event)">
                 </div>
                 <div>
                   <label class="block text-xs text-gray-500 mb-1">Até</label>
                   <input type="date" class="date-input"
-                         [ngModel]="(tempFilters.dataVencimento || {endDate: null}).endDate"
-                         (ngModelChange)="(tempFilters.dataVencimento || (tempFilters.dataVencimento = {startDate: null, endDate: null})).endDate = $event">
+                         [ngModel]="tempFilters.dataVencimento.endDate"
+                         (ngModelChange)="updateDateField('dataVencimento', 'endDate', $event)">
                 </div>
               </div>
             </div>

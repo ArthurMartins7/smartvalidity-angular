@@ -65,7 +65,7 @@ export class ModalAcoesComponent implements OnInit, OnDestroy {
       const itensInspecionados = items.filter(item => item.inspecionado);
       this.temItensInspecionados = itensInspecionados.length > 0;
       if (this.temItensInspecionados) {
-        this.mensagemInspecao = `Existem ${itensInspecionados.length} produto(s) já inspecionado(s) no grupo que você selecionou. Desmarque este(s) produto(s) já inspecionado(s) e tente inspecionar os outros produtos novamente:`;
+        this.mensagemInspecao = `Existem ${itensInspecionados.length} produtos já inspecionados no grupo que você selecionou. Desmarque estes produtos já inspecionados e tente inspecionar os outros produtos novamente:`;
       } else {
         this.mensagemInspecao = '';
       }

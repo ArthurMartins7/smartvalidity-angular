@@ -41,17 +41,17 @@ export class FiltroAvancadoComponent implements OnInit, OnDestroy {
 
   // Filtros selecionados atualmente
   selectedFilters: MuralFilter = {
-    marca: '',
-    corredor: '',
-    categoria: '',
-    fornecedor: '',
-    lote: '',
+    marca: [],
+    corredor: [],
+    categoria: [],
+    fornecedor: [],
+    lote: [],
     dataVencimento: { startDate: null, endDate: null },
     dataFabricacao: undefined,
     dataRecebimento: undefined,
     inspecionado: undefined,
-    motivoInspecao: '',
-    usuarioInspecao: ''
+    motivoInspecao: [],
+    usuarioInspecao: []
   };
 
   // Opções disponíveis para os filtros
@@ -120,17 +120,17 @@ export class FiltroAvancadoComponent implements OnInit, OnDestroy {
 
   private initializeFilters(): MuralFilter {
     return {
-      marca: '',
-      corredor: '',
-      categoria: '',
-      fornecedor: '',
-      lote: '',
+      marca: [],
+      corredor: [],
+      categoria: [],
+      fornecedor: [],
+      lote: [],
       dataVencimento: { startDate: null, endDate: null },
       dataFabricacao: { startDate: null, endDate: null },
       dataRecebimento: { startDate: null, endDate: null },
       inspecionado: undefined,
-      motivoInspecao: '',
-      usuarioInspecao: ''
+      motivoInspecao: [],
+      usuarioInspecao: []
     };
   }
 
@@ -182,12 +182,24 @@ export class FiltroAvancadoComponent implements OnInit, OnDestroy {
           this.filteredUsuariosInspecao = [...this.filterOptions.availableUsuariosInspecao];
 
           // Atualizar os campos de busca se já houver valores selecionados
-          if (this.tempFilters.marca) this.searchTerms.marca = this.tempFilters.marca;
-          if (this.tempFilters.corredor) this.searchTerms.corredor = this.tempFilters.corredor;
-          if (this.tempFilters.categoria) this.searchTerms.categoria = this.tempFilters.categoria;
-          if (this.tempFilters.fornecedor) this.searchTerms.fornecedor = this.tempFilters.fornecedor;
-          if (this.tempFilters.lote) this.searchTerms.lote = this.tempFilters.lote;
-          if (this.tempFilters.usuarioInspecao) this.searchTerms.colaborador = this.tempFilters.usuarioInspecao;
+          if (this.tempFilters.marca && this.tempFilters.marca.length > 0) {
+            this.searchTerms.marca = this.tempFilters.marca.join(', ');
+          }
+          if (this.tempFilters.corredor && this.tempFilters.corredor.length > 0) {
+            this.searchTerms.corredor = this.tempFilters.corredor.join(', ');
+          }
+          if (this.tempFilters.categoria && this.tempFilters.categoria.length > 0) {
+            this.searchTerms.categoria = this.tempFilters.categoria.join(', ');
+          }
+          if (this.tempFilters.fornecedor && this.tempFilters.fornecedor.length > 0) {
+            this.searchTerms.fornecedor = this.tempFilters.fornecedor.join(', ');
+          }
+          if (this.tempFilters.lote && this.tempFilters.lote.length > 0) {
+            this.searchTerms.lote = this.tempFilters.lote.join(', ');
+          }
+          if (this.tempFilters.usuarioInspecao && this.tempFilters.usuarioInspecao.length > 0) {
+            this.searchTerms.colaborador = this.tempFilters.usuarioInspecao.join(', ');
+          }
 
           this.isLoading = false;
         },
@@ -216,7 +228,6 @@ export class FiltroAvancadoComponent implements OnInit, OnDestroy {
    */
   onMarcaSearch(): void {
     const searchTerm = this.searchTerms.marca.toLowerCase();
-    this.tempFilters.marca = this.searchTerms.marca;
 
     if (!searchTerm) {
       this.filteredBrands = [...this.filterOptions.availableBrands];
@@ -229,7 +240,6 @@ export class FiltroAvancadoComponent implements OnInit, OnDestroy {
 
   onCorredorSearch(): void {
     const searchTerm = this.searchTerms.corredor.toLowerCase();
-    this.tempFilters.corredor = this.searchTerms.corredor;
 
     if (!searchTerm) {
       this.filteredCorredores = [...this.filterOptions.availableCorredores];
@@ -242,7 +252,6 @@ export class FiltroAvancadoComponent implements OnInit, OnDestroy {
 
   onCategoriaSearch(): void {
     const searchTerm = this.searchTerms.categoria.toLowerCase();
-    this.tempFilters.categoria = this.searchTerms.categoria;
 
     if (!searchTerm) {
       this.filteredCategorias = [...this.filterOptions.availableCategorias];
@@ -255,7 +264,6 @@ export class FiltroAvancadoComponent implements OnInit, OnDestroy {
 
   onFornecedorSearch(): void {
     const searchTerm = this.searchTerms.fornecedor.toLowerCase();
-    this.tempFilters.fornecedor = this.searchTerms.fornecedor;
 
     if (!searchTerm) {
       this.filteredFornecedores = [...this.filterOptions.availableFornecedores];
@@ -268,7 +276,6 @@ export class FiltroAvancadoComponent implements OnInit, OnDestroy {
 
   onLoteSearch(): void {
     const searchTerm = this.searchTerms.lote.toLowerCase();
-    this.tempFilters.lote = this.searchTerms.lote;
 
     if (!searchTerm) {
       this.filteredLotes = [...this.filterOptions.availableLotes];
@@ -288,7 +295,6 @@ export class FiltroAvancadoComponent implements OnInit, OnDestroy {
 
   onColaboradorSearch(): void {
     const searchTerm = this.searchTerms.colaborador.toLowerCase();
-    this.tempFilters.usuarioInspecao = this.searchTerms.colaborador;
 
     if (!searchTerm) {
       this.filteredUsuariosInspecao = [...this.filterOptions.availableUsuariosInspecao];
@@ -305,38 +311,44 @@ export class FiltroAvancadoComponent implements OnInit, OnDestroy {
   selectOption(field: string, value: string): void {
     switch (field) {
       case 'marca':
-        this.tempFilters.marca = value;
-        this.selectedFilters.marca = value;
+        if (!this.tempFilters.marca.includes(value)) {
+          this.tempFilters.marca = [...this.tempFilters.marca, value];
+        }
         this.searchTerms.marca = value;
         this.showMarcaDropdown = false;
         break;
       case 'corredor':
-        this.tempFilters.corredor = value;
-        this.selectedFilters.corredor = value;
+        if (!this.tempFilters.corredor.includes(value)) {
+          this.tempFilters.corredor = [...this.tempFilters.corredor, value];
+        }
         this.searchTerms.corredor = value;
         this.showCorredorDropdown = false;
         break;
       case 'categoria':
-        this.tempFilters.categoria = value;
-        this.selectedFilters.categoria = value;
+        if (!this.tempFilters.categoria.includes(value)) {
+          this.tempFilters.categoria = [...this.tempFilters.categoria, value];
+        }
         this.searchTerms.categoria = value;
         this.showCategoriaDropdown = false;
         break;
       case 'fornecedor':
-        this.tempFilters.fornecedor = value;
-        this.selectedFilters.fornecedor = value;
+        if (!this.tempFilters.fornecedor.includes(value)) {
+          this.tempFilters.fornecedor = [...this.tempFilters.fornecedor, value];
+        }
         this.searchTerms.fornecedor = value;
         this.showFornecedorDropdown = false;
         break;
       case 'lote':
-        this.tempFilters.lote = value;
-        this.selectedFilters.lote = value;
+        if (!this.tempFilters.lote.includes(value)) {
+          this.tempFilters.lote = [...this.tempFilters.lote, value];
+        }
         this.searchTerms.lote = value;
         this.showLoteDropdown = false;
         break;
       case 'usuarioInspecao':
-        this.tempFilters.usuarioInspecao = value;
-        this.selectedFilters.usuarioInspecao = value;
+        if (!this.tempFilters.usuarioInspecao.includes(value)) {
+          this.tempFilters.usuarioInspecao = [...this.tempFilters.usuarioInspecao, value];
+        }
         this.searchTerms.colaborador = value;
         this.showUsuarioInspecaoDropdown = false;
         break;
@@ -375,13 +387,10 @@ export class FiltroAvancadoComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Aplica os filtros e fecha o modal
+   * Aplica os filtros temporários ao serviço
    */
   applyFilters(): void {
-    // Aplica todos os filtros
     this.muralFilterService.updateFilters(this.tempFilters);
-
-    // Fecha o modal
     this.closeModal();
   }
 
@@ -423,26 +432,50 @@ export class FiltroAvancadoComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Limpa um filtro específico
+   * Limpa um filtro específico.
+   * Responsabilidade: Controle de estado dos filtros de apresentação (Component Layer).
+   *
+   * @param filterName Nome do filtro a ser limpo
    */
   clearFilter(filterName: keyof MuralFilter): void {
+    // Tratamento específico para campos de data
     if (filterName === 'dataVencimento') {
       this.tempFilters.dataVencimento = { startDate: null, endDate: null };
-    } else if (filterName === 'dataFabricacao' || filterName === 'dataRecebimento') {
+      return;
+    }
+
+    if (filterName === 'dataFabricacao' || filterName === 'dataRecebimento') {
       this.tempFilters[filterName] = undefined;
-    } else if (filterName === 'inspecionado') {
+      return;
+    }
+
+    // Tratamento para campos booleanos
+    if (filterName === 'inspecionado') {
       this.tempFilters.inspecionado = undefined;
-    } else if (filterName === 'motivoInspecao') {
-      this.tempFilters.motivoInspecao = '';
-    } else if (filterName === 'usuarioInspecao') {
-      this.tempFilters.usuarioInspecao = '';
+      return;
+    }
+
+    // Tratamento para arrays específicos
+    if (filterName === 'motivoInspecao') {
+      this.tempFilters.motivoInspecao = [];
+      return;
+    }
+
+    if (filterName === 'usuarioInspecao') {
+      this.tempFilters.usuarioInspecao = [];
       this.searchTerms.colaborador = '';
       this.filteredUsuariosInspecao = [...this.filterOptions.availableUsuariosInspecao];
-    } else {
-      // Usando type casting para contornar o problema de tipagem
-      (this.tempFilters as any)[filterName] = '';
+      return;
+    }
 
-      // Também limpa o campo de pesquisa correspondente
+    // Tratamento para arrays de filtros de texto (marca, corredor, categoria, fornecedor, lote)
+    if (filterName === 'marca' || filterName === 'corredor' || filterName === 'categoria' ||
+        filterName === 'fornecedor' || filterName === 'lote') {
+
+      // Limpar o array
+      (this.tempFilters as any)[filterName] = [];
+
+      // Limpar o campo de pesquisa correspondente e resetar lista filtrada
       switch (filterName) {
         case 'marca':
           this.searchTerms.marca = '';
@@ -473,11 +506,11 @@ export class FiltroAvancadoComponent implements OnInit, OnDestroy {
    */
   hasTempFilters(): boolean {
     return (
-      !!this.tempFilters.marca ||
-      !!this.tempFilters.corredor ||
-      !!this.tempFilters.categoria ||
-      !!this.tempFilters.fornecedor ||
-      !!this.tempFilters.lote ||
+      (this.tempFilters.marca && this.tempFilters.marca.length > 0) ||
+      (this.tempFilters.corredor && this.tempFilters.corredor.length > 0) ||
+      (this.tempFilters.categoria && this.tempFilters.categoria.length > 0) ||
+      (this.tempFilters.fornecedor && this.tempFilters.fornecedor.length > 0) ||
+      (this.tempFilters.lote && this.tempFilters.lote.length > 0) ||
       this.tempFilters.inspecionado !== undefined ||
       !!this.tempFilters.dataVencimento?.startDate ||
       !!this.tempFilters.dataVencimento?.endDate ||
@@ -485,8 +518,8 @@ export class FiltroAvancadoComponent implements OnInit, OnDestroy {
       !!this.tempFilters.dataFabricacao?.endDate ||
       !!this.tempFilters.dataRecebimento?.startDate ||
       !!this.tempFilters.dataRecebimento?.endDate ||
-      !!this.tempFilters.motivoInspecao ||
-      !!this.tempFilters.usuarioInspecao
+      (this.tempFilters.motivoInspecao && this.tempFilters.motivoInspecao.length > 0) ||
+      (this.tempFilters.usuarioInspecao && this.tempFilters.usuarioInspecao.length > 0)
     );
   }
 
@@ -511,15 +544,64 @@ export class FiltroAvancadoComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Valida o intervalo de datas, garantindo que a data final não seja menor que a inicial
+   * Atualiza um campo de data específico nos filtros temporários.
+   * Responsabilidade: Controle da lógica de apresentação de campos de data (Component Layer).
+   * Garante que o valor da data seja armazenado exatamente como digitado pelo usuário.
+   *
+   * @param fieldName Nome do campo de data
+   * @param type Tipo do campo (startDate ou endDate)
+   * @param value Novo valor da data (formato yyyy-mm-dd do input date)
+   */
+  updateDateField(fieldName: 'dataVencimento' | 'dataFabricacao' | 'dataRecebimento', type: 'startDate' | 'endDate', value: string): void {
+    // dataVencimento sempre existe
+    if (fieldName === 'dataVencimento') {
+      this.tempFilters.dataVencimento[type] = value || null;
+      this.validateDateRange(fieldName);
+      return;
+    }
+
+    // Para dataFabricacao e dataRecebimento - inicializa se não existir
+    if (!this.tempFilters[fieldName]) {
+      this.tempFilters[fieldName] = { startDate: null, endDate: null };
+    }
+
+    // Agora pode acessar com segurança
+    this.tempFilters[fieldName]![type] = value || null;
+
+    // Validar o intervalo de datas após a atualização
+    this.validateDateRange(fieldName);
+  }
+
+  /**
+   * Valida o intervalo de datas, garantindo que a data final não seja menor que a inicial.
+   * Responsabilidade: Validação de dados de entrada no lado do cliente (Component Layer).
+   *
+   * @param fieldName Nome do campo de data a ser validado
    */
   validateDateRange(fieldName: 'dataVencimento' | 'dataFabricacao' | 'dataRecebimento'): void {
+    // Para dataVencimento, sempre existe - validação direta
+    if (fieldName === 'dataVencimento') {
+      const dateRange = this.tempFilters.dataVencimento;
+      if (dateRange.startDate && dateRange.endDate) {
+        const startDate = new Date(dateRange.startDate);
+        const endDate = new Date(dateRange.endDate);
+        if (startDate > endDate) {
+          dateRange.endDate = dateRange.startDate;
+        }
+      }
+      return;
+    }
+
+    // Para dataFabricacao e dataRecebimento - podem ser undefined
     const dateRange = this.tempFilters[fieldName];
+
+    // Se não existe, inicializa
     if (!dateRange) {
       this.tempFilters[fieldName] = this.initializeDateField();
       return;
     }
 
+    // Se existe, valida o intervalo
     if (dateRange.startDate && dateRange.endDate) {
       const startDate = new Date(dateRange.startDate);
       const endDate = new Date(dateRange.endDate);

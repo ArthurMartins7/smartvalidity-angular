@@ -30,6 +30,7 @@ export class SidebarComponent {
 
   additionalItems: MenuItem[] = [
     { id: 'notificacoes', icon: 'notifications', label: 'Notificações', route: '/notificacoes', badge: 'NOVO' },
+    { id: 'usuarios-perfis', icon: 'apps', label: 'Usuários e Perfis', route: '/usuarios-perfis-listagem' },
     { id: 'aplicativos', icon: 'apps', label: 'Aplicativos', route: '/aplicativos' },
     { id: 'blog', icon: 'article', label: 'Blog', route: '/blog' },
   ];

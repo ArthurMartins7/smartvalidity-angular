@@ -1,3 +1,4 @@
+import { UsuariosPerfisListagemComponent } from './components/usuarios-perfis/usuarios-perfis-listagem/usuarios-perfis-listagem.component';
 import { Routes } from '@angular/router';
 import { CategoriaDetalheComponent } from './components/categoria/categoria-detalhe/categoria-detalhe/categoria-detalhe.component';
 import { CategoriaEditarComponent } from './components/categoria/categoria-editar/categoria-editar/categoria-editar.component';
@@ -29,6 +30,7 @@ export const routes: Routes = [
   { path: 'fornecedor-detalhe', component: FornecedorDetalheComponent },
   { path: 'fornecedor-editar/:id', component: FornecedorEditarComponent },
   { path: 'entrada-estoque', component: EntradaEstoqueComponent },
+  { path: 'usuarios-perfis-listagem', component: UsuariosPerfisListagemComponent },
 
   // Catch all route
   { path: 'corredor-detalhe', component: CorredorDetalheComponent },

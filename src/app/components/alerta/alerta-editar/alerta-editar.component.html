@@ -1,0 +1,213 @@
+<div class="min-h-screen bg-gray-50 p-6">
+  <div class="max-w-4xl mx-auto">
+    <!-- Header -->
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center space-x-3">
+          <button 
+            (click)="voltar()"
+            class="p-2 text-gray-400 hover:text-gray-600 transition-colors">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+            </svg>
+          </button>
+          <div>
+            <h1 class="text-2xl font-bold text-gray-900">{{ obterTituloTela() }}</h1>
+            <p class="text-sm text-gray-500">{{ isEdicao ? 'Edite as informações do alerta' : 'Preencha os dados para criar um novo alerta' }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Loading State -->
+    <div *ngIf="carregando" class="bg-white rounded-lg shadow-sm border border-gray-200 p-12 text-center">
+      <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+      <p class="text-gray-500">{{ isEdicao ? 'Carregando alerta...' : 'Processando...' }}</p>
+    </div>
+
+    <!-- Form -->
+    <div *ngIf="!carregando" class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+      <form (ngSubmit)="salvar()" #alertaForm="ngForm">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          
+          <!-- Título -->
+          <div class="md:col-span-2">
+            <label for="titulo" class="block text-sm font-medium text-gray-700 mb-2">
+              Título *
+            </label>
+            <input
+              type="text"
+              id="titulo"
+              name="titulo"
+              [(ngModel)]="alertaDTO.titulo"
+              #titulo="ngModel"
+              required
+              maxlength="100"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              placeholder="Digite o título do alerta">
+            <div *ngIf="titulo.invalid && titulo.touched" class="text-red-500 text-sm mt-1">
+              Título é obrigatório
+            </div>
+          </div>
+
+          <!-- Descrição -->
+          <div class="md:col-span-2">
+            <label for="descricao" class="block text-sm font-medium text-gray-700 mb-2">
+              Descrição *
+            </label>
+            <textarea
+              id="descricao"
+              name="descricao"
+              [(ngModel)]="alertaDTO.descricao"
+              #descricao="ngModel"
+              required
+              rows="3"
+              maxlength="500"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              placeholder="Descreva o alerta em detalhes"></textarea>
+            <div *ngIf="descricao.invalid && descricao.touched" class="text-red-500 text-sm mt-1">
+              Descrição é obrigatória
+            </div>
+          </div>
+
+          <!-- Tipo -->
+          <div>
+            <label for="tipo" class="block text-sm font-medium text-gray-700 mb-2">
+              Tipo *
+            </label>
+            
+            <!-- Modo Criação: Select editável -->
+            <select
+              *ngIf="!isEdicao"
+              id="tipo"
+              name="tipo"
+              [(ngModel)]="alertaDTO.tipo"
+              required
+              class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+              <option value="">Selecione o tipo</option>
+              <option *ngFor="let tipoEnum of tiposAlerta" [value]="tipoEnum">
+                {{ obterDescricaoTipo(tipoEnum) }}
+              </option>
+            </select>
+            
+            <!-- Modo Edição: Campo somente leitura -->
+            <div
+              *ngIf="isEdicao"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm bg-gray-50 text-gray-700">
+              {{ tipoAlertaOriginal ? obterDescricaoTipo(tipoAlertaOriginal) : 'Tipo não definido' }}
+              <span class="text-xs text-gray-500 ml-2">(não editável)</span>
+            </div>
+          </div>
+
+          <!-- Data/Hora Disparo -->
+          <div>
+            <label for="dataHoraDisparo" class="block text-sm font-medium text-gray-700 mb-2">
+              Data/Hora de Disparo *
+            </label>
+            <input
+              type="datetime-local"
+              id="dataHoraDisparo"
+              name="dataHoraDisparo"
+              [(ngModel)]="alertaDTO.dataHoraDisparo"
+              #dataHoraDisparo="ngModel"
+              required
+              class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+            <div *ngIf="dataHoraDisparo.invalid && dataHoraDisparo.touched" class="text-red-500 text-sm mt-1">
+              Data/hora de disparo é obrigatória
+            </div>
+          </div>
+
+          <!-- Produto -->
+          <div>
+            <label for="produto" class="block text-sm font-medium text-gray-700 mb-2">
+              Produto Relacionado
+            </label>
+            <select
+              id="produto"
+              name="produto"
+              [(ngModel)]="produtoSelecionado"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+              <option value="">Nenhum produto específico</option>
+              <option *ngFor="let produto of produtos" [value]="produto.id">
+                {{ produto.descricao }}
+              </option>
+            </select>
+          </div>
+
+          <!-- Dias de Antecedência -->
+          <div>
+            <label for="diasAntecedencia" class="block text-sm font-medium text-gray-700 mb-2">
+              Dias de Antecedência
+            </label>
+            <input
+              type="number"
+              id="diasAntecedencia"
+              name="diasAntecedencia"
+              [(ngModel)]="alertaDTO.diasAntecedencia"
+              min="0"
+              max="365"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              placeholder="Ex: 7">
+          </div>
+
+          <!-- Switches -->
+          <div class="md:col-span-2">
+            <div class="flex flex-wrap gap-6">
+              <!-- Recorrente -->
+              <div class="flex items-center">
+                <input
+                  type="checkbox"
+                  id="recorrente"
+                  name="recorrente"
+                  [(ngModel)]="alertaDTO.recorrente"
+                  class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                <label for="recorrente" class="ml-2 block text-sm text-gray-700">
+                  Alerta recorrente
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <!-- Configuração de Recorrência -->
+          <div *ngIf="alertaDTO.recorrente" class="md:col-span-2">
+            <label for="configuracaoRecorrencia" class="block text-sm font-medium text-gray-700 mb-2">
+              Configuração de Recorrência
+            </label>
+            <input
+              type="text"
+              id="configuracaoRecorrencia"
+              name="configuracaoRecorrencia"
+              [(ngModel)]="alertaDTO.configuracaoRecorrencia"
+              maxlength="100"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              placeholder="Ex: Diário, Semanal, Mensal">
+          </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="flex justify-end space-x-3 mt-8 pt-6 border-t border-gray-200">
+          <button
+            type="button"
+            (click)="voltar()"
+            class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+            Cancelar
+          </button>
+          
+          <button
+            type="submit"
+            [disabled]="alertaForm.invalid || carregando"
+            class="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed">
+            <span *ngIf="!carregando">{{ isEdicao ? 'Atualizar' : 'Criar' }} Alerta</span>
+            <span *ngIf="carregando" class="flex items-center">
+              <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              Processando...
+            </span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div> 

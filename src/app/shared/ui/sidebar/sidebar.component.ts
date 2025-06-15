@@ -26,6 +26,7 @@ export class SidebarComponent {
     { id: 'estoque', icon: 'inventory', label: 'Estoque', route: '/entrada-estoque' },
     { id: 'layout', icon: 'grid_view', label: 'Layout', route: '/corredor' },
     { id: 'fornecedores', icon: 'business', label: 'Fornecedores', route: '/fornecedor-listagem' },
+    { id: 'alertas', icon: 'notifications_active', label: 'Alertas', route: '/alertas' },
   ];
 
   additionalItems: MenuItem[] = [

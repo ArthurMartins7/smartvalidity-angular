@@ -9,5 +9,6 @@ export class ItemProdutoDTO {
   dataVencimento!: string;
   dataRecebimento!: string;
   produto!: ProdutoDTO;
+  quantidade?: number;
 }
 

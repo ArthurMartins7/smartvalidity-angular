@@ -21,6 +21,7 @@ export class EntradaEstoqueComponent implements OnInit {
   formData = {
     produto: '',
     lote: '',
+    quantidade: 1,
     dataRecebimento: '',
     horaRecebimento: '',
     dataFabricacao: '',
@@ -119,7 +120,8 @@ export class EntradaEstoqueComponent implements OnInit {
           nome: produtoSelecionado.categoria.nome,
           produtos: []
         }
-      }
+      },
+      quantidade: this.formData.quantidade
     };
 
     console.log('ItemProduto a ser enviado:', JSON.stringify(itemProduto, null, 2));
@@ -131,6 +133,7 @@ export class EntradaEstoqueComponent implements OnInit {
         this.formData = {
           produto: '',
           lote: '',
+          quantidade: 1,
           dataRecebimento: '',
           horaRecebimento: '',
           dataFabricacao: '',
@@ -139,7 +142,7 @@ export class EntradaEstoqueComponent implements OnInit {
           horaVencimento: ''
         };
         this.produtoSelecionado = null;
-        this.router.navigate(['/produto-listagem']);
+        this.router.navigate(['/mural-listagem']);
       },
       error: (erro) => {
         console.error('Erro completo:', erro);
@@ -163,6 +166,6 @@ export class EntradaEstoqueComponent implements OnInit {
   }
 
   voltar(): void {
-    this.router.navigate(['/produto-listagem']);
+    this.router.navigate(['/mural-listagem']);
   }
 }

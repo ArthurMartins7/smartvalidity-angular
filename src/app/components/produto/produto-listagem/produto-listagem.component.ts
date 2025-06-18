@@ -160,34 +160,34 @@ export class ProdutoListagemComponent implements OnInit, OnDestroy {
   private aplicarFiltrosLocalmente(produtos: Produto[]) {
     // Aplicar filtros
     let produtosFiltrados = produtos;
-    
+
     if (this.seletor.codigoBarras) {
-      produtosFiltrados = produtosFiltrados.filter(p => 
+      produtosFiltrados = produtosFiltrados.filter(p =>
         p.codigoBarras?.toLowerCase().includes(this.seletor.codigoBarras.toLowerCase()));
     }
-    
+
     if (this.seletor.descricao) {
-      produtosFiltrados = produtosFiltrados.filter(p => 
+      produtosFiltrados = produtosFiltrados.filter(p =>
         p.descricao?.toLowerCase().includes(this.seletor.descricao.toLowerCase()));
     }
-    
+
     if (this.seletor.marca) {
-      produtosFiltrados = produtosFiltrados.filter(p => 
+      produtosFiltrados = produtosFiltrados.filter(p =>
         p.marca?.toLowerCase().includes(this.seletor.marca.toLowerCase()));
     }
-    
+
     if (this.seletor.unidadeMedida) {
-      produtosFiltrados = produtosFiltrados.filter(p => 
+      produtosFiltrados = produtosFiltrados.filter(p =>
         p.unidadeMedida?.toLowerCase().includes(this.seletor.unidadeMedida.toLowerCase()));
     }
-    
+
     if (this.seletor.fornecedorId) {
       produtosFiltrados = produtosFiltrados.filter(p => {
         // Verificar se o produto tem fornecedores
         if (!p.fornecedores || p.fornecedores.length === 0) {
           return false;
         }
-        
+
         // Verificar se algum dos fornecedores do produto corresponde ao fornecedor selecionado
         return p.fornecedores.some(fornecedor => {
           // Se o fornecedor for um objeto, verificar o ID
@@ -199,15 +199,15 @@ export class ProdutoListagemComponent implements OnInit, OnDestroy {
         });
       });
     }
-    
+
     // Calcular total de páginas
     this.totalPaginas = Math.ceil(produtosFiltrados.length / this.seletor.limite);
-    
+
     // Aplicar paginação
     const inicio = (this.seletor.pagina - 1) * this.seletor.limite;
     const fim = inicio + this.seletor.limite;
     produtosFiltrados = produtosFiltrados.slice(inicio, fim);
-    
+
     // Criar uma nova instância para cada produto e seus fornecedores
     this.produtos = produtosFiltrados.map(produto => {
       const novoProduto = { ...produto };
@@ -358,7 +358,7 @@ export class ProdutoListagemComponent implements OnInit, OnDestroy {
           this.corredorService.listarTodos().subscribe({
             next: (corredores) => {
               // Encontrar o corredor que contém esta categoria
-              const corredorEncontrado = corredores.find(corredor => 
+              const corredorEncontrado = corredores.find(corredor =>
                 corredor.categorias.some(cat => cat.id === categoriaId)
               );
 
@@ -420,7 +420,7 @@ export class ProdutoListagemComponent implements OnInit, OnDestroy {
   }
 
   irParaEntradaEstoque(produto: Produto) {
-    this.router.navigate(['/entrada-estoque'], {
+    this.router.navigate(['/item-produto-cadastro'], {
       queryParams: {
         produtoId: produto.id
       }

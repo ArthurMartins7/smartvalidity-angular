@@ -8,6 +8,7 @@ import { EntradaEstoqueComponent } from './components/entrada-estoque/entrada-es
 import { FornecedorDetalheComponent } from './components/fornecedor/fornecedor-detalhe/fornecedor-detalhe.component';
 import { FornecedorEditarComponent } from './components/fornecedor/fornecedor-editar/fornecedor-editar/fornecedor-editar.component';
 import { FornecedorListagemComponent } from './components/fornecedor/fornecedor-listagem/fornecedor-listagem/fornecedor-listagem.component';
+import { ItemProdutoCadastroComponent } from './components/item-produto/item-produto-cadastro/item-produto-cadastro.component';
 import { MuralDetalheComponent } from './components/mural/mural-detalhe/mural-detalhe.component';
 import { MuralListagemComponent } from './components/mural/mural-listagem/mural-listagem.component';
 import { ProdutoEditarComponent } from './components/produto/produto-editar/produto-editar/produto-editar.component';
@@ -29,6 +30,7 @@ export const routes: Routes = [
   { path: 'fornecedor-detalhe', component: FornecedorDetalheComponent },
   { path: 'fornecedor-editar/:id', component: FornecedorEditarComponent },
   { path: 'entrada-estoque', component: EntradaEstoqueComponent },
+  { path: 'item-produto-cadastro', component: ItemProdutoCadastroComponent },
 
   // Catch all route
   { path: 'corredor-detalhe', component: CorredorDetalheComponent },

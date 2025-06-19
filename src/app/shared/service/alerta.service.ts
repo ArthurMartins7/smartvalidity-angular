@@ -2,15 +2,21 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { map, tap } from 'rxjs/operators';
-import { environment } from '../../../environments/environment';
 import { AlertaDTO } from '../model/dto/alerta.dto';
 import { AlertaSeletor } from '../model/seletor/alerta.seletor';
+
+/**
+ * URL base da API
+ * Em produção, usar URL relativa: '/smartvalidity'
+ * Em desenvolvimento, usar URL completa: 'http://localhost:8080/smartvalidity'
+ */
+const API_URL = 'http://localhost:8080/smartvalidity';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AlertaService {
-  private readonly API = `${environment.apiUrl}/alertas`;
+  private readonly API = `${API_URL}/alertas`;
 
   constructor(private httpClient: HttpClient) {}
 

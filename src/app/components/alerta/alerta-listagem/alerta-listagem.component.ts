@@ -272,32 +272,6 @@ export class AlertaListagemComponent implements OnInit, OnDestroy {
     });
   }
 
-  public gerarAlertasAutomaticos(): void {
-    Swal.fire({
-      title: 'Gerar Alertas Automáticos?',
-      text: 'Isso irá criar alertas automáticos para produtos próximos ao vencimento.',
-      icon: 'question',
-      showCancelButton: true,
-      confirmButtonColor: '#3085d6',
-      cancelButtonColor: '#d33',
-      confirmButtonText: 'Sim, gerar!',
-      cancelButtonText: 'Cancelar'
-    }).then((result) => {
-      if (result.isConfirmed) {
-        this.alertaService.gerarAlertasAutomaticos().subscribe({
-          next: (response) => {
-            Swal.fire('Sucesso!', response.message || 'Alertas automáticos gerados com sucesso.', 'success');
-            this.buscarAlertas();
-          },
-          error: (erro) => {
-            console.error('Erro ao gerar alertas automáticos:', erro);
-            Swal.fire('Erro!', 'Não foi possível gerar os alertas automáticos.', 'error');
-          }
-        });
-      }
-    });
-  }
-
   public formatarData(data: Date): string {
     if (!data) return '-';
     return new Date(data).toLocaleDateString('pt-BR');

@@ -96,15 +96,6 @@ export class AlertaService {
     );
   }
 
-  gerarAlertasAutomaticos(): Observable<any> {
-    return this.httpClient.post<any>(`${this.API}/gerar-automaticos`, {}).pipe(
-      tap({
-        next: (response) => console.log('Alertas automáticos gerados:', response),
-        error: (error) => console.error('Erro ao gerar alertas automáticos:', error)
-      })
-    );
-  }
-
   contarTotalRegistros(seletor: AlertaSeletor): Observable<number> {
     return this.httpClient.post<number>(`${this.API}/contar-registros`, seletor).pipe(
       tap({

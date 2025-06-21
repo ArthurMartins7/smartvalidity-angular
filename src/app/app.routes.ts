@@ -1,5 +1,7 @@
 import { UsuariosPerfisListagemComponent } from './components/usuarios-perfis/usuarios-perfis-listagem/usuarios-perfis-listagem.component';
 import { Routes } from '@angular/router';
+import { AlertaEditarComponent } from './components/alerta/alerta-editar/alerta-editar.component';
+import { AlertaListagemComponent } from './components/alerta/alerta-listagem/alerta-listagem.component';
 import { CategoriaDetalheComponent } from './components/categoria/categoria-detalhe/categoria-detalhe/categoria-detalhe.component';
 import { CategoriaEditarComponent } from './components/categoria/categoria-editar/categoria-editar/categoria-editar.component';
 import { CorredorDetalheComponent } from './components/corredor/corredor-detalhe/corredor-detalhe.component';
@@ -32,8 +34,10 @@ export const routes: Routes = [
   { path: 'entrada-estoque', component: EntradaEstoqueComponent },
   { path: 'usuarios-perfis-listagem', component: UsuariosPerfisListagemComponent },
 
-  // Catch all route
-  { path: 'corredor-detalhe', component: CorredorDetalheComponent },
+  // Rotas de Alertas
+  { path: 'alertas', component: AlertaListagemComponent },
+  { path: 'alerta-editar', component: AlertaEditarComponent },
+  { path: 'alerta-editar/:id', component: AlertaEditarComponent },
 
   // Rotas do Mural
   { path: 'mural-listagem', component: MuralListagemComponent },

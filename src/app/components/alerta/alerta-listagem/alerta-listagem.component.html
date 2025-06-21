@@ -1,0 +1,290 @@
+<!-- Cabeçalho -->
+<div class="flex items-center gap-2 mb-8">
+  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6 text-gray-600">
+    <path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0" />
+  </svg>
+  <div>
+    <div class="text-gray-500">Sistema</div>
+    <div class="text-2xl font-bold">Gestão de Alertas</div>
+  </div>
+</div>
+
+<div class="p-3 bg-white-100">
+  <!-- Campo de pesquisa com filtro -->
+  <div class="mb-6 relative">
+    <div class="relative">
+      <div class="absolute inset-y-0 left-3 flex items-center pointer-events-none">
+        <svg class="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+        </svg>
+      </div>
+      <input
+        type="text"
+        placeholder="Pesquisar alertas por título..."
+        class="w-full pl-12 pr-12 py-3 border rounded-full bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-200 text-lg"
+        [(ngModel)]="filtroTitulo"
+        (ngModelChange)="onSearchInput()">
+      <button
+        (click)="toggleFiltros()"
+        class="absolute inset-y-0 right-3 flex items-center text-gray-400 hover:text-gray-600">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 3c2.755 0 5.455.232 8.083.678.533.09.917.556.917 1.096v1.044a2.25 2.25 0 01-.659 1.591l-5.432 5.432a2.25 2.25 0 00-.659 1.591v2.927a2.25 2.25 0 01-1.244 2.013L9.75 21v-6.568a2.25 2.25 0 00-.659-1.591L3.659 7.409A2.25 2.25 0 013 5.818V4.774c0-.54.384-1.006.917-1.096A48.32 48.32 0 0112 3z" />
+        </svg>
+      </button>
+    </div>
+
+    <!-- Popup de Filtros -->
+    <div *ngIf="mostrarFiltros"
+         cdkDrag
+         cdkDragBoundary=".p-3"
+         cdkDragHandle
+         class="absolute z-10 mt-2 w-96 bg-white rounded-lg shadow-lg border border-gray-200 cursor-move">
+      <div class="p-4">
+        <div class="flex justify-between items-center mb-4">
+          <h3 class="text-lg font-semibold">Filtros</h3>
+          <button
+            (click)="toggleFiltros()"
+            class="text-gray-400 hover:text-gray-600">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+
+        <div class="space-y-4">
+          <!-- Filtro de Tipo -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Tipo de Alerta</label>
+            <select
+              [(ngModel)]="filtroTipo"
+              class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+              <option [ngValue]="null">Todos os tipos</option>
+              <option *ngFor="let tipo of tiposAlerta" [ngValue]="tipo">
+                {{ obterDescricaoTipo(tipo) }}
+              </option>
+            </select>
+          </div>
+
+          <!-- Filtro de Status -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Status</label>
+            <select
+              [(ngModel)]="filtroAtivo"
+              class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+              <option [ngValue]="null">Todos</option>
+              <option [ngValue]="true">Ativo</option>
+              <option [ngValue]="false">Inativo</option>
+            </select>
+          </div>
+
+          <!-- Filtro de Produto -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Produto</label>
+            <select
+              [(ngModel)]="filtroProduto"
+              class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+              <option [ngValue]="null">Todos os produtos</option>
+              <option *ngFor="let produto of produtos" [ngValue]="produto">
+                {{ produto.descricao }}
+              </option>
+            </select>
+          </div>
+
+          <!-- Filtros de Data -->
+          <div class="grid grid-cols-2 gap-2">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Data Início</label>
+              <input
+                type="date"
+                [(ngModel)]="filtroDataInicio"
+                class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Data Fim</label>
+              <input
+                type="date"
+                [(ngModel)]="filtroDataFim"
+                class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+            </div>
+          </div>
+        </div>
+
+        <!-- Botões de Ação -->
+        <div class="flex justify-end space-x-2 mt-4">
+          <button
+            type="button"
+            (click)="limparFiltros()"
+            class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200">
+            Limpar
+          </button>
+          <button
+            type="button"
+            (click)="aplicarFiltros()"
+            class="px-4 py-2 text-sm font-medium text-white bg-blue-500 rounded-lg hover:bg-blue-600">
+            Aplicar
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Seletor de itens por página e botões de ação -->
+  <div class="flex justify-between items-center mb-4">
+    <div class="flex gap-2">
+      <button (click)="adicionarAlerta()"
+        class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-full flex items-center transition-all transform hover:scale-105 shadow-sm hover:shadow-md">
+        <span class="mr-2 text-base font-semibold">+</span>
+        <span class="text-sm font-medium">Criar Alerta</span>
+      </button>
+    </div>
+
+    <div class="flex items-center gap-2">
+      <label for="itensPorPagina" class="text-sm text-gray-600">Itens por página:</label>
+      <select
+        id="itensPorPagina"
+        [(ngModel)]="itensPorPagina"
+        (ngModelChange)="alterarItensPorPagina()"
+        class="bg-white border border-gray-300 text-gray-700 py-2 px-4 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+        <option *ngFor="let opcao of opcoesItensPorPagina" [value]="opcao">
+          {{ opcao }}
+        </option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Lista de Alertas -->
+  <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+    <div class="overflow-x-auto">
+      <table class="min-w-full divide-y divide-gray-200">
+        <thead class="bg-gray-50">
+          <tr>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Título</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tipo</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Data Disparo</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Recorrente</th>
+            <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Ações</th>
+          </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-gray-200">
+          <tr *ngFor="let alerta of alertas; trackBy: trackByAlerta" class="hover:bg-gray-50">
+            <td class="px-6 py-4 whitespace-nowrap">
+              <div class="text-sm font-medium text-gray-900">{{ alerta.titulo }}</div>
+              <div class="text-sm text-gray-500 max-w-xs truncate" [title]="alerta.descricao">{{ alerta.descricao }}</div>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap">
+              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
+                    [class]="obterCorTipo(alerta.tipo)">
+                {{ obterDescricaoTipo(alerta.tipo) }}
+              </span>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+              {{ formatarDataHora(alerta.dataHoraDisparo) }}
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap">
+              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
+                    [class]="alerta.ativo ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'">
+                {{ alerta.ativo ? 'Ativo' : 'Inativo' }}
+              </span>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+              <span class="inline-flex items-center">
+                <svg *ngIf="alerta.recorrente" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4 text-green-600">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                </svg>
+                <svg *ngIf="!alerta.recorrente" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4 text-gray-400">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </span>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+              <div class="flex items-center justify-end space-x-2">
+                <button (click)="visualizarAlerta(alerta)"
+                        class="text-blue-600 hover:text-blue-900"
+                        title="Visualizar">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                  </svg>
+                </button>
+
+                <button (click)="editarAlerta(alerta)"
+                        class="text-indigo-600 hover:text-indigo-900"
+                        title="Editar">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
+                  </svg>
+                </button>
+
+                <button (click)="toggleAtivoAlerta(alerta)"
+                        [class]="alerta.ativo ? 'text-orange-600 hover:text-orange-900' : 'text-green-600 hover:text-green-900'"
+                        [title]="alerta.ativo ? 'Desativar' : 'Ativar'">
+                  <svg *ngIf="alerta.ativo" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728L5.636 5.636m12.728 12.728L18.364 5.636M5.636 18.364l12.728-12.728" />
+                  </svg>
+                  <svg *ngIf="!alerta.ativo" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M5.636 5.636a9 9 0 1012.728 0M12 3v9" />
+                  </svg>
+                </button>
+
+                <button (click)="excluirAlerta(alerta)"
+                        class="text-red-600 hover:text-red-900"
+                        title="Excluir">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
+                  </svg>
+                </button>
+              </div>
+            </td>
+          </tr>
+
+          <!-- Mensagem quando não há alertas -->
+          <tr *ngIf="alertas.length === 0">
+            <td colspan="6" class="px-6 py-8 text-center text-gray-500">
+              <div class="flex flex-col items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1" stroke="currentColor" class="w-12 h-12 text-gray-300 mb-2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0" />
+                </svg>
+                <p class="text-lg font-medium">Nenhum alerta encontrado</p>
+                <p class="text-sm">Crie um novo alerta ou ajuste os filtros</p>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Controles de Paginação -->
+  <div class="mt-4 flex justify-between items-center" *ngIf="alertas.length > 0">
+    <!-- Botões de navegação -->
+    <div class="flex space-x-4">
+      <button
+        (click)="voltarPagina()"
+        [disabled]="seletor.pagina === 1"
+        class="px-4 py-2 bg-gray-200 text-gray-600 rounded-lg hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed">
+        Anterior
+      </button>
+      <button
+        (click)="avancarPagina()"
+        [disabled]="seletor.pagina === totalPaginas"
+        class="px-4 py-2 bg-gray-200 text-gray-600 rounded-lg hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed">
+        Próxima
+      </button>
+    </div>
+
+    <!-- Páginas -->
+    <div class="flex space-x-2">
+      <button
+        *ngFor="let pagina of criarArrayPaginas()"
+        (click)="irParaPagina(pagina)"
+        [class.bg-blue-500]="pagina === seletor.pagina"
+        [class.text-white]="pagina === seletor.pagina"
+        [class.bg-gray-200]="pagina !== seletor.pagina"
+        [class.text-gray-600]="pagina !== seletor.pagina"
+        class="px-4 py-2 rounded-lg hover:bg-blue-600 hover:text-white transition-colors">
+        {{ pagina }}
+      </button>
+    </div>
+  </div>
+</div>

@@ -1,13 +1,15 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
 
 interface MenuItem {
   id: string;
-  icon: string;
+  icon?: string;
   label: string;
   route: string;
   badge?: string;
+  image?: string;
+  imageActive?: string;
 }
 
 @Component({
@@ -17,26 +19,33 @@ interface MenuItem {
   templateUrl: './sidebar.component.html',
   styleUrl: './sidebar.component.css'
 })
-export class SidebarComponent {
+export class SidebarComponent implements OnInit {
   activeMenuItem = 'mural'; // Default active menu item
   isSidebarOpen = true; // Control sidebar visibility
+  userName: string = '';
 
   menuItems: MenuItem[] = [
-    { id: 'mural', icon: 'dashboard', label: 'Mural', route: '/mural-listagem' },
-    { id: 'estoque', icon: 'inventory', label: 'Estoque', route: '/entrada-estoque' },
-    { id: 'layout', icon: 'grid_view', label: 'Layout', route: '/corredor' },
-    { id: 'fornecedores', icon: 'business', label: 'Fornecedores', route: '/fornecedor-listagem' },
-    { id: 'alertas', icon: 'notifications_active', label: 'Alertas', route: '/alertas' },
+    { id: 'mural', image: '/icons/mural.svg', imageActive: '/icons/mural-blue.svg', label: 'Mural', route: '/mural-listagem' },
+    { id: 'estoque', image: '/icons/estoque.svg', imageActive: '/icons/estoque-blue.svg', label: 'Estoque', route: '/entrada-estoque' },
+    { id: 'layout', icon: 'widgets', label: 'Layout', route: '/corredor' },
+
   ];
 
   additionalItems: MenuItem[] = [
-    { id: 'notificacoes', icon: 'notifications', label: 'Notificações', route: '/notificacoes', badge: 'NOVO' },
-    { id: 'usuarios-perfis', icon: 'apps', label: 'Usuários e Perfis', route: '/usuarios-perfis-listagem' },
-    { id: 'aplicativos', icon: 'apps', label: 'Aplicativos', route: '/aplicativos' },
-    { id: 'blog', icon: 'article', label: 'Blog', route: '/blog' },
+    { id: 'usuarios-perfis', icon: 'people', label: 'Usuários e Perfis', route: '/usuarios-perfis-listagem' },
+    { id: 'alertas', image: '/icons/notification-settings.svg', imageActive: '/icons/notification-settings-blue.svg', label: 'Gerenciar Alertas', route: '/alertas' },
+    { id: 'fornecedores', image: '/icons/fornecedor.svg', imageActive: '/icons/fornecedor-blue.svg', label: 'Fornecedores', route: '/fornecedor-listagem' },
+
   ];
 
+  // Flag to highlight unread notifications
+  unreadNotifications = true;
+
   constructor(private router: Router) {}
+
+  ngOnInit(): void {
+    this.userName = sessionStorage.getItem('usuarioNome') ?? 'Usuário';
+  }
 
   toggleSidebar(): void {
     this.isSidebarOpen = !this.isSidebarOpen;
@@ -65,5 +74,10 @@ export class SidebarComponent {
 
   isMobile(): boolean {
     return window.innerWidth < 768; // md breakpoint do Tailwind
+  }
+
+  goToNotifications(): void {
+    this.router.navigate(['/notificacoes']);
+    this.unreadNotifications = false;
   }
 }

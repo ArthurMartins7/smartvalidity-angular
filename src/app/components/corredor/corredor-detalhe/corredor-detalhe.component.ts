@@ -82,23 +82,32 @@ export class CorredorDetalheComponent implements OnInit {
     );
   }
 
+  public adicionarResponsavel(): void {
+    if (this.responsavelSelecionado && !this.corredor.responsaveis.some(r => r.id === this.responsavelSelecionado!.id)) {
+      this.corredor.responsaveis.push(this.responsavelSelecionado);
+      this.responsavelSelecionado = null;
+    }
+  }
+
+  public removerResponsavel(index: number): void {
+    this.corredor.responsaveis.splice(index, 1);
+  }
+
   salvar(): void {
-    if (!this.corredor.nome || !this.responsavelSelecionado) {
-      Swal.fire('Preencha todos os campos obrigatórios!', '', 'warning');
+    if (!this.corredor.nome || this.corredor.responsaveis.length === 0) {
+      Swal.fire('Preencha todos os campos obrigatórios e adicione pelo menos um responsável!', '', 'warning');
       return;
     }
 
-    // Limpa os campos do Spring Security do responsável
-    const responsavelLimpo = {
-      id: this.responsavelSelecionado.id,
-      perfilAcesso: this.responsavelSelecionado.perfilAcesso,
-      cpf: this.responsavelSelecionado.cpf,
-      nome: this.responsavelSelecionado.nome,
-      email: this.responsavelSelecionado.email,
-      senha: this.responsavelSelecionado.senha
-    };
-
-    this.corredor.responsaveis = [responsavelLimpo];
+    // Limpa os campos do Spring Security dos responsáveis
+    this.corredor.responsaveis = this.corredor.responsaveis.map(responsavel => ({
+      id: responsavel.id,
+      perfilAcesso: responsavel.perfilAcesso,
+      cpf: responsavel.cpf,
+      nome: responsavel.nome,
+      email: responsavel.email,
+      senha: responsavel.senha
+    }));
 
     if (this.idCorredor) {
       this.atualizar();

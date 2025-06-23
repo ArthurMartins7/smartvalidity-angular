@@ -89,7 +89,12 @@ export class AlertaListagemComponent implements OnInit, OnDestroy {
       },
       error: (erro) => {
         console.error('Erro ao buscar alertas:', erro);
-        Swal.fire('Erro!', 'Não foi possível carregar os alertas.', 'error');
+        // Só exibe erro se não for um erro 404 (sem alertas) ou similar
+        if (erro.status !== 404 && erro.status !== 204) {
+          Swal.fire('Erro!', 'Não foi possível carregar os alertas.', 'error');
+        }
+        // Se for 404 ou 204, apenas define lista vazia
+        this.alertas = [];
       }
     });
   }

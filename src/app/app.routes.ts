@@ -1,4 +1,3 @@
-import { UsuariosPerfisListagemComponent } from './components/usuarios-perfis/usuarios-perfis-listagem/usuarios-perfis-listagem.component';
 import { Routes } from '@angular/router';
 import { AlertaEditarComponent } from './components/alerta/alerta-editar/alerta-editar.component';
 import { AlertaListagemComponent } from './components/alerta/alerta-listagem/alerta-listagem.component';
@@ -13,9 +12,11 @@ import { FornecedorEditarComponent } from './components/fornecedor/fornecedor-ed
 import { FornecedorListagemComponent } from './components/fornecedor/fornecedor-listagem/fornecedor-listagem/fornecedor-listagem.component';
 import { MuralDetalheComponent } from './components/mural/mural-detalhe/mural-detalhe.component';
 import { MuralListagemComponent } from './components/mural/mural-listagem/mural-listagem.component';
+import { NotificacaoListagemComponent } from './components/notificacao/notificacao-listagem.component';
 import { ProdutoEditarComponent } from './components/produto/produto-editar/produto-editar/produto-editar.component';
 import { ProdutoDetalheComponent } from './components/produto/produto-listagem/produto-detalhe/produto-detalhe/produto-detalhe.component';
 import { ProdutoListagemComponent } from './components/produto/produto-listagem/produto-listagem.component';
+import { UsuariosPerfisListagemComponent } from './components/usuarios-perfis/usuarios-perfis-listagem/usuarios-perfis-listagem.component';
 import { LoginComponent } from './core/auth/pages/login/login/login.component';
 import { RegisterComponent } from './core/auth/pages/register/register/register.component';
 
@@ -38,6 +39,9 @@ export const routes: Routes = [
   { path: 'alertas', component: AlertaListagemComponent },
   { path: 'alerta-editar', component: AlertaEditarComponent },
   { path: 'alerta-editar/:id', component: AlertaEditarComponent },
+
+  // Rotas de Notificações
+  { path: 'notificacoes', component: NotificacaoListagemComponent },
 
   // Rotas do Mural
   { path: 'mural-listagem', component: MuralListagemComponent },

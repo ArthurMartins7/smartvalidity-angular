@@ -1,0 +1,83 @@
+<!-- Header -->
+<div class="bg-gray-100 p-6 rounded-b-lg mb-6">
+  <div class="flex items-center justify-between">
+    <div>
+      <h1 class="text-3xl font-bold text-gray-800 mb-1">gerenciar equipe</h1>
+      <p class="text-gray-600">aqui você pode gerenciar, editar e adicionar novos usuários à equipe</p>
+    </div>
+    <div class="flex items-center gap-4">
+      <a href="#" class="text-blue-600 flex items-center gap-1 text-sm hover:underline">
+        <span class="material-icons text-base">menu_book</span>
+        tutorial de gerenciamento
+      </a>
+      <button class="bg-orange-500 hover:bg-orange-600 text-white font-semibold px-6 py-2 rounded transition flex items-center gap-2">
+        convidar usuário
+        <span class="material-icons text-base">add</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Tabs -->
+<div class="border-b border-gray-200 flex items-center gap-8 mb-4">
+  <button class="pb-2 border-b-2 border-orange-500 text-orange-600 font-semibold">minha equipe</button>
+  <button class="pb-2 text-gray-500 hover:text-orange-600 transition">pendentes</button>
+  <div class="ml-auto flex items-center gap-2">
+    <a href="#" class="flex items-center gap-1 text-blue-600 text-sm hover:underline">
+      <span class="material-icons text-base">help_outline</span>
+      conhecer perfis
+    </a>
+  </div>
+</div>
+
+<!-- Search -->
+<div class="flex items-center mb-4 max-w-md">
+  <div class="relative w-full">
+    <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+      <span class="material-icons">search</span>
+    </span>
+    <input
+      type="text"
+      placeholder="Pesquisar"
+      class="w-full pl-10 pr-10 py-2 border rounded-full bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-100 focus:border-orange-200 text-base"
+
+    >
+    <button class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+      <span class="material-icons">close</span>
+    </button>
+  </div>
+</div>
+
+<!-- Table -->
+<div class="overflow-x-auto">
+  <table class="min-w-full border-separate border-spacing-0">
+    <thead>
+      <tr class="bg-gray-700 text-white">
+        <th class="px-4 py-3 text-left font-semibold">nome <span class="material-icons align-middle text-sm">unfold_more</span></th>
+        <th class="px-4 py-3 text-left font-semibold">e-mail <span class="material-icons align-middle text-sm">unfold_more</span></th>
+        <th class="px-4 py-3 text-left font-semibold">cargo <span class="material-icons align-middle text-sm">unfold_more</span></th>
+        <th class="px-4 py-3 text-left font-semibold">data de criação <span class="material-icons align-middle text-sm">unfold_more</span></th>
+        <th class="px-4 py-3 text-left font-semibold">perfil <span class="material-icons align-middle text-sm">unfold_more</span></th>
+        <th class="px-4 py-3 text-left font-semibold">excluir</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="bg-white border-b hover:bg-gray-50">
+        @for (usuario of usuarios; track usuario.id) {
+          <td class="px-4 py-3">{{usuario.nome}}</td>
+          <td class="px-4 py-3">{{usuario.email}}</td>
+          <td class="px-4 py-3">sem cargo</td>
+          <td class="px-4 py-3">30/10/2024</td>
+          <td class="px-4 py-3">{{usuario.perfilAcesso}}</td>
+
+        }
+        <td class="px-4 py-3">
+          <button class="text-red-500 hover:text-red-700">
+            <span class="material-icons">delete</span>
+          </button>
+        </td>
+      </tr>
+      <!-- Outras linhas aqui -->
+    </tbody>
+  </table>
+</div>

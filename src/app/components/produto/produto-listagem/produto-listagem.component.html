@@ -11,7 +11,7 @@
 
 <!-- Conteúdo principal -->
 <div class="w-full flex justify-center">
-  <div class="w-full max-w-4xl p-6">
+  <div class="w-full p-6">
     <!-- Campo de pesquisa -->
     <div class="mb-6">
       <div class="relative">
@@ -157,8 +157,8 @@
     </div>
 
     <!-- Container da tabela -->
-    <div class="bg-white p-6 rounded-lg shadow overflow-x-auto">
-      <table class="w-full border-collapse border border-gray-300">
+    <div class="overflow-x-auto">
+      <table class="min-w-full border-separate border-spacing-0 border border-gray-300">
         <thead class="bg-gray-200">
           <tr>
             <th class="border border-gray-300 p-2 text-left">Código de Barras</th>
@@ -189,8 +189,10 @@
             </td>
             <td class="border border-gray-300 p-2">
               <div class="flex justify-center space-x-4">
-                <button (click)="editar(produto)" class="text-gray-600 hover:text-blue-500 flex items-center gap-3" title="Editar produto">
-                  <i class="material-icons text-gray-600" (click)="irParaEntradaEstoque(produto)" style="cursor: pointer;">inventory</i>
+                <button (click)="irParaEntradaEstoque(produto)" class="text-gray-600 hover:text-blue-500 flex items-center gap-1" title="Entrada de estoque">
+                  <i class="material-icons text-gray-600" style="cursor: pointer;">inventory</i>
+                </button>
+                <button (click)="editar(produto)" class="text-gray-600 hover:text-blue-500 flex items-center gap-1" title="Editar produto">
                   <img src="/icons/edit.png" alt="Editar" class="w-5 h-5">
                 </button>
                 <button (click)="excluir(produto)" class="text-gray-600 hover:text-red-500 flex items-center gap-1" title="Excluir produto">

@@ -65,7 +65,9 @@
   <app-filtro-tags
     (clearFilter)="clearFilter($event)"
     (clearDateFilter)="clearDateFilter()"
-    (resetAllFilters)="resetAllFilters()">
+    (clearSpecificDateFilter)="clearSpecificDateFilter($event)"
+    (resetAllFilters)="resetAllFilters()"
+    (removeFilterValue)="onRemoveFilterValue($event)">
   </app-filtro-tags>
 
 
@@ -140,8 +142,13 @@
     <div class="grid grid-cols-[1fr_auto_1fr] gap-6 items-center">
       <!-- Contador posicionado à esquerda -->
       <div class="justify-self-end pr-4">
-        <div *ngIf="hasSelectedItems()" class="text-sm text-black bg-gray-50 border border-gray-200 rounded px-3 py-1">
+        <div *ngIf="hasSelectedItems()" class="text-sm text-black bg-gray-50 border border-gray-200 rounded px-3 py-1 flex items-center">
           Selecionado(s): {{ getSelectedItemsCount() }}
+          <button class="ml-2 focus:outline-none" (click)="cancelarSelecao()" title="Cancelar seleção">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
         </div>
       </div>
 
@@ -210,6 +217,8 @@
   <app-modal-acoes
     [itensPaginaAtual]="filteredItems"
     [totalItensAba]="totalItensAba"
+    [nomeAba]="nomeAbaAtual"
+    [numeroPaginaAtual]="paginaAtual"
     (acaoSelecionada)="onAcaoSelecionada($event)">
   </app-modal-acoes>
 </div>

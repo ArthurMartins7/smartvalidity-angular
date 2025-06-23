@@ -91,7 +91,7 @@ export class MuralDetalheComponent implements OnInit {
     // Se for motivo "Outro", usa o motivo customizado
     const motivoFinal = this.motivoInspecao === 'Outro' ? this.motivoCustomizado : this.motivoInspecao;
 
-    this.muralService.marcarInspecionado(this.itemId, motivoFinal).subscribe({
+    this.muralService.marcarInspecionado(this.itemId, this.motivoInspecao, this.motivoCustomizado).subscribe({
       next: (item) => {
         // Atualiza o estado local com o item retornado
         if (item) {
@@ -100,10 +100,13 @@ export class MuralDetalheComponent implements OnInit {
 
         // Adiciona um pequeno atraso para permitir que o usuário veja a mudança
         setTimeout(() => {
-          // Redireciona para a mesma aba de onde o usuário veio
+          // Redireciona para a mesma aba de onde o usuário veio, preservando o estado dos filtros
           this.router.navigate(['/mural-listagem'], {
             queryParams: { tab: this.activeTab },
-            state: { activeTab: this.activeTab }
+            state: {
+              activeTab: this.activeTab,
+              preserveFilters: true // Indica que os filtros devem ser mantidos
+            }
           });
         }, 1000);
       },
@@ -116,6 +119,17 @@ export class MuralDetalheComponent implements OnInit {
           this.error = 'Ocorreu um erro ao marcar o item como inspecionado. Por favor, tente novamente mais tarde.';
         }
         this.processandoInspecao = false;
+      }
+    });
+  }
+
+  voltar(): void {
+    // Sempre navega de volta para a listagem preservando os filtros
+    this.router.navigate(['/mural-listagem'], {
+      queryParams: { tab: this.activeTab },
+      state: {
+        activeTab: this.activeTab,
+        preserveFilters: true // Sempre preserva os filtros
       }
     });
   }

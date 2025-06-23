@@ -19,41 +19,39 @@ export class ModalAcoesComponent implements OnInit, OnDestroy {
   @Output() acaoSelecionada = new EventEmitter<AcaoTipo>();
   @Input() itensPaginaAtual: MuralListagemDTO[] = [];
   @Input() totalItensAba: number = 0;
+  @Input() nomeAba: string = '';
+  @Input() numeroPaginaAtual: number = 1;
 
   // Propriedades para controle do modal
   visible = false;
   itensSelecionadosCount = 0;
   itensPaginaCount = 0;
+  temItensInspecionados = false;
+  mensagemInspecao = '';
+  selecoesMisturadas = false;
+  mensagemSelecaoMisturada = '';
+  itensSelecionados: MuralListagemDTO[] = [];
 
   private subscriptions: Subscription[] = [];
 
   constructor(private selecaoService: MuralSelecaoService) { }
 
   ngOnInit(): void {
-    // Inscrever-se nas mudanças de visibilidade do modal
-    const visibilitySubscription = this.selecaoService.showAcoesModal$.subscribe(
-      visible => {
-        this.visible = visible;
-        if (visible) {
-          this.atualizarContadores();
+    // Inscreve-se para receber atualizações do estado do modal
+    this.subscriptions.push(
+      this.selecaoService.showAcoesModal$.subscribe(
+        show => {
+          this.visible = show;
+          if (show) {
+            this.atualizarContadores();
+          }
         }
-      }
+      )
     );
-
-    // Inscrever-se nas mudanças de seleção
-    const selectionSubscription = this.selecaoService.selectedItems$.subscribe(
-      () => {
-        if (this.visible) {
-          this.atualizarContadores();
-        }
-      }
-    );
-
-    this.subscriptions.push(visibilitySubscription, selectionSubscription);
   }
 
   ngOnDestroy(): void {
-    // Cancelar todas as subscriptions ativas
+    // Cancela todas as inscrições ao destruir o componente
     this.subscriptions.forEach(sub => sub.unsubscribe());
   }
 
@@ -61,8 +59,41 @@ export class ModalAcoesComponent implements OnInit, OnDestroy {
    * Atualiza os contadores de itens
    */
   private atualizarContadores(): void {
-    this.itensSelecionadosCount = this.selecaoService.getSelectedItemsCount();
+    this.selecaoService.getSelectedItems().subscribe(items => {
+      this.itensSelecionados = items;
+      this.itensSelecionadosCount = items.length;
+      const itensInspecionados = items.filter(item => item.inspecionado);
+      this.temItensInspecionados = itensInspecionados.length > 0;
+      if (this.temItensInspecionados) {
+        this.mensagemInspecao = `Existem ${itensInspecionados.length} produtos já inspecionados no grupo que você selecionou. Desmarque estes produtos já inspecionados e tente inspecionar os outros produtos novamente:`;
+      } else {
+        this.mensagemInspecao = '';
+      }
+      // Lógica para seleção mista de abas (NÃO de páginas)
+      this.selecoesMisturadas = false;
+      this.mensagemSelecaoMisturada = '';
+      if (items.length > 0) {
+        const statusSet = new Set(items.map(item => item.status));
+        if (statusSet.size > 1) {
+          this.selecoesMisturadas = true;
+          this.mensagemSelecaoMisturada = 'Existem produtos selecionados de abas diferentes. As opções "Produtos da página atual" e "Todos os produtos da aba" só podem ser usadas quando todos os produtos selecionados pertencem à mesma aba.';
+        }
+      }
+    });
     this.itensPaginaCount = this.itensPaginaAtual.length;
+  }
+
+  /**
+   * Seleciona uma ação e emite o evento
+   */
+  selecionarAcao(acao: AcaoTipo): void {
+    // Se for ação de inspeção e houver itens já inspecionados, não permite
+    if (acao === 'inspecao' && this.temItensInspecionados) {
+      return;
+    }
+
+    this.acaoSelecionada.emit(acao);
+    this.closeModal();
   }
 
   /**
@@ -72,22 +103,45 @@ export class ModalAcoesComponent implements OnInit, OnDestroy {
     this.selecaoService.closeAcoesModal();
   }
 
-  /**
-   * Seleciona uma ação e emite o evento
-   */
-  selecionarAcao(acao: AcaoTipo): void {
-    switch (acao) {
-      case 'relatorio-pagina':
-        // Seleciona temporariamente todos os itens da página
-        this.selecaoService.selectAll(this.itensPaginaAtual, true);
-        break;
-      case 'relatorio-todos':
-        // Atualiza o total de itens na aba
-        this.selecaoService.selectAllInTab(this.totalItensAba);
-        break;
-    }
+  desmarcarInspecionadosSelecionados(): void {
+    this.selecaoService.getSelectedItems().subscribe(items => {
+      this.selecaoService.desmarcarInspecionados(items);
+      this.atualizarContadores();
+    });
+  }
 
-    this.acaoSelecionada.emit(acao);
-    this.closeModal();
+  desmarcarOutrasPaginasAbas(): void {
+    this.selecaoService.getSelectedItems().subscribe(items => {
+      const idsPaginaAtual = this.itensPaginaAtual.map(item => item.id);
+      const idsParaManter = items.filter(item => idsPaginaAtual.includes(item.id)).map(item => item.id);
+      this.selecaoService.updateSelectedItems(idsParaManter);
+      this.atualizarContadores();
+    });
+  }
+
+  /**
+   * Quantos itens selecionados pertencem à aba atual
+   */
+  get selecionadosNaAbaAtual(): number {
+    // nomeAba pode ser 'Próximos a vencer', 'Vencem hoje', 'Vencidos'
+    // status é 'proximo', 'hoje', 'vencido'
+    let statusAtual = '';
+    if (this.nomeAba === 'Próximos a vencer') statusAtual = 'proximo';
+    else if (this.nomeAba === 'Vencem hoje') statusAtual = 'hoje';
+    else if (this.nomeAba === 'Vencidos') statusAtual = 'vencido';
+    return this.itensSelecionados.filter(item => item.status === statusAtual).length;
+  }
+
+  /**
+   * Quantos itens selecionados pertencem a outras abas
+   */
+  get selecionadosOutrasAbas(): number {
+    // nomeAba pode ser 'Próximos a vencer', 'Vencem hoje', 'Vencidos'
+    // status é 'proximo', 'hoje', 'vencido'
+    let statusAtual = '';
+    if (this.nomeAba === 'Próximos a vencer') statusAtual = 'proximo';
+    else if (this.nomeAba === 'Vencem hoje') statusAtual = 'hoje';
+    else if (this.nomeAba === 'Vencidos') statusAtual = 'vencido';
+    return this.itensSelecionados.filter(item => item.status !== statusAtual).length;
   }
 }

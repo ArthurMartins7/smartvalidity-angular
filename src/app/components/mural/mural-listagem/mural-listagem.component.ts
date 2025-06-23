@@ -31,44 +31,25 @@ import { MuralTabsComponent } from '../mural-tabs/mural-tabs.component';
   styleUrls: ['./mural-listagem.component.css']
 })
 export class MuralListagemComponent implements OnInit, OnDestroy {
-  // -------------------- Propriedades Principais --------------------
-  /** Lista de itens filtrados atualmente visíveis */
+
   filteredItems: MuralListagemDTO[] = [];
 
-  /** Aba ativa atual */
+
   activeTab: 'proximo' | 'hoje' | 'vencido' = 'proximo';
-
-  /** Termo de pesquisa para filtrar itens */
   searchTerm: string = '';
-
-  /** Direção de ordenação atual */
   sortDirection: 'asc' | 'desc' = 'asc';
-
-  /** Campo de ordenação */
   sortField: string = '';
-
-  /** Status de filtro de inspeção */
   filtroInspecao: 'todos' | 'inspecionados' | 'naoInspecionados' = 'todos';
 
-  // -------------------- Controle de UI --------------------
-  /** Visibilidade do modal de filtros avançados */
   showFilterModal: boolean = false;
-
-  /** Status de carregamento */
   loading: boolean = false;
 
-  /** IDs dos itens selecionados */
   private selectedIds: string[] = [];
-
-  /** Subscriptions para gerenciar unsubscribe */
   private subscriptions: Subscription[] = [];
-
-  /** Propriedades de paginação */
   public totalPaginas: number = 1;
   public opcoesItensPorPagina: number[] = [5, 10, 15, 20, 25, 50];
   public totalItensAba: number = 0;
 
-  // Getters para acessar valores do filterService de forma mais limpa
   public get paginaAtual(): number {
     return this.filterService['paginaAtualSubject'].value;
   }
@@ -86,9 +67,6 @@ export class MuralListagemComponent implements OnInit, OnDestroy {
     private router: Router
   ) {}
 
-  /**
-   * Inicialização do componente
-   */
   ngOnInit(): void {
     this.initializeFromRouting();
     this.setupFilterSubscriptions();
@@ -96,9 +74,6 @@ export class MuralListagemComponent implements OnInit, OnDestroy {
     this.loadFilterOptions();
   }
 
-  /**
-   * Carrega as opções para os filtros do backend
-   */
   loadFilterOptions(): void {
     const subscription = this.muralService.getOpcoesFiltro().subscribe({
       next: (options) => {
@@ -116,15 +91,10 @@ export class MuralListagemComponent implements OnInit, OnDestroy {
     this.subscriptions.push(subscription);
   }
 
-  /**
-   * Configura as assinaturas para a seleção de itens
-   */
   private setupSelectionSubscription(): void {
-    // Inscrever-se para mudanças nos itens selecionados
     const subscription = this.selecaoService.selectedItems$.subscribe(
       selectedIds => {
         this.selectedIds = selectedIds;
-        // Atualizar o estado de seleção dos itens
         this.updateItemSelectionState();
       }
     );
@@ -132,9 +102,6 @@ export class MuralListagemComponent implements OnInit, OnDestroy {
     this.subscriptions.push(subscription);
   }
 
-  /**
-   * Atualiza o estado de seleção dos itens com base nos IDs selecionados
-   */
   private updateItemSelectionState(): void {
     if (this.filteredItems && this.filteredItems.length > 0) {
       this.filteredItems.forEach(item => {
@@ -143,66 +110,61 @@ export class MuralListagemComponent implements OnInit, OnDestroy {
     }
   }
 
-  /**
-   * Seleciona ou desmarca todos os itens
-   */
   selectAll(event: Event): void {
     const target = event.target as HTMLInputElement;
     const checked = target.checked;
-
     this.selecaoService.selectAll(this.filteredItems, checked);
     this.updateItemSelectionState();
   }
 
-  /**
-   * Handler para quando um item é selecionado individualmente
-   */
   onItemSelection(item: MuralListagemDTO, selected: boolean): void {
     this.selecaoService.toggleItemSelection(item, selected);
   }
 
-  /**
-   * Limpeza ao destruir o componente
-   */
   ngOnDestroy(): void {
-    // Cancelar todas as subscriptions ativas
     this.subscriptions.forEach(sub => sub.unsubscribe());
   }
 
-  /**
-   * Inicializa o componente com base nos parâmetros de rota
-   */
   private initializeFromRouting(): void {
-    // Primeiro verificamos se há um state com a aba ativa
     const navigation = this.router.getCurrentNavigation();
-    if (navigation?.extras.state && 'activeTab' in navigation.extras.state) {
-      this.activeTab = navigation.extras.state['activeTab'] as 'proximo' | 'hoje' | 'vencido';
-      // Redefinir para a página 1 quando a aba muda
-      this.filterService.updatePaginaAtual(1);
+    const state = navigation?.extras?.state;
+
+    if (state) {
+      if ('activeTab' in state) {
+        this.activeTab = state['activeTab'] as 'proximo' | 'hoje' | 'vencido';
+      }
+
+      if (!state['preserveFilters']) {
+        this.filterService.resetFilters();
+        this.filterService.updatePaginaAtual(1);
+        this.filtroInspecao = 'todos'; // Reset do filtro de inspeção
+      } else {
+
+        this.filtroInspecao = this.filterService.getInspecaoFilter();
+      }
+
       this.loadItems();
     } else {
-      // Se não houver estado, verificamos os parâmetros da URL
+
       const subscription = this.route.queryParams.subscribe(params => {
         if (params['tab']) {
           const newTab = params['tab'] as 'proximo' | 'hoje' | 'vencido';
-          // Verificar se a aba mudou antes de redefinir a página
+
           if (newTab !== this.activeTab) {
             this.activeTab = newTab;
-            // Redefinir para a página 1 quando a aba muda
+
             this.filterService.updatePaginaAtual(1);
           }
         }
+
+        this.filtroInspecao = this.filterService.getInspecaoFilter();
         this.loadItems();
       });
       this.subscriptions.push(subscription);
     }
   }
 
-  /**
-   * Configura as assinaturas para os filtros
-   */
   private setupFilterSubscriptions(): void {
-    // Combinar todas as assinaturas de filtro em uma só
     const subscription = combineLatest([
       this.filterService.searchTerm$,
       this.filterService.filters$,
@@ -212,54 +174,43 @@ export class MuralListagemComponent implements OnInit, OnDestroy {
       this.searchTerm = searchTerm;
       this.sortField = sortField;
       this.sortDirection = sortDirection;
-      // Aplicar filtros sempre que qualquer um dos valores mudar
       this.applyFilters();
     });
 
     this.subscriptions.push(subscription);
   }
 
-  /**
-   * Carrega os itens com base na aba ativa
-   */
   loadItems(): void {
-    // Garantir que todos os filtros serão aplicados após carregar os itens
     this.applyFilters();
   }
 
-  /**
-   * Aplica os filtros aos itens
-   */
   applyFilters(): void {
     this.loading = true;
-
-    // Converte o estado atual dos filtros para o DTO
     const filtroDTO = this.filterService.toFilterDTO();
 
-    // Adiciona informação da aba ativa como um filtro adicional
     switch (this.activeTab) {
       case 'proximo':
-        // Deixa como está, o backend filtrará para próximos a vencer
         filtroDTO.status = 'proximo';
         break;
       case 'hoje':
-        // Adiciona filtro para itens que vencem hoje
         filtroDTO.status = 'hoje';
         break;
       case 'vencido':
-        // Adiciona filtro para itens vencidos
         filtroDTO.status = 'vencido';
         break;
     }
 
-    // Adiciona filtro de status de inspeção, se aplicável
     if (this.filtroInspecao === 'inspecionados') {
       filtroDTO.inspecionado = true;
     } else if (this.filtroInspecao === 'naoInspecionados') {
       filtroDTO.inspecionado = false;
     }
 
-    // Calcular o total de páginas e o total de itens
+    let sortDirectionToSend = this.sortDirection;
+    if (this.activeTab === 'vencido' && this.sortField === 'dataVencimento') {
+      sortDirectionToSend = this.sortDirection === 'asc' ? 'desc' : 'asc';
+    }
+    filtroDTO.sortDirection = sortDirectionToSend;
     this.calcularTotalPaginas(filtroDTO);
     this.selecaoService.updateTotalItensAba(filtroDTO);
 
@@ -272,7 +223,6 @@ export class MuralListagemComponent implements OnInit, OnDestroy {
           return item;
         });
 
-        // Atualiza o estado de seleção dos itens
         this.updateItemSelectionState();
         this.loading = false;
       },
@@ -285,108 +235,74 @@ export class MuralListagemComponent implements OnInit, OnDestroy {
     this.subscriptions.push(subscription);
   }
 
-  /**
-   * Manipula a alteração do termo de pesquisa
-   */
   onSearchChange(term: string): void {
     this.filterService.updateSearchTerm(term);
   }
 
-  /**
-   * Abre o modal de filtros avançados
-   */
   openFilterModal(): void {
     this.showFilterModal = true;
   }
 
-  /**
-   * Fecha o modal de filtros avançados
-   */
   closeFilterModal(): void {
     this.showFilterModal = false;
   }
 
-  /**
-   * Limpa um filtro específico
-   */
   clearFilter(filterName: string): void {
     this.filterService.clearFilter(filterName as keyof MuralFilter);
+    this.applyFilters();
   }
 
-  /**
-   * Limpa o filtro de data
-   */
   clearDateFilter(): void {
     this.filterService.clearDateFilter('dataVencimento');
+    this.applyFilters();
   }
 
-  /**
-   * Reseta todos os filtros
-   */
+  clearSpecificDateFilter(dateType: string): void {
+    if (dateType === 'dataVencimento' || dateType === 'dataFabricacao' || dateType === 'dataRecebimento') {
+      this.filterService.clearSpecificDateFilter(dateType as 'dataVencimento' | 'dataFabricacao' | 'dataRecebimento');
+      this.applyFilters();
+    }
+  }
+
   resetAllFilters(): void {
     this.filterService.resetFilters();
     this.filterService.updateSortField('');
     this.filterService.updateSortDirection('asc');
   }
 
-  /**
-   * Alterna a direção de ordenação
-   */
   toggleSortOrder(): void {
     const newDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';
     this.filterService.updateSortDirection(newDirection);
-    // Define o campo para ordenação como "nome" se não estiver definido
     if (!this.sortField) {
       this.filterService.updateSortField('nome');
     }
   }
 
-  /**
-   * Define o campo de ordenação
-   */
   setSortField(field: string): void {
-    // Se clicar no mesmo campo, inverte a direção
+
     if (this.sortField === field) {
       this.toggleSortOrder();
     } else {
-      // Se mudar o campo, define a direção como ascendente
       this.filterService.updateSortField(field);
       this.filterService.updateSortDirection('asc');
     }
   }
 
-  /**
-   * Recebe a seleção de opção de ordenação do dropdown
-   */
   onSortOptionSelected(option: {field: string, direction: 'asc' | 'desc'}): void {
-    // Atualiza o campo de ordenação e a direção
     this.filterService.updateSortField(option.field);
     this.filterService.updateSortDirection(option.direction);
-
-    // Força a página para 1 ao mudar a ordenação
     this.filterService.updatePaginaAtual(1);
-
-    // Aplica os filtros com a nova ordenação
     this.applyFilters();
   }
 
-  /**
-   * Callback quando a inspeção é confirmada
-   */
   onInspecaoConfirmada(): void {
     try {
-      // Obtém o motivo da inspeção e os itens selecionados
+
       this.selecaoService.confirmarInspecao(this.filteredItems).subscribe({
         next: (itensAtualizados) => {
           console.log('Itens inspecionados com sucesso:', itensAtualizados);
-
-          // Limpa a seleção
           this.selecaoService.clearSelection();
-
-          // Fecha o modal
           this.selecaoService.closeInspecaoModal();
-
-          // Recarrega os itens
           this.loadItems();
         },
         error: (err) => {
@@ -398,46 +314,29 @@ export class MuralListagemComponent implements OnInit, OnDestroy {
     }
   }
 
-  /**
-   * Verifica se há filtros aplicados
-   */
   hasAppliedFilters(): boolean {
     return this.filterService.hasAppliedFilters() || !!this.searchTerm;
   }
 
-  /**
-   * Abre o modal para marcar itens selecionados como inspecionados
-   */
   marcarSelecionadosComoInspecionados(): void {
     if (this.hasSelectedItems()) {
       this.selecaoService.openInspecaoModal();
     }
   }
 
-  /**
-   * Verifica se há itens selecionados
-   */
   hasSelectedItems(): boolean {
     return this.selectedIds.length > 0;
   }
 
-  /**
-   * Retorna o número de itens selecionados
-   */
   getSelectedItemsCount(): number {
     return this.selectedIds.length;
   }
 
-  /**
-   * Define a aba ativa e carrega os itens correspondentes
-   */
   setActiveTab(tab: 'proximo' | 'hoje' | 'vencido'): void {
     this.activeTab = tab;
 
-    // Redefinir para a página 1 sempre que mudar de aba
     this.filterService.updatePaginaAtual(1);
 
-    // Atualiza a URL sem recarregar a página
     this.router.navigate([], {
       relativeTo: this.route,
       queryParams: { tab: tab },
@@ -447,14 +346,12 @@ export class MuralListagemComponent implements OnInit, OnDestroy {
     this.loadItems();
   }
 
-  // Método para calcular o total de páginas
+
   private calcularTotalPaginas(filtro: MuralFiltroDTO): void {
-    // Primeiro obtém o total de registros
+
     this.muralService.contarTotalRegistros(filtro).subscribe({
       next: (totalRegistros) => {
-        // Atualiza o total de itens na aba
         this.totalItensAba = totalRegistros;
-        // Calcula o total de páginas
         this.totalPaginas = Math.ceil(totalRegistros / this.itensPorPagina);
         this.filterService.updateTotalPaginas(this.totalPaginas);
       },
@@ -467,37 +364,27 @@ export class MuralListagemComponent implements OnInit, OnDestroy {
     });
   }
 
-  // Método para avançar para a próxima página
   public avancarPagina(): void {
     if (this.paginaAtual < this.totalPaginas) {
-      // Limpa a seleção antes de mudar de página
-      this.selecaoService.clearSelection();
       this.filterService.updatePaginaAtual(this.paginaAtual + 1);
       this.applyFilters();
     }
   }
 
-  // Método para voltar para a página anterior
   public voltarPagina(): void {
     if (this.paginaAtual > 1) {
-      // Limpa a seleção antes de mudar de página
-      this.selecaoService.clearSelection();
       this.filterService.updatePaginaAtual(this.paginaAtual - 1);
       this.applyFilters();
     }
   }
 
-  // Método para ir para uma página específica
   public irParaPagina(pagina: number): void {
     if (pagina !== this.paginaAtual) {
-      // Limpa a seleção antes de mudar de página
-      this.selecaoService.clearSelection();
       this.filterService.updatePaginaAtual(pagina);
       this.applyFilters();
     }
   }
 
-  // Método para criar um array com os números das páginas
   public criarArrayPaginas(): number[] {
     const paginas = [];
     for (let i = 1; i <= this.totalPaginas; i++) {
@@ -506,166 +393,105 @@ export class MuralListagemComponent implements OnInit, OnDestroy {
     return paginas;
   }
 
-  // Método para alterar a quantidade de itens por página
   public alterarItensPorPagina(quantidade: number): void {
-    // Limpa a seleção antes de mudar a quantidade de itens por página
-    this.selecaoService.clearSelection();
     this.filterService.updateItensPorPagina(quantidade);
     this.applyFilters();
   }
 
-  /**
-   * Gera relatório Excel com os dados atualmente filtrados
-   */
   gerarRelatorio(): void {
-    // Determina o título com base na aba ativa
-    let titulo = '';
-    switch (this.activeTab) {
-      case 'proximo':
-        titulo = 'Relatório de Produtos Próximos do Vencimento';
-        break;
-      case 'hoje':
-        titulo = 'Relatório de Produtos que Vencem Hoje';
-        break;
-      case 'vencido':
-        titulo = 'Relatório de Produtos Vencidos';
-        break;
-    }
-
-    // Adiciona informação dos filtros ao título se houver filtros aplicados
-    if (this.hasAppliedFilters()) {
-      titulo += ' (Filtrado)';
-    }
-
-    // Gera o relatório com os itens atualmente filtrados
-    this.relatorioService.gerarRelatorioExcel(this.filteredItems, titulo);
-  }
-
-  /**
-   * Gera relatório Excel apenas com os itens selecionados
-   */
-  gerarRelatorioSelecionados(): void {
-    const itensSelecionados = this.filteredItems.filter(item => item.selecionado);
-    if (itensSelecionados.length === 0) return;
-
-    const titulo = this.getTituloRelatorio('selecionados', itensSelecionados.length);
-    this.relatorioService.gerarRelatorioExcel(itensSelecionados, titulo);
-    this.selecaoService.clearSelection();
-  }
-
-  /**
-   * Gera relatório Excel com os itens da página atual
-   */
-  private gerarRelatorioPaginaAtual(): void {
-    if (this.filteredItems.length === 0) return;
-
-    const titulo = this.getTituloRelatorio('pagina', this.filteredItems.length);
-    this.relatorioService.gerarRelatorioExcel(this.filteredItems, titulo);
-    this.selecaoService.clearSelection();
-  }
-
-  /**
-   * Gera relatório com todos os itens de todas as páginas
-   */
-  private gerarRelatorioTodosItens(): void {
-    // Obtém o filtro atual
-    const filtroDTO = this.filterService.toFilterDTO();
-
-    // Remove a paginação para obter todos os itens
-    filtroDTO.pagina = undefined;
-    filtroDTO.limite = undefined;
-
-    // Garante que o status da aba atual seja mantido
-    filtroDTO.status = this.activeTab;
-
-    // Primeiro obtém o total exato de itens
-    this.muralService.contarTotalRegistros(filtroDTO).subscribe({
-      next: (totalItens) => {
-        // Busca todos os itens e gera o relatório
-        this.muralService.filtrarProdutos(filtroDTO).subscribe({
-          next: (itens) => {
-            if (itens.length !== totalItens) {
-              console.warn(`Discrepância no número de itens: esperado ${totalItens}, recebido ${itens.length}`);
-            }
-            const titulo = this.getTituloRelatorio('todos', itens.length);
-            this.relatorioService.gerarRelatorioExcel(itens, titulo);
-            this.selecaoService.clearSelection();
-          },
-          error: (erro) => {
-            console.error('Erro ao gerar relatório com todos os itens:', erro);
-          }
-        });
+    this.relatorioService.gerarRelatorioMural(
+      'PAGINA',
+      null,
+      this.filterService.toFilterDTO(),
+      this.activeTab
+    ).subscribe({
+      next: (response) => {
+        this.relatorioService.downloadArquivo(response);
       },
       error: (erro) => {
-        console.error('Erro ao contar total de registros:', erro);
+        console.error('Erro ao gerar relatório:', erro);
+        // TODO: Mostrar mensagem de erro para o usuário
       }
     });
   }
 
-  /**
-   * Gera o título do relatório com base no tipo e quantidade de itens
-   */
-  private getTituloRelatorio(tipo: 'selecionados' | 'pagina' | 'todos', quantidade: number): string {
-    let titulo = '';
-    switch (this.activeTab) {
-      case 'proximo':
-        titulo = 'Relatório de Produtos Próximos do Vencimento';
-        break;
-      case 'hoje':
-        titulo = 'Relatório de Produtos que Vencem Hoje';
-        break;
-      case 'vencido':
-        titulo = 'Relatório de Produtos Vencidos';
-        break;
-    }
+  gerarRelatorioSelecionados(): void {
+    const itensSelecionados = this.filteredItems.filter(item => item.selecionado);
+    if (itensSelecionados.length === 0) return;
 
-    // Adiciona informação dos filtros ao título se houver filtros aplicados
-    if (this.hasAppliedFilters()) {
-      titulo += ' (Filtrado)';
-    }
+    const ids = itensSelecionados.map(item => item.id);
 
-    // Adiciona informação sobre a quantidade de itens
-    switch (tipo) {
-      case 'selecionados':
-        titulo += ` (${quantidade} item(ns) selecionado(s))`;
-        break;
-      case 'pagina':
-        titulo += ` (${quantidade} item(ns) da página atual)`;
-        break;
-      case 'todos':
-        titulo += ` (${quantidade} item(ns) no total)`;
-        break;
-    }
-
-    return titulo;
+    this.relatorioService.gerarRelatorioMural(
+      'SELECIONADOS',
+      ids,
+      this.filterService.toFilterDTO(),
+      this.activeTab
+    ).subscribe({
+      next: (response) => {
+        this.relatorioService.downloadArquivo(response);
+        this.selecaoService.clearSelection();
+      },
+      error: (erro) => {
+        console.error('Erro ao gerar relatório:', erro);
+        // TODO: Mostrar mensagem de erro para o usuário
+      }
+    });
   }
 
-  /**
-   * Filtra os itens por status de inspeção
-   * @param status Status de inspeção a ser filtrado ('todos', 'inspecionados', 'naoInspecionados')
-   */
+  private gerarRelatorioPaginaAtual(): void {
+    if (this.filteredItems.length === 0) return;
+
+    const ids = this.filteredItems.map(item => item.id);
+
+    this.relatorioService.gerarRelatorioMural(
+      'SELECIONADOS',
+      ids,
+      this.filterService.toFilterDTO(),
+      this.activeTab
+    ).subscribe({
+      next: (response) => {
+        this.relatorioService.downloadArquivo(response);
+      },
+      error: (erro) => {
+        console.error('Erro ao gerar relatório:', erro);
+        // TODO: Mostrar mensagem de erro para o usuário
+      }
+    });
+  }
+
+  private gerarRelatorioTodosItens(): void {
+    const filtro = this.filterService.toFilterDTO();
+    filtro.status = this.activeTab; // Garante que o status da aba está incluso
+
+    this.relatorioService.gerarRelatorioMural(
+      'TODOS',
+      null,
+      filtro,
+      this.activeTab
+    ).subscribe({
+      next: (response) => {
+        this.relatorioService.downloadArquivo(response);
+      },
+      error: (erro) => {
+        console.error('Erro ao gerar relatório:', erro);
+        // TODO: Mostrar mensagem de erro para o usuário
+      }
+    });
+  }
+
   filtrarPorStatusInspecao(status: 'todos' | 'inspecionados' | 'naoInspecionados'): void {
     this.filtroInspecao = status;
-
-    // Redefinir para a página 1 ao mudar o filtro
     this.filterService.updatePaginaAtual(1);
-
-    // Aplicar os filtros
+    this.filterService.updateInspecaoFilter(status);
     this.applyFilters();
   }
 
-  /**
-   * Abre o modal de ações em lote
-   */
   abrirModalAcoes(): void {
     if (this.hasSelectedItems()) {
       this.selecaoService.openAcoesModal();
     }
   }
 
-  /**
-   * Handler para quando uma ação é selecionada no modal
-   */
   onAcaoSelecionada(acao: 'relatorio-selecionados' | 'relatorio-pagina' | 'relatorio-todos' | 'inspecao'): void {
     switch (acao) {
       case 'relatorio-selecionados':
@@ -681,5 +507,34 @@ export class MuralListagemComponent implements OnInit, OnDestroy {
         this.marcarSelecionadosComoInspecionados();
         break;
     }
+  }
+
+  cancelarSelecao(): void {
+    this.selecaoService.cancelarSelecaoBackend().subscribe({
+      next: () => {
+        this.selecaoService.clearSelection();
+      },
+      error: (err) => {
+        this.selecaoService.clearSelection();
+      }
+    });
+  }
+
+  isAllSelectedOnPage(): boolean {
+    return this.filteredItems.length > 0 && this.filteredItems.every(item => this.selectedIds.includes(item.id));
+  }
+
+  get nomeAbaAtual(): string {
+    switch (this.activeTab) {
+      case 'proximo': return 'Próximos a vencer';
+      case 'hoje': return 'Vencem hoje';
+      case 'vencido': return 'Vencidos';
+      default: return '';
+    }
+  }
+
+  onRemoveFilterValue(event: {filterName: string, value: string}): void {
+    this.filterService.removeFilterValue(event.filterName as keyof MuralFilter, event.value);
+    this.applyFilters();
   }
 }

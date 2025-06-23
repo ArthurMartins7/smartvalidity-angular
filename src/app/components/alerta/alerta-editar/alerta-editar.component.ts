@@ -37,12 +37,8 @@ export class AlertaEditarComponent implements OnInit {
   public produtoSelecionado: string = '';
   public usuariosSelecionados: string[] = [];
 
-  // Campo apenas para exibição (não editável)
-  public tipoAlertaOriginal: TipoAlerta | null = null;
-
   // Enums para template
   public TipoAlerta = TipoAlerta;
-  public tiposAlerta = Object.values(TipoAlerta);
 
   ngOnInit(): void {
     this.route.paramMap.subscribe(params => {
@@ -62,6 +58,7 @@ export class AlertaEditarComponent implements OnInit {
   private inicializarAlerta(): void {
     if (!this.isEdicao) {
       this.alertaDTO = new AlertaDTO.Cadastro();
+      // Alertas criados pelo usuário são sempre do tipo PERSONALIZADO
       this.alertaDTO.tipo = TipoAlerta.PERSONALIZADO;
       this.alertaDTO.recorrente = false;
     }
@@ -84,7 +81,8 @@ export class AlertaEditarComponent implements OnInit {
         this.alertaDTO = new AlertaDTO.Cadastro();
         this.alertaDTO.titulo = alerta.titulo;
         this.alertaDTO.descricao = alerta.descricao;
-        this.alertaDTO.tipo = alerta.tipo;
+        // Alertas editáveis são sempre PERSONALIZADO (garantia adicional)
+        this.alertaDTO.tipo = TipoAlerta.PERSONALIZADO;
         this.alertaDTO.recorrente = alerta.recorrente;
         this.alertaDTO.dataHoraDisparo = alerta.dataHoraDisparo;
         this.alertaDTO.diasAntecedencia = alerta.diasAntecedencia;
@@ -96,8 +94,6 @@ export class AlertaEditarComponent implements OnInit {
         if (alerta.produtosAlertaIds && alerta.produtosAlertaIds.length > 0) {
           this.produtoSelecionado = alerta.produtosAlertaIds[0];
         }
-
-        this.tipoAlertaOriginal = alerta.tipo;
 
         this.carregando = false;
       },
@@ -151,6 +147,9 @@ export class AlertaEditarComponent implements OnInit {
   }
 
   private criarAlerta(): void {
+    // Garantir que o tipo seja sempre PERSONALIZADO para alertas criados pelo usuário
+    this.alertaDTO.tipo = TipoAlerta.PERSONALIZADO;
+    
     this.alertaService.criarAlerta(this.alertaDTO).subscribe({
       next: (alertaCriado) => {
         Swal.fire('Sucesso!', 'Alerta criado com sucesso.', 'success');
@@ -204,11 +203,6 @@ export class AlertaEditarComponent implements OnInit {
       return false;
     }
 
-    if (!this.alertaDTO.tipo) {
-      Swal.fire('Atenção!', 'O tipo do alerta é obrigatório.', 'warning');
-      return false;
-    }
-
     if (!this.alertaDTO.dataHoraDisparo) {
       Swal.fire('Atenção!', 'A data/hora de disparo é obrigatória.', 'warning');
       return false;
@@ -226,20 +220,7 @@ export class AlertaEditarComponent implements OnInit {
     return this.isEdicao ? 'Editar Alerta' : 'Criar Alerta';
   }
 
-  public obterDescricaoTipo(tipo: TipoAlerta): string {
-    switch (tipo) {
-      case TipoAlerta.VENCIMENTO_HOJE:
-        return 'Vencimento Hoje';
-      case TipoAlerta.VENCIMENTO_AMANHA:
-        return 'Vencimento Amanhã';
-      case TipoAlerta.VENCIMENTO_ATRASO:
-        return 'Vencimento em Atraso';
-      case TipoAlerta.PERSONALIZADO:
-        return 'Personalizado';
-      default:
-        return tipo;
-    }
-  }
+
 
   public formatarDataHoraInput(data: Date): string {
     if (!data) return '';

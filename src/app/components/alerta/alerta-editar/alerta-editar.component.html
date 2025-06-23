@@ -4,7 +4,7 @@
     <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
       <div class="flex items-center justify-between">
         <div class="flex items-center space-x-3">
-          <button 
+          <button
             (click)="voltar()"
             class="p-2 text-gray-400 hover:text-gray-600 transition-colors">
             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -29,7 +29,7 @@
     <div *ngIf="!carregando" class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
       <form (ngSubmit)="salvar()" #alertaForm="ngForm">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-          
+
           <!-- Título -->
           <div class="md:col-span-2">
             <label for="titulo" class="block text-sm font-medium text-gray-700 mb-2">
@@ -67,35 +67,6 @@
               placeholder="Descreva o alerta em detalhes"></textarea>
             <div *ngIf="descricao.invalid && descricao.touched" class="text-red-500 text-sm mt-1">
               Descrição é obrigatória
-            </div>
-          </div>
-
-          <!-- Tipo -->
-          <div>
-            <label for="tipo" class="block text-sm font-medium text-gray-700 mb-2">
-              Tipo *
-            </label>
-            
-            <!-- Modo Criação: Select editável -->
-            <select
-              *ngIf="!isEdicao"
-              id="tipo"
-              name="tipo"
-              [(ngModel)]="alertaDTO.tipo"
-              required
-              class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-              <option value="">Selecione o tipo</option>
-              <option *ngFor="let tipoEnum of tiposAlerta" [value]="tipoEnum">
-                {{ obterDescricaoTipo(tipoEnum) }}
-              </option>
-            </select>
-            
-            <!-- Modo Edição: Campo somente leitura -->
-            <div
-              *ngIf="isEdicao"
-              class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm bg-gray-50 text-gray-700">
-              {{ tipoAlertaOriginal ? obterDescricaoTipo(tipoAlertaOriginal) : 'Tipo não definido' }}
-              <span class="text-xs text-gray-500 ml-2">(não editável)</span>
             </div>
           </div>
 
@@ -192,7 +163,7 @@
             class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
             Cancelar
           </button>
-          
+
           <button
             type="submit"
             [disabled]="alertaForm.invalid || carregando"
@@ -210,4 +181,4 @@
       </form>
     </div>
   </div>
-</div> 
+</div>

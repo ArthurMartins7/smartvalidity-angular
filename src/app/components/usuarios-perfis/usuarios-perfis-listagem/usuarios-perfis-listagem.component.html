@@ -6,12 +6,9 @@
       <p class="text-gray-600">aqui você pode gerenciar, editar e adicionar novos usuários à equipe</p>
     </div>
     <div class="flex items-center gap-4">
-      <a href="#" class="text-blue-600 flex items-center gap-1 text-sm hover:underline">
-        <span class="material-icons text-base">menu_book</span>
-        tutorial de gerenciamento
-      </a>
-      <button class="bg-orange-500 hover:bg-orange-600 text-white font-semibold px-6 py-2 rounded transition flex items-center gap-2">
-        convidar usuário
+
+      <button class="bg-[#5084C1] hover:bg-[#5084C1] text-white font-semibold px-6 py-2 rounded transition flex items-center gap-2">
+        cadastrar usuário
         <span class="material-icons text-base">add</span>
       </button>
     </div>
@@ -20,8 +17,8 @@
 
 <!-- Tabs -->
 <div class="border-b border-gray-200 flex items-center gap-8 mb-4">
-  <button class="pb-2 border-b-2 border-orange-500 text-orange-600 font-semibold">minha equipe</button>
-  <button class="pb-2 text-gray-500 hover:text-orange-600 transition">pendentes</button>
+  <button class="pb-2 border-b-2 border-blue-600 text-[#5084C1] font-semibold">minha equipe</button>
+  <button class="pb-2 text-gray-500 hover:text-[#5084C1] transition">pendentes</button>
   <div class="ml-auto flex items-center gap-2">
     <a href="#" class="flex items-center gap-1 text-blue-600 text-sm hover:underline">
       <span class="material-icons text-base">help_outline</span>
@@ -62,21 +59,20 @@
       </tr>
     </thead>
     <tbody>
-      <tr class="bg-white border-b hover:bg-gray-50">
-        @for (usuario of usuarios; track usuario.id) {
+      @for (usuario of usuarios; track usuario.id) {
+        <tr class="bg-white border-b hover:bg-gray-50">
           <td class="px-4 py-3">{{usuario.nome}}</td>
           <td class="px-4 py-3">{{usuario.email}}</td>
           <td class="px-4 py-3">sem cargo</td>
           <td class="px-4 py-3">30/10/2024</td>
           <td class="px-4 py-3">{{usuario.perfilAcesso}}</td>
-
-        }
-        <td class="px-4 py-3">
-          <button class="text-red-500 hover:text-red-700">
-            <span class="material-icons">delete</span>
-          </button>
-        </td>
-      </tr>
+          <td class="px-4 py-3">
+            <button class="text-red-600 hover:text-red-800">
+              <span class="material-icons">delete</span>
+            </button>
+          </td>
+        </tr>
+      }
       <!-- Outras linhas aqui -->
     </tbody>
   </table>

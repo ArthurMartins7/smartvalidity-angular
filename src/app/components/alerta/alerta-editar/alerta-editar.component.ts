@@ -5,10 +5,12 @@ import { ActivatedRoute, Router } from '@angular/router';
 import Swal from 'sweetalert2';
 
 import { AlertaDTO } from '../../../shared/model/dto/alerta.dto';
+import { ItemProdutoDTO } from '../../../shared/model/dto/item-Produto.dto';
 import { Produto } from '../../../shared/model/entity/produto';
 import { Usuario } from '../../../shared/model/entity/usuario.model';
 import { TipoAlerta } from '../../../shared/model/enum/tipo-alerta.enum';
 import { AlertaService } from '../../../shared/service/alerta.service';
+import { ItemProdutoService } from '../../../shared/service/item-produto.service';
 import { ProdutoService } from '../../../shared/service/produto.service';
 import { UsuarioService } from '../../../shared/service/usuario.service';
 
@@ -23,6 +25,7 @@ export class AlertaEditarComponent implements OnInit {
   private alertaService = inject(AlertaService);
   private produtoService = inject(ProdutoService);
   private usuarioService = inject(UsuarioService);
+  private itemProdutoService = inject(ItemProdutoService);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
 
@@ -36,6 +39,7 @@ export class AlertaEditarComponent implements OnInit {
   // Campos auxiliares para o formulário
   public produtoSelecionado: string = '';
   public usuariosSelecionados: string[] = [];
+  public itensProdutoNaoInspecionados: ItemProdutoDTO[] = [];
 
   // Enums para template
   public TipoAlerta = TipoAlerta;
@@ -107,12 +111,13 @@ export class AlertaEditarComponent implements OnInit {
   }
 
   private carregarProdutos(): void {
-    this.produtoService.listarTodos().subscribe({
+    // Carrega apenas produtos que possuem itens-produto não inspecionados
+    this.produtoService.listarProdutosComItensNaoInspecionados().subscribe({
       next: (produtos) => {
         this.produtos = produtos;
       },
       error: (erro) => {
-        console.error('Erro ao carregar produtos:', erro);
+        console.error('Erro ao carregar produtos com itens não inspecionados:', erro);
       }
     });
   }
@@ -239,5 +244,31 @@ export class AlertaEditarComponent implements OnInit {
 
   public isUsuarioSelecionado(usuarioId: string): boolean {
     return this.usuariosSelecionados.includes(usuarioId);
+  }
+
+  /**
+   * Método chamado quando o produto é selecionado
+   * Busca automaticamente os itens-produto não inspecionados
+   */
+  public onProdutoSelecionado(): void {
+    if (this.produtoSelecionado) {
+      console.log('Produto selecionado:', this.produtoSelecionado);
+      
+      // Buscar itens-produto não inspecionados do produto selecionado
+      this.itemProdutoService.buscarItensProdutoNaoInspecionadosPorProduto(this.produtoSelecionado)
+        .subscribe({
+          next: (itens: ItemProdutoDTO[]) => {
+            this.itensProdutoNaoInspecionados = itens;
+            console.log(`Encontrados ${itens.length} itens-produto não inspecionados para o produto:`, itens);
+          },
+          error: (erro: any) => {
+            console.error('Erro ao buscar itens-produto não inspecionados:', erro);
+            this.itensProdutoNaoInspecionados = [];
+          }
+        });
+    } else {
+      // Se nenhum produto selecionado, limpar lista de itens
+      this.itensProdutoNaoInspecionados = [];
+    }
   }
 }

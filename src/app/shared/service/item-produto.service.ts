@@ -25,6 +25,14 @@ export class ItemProdutoService {
     return this.httpClient.get<ItemProdutoDTO[]>(`${this.API}/produto/${produtoId}`);
   }
 
+  /**
+   * Busca itens-produto não inspecionados de um produto específico
+   * Para uso em alertas personalizados
+   */
+  buscarItensProdutoNaoInspecionadosPorProduto(produtoId: string): Observable<ItemProdutoDTO[]> {
+    return this.httpClient.get<ItemProdutoDTO[]>(`${this.API}/produto/${produtoId}/nao-inspecionados`);
+  }
+
   criarItemProduto(novoItemProduto: ItemProdutoDTO): Observable<ItemProdutoDTO> {
     return this.httpClient.post<ItemProdutoDTO>(this.API, novoItemProduto);
   }

@@ -1,8 +1,8 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { Produto } from '../model/entity/produto';
 import { tap } from 'rxjs/operators';
+import { Produto } from '../model/entity/produto';
 import { ProdutoSeletor } from '../model/seletor/produto.seletor';
 
 @Injectable({
@@ -18,6 +18,19 @@ export class ProdutoService {
       tap({
         next: (response) => console.log('Lista de produtos:', response),
         error: (error) => console.error('Erro ao listar produtos:', error)
+      })
+    );
+  }
+
+  /**
+   * Lista apenas produtos que possuem itens-produto não inspecionados
+   * Para uso em alertas personalizados
+   */
+  listarProdutosComItensNaoInspecionados(): Observable<Produto[]> {
+    return this.httpClient.get<Produto[]>(`${this.API}/com-itens-nao-inspecionados`).pipe(
+      tap({
+        next: (response) => console.log('Produtos com itens não inspecionados:', response),
+        error: (error) => console.error('Erro ao listar produtos com itens não inspecionados:', error)
       })
     );
   }

@@ -5,10 +5,12 @@ import { ActivatedRoute, Router } from '@angular/router';
 import Swal from 'sweetalert2';
 
 import { AlertaDTO } from '../../../shared/model/dto/alerta.dto';
+import { ItemProdutoDTO } from '../../../shared/model/dto/item-Produto.dto';
 import { Produto } from '../../../shared/model/entity/produto';
 import { Usuario } from '../../../shared/model/entity/usuario.model';
 import { TipoAlerta } from '../../../shared/model/enum/tipo-alerta.enum';
 import { AlertaService } from '../../../shared/service/alerta.service';
+import { ItemProdutoService } from '../../../shared/service/item-produto.service';
 import { ProdutoService } from '../../../shared/service/produto.service';
 import { UsuarioService } from '../../../shared/service/usuario.service';
 
@@ -23,6 +25,7 @@ export class AlertaEditarComponent implements OnInit {
   private alertaService = inject(AlertaService);
   private produtoService = inject(ProdutoService);
   private usuarioService = inject(UsuarioService);
+  private itemProdutoService = inject(ItemProdutoService);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
 
@@ -36,13 +39,10 @@ export class AlertaEditarComponent implements OnInit {
   // Campos auxiliares para o formulário
   public produtoSelecionado: string = '';
   public usuariosSelecionados: string[] = [];
-
-  // Campo apenas para exibição (não editável)
-  public tipoAlertaOriginal: TipoAlerta | null = null;
+  public itensProdutoNaoInspecionados: ItemProdutoDTO[] = [];
 
   // Enums para template
   public TipoAlerta = TipoAlerta;
-  public tiposAlerta = Object.values(TipoAlerta);
 
   ngOnInit(): void {
     this.route.paramMap.subscribe(params => {
@@ -62,6 +62,7 @@ export class AlertaEditarComponent implements OnInit {
   private inicializarAlerta(): void {
     if (!this.isEdicao) {
       this.alertaDTO = new AlertaDTO.Cadastro();
+      // Alertas criados pelo usuário são sempre do tipo PERSONALIZADO
       this.alertaDTO.tipo = TipoAlerta.PERSONALIZADO;
       this.alertaDTO.recorrente = false;
     }
@@ -84,7 +85,8 @@ export class AlertaEditarComponent implements OnInit {
         this.alertaDTO = new AlertaDTO.Cadastro();
         this.alertaDTO.titulo = alerta.titulo;
         this.alertaDTO.descricao = alerta.descricao;
-        this.alertaDTO.tipo = alerta.tipo;
+        // Alertas editáveis são sempre PERSONALIZADO (garantia adicional)
+        this.alertaDTO.tipo = TipoAlerta.PERSONALIZADO;
         this.alertaDTO.recorrente = alerta.recorrente;
         this.alertaDTO.dataHoraDisparo = alerta.dataHoraDisparo;
         this.alertaDTO.diasAntecedencia = alerta.diasAntecedencia;
@@ -96,8 +98,6 @@ export class AlertaEditarComponent implements OnInit {
         if (alerta.produtosAlertaIds && alerta.produtosAlertaIds.length > 0) {
           this.produtoSelecionado = alerta.produtosAlertaIds[0];
         }
-
-        this.tipoAlertaOriginal = alerta.tipo;
 
         this.carregando = false;
       },
@@ -111,12 +111,13 @@ export class AlertaEditarComponent implements OnInit {
   }
 
   private carregarProdutos(): void {
-    this.produtoService.listarTodos().subscribe({
+    // Carrega apenas produtos que possuem itens-produto não inspecionados
+    this.produtoService.listarProdutosComItensNaoInspecionados().subscribe({
       next: (produtos) => {
         this.produtos = produtos;
       },
       error: (erro) => {
-        console.error('Erro ao carregar produtos:', erro);
+        console.error('Erro ao carregar produtos com itens não inspecionados:', erro);
       }
     });
   }
@@ -151,6 +152,9 @@ export class AlertaEditarComponent implements OnInit {
   }
 
   private criarAlerta(): void {
+    // Garantir que o tipo seja sempre PERSONALIZADO para alertas criados pelo usuário
+    this.alertaDTO.tipo = TipoAlerta.PERSONALIZADO;
+    
     this.alertaService.criarAlerta(this.alertaDTO).subscribe({
       next: (alertaCriado) => {
         Swal.fire('Sucesso!', 'Alerta criado com sucesso.', 'success');
@@ -204,11 +208,6 @@ export class AlertaEditarComponent implements OnInit {
       return false;
     }
 
-    if (!this.alertaDTO.tipo) {
-      Swal.fire('Atenção!', 'O tipo do alerta é obrigatório.', 'warning');
-      return false;
-    }
-
     if (!this.alertaDTO.dataHoraDisparo) {
       Swal.fire('Atenção!', 'A data/hora de disparo é obrigatória.', 'warning');
       return false;
@@ -226,20 +225,7 @@ export class AlertaEditarComponent implements OnInit {
     return this.isEdicao ? 'Editar Alerta' : 'Criar Alerta';
   }
 
-  public obterDescricaoTipo(tipo: TipoAlerta): string {
-    switch (tipo) {
-      case TipoAlerta.VENCIMENTO_HOJE:
-        return 'Vencimento Hoje';
-      case TipoAlerta.VENCIMENTO_AMANHA:
-        return 'Vencimento Amanhã';
-      case TipoAlerta.VENCIMENTO_ATRASO:
-        return 'Vencimento em Atraso';
-      case TipoAlerta.PERSONALIZADO:
-        return 'Personalizado';
-      default:
-        return tipo;
-    }
-  }
+
 
   public formatarDataHoraInput(data: Date): string {
     if (!data) return '';
@@ -258,5 +244,31 @@ export class AlertaEditarComponent implements OnInit {
 
   public isUsuarioSelecionado(usuarioId: string): boolean {
     return this.usuariosSelecionados.includes(usuarioId);
+  }
+
+  /**
+   * Método chamado quando o produto é selecionado
+   * Busca automaticamente os itens-produto não inspecionados
+   */
+  public onProdutoSelecionado(): void {
+    if (this.produtoSelecionado) {
+      console.log('Produto selecionado:', this.produtoSelecionado);
+      
+      // Buscar itens-produto não inspecionados do produto selecionado
+      this.itemProdutoService.buscarItensProdutoNaoInspecionadosPorProduto(this.produtoSelecionado)
+        .subscribe({
+          next: (itens: ItemProdutoDTO[]) => {
+            this.itensProdutoNaoInspecionados = itens;
+            console.log(`Encontrados ${itens.length} itens-produto não inspecionados para o produto:`, itens);
+          },
+          error: (erro: any) => {
+            console.error('Erro ao buscar itens-produto não inspecionados:', erro);
+            this.itensProdutoNaoInspecionados = [];
+          }
+        });
+    } else {
+      // Se nenhum produto selecionado, limpar lista de itens
+      this.itensProdutoNaoInspecionados = [];
+    }
   }
 }

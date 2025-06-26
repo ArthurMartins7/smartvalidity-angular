@@ -1,7 +1,12 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
 import { AuthenticationService } from '../../../core/auth/services/auth.service';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
+
+import { NotificacaoService } from '../../service/notificacao.service';
+
 
 interface MenuItem {
   id: string;
@@ -20,12 +25,15 @@ interface MenuItem {
   templateUrl: './sidebar.component.html',
   styleUrl: './sidebar.component.css'
 })
-export class SidebarComponent implements OnInit {
+export class SidebarComponent implements OnInit, OnDestroy {
+  private destroy$ = new Subject<void>();
+
   activeMenuItem = 'mural'; // Default active menu item
   isSidebarOpen = true; // Control sidebar visibility
   // Controls the visibility of the profile dropdown menu
   isDropdownOpen = false;
   userName: string = '';
+  unreadCount: number = 0;
 
   menuItems: MenuItem[] = [
     { id: 'mural', image: '/icons/mural.svg', imageActive: '/icons/mural-blue.svg', label: 'Mural', route: '/mural-listagem' },
@@ -41,14 +49,31 @@ export class SidebarComponent implements OnInit {
 
   ];
 
-  // Flag to highlight unread notifications
-  unreadNotifications = true;
+  constructor(
+    private router: Router,
+              private authService: AuthenticationService,
+    private notificacaoService: NotificacaoService
+  ) {}
 
-  constructor(private router: Router,
-              private authService: AuthenticationService) {}
-
-  ngOnInit(): void {
+    ngOnInit(): void {
     this.userName = sessionStorage.getItem('usuarioNome') ?? 'Usuário';
+
+    // Subscrever para atualizações de notificações não lidas
+    this.notificacaoService.unreadCount$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(count => {
+        this.unreadCount = count;
+      });
+
+    // Atualizar contador de forma silenciosa após um pequeno delay
+    setTimeout(() => {
+      this.notificacaoService.atualizarContadorNaoLidas();
+    }, 1000);
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   toggleSidebar(): void {
@@ -82,7 +107,14 @@ export class SidebarComponent implements OnInit {
 
   goToNotifications(): void {
     this.router.navigate(['/notificacoes']);
-    this.unreadNotifications = false;
+    // O contador será atualizado automaticamente quando as notificações forem marcadas como lidas
+  }
+
+  /**
+   * Verificar se há notificações não lidas
+   */
+  hasUnreadNotifications(): boolean {
+    return this.unreadCount > 0;
   }
 
   navigateToMinhaContaInfo() {

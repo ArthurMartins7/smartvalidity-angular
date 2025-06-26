@@ -15,6 +15,7 @@ import { MinhaContaInfoComponent } from './components/minha-conta/minha-conta-in
 import { ItemProdutoCadastroComponent } from './components/item-produto/item-produto-cadastro/item-produto-cadastro.component';
 import { MuralDetalheComponent } from './components/mural/mural-detalhe/mural-detalhe.component';
 import { MuralListagemComponent } from './components/mural/mural-listagem/mural-listagem.component';
+import { NotificacaoListagemComponent } from './components/notificacao/notificacao-listagem.component';
 import { ProdutoEditarComponent } from './components/produto/produto-editar/produto-editar/produto-editar.component';
 import { ProdutoDetalheComponent } from './components/produto/produto-listagem/produto-detalhe/produto-detalhe/produto-detalhe.component';
 import { ProdutoListagemComponent } from './components/produto/produto-listagem/produto-listagem.component';
@@ -51,6 +52,9 @@ export const routes: Routes = [
   { path: 'alertas', component: AlertaListagemComponent },
   { path: 'alerta-editar', component: AlertaEditarComponent },
   { path: 'alerta-editar/:id', component: AlertaEditarComponent },
+
+  // Rotas de Notificações
+  { path: 'notificacoes', component: NotificacaoListagemComponent },
 
   // Rotas do Mural
   { path: 'mural-listagem', component: MuralListagemComponent },

@@ -52,6 +52,12 @@ export class UsuariosPerfisListagemComponent implements OnInit {
     );
   }
 
+  editarUsuario(usuario: Usuario): void {
+    if (usuario && usuario.id) {
+      this.router.navigate(['/usuarios-perfis-editar', usuario.id]);
+    }
+  }
+
   public navegarParaUsuariosPendentes(): void {
     this.router.navigate(['/usuarios-perfis-pendentes']);
   }

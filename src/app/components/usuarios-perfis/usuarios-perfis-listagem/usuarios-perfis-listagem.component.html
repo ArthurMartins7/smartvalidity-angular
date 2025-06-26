@@ -81,7 +81,7 @@
           <td class="px-9 py-3">30/10/2024</td>
           <td class="px-4 py-3">{{usuario.perfilAcesso}}</td>
           <td class="pl-0 pr-4 py-3 flex items-center gap-3 justify-end sticky right-0 bg-white z-10">
-            <button class="w-9 h-9 flex items-center justify-center border border-gray-300 rounded text-gray-700 hover:text-gray-900 hover:bg-gray-100 transition">
+            <button class="w-9 h-9 flex items-center justify-center border border-gray-300 rounded text-gray-700 hover:text-gray-900 hover:bg-gray-100 transition" (click)="editarUsuario(usuario)">
               <span class="material-icons text-base">edit</span>
             </button>
             <button class="w-9 h-9 flex items-center justify-center border border-gray-300 rounded text-red-600 hover:text-red-800 hover:bg-gray-100 transition">

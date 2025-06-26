@@ -10,9 +10,9 @@ import { EntradaEstoqueComponent } from './components/entrada-estoque/entrada-es
 import { FornecedorDetalheComponent } from './components/fornecedor/fornecedor-detalhe/fornecedor-detalhe.component';
 import { FornecedorEditarComponent } from './components/fornecedor/fornecedor-editar/fornecedor-editar/fornecedor-editar.component';
 import { FornecedorListagemComponent } from './components/fornecedor/fornecedor-listagem/fornecedor-listagem/fornecedor-listagem.component';
+import { ItemProdutoCadastroComponent } from './components/item-produto/item-produto-cadastro/item-produto-cadastro.component';
 import { MinhaContaEditarComponent } from './components/minha-conta/minha-conta-editar/minha-conta-editar.component';
 import { MinhaContaInfoComponent } from './components/minha-conta/minha-conta-info/minha-conta-info.component';
-import { ItemProdutoCadastroComponent } from './components/item-produto/item-produto-cadastro/item-produto-cadastro.component';
 import { MuralDetalheComponent } from './components/mural/mural-detalhe/mural-detalhe.component';
 import { MuralListagemComponent } from './components/mural/mural-listagem/mural-listagem.component';
 import { NotificacaoListagemComponent } from './components/notificacao/notificacao-listagem.component';
@@ -21,13 +21,13 @@ import { ProdutoDetalheComponent } from './components/produto/produto-listagem/p
 import { ProdutoListagemComponent } from './components/produto/produto-listagem/produto-listagem.component';
 import { UsuariosPerfisListagemComponent } from './components/usuarios-perfis/usuarios-perfis-listagem/usuarios-perfis-listagem.component';
 import { UsuariosPerfisPendentesComponent } from './components/usuarios-perfis/usuarios-perfis-pendentes/usuarios-perfis-pendentes.component';
-import { LoginComponent } from './core/auth/pages/login/login/login.component';
 import { RegisterComponent } from './core/auth/pages/register/register/register.component';
+import { SigninComponent } from './core/auth/pages/signin/signin.component';
 import { SignupInfoPessoaisComponent } from './core/auth/pages/signup/signup-info-pessoais/signup-info-pessoais.component';
 import { SignupSenhaComponent } from './core/auth/pages/signup/signup-senha/signup-senha.component';
-import { SignupVerificacaoComponent } from './core/auth/pages/signup/signup-verificacao/signup-verificacao.component';
 import { SignupValidarIdentidadeComponent } from './core/auth/pages/signup/signup-validar-identidade/signup-validar-identidade.component';
-import { SigninComponent } from './core/auth/pages/signin/signin.component';
+import { SignupVerificacaoComponent } from './core/auth/pages/signup/signup-verificacao/signup-verificacao.component';
+import { UsuariosPerfisEditarComponent } from './components/usuarios-perfis/usuarios-perfis-editar/usuarios-perfis-editar.component';
 
 export const routes: Routes = [
   //{ path: 'login', component: LoginComponent },
@@ -47,6 +47,7 @@ export const routes: Routes = [
   { path: 'usuarios-perfis-pendentes', component: UsuariosPerfisPendentesComponent },
   { path: 'minha-conta-info', component: MinhaContaInfoComponent },
   { path: 'minha-conta-editar', component: MinhaContaEditarComponent },
+  { path: 'usuarios-perfis-editar/:id', component: UsuariosPerfisEditarComponent },
 
   // Rotas de Alertas
   { path: 'alertas', component: AlertaListagemComponent },

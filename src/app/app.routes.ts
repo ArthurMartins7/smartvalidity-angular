@@ -28,6 +28,12 @@ import { SignupSenhaComponent } from './core/auth/pages/signup/signup-senha/sign
 import { SignupValidarIdentidadeComponent } from './core/auth/pages/signup/signup-validar-identidade/signup-validar-identidade.component';
 import { SignupVerificacaoComponent } from './core/auth/pages/signup/signup-verificacao/signup-verificacao.component';
 import { UsuariosPerfisEditarComponent } from './components/usuarios-perfis/usuarios-perfis-editar/usuarios-perfis-editar.component';
+import { MinhaContaSenhaValidarIdentidadeComponent } from './components/minha-conta/minha-conta-senha-validar-identidade/minha-conta-senha-validar-identidade.component';
+import { MinhaContaSenhaCodigoVerificacaoComponent } from './components/minha-conta/minha-conta-senha-codigo-verificacao/minha-conta-senha-codigo-verificacao.component';
+import { MinhaContaSenhaAlterarComponent } from './components/minha-conta/minha-conta-senha-alterar/minha-conta-senha-alterar.component';
+import { PasswordRecoveryValidarIdentidadeComponent } from './core/auth/pages/password-recovery/password-recovery-validar-identidade/password-recovery-validar-identidade.component';
+import { PasswordRecoveryCodigoVerificacaoComponent } from './core/auth/pages/password-recovery/password-recovery-codigo-verificacao/password-recovery-codigo-verificacao.component';
+import { PasswordRecoveryAlterarSenhaComponent } from './core/auth/pages/password-recovery/password-recovery-alterar-senha/password-recovery-alterar-senha.component';
 
 export const routes: Routes = [
   //{ path: 'login', component: LoginComponent },
@@ -45,9 +51,15 @@ export const routes: Routes = [
   { path: 'item-produto-cadastro', component: ItemProdutoCadastroComponent },
   { path: 'usuarios-perfis-listagem', component: UsuariosPerfisListagemComponent },
   { path: 'usuarios-perfis-pendentes', component: UsuariosPerfisPendentesComponent },
+  { path: 'usuarios-perfis-editar/:id', component: UsuariosPerfisEditarComponent },
+
+  // Rotas de Minha Conta
   { path: 'minha-conta-info', component: MinhaContaInfoComponent },
   { path: 'minha-conta-editar', component: MinhaContaEditarComponent },
-  { path: 'usuarios-perfis-editar/:id', component: UsuariosPerfisEditarComponent },
+  { path: 'minha-conta-senha-validar-identidade', component: MinhaContaSenhaValidarIdentidadeComponent },
+  { path: 'minha-conta-senha-codigo-verificacao', component: MinhaContaSenhaCodigoVerificacaoComponent },
+  { path: 'minha-conta-senha-alterar', component: MinhaContaSenhaAlterarComponent },
+
 
   // Rotas de Alertas
   { path: 'alertas', component: AlertaListagemComponent },
@@ -64,10 +76,13 @@ export const routes: Routes = [
   { path: 'categoria-detalhe', component: CategoriaDetalheComponent },
   { path: 'categoria-editar', component: CategoriaEditarComponent },
 
-  // Rotas de Sign Up e Sign In
+  // Rotas de Sign Up e Sign In e Password Recovery
   { path: '', component: SigninComponent },
   { path: 'signup-info-pessoais', component: SignupInfoPessoaisComponent },
   { path: 'signup-senha', component: SignupSenhaComponent },
   { path: 'signup-verificacao', component: SignupVerificacaoComponent },
   { path: 'signup-validar-identidade', component: SignupValidarIdentidadeComponent },
+  { path: 'password-recovery-validar-identidade', component: PasswordRecoveryValidarIdentidadeComponent },
+  { path: 'password-recovery-codigo-verificacao', component: PasswordRecoveryCodigoVerificacaoComponent },
+  { path: 'password-recovery-alterar-senha', component: PasswordRecoveryAlterarSenhaComponent },
 ];

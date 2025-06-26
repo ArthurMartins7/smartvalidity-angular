@@ -1,17 +1,19 @@
 import { Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { Usuario } from '../../../shared/model/entity/usuario.model';
-import { Empresa } from '../../../shared/model/entity/empresa';
-import { HeaderAuthComponent } from '../../../shared/ui/headers/header-auth/header-auth.component';
+import { Empresa } from '../../../../../shared/model/entity/empresa';
+import { Usuario } from '../../../../../shared/model/entity/usuario.model';
+import { CommonModule } from '@angular/common';
+import { HeaderPasswordRecoveryComponent } from '../../../../../shared/ui/headers/header-password-recovery/header-password-recovery.component';
 
 @Component({
-  selector: 'app-minha-conta-senha-validar-identidade',
-  imports: [FormsModule, HeaderAuthComponent],
-  templateUrl: './minha-conta-senha-validar-identidade.component.html',
-  styleUrl: './minha-conta-senha-validar-identidade.component.css'
+  selector: 'app-password-recovery-alterar-senha',
+  standalone: true,
+  imports: [CommonModule, FormsModule, HeaderPasswordRecoveryComponent],
+  templateUrl: './password-recovery-alterar-senha.component.html',
+  styleUrl: './password-recovery-alterar-senha.component.css'
 })
-export class MinhaContaSenhaValidarIdentidadeComponent {
+export class PasswordRecoveryAlterarSenhaComponent {
 
   public usuario: Usuario = new Usuario();
   public empresa: Empresa = new Empresa();
@@ -30,21 +32,7 @@ export class MinhaContaSenhaValidarIdentidadeComponent {
   public showSenha: boolean = false;
   public showConfirmarSenha: boolean = false;
 
-  // E-mail destino para exibição na mensagem
-  public emailDestino: string = '';
-
   private router = inject(Router);
-
-  constructor() {
-    // Tenta recuperar o e-mail salvo na etapa 1
-    const usuarioJson = sessionStorage.getItem('signup_usuario');
-    if (usuarioJson) {
-      try {
-        const usuario = JSON.parse(usuarioJson);
-        this.emailDestino = usuario.email || '';
-      } catch (_) {}
-    }
-  }
 
   /**
    * Avança para a próxima etapa do cadastro.
@@ -68,7 +56,7 @@ export class MinhaContaSenhaValidarIdentidadeComponent {
    * Retorna para a etapa anterior (informações pessoais)
    */
   public voltar(): void {
-    this.router.navigate(['signup-senha']);
+    this.router.navigate(['']);
   }
 
   public toggleShowSenha(): void {
@@ -77,14 +65,6 @@ export class MinhaContaSenhaValidarIdentidadeComponent {
 
   public toggleShowConfirmarSenha(): void {
     this.showConfirmarSenha = !this.showConfirmarSenha;
-  }
-
-  // Envia código de verificação e navega para próxima etapa
-  public receberCodigo(): void {
-    // Aqui poderia chamar serviço para enviar e-mail
-    alert('Código enviado para ' + this.emailDestino);
-
-    this.router.navigate(['minha-conta-senha-codigo-verificacao']);
   }
 
 }

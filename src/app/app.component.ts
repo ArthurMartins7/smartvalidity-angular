@@ -35,7 +35,7 @@ export class AppComponent implements OnInit {
   }
 
   private updateAuthRoute(url: string): void {
-    const authRoutes = ['/', '/register','signup-info-pessoais', '/signup-senha', '/signup-verificacao', '/signup-validar-identidade'];
+    const authRoutes = ['/', 'signup-info-pessoais', '/signup-senha', '/signup-verificacao', '/signup-validar-identidade'];
     this.isAuthRoute = authRoutes.includes(url);
   }
 

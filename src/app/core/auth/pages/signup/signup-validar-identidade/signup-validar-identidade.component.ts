@@ -53,7 +53,7 @@ export class SignupValidarIdentidadeComponent {
     // Aqui você validaria o código com o backend.
     alert('Conta criada com sucesso!');
 
-    this.router.navigate(['login']);
+    this.router.navigate(['']);
   }
 
   /**

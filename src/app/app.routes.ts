@@ -30,7 +30,7 @@ import { SignupValidarIdentidadeComponent } from './core/auth/pages/signup/signu
 import { SigninComponent } from './core/auth/pages/signin/signin.component';
 
 export const routes: Routes = [
-  { path: 'login', component: LoginComponent },
+  //{ path: 'login', component: LoginComponent },
   { path: 'register', component: RegisterComponent },
   { path: 'corredor', component: CorredorListagemComponent },
   { path: 'corredor-detalhe', component: CorredorDetalheComponent },

@@ -68,11 +68,11 @@ export class SigninComponent {
   }
 
   realizarCadastro() {
-    this.router.navigate(['/register']);
+    this.router.navigate(['/signup-info-pessoais']);
   }
 
   public verificarPerfilAcesso() {
-    this.router.navigate(['/entrada-estoque']);
+    this.router.navigate(['/mural-listagem']);
   }
 
   public toggleShowSenha(): void {

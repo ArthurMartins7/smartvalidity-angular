@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
+import { AuthenticationService } from '../../../core/auth/services/auth.service';
 
 interface MenuItem {
   id: string;
@@ -22,6 +23,8 @@ interface MenuItem {
 export class SidebarComponent implements OnInit {
   activeMenuItem = 'mural'; // Default active menu item
   isSidebarOpen = true; // Control sidebar visibility
+  // Controls the visibility of the profile dropdown menu
+  isDropdownOpen = false;
   userName: string = '';
 
   menuItems: MenuItem[] = [
@@ -41,7 +44,8 @@ export class SidebarComponent implements OnInit {
   // Flag to highlight unread notifications
   unreadNotifications = true;
 
-  constructor(private router: Router) {}
+  constructor(private router: Router,
+              private authService: AuthenticationService) {}
 
   ngOnInit(): void {
     this.userName = sessionStorage.getItem('usuarioNome') ?? 'Usuário';
@@ -79,5 +83,24 @@ export class SidebarComponent implements OnInit {
   goToNotifications(): void {
     this.router.navigate(['/notificacoes']);
     this.unreadNotifications = false;
+  }
+
+  navigateToMinhaContaInfo() {
+    this.router.navigate(['minha-conta-info']);
+  }
+
+  // Toggles the profile dropdown open/close
+  toggleDropdown(): void {
+    this.isDropdownOpen = !this.isDropdownOpen;
+  }
+
+  closeDropdown(): void {
+    this.isDropdownOpen = false;
+  }
+
+  logout(): void {
+    // Clear stored auth data and redirect the user to the login page
+    this.authService.logout();
+    this.router.navigate(['']);
   }
 }

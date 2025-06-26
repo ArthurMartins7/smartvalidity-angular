@@ -1,0 +1,75 @@
+<app-header-auth></app-header-auth>
+
+<!-- New multi-step sign-up – Etapa 01. Informações pessoais -->
+<section class="bg-white">
+  <div class="flex flex-col items-center justify-center px-6 pt-0 pb-8 mx-auto md:h-screen lg:py-0">
+
+
+    <!-- Header estilo Validata -->
+
+
+    <div class="w-full bg-white rounded-lg shadow md:mt-0 sm:max-w-xl xl:p-0">
+      <div class="p-6 space-y-4 md:space-y-6 sm:p-8">
+        <!-- Título do formulário -->
+        <h2 class="text-2xl font-bold text-gray-900 text-left mb-2">1. Informações Pessoais</h2>
+        <div class="w-full h-px bg-gray-200 opacity-70 mb-6"></div>
+        <!-- Formulário -->
+        <form class="space-y-4 md:space-y-6" action="#">
+          <div>
+            <label for="nome" class="block mb-2 text-sm font-medium text-gray-900">Nome completo</label>
+            <input [(ngModel)]="usuario.nome" name="nome" id="nome" type="text" required
+                   class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
+                   placeholder="Digite seu nome completo">
+          </div>
+
+          <div>
+            <label for="email" class="block mb-2 text-sm font-medium text-gray-900">E-mail</label>
+            <input [(ngModel)]="usuario.email" name="email" id="email" type="email" required
+                   class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
+                   placeholder="exemplo@empresa.com">
+          </div>
+
+          <div>
+            <label for="cnpj" class="block mb-2 text-sm font-medium text-gray-900">CNPJ <span
+              class="text-gray-400 text-xs">(opcional)</span></label>
+            <input [(ngModel)]="empresa.cnpj" name="cnpj" id="cnpj" type="text"
+                   class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
+                   placeholder="00.000.000/0000-00">
+          </div>
+
+          <div>
+            <label for="razaoSocial" class="block mb-2 text-sm font-medium text-gray-900">Razão social</label>
+            <input [(ngModel)]="empresa.razaoSocial" name="razaoSocial" id="razaoSocial" type="text"
+                   class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
+                   placeholder="Nome empresarial">
+          </div>
+
+          <div>
+            <label for="cargo" class="block mb-2 text-sm font-medium text-gray-900">Cargo</label>
+            <input [(ngModel)]="usuario.cargo" name="cargo" id="cargo" type="text"
+                   class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
+                   placeholder="Seu cargo na empresa">
+          </div>
+
+          <!-- Checkboxes -->
+          <div class="flex flex-col space-y-2 pt-2">
+            <label class="inline-flex items-start text-sm text-gray-500">
+              <input type="checkbox" [(ngModel)]="aceitaTermos" name="aceitaTermos"
+                     class="w-4 h-4 mt-1 border border-gray-300 rounded bg-gray-50 focus:ring-3 focus:ring-primary-300">
+              <span class="ml-2">Ao me cadastrar eu concordo com os <a href="#" class="text-blue-600 hover:underline">termos e condições de uso</a> do Validata.</span>
+            </label>
+
+          </div>
+
+          <!-- Botão Avançar -->
+          <div class="flex justify-center pt-4">
+            <button (click)="avancar()" type="button"
+                    class="text-white bg-[#5084C1] hover:bg-[#3969a1] focus:ring-4 focus:outline-none focus:ring-blue-300 font-bold rounded-lg text-lg w-full py-3 text-center">
+              Avançar →
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>

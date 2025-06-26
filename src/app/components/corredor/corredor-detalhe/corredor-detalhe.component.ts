@@ -92,10 +92,12 @@ export class CorredorDetalheComponent implements OnInit {
     const responsavelLimpo = {
       id: this.responsavelSelecionado.id,
       perfilAcesso: this.responsavelSelecionado.perfilAcesso,
-      cpf: this.responsavelSelecionado.cpf,
+      //cpf: this.responsavelSelecionado.cpf,
       nome: this.responsavelSelecionado.nome,
       email: this.responsavelSelecionado.email,
-      senha: this.responsavelSelecionado.senha
+      senha: this.responsavelSelecionado.senha,
+      cargo: this.responsavelSelecionado.cargo,
+      empresa: this.responsavelSelecionado.empresa
     };
 
     this.corredor.responsaveis = [responsavelLimpo];

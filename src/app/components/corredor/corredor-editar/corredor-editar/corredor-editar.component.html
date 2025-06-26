@@ -46,25 +46,16 @@
 
         <div class="w-full">
           <label for="responsavelCorredor" class="block mb-1.5 text-sm font-medium text-gray-900">
-            Responsáveis pelo Corredor:
+            Responsável pelo Corredor:
           </label>
-          <div class="flex gap-2">
-            <select [(ngModel)]="responsavelSelecionado" name="responsavelCorredor" id="responsavelCorredor"
-              class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg p-2.5
-              focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-              <option [ngValue]="null">Selecione um responsável</option>
-              <option *ngFor="let responsavel of responsaveisDisponiveis" [ngValue]="responsavel">
-                {{ responsavel.nome }}
-              </option>
-            </select>
-            <button type="button" (click)="adicionarResponsavel()" class="bg-blue-500 hover:bg-blue-700 text-white px-4 py-2 rounded">Adicionar</button>
-          </div>
-          <div *ngIf="corredor.responsaveis.length > 0" class="mt-2">
-            <div *ngFor="let responsavel of corredor.responsaveis; let i = index" class="flex items-center gap-2 mb-1">
-              <span class="bg-gray-100 px-2 py-1 rounded">{{ responsavel.nome }}</span>
-              <button type="button" (click)="removerResponsavel(i)" class="text-red-500 hover:text-red-700">Remover</button>
-            </div>
-          </div>
+          <select [(ngModel)]="responsavelSelecionado" name="responsavelCorredor" id="responsavelCorredor"
+            class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg p-2.5
+            focus:ring-2 focus:ring-blue-500 focus:border-blue-500" required>
+            <option [ngValue]="null">Selecione um responsável</option>
+            <option *ngFor="let responsavel of responsaveisDisponiveis" [ngValue]="responsavel">
+              {{ responsavel.nome }}
+            </option>
+          </select>
         </div>
       </div>
 
@@ -85,3 +76,4 @@
     </form>
   </div>
 </section>
+

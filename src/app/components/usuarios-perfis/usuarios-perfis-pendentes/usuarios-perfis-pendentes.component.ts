@@ -1,18 +1,18 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { Usuario } from '../../../shared/model/entity/usuario.model';
 import { UsuarioService } from '../../../shared/service/usuario.service';
 import { ConvidarUsuarioModalComponent } from '../convidar-usuario-modal/convidar-usuario-modal.component';
 
 @Component({
-  selector: 'app-usuarios-perfis-listagem',
-  imports: [CommonModule, FormsModule, ConvidarUsuarioModalComponent],
-  templateUrl: './usuarios-perfis-listagem.component.html',
-  styleUrl: './usuarios-perfis-listagem.component.css'
+  selector: 'app-usuarios-perfis-pendentes',
+  imports: [CommonModule, FormsModule, RouterModule, ConvidarUsuarioModalComponent],
+  templateUrl: './usuarios-perfis-pendentes.component.html',
+  styleUrl: './usuarios-perfis-pendentes.component.css'
 })
-export class UsuariosPerfisListagemComponent implements OnInit {
+export class UsuariosPerfisPendentesComponent {
 
   private usuarioService = inject(UsuarioService);
   private router = inject(Router);
@@ -36,8 +36,14 @@ export class UsuariosPerfisListagemComponent implements OnInit {
     return this.usuarios.slice(start, end);
   }
 
+  get paginetedUsersTeste(): any[] {
+    return [
+      { nome: 'Pietro', email: 'pietro@gmail.com', perfil: 'OPERADOR' },
+    ];
+  }
+
   ngOnInit(): void {
-    this.buscarTodosUsuarios();
+   // this.buscarTodosUsuarios();
   }
 
   public buscarTodosUsuarios() {
@@ -54,6 +60,10 @@ export class UsuariosPerfisListagemComponent implements OnInit {
 
   public navegarParaUsuariosPendentes(): void {
     this.router.navigate(['/usuarios-perfis-pendentes']);
+  }
+
+  public navegarParaMinhaEquipe(): void {
+    this.router.navigate(['/usuarios-perfis-listagem']);
   }
 
   onItemsPerPageChange(event: Event): void {

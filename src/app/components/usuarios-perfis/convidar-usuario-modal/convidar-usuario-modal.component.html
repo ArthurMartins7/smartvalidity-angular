@@ -1,0 +1,41 @@
+<!-- Overlay -->
+<div class="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+  <!-- Click outside to close -->
+  <div class="absolute inset-0" (click)="onClose()"></div>
+
+  <!-- Modal Card -->
+  <div class="relative bg-white rounded-lg shadow-lg w-full max-w-md p-8 z-10">
+    <!-- Close icon -->
+    <button class="absolute top-3 right-3 text-gray-400 hover:text-gray-600" (click)="onClose()">
+      <span class="material-icons text-xl">close</span>
+    </button>
+
+    <!-- Title -->
+    <h2 class="text-2xl font-semibold mb-6">Convidar usuário</h2>
+
+    <!-- Perfil select -->
+    <label class="block text-sm font-medium mb-1">perfil</label>
+    <div class="relative mb-8">
+      <select [(ngModel)]="perfil" class="w-full appearance-none border-b border-gray-300 focus:border-blue-500 outline-none py-2 pr-8">
+        <option *ngFor="let p of perfis" [value]="p">{{ p }}</option>
+      </select>
+      <span class="material-icons absolute right-0 top-1/2 -translate-y-1/2 text-gray-400">expand_more</span>
+    </div>
+
+    <!-- Nome input -->
+    <label class="block text-sm font-medium mb-1">nome</label>
+    <input type="text" [(ngModel)]="nome" class="w-full border-b border-gray-300 focus:border-blue-500 outline-none py-2 mb-4" />
+
+    <!-- Email input -->
+    <label class="block text-sm font-medium mb-1">e-mail</label>
+    <input type="text" [(ngModel)]="email" class="w-full border-b border-gray-300 focus:border-blue-500 outline-none py-2 mb-2" />
+
+    <p class="text-xs text-gray-500 mb-2">Um código de acesso será enviado para o e-mail informado; ele deverá utilizá-lo para fazer login.</p>
+
+    <!-- Action buttons -->
+    <div class="flex justify-end gap-4">
+      <button class="px-4 py-2 rounded text-gray-600 border border-gray-300 hover:bg-gray-100" (click)="onClose()">cancelar</button>
+      <button class="px-6 py-2 rounded bg-[#5084C1] text-white font-semibold disabled:opacity-50" [disabled]="!nome || !email" (click)="enviarConvite()">enviar convite</button>
+    </div>
+  </div>
+</div>

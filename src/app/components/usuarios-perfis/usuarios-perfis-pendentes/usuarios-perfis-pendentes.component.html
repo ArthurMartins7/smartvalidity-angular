@@ -1,0 +1,137 @@
+<!-- Header -->
+<div class="bg-gray-100 -mx-6 md:-mx-6 py-6 px-8 mb-10">
+  <div class="flex items-center justify-between">
+    <div>
+      <!-- Cabeçalho no padrão Minha Conta -->
+      <div class="flex items-center gap-2">
+        <!-- Ícone seta -->
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6 text-gray-600">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+        </svg>
+
+        <!-- Títulos -->
+        <div>
+          <div class="text-gray-500 text-base">Usuários e Perfis</div>
+          <div class="text-3xl font-bold">Gerenciar equipe</div>
+          <p class="text-gray-800 text-base mt-1 whitespace-nowrap">aqui você pode gerenciar, editar e adicionar novos usuários à equipe</p>
+        </div>
+      </div>
+    </div>
+    <div class="flex items-center gap-4">
+
+      <button class="bg-[#5084C1] hover:bg-[#3969a1] text-white font-bold text-base px-5 py-2 rounded transition transform hover:scale-105 flex items-center gap-2" (click)="abrirModalConvite()">
+        convidar usuário
+        <span class="material-icons text-base">add</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Tabs -->
+<div class="border-b border-gray-200 flex items-center gap-8 mb-4">
+  <button class="pb-2 text-gray-500 hover:text-[#5084C1] transition" (click)="navegarParaMinhaEquipe()">minha equipe</button>
+  <button class="pb-2 border-b-2 border-blue-600 text-[#5084C1] font-semibold" (click)="navegarParaUsuariosPendentes()">pendentes</button>
+  <!-- Comentado: link conhecer perfis
+  <div class="ml-auto flex items-center gap-2">
+    <a href="#" class="flex items-center gap-1 text-blue-600 text-sm hover:underline">
+      <span class="material-icons text-base">help_outline</span>
+      conhecer perfis
+    </a>
+  </div>
+  -->
+</div>
+
+<ng-container *ngIf="usuarios.length > 0">
+  <!-- Search -->
+  <div class="flex items-center mb-4 max-w-md">
+    <div class="relative w-full">
+      <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+        <span class="material-icons">search</span>
+      </span>
+      <input
+        type="text"
+        placeholder="Pesquisar"
+        class="w-full pl-10 pr-10 py-2 border rounded-full bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-100 focus:border-orange-200 text-base"
+
+      >
+      <button class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+        <span class="material-icons">close</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Table -->
+  <div class="bg-white rounded-lg shadow-md overflow-hidden border border-gray-200 overflow-x-auto">
+    <table class="min-w-full border-separate border-spacing-0 divide-y divide-gray-200">
+      <thead>
+        <tr class="bg-gray-700 text-white text-base">
+          <th class="px-4 py-3 text-left font-semibold">nome <span class="material-icons align-middle text-sm">unfold_more</span></th>
+          <th class="px-4 py-3 text-left font-semibold">e-mail <span class="material-icons align-middle text-sm">unfold_more</span></th>
+          <th class="px-4 py-3 text-left font-semibold">perfil <span class="material-icons align-middle text-sm">unfold_more</span></th>
+          <th class="px-4 py-3 text-left font-semibold">convite expira em<span class="material-icons align-middle text-sm">unfold_more</span></th>
+          <th class="pl-0 pr-9 py-3 text-right font-semibold sticky right-0 bg-gray-700 z-10">ações</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (usuario of paginetedUsersTeste; track usuario.id) {
+          <tr class="bg-white border-b hover:bg-gray-50 text-base">
+            <td class="px-4 py-3">{{usuario.nome}}</td>
+            <td class="px-4 py-3">{{usuario.email}}</td>
+            <td class="px-4 py-3">{{usuario.perfilAcesso}}</td>
+            <td class="px-16 py-3">15 dias</td>
+
+            <td class="pl-0 pr-4 py-3 flex items-center gap-3 justify-end sticky right-0 bg-white z-10">
+              <button class="w-9 h-9 flex items-center justify-center border border-gray-300 rounded text-blue-600 hover:text-blue-800 hover:bg-gray-100 transition" title="Reenviar convite">
+                <span class="material-icons text-base">cached</span>
+              </button>
+              <button class="w-9 h-9 flex items-center justify-center border border-gray-300 rounded text-red-600 hover:text-red-800 hover:bg-gray-100 transition">
+                <span class="material-icons text-base">delete</span>
+              </button>
+            </td>
+          </tr>
+        }
+        <!-- Outras linhas aqui -->
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Pagination Footer -->
+  <div class="flex items-center justify-between mt-4">
+    <!-- Items per page selector -->
+    <div class="flex items-center gap-2">
+      <span class="text-gray-700">Itens por página:</span>
+      <select class="border rounded w-12 h-7 text-center text-sm" [(ngModel)]="itemsPerPage" (change)="onItemsPerPageChange($event)">
+        <option *ngFor="let option of itemsPerPageOptions" [value]="option">{{ option }}</option>
+      </select>
+    </div>
+
+    <!-- Page navigation -->
+    <div class="flex items-center gap-2">
+      <button (click)="prevPage()" [disabled]="currentPage === 1" class="w-8 h-8 flex items-center justify-center rounded bg-gray-200 disabled:opacity-50">
+        <span class="material-icons text-sm">chevron_left</span>
+      </button>
+      <span class="w-8 h-8 flex items-center justify-center rounded bg-[#5084C1] text-white select-none">{{ currentPage }}</span>
+      <button (click)="nextPage()" [disabled]="currentPage === totalPages" class="w-8 h-8 flex items-center justify-center rounded bg-gray-200 disabled:opacity-50">
+        <span class="material-icons text-sm">chevron_right</span>
+      </button>
+    </div>
+  </div>
+</ng-container>
+
+<!-- Empty state when no pending users -->
+<div *ngIf="usuarios.length === 0" class="flex flex-col items-center justify-center mt-24 text-center">
+  <svg xmlns="http://www.w3.org/2000/svg" class="h-24 w-24 text-gray-400 mb-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+    <path stroke-linecap="round" stroke-linejoin="round" d="M3 7.5A2.25 2.25 0 015.25 5.25h4.086a2.25 2.25 0 011.59.659l1.828 1.828a2.25 2.25 0 001.59.659H18.75A2.25 2.25 0 0121 10.5v8.25A2.25 2.25 0 0118.75 21H5.25A2.25 2.25 0 013 18.75V7.5z" />
+  </svg>
+
+  <h2 class="text-lg font-semibold mb-2">não há nenhum colaborador pendente na equipe</h2>
+  <p class="text-gray-600 max-w-md mb-6">novos colaboradores recebem o convite por e-mail para fazer parte da equipe</p>
+
+  <button class="border border-blue-600 text-blue-600 hover:bg-blue-50 px-6 py-2 rounded font-medium flex items-center gap-2" (click)="abrirModalConvite()">
+    convidar usuário
+    <span class="material-icons text-base">add</span>
+  </button>
+</div>
+
+<!-- Modal Component -->
+<app-convidar-usuario-modal *ngIf="mostrarModalConvite" (close)="mostrarModalConvite = false"></app-convidar-usuario-modal>

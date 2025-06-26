@@ -65,8 +65,10 @@ export class CorredorEditarComponent implements OnInit {
         if (corredor.imagemEmBase64) {
           this.imagePreview = 'data:image/jpeg;base64,' + corredor.imagemEmBase64;
         }
-        if (!this.corredor.responsaveis) {
-          this.corredor.responsaveis = [];
+        if (corredor.responsaveis && corredor.responsaveis.length > 0) {
+          this.responsavelSelecionado = this.responsaveisDisponiveis.find(
+            r => r.id === corredor.responsaveis[0].id
+          ) || null;
         }
       },
       (erro) => {
@@ -92,37 +94,29 @@ export class CorredorEditarComponent implements OnInit {
     });
   }
 
-  public adicionarResponsavel(): void {
-    if (this.responsavelSelecionado && !this.corredor.responsaveis.some(r => r.id === this.responsavelSelecionado!.id)) {
-      this.corredor.responsaveis.push(this.responsavelSelecionado);
-      this.responsavelSelecionado = null;
-    }
-  }
-
-  public removerResponsavel(index: number): void {
-    this.corredor.responsaveis.splice(index, 1);
-  }
-
   atualizar(): void {
-    if (!this.corredor.nome || this.corredor.responsaveis.length === 0) {
-      Swal.fire('Preencha todos os campos obrigatórios e adicione pelo menos um responsável!', '', 'warning');
+    if (!this.corredor.nome || !this.responsavelSelecionado) {
+      Swal.fire('Preencha todos os campos obrigatórios!', '', 'warning');
       return;
     }
 
-    const responsaveisMapeados = this.corredor.responsaveis.map(responsavel => ({
-      id: responsavel.id,
-      perfilAcesso: responsavel.perfilAcesso,
-      cpf: responsavel.cpf,
-      nome: responsavel.nome,
-      email: responsavel.email,
-      senha: responsavel.senha
-    }));
-
     const corredorMapeado = {
       ...this.corredor,
-      responsaveis: responsaveisMapeados
+      responsaveis: [
+        {
+          id: this.responsavelSelecionado.id,
+          perfilAcesso: this.responsavelSelecionado.perfilAcesso,
+          //cpf: this.responsavelSelecionado.cpf,
+          nome: this.responsavelSelecionado.nome,
+          email: this.responsavelSelecionado.email,
+          senha: this.responsavelSelecionado.senha,
+          cargo: this.responsavelSelecionado.cargo,
+          empresa: this.responsavelSelecionado.empresa
+        }
+      ]
     };
 
+    // Primeiro atualiza os dados do corredor
     this.corredorService.atualizarCorredor(this.idCorredor, corredorMapeado)
       .pipe(
         catchError((error: HttpErrorResponse) => {
@@ -133,6 +127,7 @@ export class CorredorEditarComponent implements OnInit {
       )
       .subscribe({
         next: (resposta) => {
+          // Se houver uma nova imagem selecionada, faz o upload
           if (this.selectedFile) {
             const formData = new FormData();
             formData.append('imagem', this.selectedFile);

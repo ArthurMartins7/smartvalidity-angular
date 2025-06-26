@@ -1,16 +1,25 @@
 <!-- Header -->
-<div class="bg-gray-100 p-6 rounded-b-lg mb-6">
+<div class="bg-gray-100 -mx-6 md:-mx-6 py-6 px-8 mb-10">
   <div class="flex items-center justify-between">
     <div>
-      <h1 class="text-3xl font-bold text-gray-800 mb-1">gerenciar equipe</h1>
-      <p class="text-gray-600">aqui você pode gerenciar, editar e adicionar novos usuários à equipe</p>
+      <!-- Cabeçalho no padrão Minha Conta -->
+      <div class="flex items-center gap-2">
+        <!-- Ícone seta -->
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6 text-gray-600">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+        </svg>
+
+        <!-- Títulos -->
+        <div>
+          <div class="text-gray-500 text-base">Usuários e Perfis</div>
+          <div class="text-3xl font-bold">Gerenciar equipe</div>
+          <p class="text-gray-800 text-base mt-1 whitespace-nowrap">aqui você pode gerenciar, editar e adicionar novos usuários à equipe</p>
+        </div>
+      </div>
     </div>
     <div class="flex items-center gap-4">
-      <a href="#" class="text-blue-600 flex items-center gap-1 text-sm hover:underline">
-        <span class="material-icons text-base">menu_book</span>
-        tutorial de gerenciamento
-      </a>
-      <button class="bg-orange-500 hover:bg-orange-600 text-white font-semibold px-6 py-2 rounded transition flex items-center gap-2">
+
+      <button class="bg-[#5084C1] hover:bg-[#3969a1] text-white font-bold text-base px-5 py-2 rounded transition transform hover:scale-105 flex items-center gap-2" (click)="abrirModalConvite()">
         convidar usuário
         <span class="material-icons text-base">add</span>
       </button>
@@ -20,14 +29,16 @@
 
 <!-- Tabs -->
 <div class="border-b border-gray-200 flex items-center gap-8 mb-4">
-  <button class="pb-2 border-b-2 border-orange-500 text-orange-600 font-semibold">minha equipe</button>
-  <button class="pb-2 text-gray-500 hover:text-orange-600 transition">pendentes</button>
+  <button class="pb-2 border-b-2 border-blue-600 text-[#5084C1] font-semibold">minha equipe</button>
+  <button class="pb-2 text-gray-500 hover:text-[#5084C1] transition" (click)="navegarParaUsuariosPendentes()">pendentes</button>
+  <!-- Comentado: link conhecer perfis
   <div class="ml-auto flex items-center gap-2">
     <a href="#" class="flex items-center gap-1 text-blue-600 text-sm hover:underline">
       <span class="material-icons text-base">help_outline</span>
       conhecer perfis
     </a>
   </div>
+  -->
 </div>
 
 <!-- Search -->
@@ -49,35 +60,62 @@
 </div>
 
 <!-- Table -->
-<div class="overflow-x-auto">
-  <table class="min-w-full border-separate border-spacing-0">
+<div class="bg-white rounded-lg shadow-md overflow-hidden border border-gray-200 overflow-x-auto">
+  <table class="min-w-full border-separate border-spacing-0 divide-y divide-gray-200">
     <thead>
-      <tr class="bg-gray-700 text-white">
+      <tr class="bg-gray-700 text-white text-base">
         <th class="px-4 py-3 text-left font-semibold">nome <span class="material-icons align-middle text-sm">unfold_more</span></th>
         <th class="px-4 py-3 text-left font-semibold">e-mail <span class="material-icons align-middle text-sm">unfold_more</span></th>
         <th class="px-4 py-3 text-left font-semibold">cargo <span class="material-icons align-middle text-sm">unfold_more</span></th>
         <th class="px-4 py-3 text-left font-semibold">data de criação <span class="material-icons align-middle text-sm">unfold_more</span></th>
         <th class="px-4 py-3 text-left font-semibold">perfil <span class="material-icons align-middle text-sm">unfold_more</span></th>
-        <th class="px-4 py-3 text-left font-semibold">excluir</th>
+        <th class="pl-0 pr-9 py-3 text-right font-semibold sticky right-0 bg-gray-700 z-10">ações</th>
       </tr>
     </thead>
     <tbody>
-      <tr class="bg-white border-b hover:bg-gray-50">
-        @for (usuario of usuarios; track usuario.id) {
+      @for (usuario of paginatedUsers; track usuario.id) {
+        <tr class="bg-white border-b hover:bg-gray-50 text-base">
           <td class="px-4 py-3">{{usuario.nome}}</td>
           <td class="px-4 py-3">{{usuario.email}}</td>
-          <td class="px-4 py-3">sem cargo</td>
-          <td class="px-4 py-3">30/10/2024</td>
+          <td class="px-4 py-3">{{usuario.cargo}}</td>
+          <td class="px-9 py-3">30/10/2024</td>
           <td class="px-4 py-3">{{usuario.perfilAcesso}}</td>
-
-        }
-        <td class="px-4 py-3">
-          <button class="text-red-500 hover:text-red-700">
-            <span class="material-icons">delete</span>
-          </button>
-        </td>
-      </tr>
+          <td class="pl-0 pr-4 py-3 flex items-center gap-3 justify-end sticky right-0 bg-white z-10">
+            <button class="w-9 h-9 flex items-center justify-center border border-gray-300 rounded text-gray-700 hover:text-gray-900 hover:bg-gray-100 transition">
+              <span class="material-icons text-base">edit</span>
+            </button>
+            <button class="w-9 h-9 flex items-center justify-center border border-gray-300 rounded text-red-600 hover:text-red-800 hover:bg-gray-100 transition">
+              <span class="material-icons text-base">delete</span>
+            </button>
+          </td>
+        </tr>
+      }
       <!-- Outras linhas aqui -->
     </tbody>
   </table>
 </div>
+
+<!-- Pagination Footer -->
+<div class="flex items-center justify-between mt-4">
+  <!-- Items per page selector -->
+  <div class="flex items-center gap-2">
+    <span class="text-gray-700">Itens por página:</span>
+    <select class="border rounded w-12 h-7 text-center text-sm" [(ngModel)]="itemsPerPage" (change)="onItemsPerPageChange($event)">
+      <option *ngFor="let option of itemsPerPageOptions" [value]="option">{{ option }}</option>
+    </select>
+  </div>
+
+  <!-- Page navigation -->
+  <div class="flex items-center gap-2">
+    <button (click)="prevPage()" [disabled]="currentPage === 1" class="w-8 h-8 flex items-center justify-center rounded bg-gray-200 disabled:opacity-50">
+      <span class="material-icons text-sm">chevron_left</span>
+    </button>
+    <span class="w-8 h-8 flex items-center justify-center rounded bg-[#5084C1] text-white select-none">{{ currentPage }}</span>
+    <button (click)="nextPage()" [disabled]="currentPage === totalPages" class="w-8 h-8 flex items-center justify-center rounded bg-gray-200 disabled:opacity-50">
+      <span class="material-icons text-sm">chevron_right</span>
+    </button>
+  </div>
+</div>
+
+<!-- Modal Component -->
+<app-convidar-usuario-modal *ngIf="mostrarModalConvite" (close)="mostrarModalConvite = false"></app-convidar-usuario-modal>

@@ -99,15 +99,19 @@ export class CorredorDetalheComponent implements OnInit {
       return;
     }
 
-    // Limpa os campos do Spring Security dos responsáveis
-    this.corredor.responsaveis = this.corredor.responsaveis.map(responsavel => ({
-      id: responsavel.id,
-      perfilAcesso: responsavel.perfilAcesso,
-      cpf: responsavel.cpf,
-      nome: responsavel.nome,
-      email: responsavel.email,
-      senha: responsavel.senha
-    }));
+    // Limpa os campos do Spring Security do responsável
+    const responsavelLimpo: Usuario = {
+      id: this.responsavelSelecionado!.id,
+      perfilAcesso: this.responsavelSelecionado!.perfilAcesso,
+      //cpf: this.responsavelSelecionado.cpf,
+      nome: this.responsavelSelecionado!.nome,
+      email: this.responsavelSelecionado!.email,
+      senha: this.responsavelSelecionado!.senha,
+      cargo: this.responsavelSelecionado!.cargo,
+      empresa: this.responsavelSelecionado!.empresa
+    };
+
+    this.corredor.responsaveis = [responsavelLimpo];
 
     if (this.idCorredor) {
       this.atualizar();

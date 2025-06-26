@@ -25,12 +25,16 @@ export class ItemProdutoService {
     return this.httpClient.get<ItemProdutoDTO[]>(`${this.API}/produto/${produtoId}`);
   }
 
-  criarItemProduto(novoItemProduto: ItemProdutoDTO): Observable<any> {
-    const headers = new HttpHeaders().set('Content-Type', 'application/json');
-    return this.httpClient.post(this.API, novoItemProduto, {
-      headers,
-      responseType: 'text'
-    });
+  /**
+   * Busca itens-produto não inspecionados de um produto específico
+   * Para uso em alertas personalizados
+   */
+  buscarItensProdutoNaoInspecionadosPorProduto(produtoId: string): Observable<ItemProdutoDTO[]> {
+    return this.httpClient.get<ItemProdutoDTO[]>(`${this.API}/produto/${produtoId}/nao-inspecionados`);
+  }
+
+  criarItemProduto(novoItemProduto: ItemProdutoDTO): Observable<ItemProdutoDTO> {
+    return this.httpClient.post<ItemProdutoDTO>(this.API, novoItemProduto);
   }
 
   atualizarItemProduto(id: string, itemProdutoAtualizado: ItemProdutoDTO): Observable<ItemProdutoDTO> {

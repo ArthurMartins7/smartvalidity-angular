@@ -32,7 +32,7 @@
     </div>
     <div class="flex items-center gap-4">
 
-      <button class="bg-[#5084C1] hover:bg-[#3969a1] text-white font-bold text-lg px-7 py-3 rounded transition transform hover:scale-105 flex items-center gap-2">
+      <button class="bg-[#5084C1] hover:bg-[#3969a1] text-white font-bold text-lg px-7 py-3 rounded transition transform hover:scale-105 flex items-center gap-2" (click)="realizarCadastro()">
         cadastre-se
       </button>
 
@@ -79,7 +79,7 @@
 
           <!-- Remember & Forgot -->
           <div class="flex items-center justify-end">
-            <a href="#" class="text-sm font-medium text-black hover:underline">Esqueceu a senha?</a>
+            <button type="button" class="text-sm font-medium text-black hover:underline" (click)="esqueceuSenha()">Esqueceu a senha?</button>
           </div>
 
           <!-- Submit -->
@@ -100,4 +100,7 @@
     </div>
   </div>
 </section>
+
+<!-- Modal assinatura existente -->
+<app-assinatura-existente-modal *ngIf="exibirModalAssinaturaExistente" (close)="exibirModalAssinaturaExistente=false"></app-assinatura-existente-modal>
 

@@ -1,15 +1,17 @@
+import { CommonModule } from '@angular/common';
 import { Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import Swal from 'sweetalert2';
+import { AssinaturaExistenteModalComponent } from '../../../../components/assinatura-existente-modal/assinatura-existente-modal.component';
 import { Usuario } from '../../../../shared/model/entity/usuario.model';
-import { HeaderAuthComponent } from "../../../../shared/ui/headers/header-auth/header-auth.component";
 import { AuthenticationService } from '../../services/auth.service';
 
 
 @Component({
   selector: 'app-signin',
-  imports: [FormsModule, HeaderAuthComponent],
+  standalone: true,
+  imports: [CommonModule, FormsModule, AssinaturaExistenteModalComponent],
   templateUrl: './signin.component.html',
   styleUrl: './signin.component.css'
 })
@@ -20,6 +22,7 @@ export class SigninComponent {
 
   public usuario = new Usuario();
   public showSenha: boolean = false;
+  public exibirModalAssinaturaExistente: boolean = false;
 
   realizarLogin() {
     //console.log('usuarioDTO: ', this.usuarioDTO);
@@ -68,7 +71,15 @@ export class SigninComponent {
   }
 
   realizarCadastro() {
-    this.router.navigate(['/signup-info-pessoais']);
+    // Aqui poderia haver chamada a um endpoint para verificar se já existe assinatura.
+    // Para fins de teste, vamos apenas exibir o modal.
+    this.exibirModalAssinaturaExistente = true;
+    // Caso não exista assinatura, navegue para o fluxo de cadastro:
+    // this.router.navigate(['/signup-info-pessoais']);
+  }
+
+  public esqueceuSenha() {
+    this.router.navigate(['password-recovery-validar-identidade']);
   }
 
   public verificarPerfilAcesso() {

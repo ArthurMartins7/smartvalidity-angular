@@ -93,41 +93,103 @@
             <label for="produto" class="block text-sm font-medium text-gray-700 mb-2">
               Produto Relacionado
             </label>
-            <select
+
+            <!-- Campo de busca com autocomplete -->
+            <div class="relative">
+              <input
+                type="text"
               id="produto"
               name="produto"
-              [(ngModel)]="produtoSelecionado"
-              (change)="onProdutoSelecionado()"
-              class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-              <option value="">Nenhum produto específico</option>
-              <option *ngFor="let produto of produtos" [value]="produto.id">
-                {{ produto.descricao }}
-              </option>
-            </select>
+                [(ngModel)]="termoBuscaProduto"
+                (input)="onBuscaProdutoChange()"
+                (focus)="mostrarDropdown = produtosFiltrados.length > 0"
+                (blur)="fecharDropdownComDelay()"
+                placeholder="Digite para buscar produtos..."
+                class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                autocomplete="off">
+
+              <!-- Botão de confirmar busca -->
+              <button
+                type="button"
+                (click)="executarBuscaProduto()"
+                class="absolute right-8 top-2 text-gray-400 hover:text-gray-600">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35M11 19a8 8 0 100-16 8 8 0 000 16z"></path>
+                </svg>
+              </button>
+
+              <!-- Botão para limpar seleção -->
+              <button
+                *ngIf="produtoSelecionado"
+                type="button"
+                (click)="limparSelecaoProduto()"
+                class="absolute right-2 top-2 text-gray-400 hover:text-gray-600">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+              </button>
+
+              <!-- Dropdown de resultados -->
+              <div *ngIf="mostrarDropdown && produtosFiltrados.length > 0"
+                   class="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-y-auto">
+                <div *ngFor="let produto of produtosFiltrados"
+                     (click)="selecionarProduto(produto)"
+                     class="px-3 py-2 hover:bg-blue-50 cursor-pointer border-b border-gray-100 last:border-b-0">
+                  <div class="font-medium text-gray-900">{{ produto.descricao }}</div>
+                  <div class="text-sm text-gray-500">{{ produto.marca }}</div>
+                </div>
+              </div>
+
+              <!-- Mensagem quando não há resultados -->
+              <div *ngIf="mostrarDropdown && produtosFiltrados.length === 0 && termoBuscaProduto.length >= 2"
+                   class="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg p-3">
+                <div class="text-sm text-gray-500 text-center">
+                  Nenhum produto encontrado com itens não inspecionados
+                </div>
+              </div>
+            </div>
+
             <p class="text-xs text-gray-500 mt-1">
-              * Apenas produtos com itens não inspecionados são exibidos
+              * Digite pelo menos 2 caracteres para buscar produtos com itens não inspecionados
             </p>
-            
+
+            <!-- DEBUG: Estado das variáveis -->
+            <div class="mt-2 p-2 bg-gray-100 text-xs rounded">
+              <strong>Debug:</strong><br>
+              termoBuscaProduto: "{{ termoBuscaProduto }}" ({{ termoBuscaProduto.length }} chars)<br>
+              produtosFiltrados.length: {{ produtosFiltrados.length }}<br>
+              mostrarDropdown: {{ mostrarDropdown }}<br>
+              produtoSelecionado: "{{ produtoSelecionado }}"
+            </div>
+
             <!-- Informações dos itens-produto encontrados -->
-            <div *ngIf="produtoSelecionado && itensProdutoNaoInspecionados.length > 0" 
-                 class="mt-3 p-3 bg-blue-50 border border-blue-200 rounded-md">
-              <p class="text-sm font-medium text-blue-800 mb-2">
-                📦 Itens-produto que serão vinculados ao alerta:
-              </p>
-              <div class="space-y-1">
-                <div *ngFor="let item of itensProdutoNaoInspecionados" 
-                     class="text-xs text-blue-700 flex justify-between">
-                  <span>Lote: {{ item.lote }}</span>
-                  <span>Vence: {{ item.dataVencimento | date:'dd/MM/yyyy' }}</span>
+            <div *ngIf="produtoSelecionado && itensProdutoNaoInspecionados.length > 0"
+                 class="mt-3 p-4 bg-blue-50 border border-blue-200 rounded-md">
+              <h4 class="text-sm font-medium text-blue-800 mb-3 flex items-center">
+                📦 Itens que serão monitorados por este alerta:
+              </h4>
+              <div class="space-y-2 max-h-32 overflow-y-auto">
+                <div *ngFor="let item of itensProdutoNaoInspecionados"
+                     class="flex justify-between items-center p-2 bg-white rounded border">
+                  <div class="flex-1">
+                    <span class="font-medium text-gray-900">Lote: {{ item.lote }}</span>
+                    <span class="text-sm text-gray-600 ml-2">
+                      Vence: {{ item.dataVencimento | date:'dd/MM/yyyy' }}
+                    </span>
+                  </div>
+                  <div class="text-xs px-2 py-1 rounded"
+                       [class]="getStatusVencimento(item.dataVencimento)">
+                    {{ getTextoVencimento(item.dataVencimento) }}
+                  </div>
                 </div>
               </div>
               <p class="text-xs text-blue-600 mt-2">
-                Total: {{ itensProdutoNaoInspecionados.length }} item(ns) será(ão) vinculado(s)
+                Total: {{ itensProdutoNaoInspecionados.length }} item(ns) será(ão) monitorado(s)
               </p>
             </div>
-            
+
             <!-- Mensagem quando não há itens -->
-            <div *ngIf="produtoSelecionado && itensProdutoNaoInspecionados.length === 0" 
+            <div *ngIf="produtoSelecionado && itensProdutoNaoInspecionados.length === 0"
                  class="mt-3 p-3 bg-yellow-50 border border-yellow-200 rounded-md">
               <p class="text-sm text-yellow-800">
                 ⚠️ Nenhum item-produto não inspecionado encontrado para este produto.

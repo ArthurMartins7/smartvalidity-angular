@@ -9,7 +9,7 @@ import { AlertaDTO } from '../model/dto/alerta.dto';
   providedIn: 'root'
 })
 export class NotificacaoService {
-  private readonly API_URL = 'http://localhost:8080/api/notificacoes';
+  private readonly API_URL = 'http://localhost:8080/smartvalidity/api/notificacoes';
 
   // Subject para controlar a contagem de notificações não lidas
   private unreadCountSubject = new BehaviorSubject<number>(0);

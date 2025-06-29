@@ -1,0 +1,221 @@
+/* Estilos específicos para detalhes de notificação */
+
+/* Card principal */
+.notification-detail-card {
+  transition: all 0.3s ease-in-out;
+}
+
+/* Header gradiente */
+.notification-header {
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+}
+
+/* Badges e status */
+.status-badge {
+  backdrop-filter: blur(10px);
+  background: rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+/* Seções de informações */
+.info-section {
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  border: 1px solid #e2e8f0;
+}
+
+.info-section h4 {
+  color: #1e293b;
+}
+
+/* Ícones */
+.section-icon {
+  filter: drop-shadow(0 1px 2px rgba(59, 130, 246, 0.2));
+}
+
+/* Produtos relacionados */
+.product-tag {
+  background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+  border: 1px solid #93c5fd;
+  transition: all 0.2s ease-in-out;
+}
+
+.product-tag:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(59, 130, 246, 0.2);
+}
+
+/* Botões de ação */
+.action-button {
+  transition: all 0.2s ease-in-out;
+  font-weight: 500;
+}
+
+.action-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+}
+
+.btn-primary:hover {
+  background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%);
+}
+
+.btn-success {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+}
+
+.btn-success:hover {
+  background: linear-gradient(135deg, #059669 0%, #047857 100%);
+}
+
+.btn-secondary {
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  border: 1px solid #e2e8f0;
+}
+
+.btn-secondary:hover {
+  background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+}
+
+/* Estados de prioridade */
+.priority-high {
+  background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
+  border-color: #fca5a5;
+  color: #dc2626;
+}
+
+.priority-medium {
+  background: linear-gradient(135deg, #fff7ed 0%, #fed7aa 100%);
+  border-color: #fdba74;
+  color: #ea580c;
+}
+
+.priority-low {
+  background: linear-gradient(135deg, #fefce8 0%, #fef3c7 100%);
+  border-color: #fde68a;
+  color: #d97706;
+}
+
+.priority-normal {
+  background: linear-gradient(135deg, #f0f9ff 0%, #dbeafe 100%);
+  border-color: #93c5fd;
+  color: #2563eb;
+}
+
+/* Animações */
+@keyframes slideInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.notification-detail-card {
+  animation: slideInDown 0.4s ease-out;
+}
+
+/* Loading state */
+.loading-spinner {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+  .notification-header {
+    padding: 1rem;
+  }
+
+  .notification-header h1 {
+    font-size: 1.5rem;
+  }
+
+  .grid {
+    grid-template-columns: 1fr;
+  }
+
+  .action-buttons {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .action-button {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+/* Estados especiais */
+.error-state {
+  background: radial-gradient(circle, #fef2f2 0%, #fee2e2 100%);
+}
+
+.success-state {
+  background: radial-gradient(circle, #f0fdf4 0%, #dcfce7 100%);
+}
+
+/* Hover effects */
+.info-section:hover {
+  background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+/* Text styling */
+.detail-text {
+  line-height: 1.6;
+  color: #374151;
+}
+
+.label-text {
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.value-text {
+  color: #111827;
+  font-weight: 600;
+}
+
+/* Icon styling */
+.notification-icon {
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+}
+
+/* Card hover effect */
+.notification-detail-card:hover {
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+/* Status indicators */
+.status-read {
+  background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+  color: #166534;
+  border-color: #bbf7d0;
+}
+
+.status-unread {
+  background: linear-gradient(135deg, #fefce8 0%, #fef3c7 100%);
+  color: #a16207;
+  border-color: #fde68a;
+}
+
+/* Smooth transitions */
+* {
+  transition: all 0.2s ease-in-out;
+}

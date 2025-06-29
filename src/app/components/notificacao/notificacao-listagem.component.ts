@@ -175,6 +175,15 @@ export class NotificacaoListagemComponent implements OnInit, OnDestroy {
   }
 
   /**
+   * Ver detalhes da notificação
+   */
+  public verDetalhes(notificacao: AlertaDTO.Listagem): void {
+    if (!notificacao.id) return;
+
+    this.router.navigate(['/notificacao-detalhe', notificacao.id]);
+  }
+
+  /**
    * Obter descrição do tipo de alerta
    */
   public obterDescricaoTipo(tipo: TipoAlerta): string {

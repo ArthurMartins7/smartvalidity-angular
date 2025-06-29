@@ -13,27 +13,28 @@ import { FornecedorListagemComponent } from './components/fornecedor/fornecedor-
 import { ItemProdutoCadastroComponent } from './components/item-produto/item-produto-cadastro/item-produto-cadastro.component';
 import { MinhaContaEditarComponent } from './components/minha-conta/minha-conta-editar/minha-conta-editar.component';
 import { MinhaContaInfoComponent } from './components/minha-conta/minha-conta-info/minha-conta-info.component';
+import { MinhaContaSenhaAlterarComponent } from './components/minha-conta/minha-conta-senha-alterar/minha-conta-senha-alterar.component';
+import { MinhaContaSenhaCodigoVerificacaoComponent } from './components/minha-conta/minha-conta-senha-codigo-verificacao/minha-conta-senha-codigo-verificacao.component';
+import { MinhaContaSenhaValidarIdentidadeComponent } from './components/minha-conta/minha-conta-senha-validar-identidade/minha-conta-senha-validar-identidade.component';
 import { MuralDetalheComponent } from './components/mural/mural-detalhe/mural-detalhe.component';
 import { MuralListagemComponent } from './components/mural/mural-listagem/mural-listagem.component';
+import { NotificacaoDetalheComponent } from './components/notificacao/notificacao-detalhe/notificacao-detalhe.component';
 import { NotificacaoListagemComponent } from './components/notificacao/notificacao-listagem.component';
 import { ProdutoEditarComponent } from './components/produto/produto-editar/produto-editar/produto-editar.component';
 import { ProdutoDetalheComponent } from './components/produto/produto-listagem/produto-detalhe/produto-detalhe/produto-detalhe.component';
 import { ProdutoListagemComponent } from './components/produto/produto-listagem/produto-listagem.component';
+import { UsuariosPerfisEditarComponent } from './components/usuarios-perfis/usuarios-perfis-editar/usuarios-perfis-editar.component';
 import { UsuariosPerfisListagemComponent } from './components/usuarios-perfis/usuarios-perfis-listagem/usuarios-perfis-listagem.component';
 import { UsuariosPerfisPendentesComponent } from './components/usuarios-perfis/usuarios-perfis-pendentes/usuarios-perfis-pendentes.component';
+import { PasswordRecoveryAlterarSenhaComponent } from './core/auth/pages/password-recovery/password-recovery-alterar-senha/password-recovery-alterar-senha.component';
+import { PasswordRecoveryCodigoVerificacaoComponent } from './core/auth/pages/password-recovery/password-recovery-codigo-verificacao/password-recovery-codigo-verificacao.component';
+import { PasswordRecoveryValidarIdentidadeComponent } from './core/auth/pages/password-recovery/password-recovery-validar-identidade/password-recovery-validar-identidade.component';
 import { RegisterComponent } from './core/auth/pages/register/register/register.component';
 import { SigninComponent } from './core/auth/pages/signin/signin.component';
 import { SignupInfoPessoaisComponent } from './core/auth/pages/signup/signup-info-pessoais/signup-info-pessoais.component';
 import { SignupSenhaComponent } from './core/auth/pages/signup/signup-senha/signup-senha.component';
 import { SignupValidarIdentidadeComponent } from './core/auth/pages/signup/signup-validar-identidade/signup-validar-identidade.component';
 import { SignupVerificacaoComponent } from './core/auth/pages/signup/signup-verificacao/signup-verificacao.component';
-import { UsuariosPerfisEditarComponent } from './components/usuarios-perfis/usuarios-perfis-editar/usuarios-perfis-editar.component';
-import { MinhaContaSenhaValidarIdentidadeComponent } from './components/minha-conta/minha-conta-senha-validar-identidade/minha-conta-senha-validar-identidade.component';
-import { MinhaContaSenhaCodigoVerificacaoComponent } from './components/minha-conta/minha-conta-senha-codigo-verificacao/minha-conta-senha-codigo-verificacao.component';
-import { MinhaContaSenhaAlterarComponent } from './components/minha-conta/minha-conta-senha-alterar/minha-conta-senha-alterar.component';
-import { PasswordRecoveryValidarIdentidadeComponent } from './core/auth/pages/password-recovery/password-recovery-validar-identidade/password-recovery-validar-identidade.component';
-import { PasswordRecoveryCodigoVerificacaoComponent } from './core/auth/pages/password-recovery/password-recovery-codigo-verificacao/password-recovery-codigo-verificacao.component';
-import { PasswordRecoveryAlterarSenhaComponent } from './core/auth/pages/password-recovery/password-recovery-alterar-senha/password-recovery-alterar-senha.component';
 
 export const routes: Routes = [
   //{ path: 'login', component: LoginComponent },
@@ -68,6 +69,7 @@ export const routes: Routes = [
 
   // Rotas de Notificações
   { path: 'notificacoes', component: NotificacaoListagemComponent },
+  { path: 'notificacao-detalhe/:id', component: NotificacaoDetalheComponent },
 
   // Rotas do Mural
   { path: 'mural-listagem', component: MuralListagemComponent },

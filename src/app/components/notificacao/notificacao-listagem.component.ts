@@ -10,6 +10,16 @@ import { AlertaDTO } from '../../shared/model/dto/alerta.dto';
 import { TipoAlerta } from '../../shared/model/enum/tipo-alerta.enum';
 import { NotificacaoService } from '../../shared/service/notificacao.service';
 
+/**
+ * Componente responsável pela listagem de notificações.
+ *
+ * RESPONSABILIDADES MVC (VIEW):
+ * - Apresentar dados ao usuário
+ * - Capturar interações do usuário
+ * - Chamar métodos do Service para operações de negócio
+ * - Não contém lógica de negócio complexa
+ * - Foco na experiência do usuário e interface
+ */
 @Component({
   selector: 'app-notificacao-listagem',
   standalone: true,
@@ -33,10 +43,7 @@ export class NotificacaoListagemComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    // Carrega notificações após um pequeno delay para evitar problemas de inicialização
-    setTimeout(() => {
-      this.carregarNotificacoes();
-    }, 500);
+    this.carregarNotificacoes();
   }
 
   ngOnDestroy(): void {
@@ -44,34 +51,36 @@ export class NotificacaoListagemComponent implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 
-    /**
+  /**
    * Carregar notificações do usuário
    */
-  public carregarNotificacoes(): void {
+  private carregarNotificacoes(): void {
     this.carregando = true;
 
-    const request = this.filtrarApenasNaoLidas
+    const observable = this.filtrarApenasNaoLidas
       ? this.notificacaoService.buscarNotificacoesNaoLidas()
       : this.notificacaoService.buscarNotificacoes();
 
-    request.pipe(takeUntil(this.destroy$))
+    observable.pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (notificacoes) => {
           this.notificacoes = notificacoes || [];
           this.carregando = false;
         },
         error: (error) => {
-          // Tratamento silencioso de todos os tipos de erro
-          this.carregando = false;
           this.notificacoes = [];
+          this.carregando = false;
 
-          // Se for erro de autenticação, redireciona para login
           if (error.status === 401 || error.status === 403) {
-            this.router.navigate(['/']);
-            return;
+            this.router.navigate(['/login']);
+          } else {
+            Swal.fire({
+              title: 'Erro',
+              text: 'Erro ao carregar notificações. Tente novamente.',
+              icon: 'error',
+              confirmButtonText: 'OK'
+            });
           }
-
-          // Para todos os outros casos, não faz nada (permanece silencioso)
         }
       });
   }
@@ -97,7 +106,7 @@ export class NotificacaoListagemComponent implements OnInit, OnDestroy {
           // Atualizar o status da notificação localmente
           const index = this.notificacoes.findIndex(n => n.id === notificacao.id);
           if (index !== -1) {
-            this.notificacoes[index] = { ...this.notificacoes[index] };
+            this.notificacoes[index] = { ...this.notificacoes[index], lida: true };
           }
           // Se estiver filtrando apenas não lidas, remover da lista
           if (this.filtrarApenasNaoLidas) {
@@ -117,12 +126,12 @@ export class NotificacaoListagemComponent implements OnInit, OnDestroy {
    */
   public marcarTodasComoLidas(): void {
     Swal.fire({
-      title: 'Confirmar ação',
+      title: 'Confirmar',
       text: 'Deseja marcar todas as notificações como lidas?',
       icon: 'question',
       showCancelButton: true,
-      confirmButtonText: 'Sim, marcar todas',
-      cancelButtonText: 'Cancelar'
+      confirmButtonText: 'Sim',
+      cancelButtonText: 'Não'
     }).then((result) => {
       if (result.isConfirmed) {
         this.notificacaoService.marcarTodasComoLidas()
@@ -132,15 +141,19 @@ export class NotificacaoListagemComponent implements OnInit, OnDestroy {
               this.carregarNotificacoes();
               Swal.fire({
                 title: 'Sucesso',
-                text: 'Todas as notificações foram marcadas como lidas.',
+                text: 'Todas as notificações foram marcadas como lidas',
                 icon: 'success',
                 timer: 2000,
                 showConfirmButton: false
               });
             },
             error: (error) => {
-              console.log('Informação: Problema temporário ao marcar todas como lidas');
-              // Não exibe alerta de erro, o usuário pode tentar novamente
+              Swal.fire({
+                title: 'Erro',
+                text: 'Erro ao marcar notificações como lidas',
+                icon: 'error',
+                confirmButtonText: 'OK'
+              });
             }
           });
       }
@@ -151,17 +164,12 @@ export class NotificacaoListagemComponent implements OnInit, OnDestroy {
    * Navegar para o item no mural
    */
   public irParaMural(notificacao: AlertaDTO.Listagem): void {
-    // Primeiro marcar como lida se ainda não foi
-    if (notificacao.id) {
+    if (!notificacao.lida && notificacao.id) {
       this.marcarComoLida(notificacao);
     }
 
-    // Determinar qual aba do mural abrir baseado no tipo de alerta
     let tab = 'proximo';
     switch (notificacao.tipo) {
-      case TipoAlerta.VENCIMENTO_HOJE:
-        tab = 'hoje';
-        break;
       case TipoAlerta.VENCIMENTO_ATRASO:
         tab = 'vencido';
         break;
@@ -171,16 +179,16 @@ export class NotificacaoListagemComponent implements OnInit, OnDestroy {
         break;
     }
 
-    this.router.navigate(['/mural-listagem'], { queryParams: { tab } });
+    this.router.navigate(['/mural'], { queryParams: { tab } });
   }
 
   /**
    * Ver detalhes da notificação
    */
   public verDetalhes(notificacao: AlertaDTO.Listagem): void {
-    if (!notificacao.id) return;
-
-    this.router.navigate(['/notificacao-detalhe', notificacao.id]);
+    if (notificacao.id) {
+      this.router.navigate(['/notificacao-detalhe', notificacao.id]);
+    }
   }
 
   /**
@@ -209,18 +217,7 @@ export class NotificacaoListagemComponent implements OnInit, OnDestroy {
     }
   }
 
-  /**
-   * Obter ícone do tipo de alerta
-   */
-  public obterIconeTipo(tipo: TipoAlerta): string {
-    switch (tipo) {
-      case TipoAlerta.VENCIMENTO_AMANHA: return '⚠️';
-      case TipoAlerta.VENCIMENTO_HOJE: return '🚨';
-      case TipoAlerta.VENCIMENTO_ATRASO: return '🔴';
-      case TipoAlerta.PERSONALIZADO: return '📝';
-      default: return '📋';
-    }
-  }
+
 
   /**
    * Formatar data/hora

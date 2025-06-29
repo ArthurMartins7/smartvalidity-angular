@@ -8,6 +8,15 @@ import { AlertaDTO } from '../../../shared/model/dto/alerta.dto';
 import { TipoAlerta } from '../../../shared/model/enum/tipo-alerta.enum';
 import { NotificacaoService } from '../../../shared/service/notificacao.service';
 
+/**
+ * Componente responsável pelos detalhes de uma notificação específica.
+ *
+ * RESPONSABILIDADES MVC (VIEW):
+ * - Apresentar detalhes de uma notificação específica
+ * - Permitir navegação para o mural relacionado
+ * - Marcar notificação como lida quando visualizada
+ * - Não contém lógica de negócio (delegada para o Service)
+ */
 @Component({
   selector: 'app-notificacao-detalhe',
   standalone: true,
@@ -20,7 +29,7 @@ export class NotificacaoDetalheComponent implements OnInit, OnDestroy {
 
   notificacao: AlertaDTO.Listagem | null = null;
   carregando: boolean = true;
-  erro: string = '';
+  erro: string | null = null;
 
   // Enums para template
   public TipoAlerta = TipoAlerta;
@@ -32,11 +41,11 @@ export class NotificacaoDetalheComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    const notificacaoId = this.route.snapshot.paramMap.get('id');
-    if (notificacaoId) {
-      this.carregarDetalhesNotificacao(+notificacaoId);
+    const id = this.route.snapshot.paramMap.get('id');
+    if (id) {
+      this.carregarDetalhesNotificacao(+id);
     } else {
-      this.erro = 'ID da notificação não encontrado';
+      this.erro = 'ID da notificação não fornecido';
       this.carregando = false;
     }
   }
@@ -52,15 +61,15 @@ export class NotificacaoDetalheComponent implements OnInit, OnDestroy {
   private carregarDetalhesNotificacao(id: number): void {
     this.carregando = true;
 
-    // Como não temos um endpoint específico para buscar por ID,
-    // vamos buscar todas e filtrar pelo ID
-    this.notificacaoService.buscarNotificacoes()
+    this.notificacaoService.buscarNotificacaoPorId(id)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
-        next: (notificacoes) => {
-          this.notificacao = notificacoes.find(n => n.id === id) || null;
+        next: (notificacao) => {
+          this.notificacao = notificacao;
           if (!this.notificacao) {
             this.erro = 'Notificação não encontrada';
+          } else if (!this.notificacao.lida) {
+            this.marcarComoLida();
           }
           this.carregando = false;
         },
@@ -68,9 +77,8 @@ export class NotificacaoDetalheComponent implements OnInit, OnDestroy {
           this.erro = 'Erro ao carregar detalhes da notificação';
           this.carregando = false;
 
-          // Se for erro de autenticação, redireciona para login
           if (error.status === 401 || error.status === 403) {
-            this.router.navigate(['/']);
+            this.router.navigate(['/login']);
           }
         }
       });
@@ -91,82 +99,22 @@ export class NotificacaoDetalheComponent implements OnInit, OnDestroy {
           }
         },
         error: (error) => {
-          console.log('Erro ao marcar notificação como lida');
         }
       });
   }
 
   /**
-   * Navegar para o item no mural
-   */
-  public irParaMural(): void {
-    if (!this.notificacao) return;
-
-    // Marcar como lida primeiro
-    this.marcarComoLida();
-
-    // Determinar qual aba do mural abrir baseado no tipo de alerta
-    let tab = 'proximo';
-    switch (this.notificacao.tipo) {
-      case TipoAlerta.VENCIMENTO_HOJE:
-        tab = 'hoje';
-        break;
-      case TipoAlerta.VENCIMENTO_ATRASO:
-        tab = 'vencido';
-        break;
-      case TipoAlerta.VENCIMENTO_AMANHA:
-      default:
-        tab = 'proximo';
-        break;
-    }
-
-    this.router.navigate(['/mural-listagem'], { queryParams: { tab } });
-  }
-
-  /**
    * Voltar para lista de notificações
    */
-  public voltarParaLista(): void {
+  public voltar(): void {
     this.router.navigate(['/notificacoes']);
   }
 
   /**
-   * Obter descrição do tipo de alerta
+   * Voltar para lista de notificações (alias para compatibilidade com template)
    */
-  public obterDescricaoTipo(tipo: TipoAlerta): string {
-    switch (tipo) {
-      case TipoAlerta.VENCIMENTO_AMANHA: return 'Vence Amanhã';
-      case TipoAlerta.VENCIMENTO_HOJE: return 'Vence Hoje';
-      case TipoAlerta.VENCIMENTO_ATRASO: return 'Vencido';
-      case TipoAlerta.PERSONALIZADO: return 'Personalizado';
-      default: return 'Desconhecido';
-    }
-  }
-
-  /**
-   * Obter cor do tipo de alerta
-   */
-  public obterCorTipo(tipo: TipoAlerta): string {
-    switch (tipo) {
-      case TipoAlerta.VENCIMENTO_AMANHA: return 'bg-yellow-100 text-yellow-800 border-yellow-200';
-      case TipoAlerta.VENCIMENTO_HOJE: return 'bg-orange-100 text-orange-800 border-orange-200';
-      case TipoAlerta.VENCIMENTO_ATRASO: return 'bg-red-100 text-red-800 border-red-200';
-      case TipoAlerta.PERSONALIZADO: return 'bg-blue-100 text-blue-800 border-blue-200';
-      default: return 'bg-gray-100 text-gray-800 border-gray-200';
-    }
-  }
-
-  /**
-   * Obter ícone do tipo de alerta
-   */
-  public obterIconeTipo(tipo: TipoAlerta): string {
-    switch (tipo) {
-      case TipoAlerta.VENCIMENTO_AMANHA: return '⚠️';
-      case TipoAlerta.VENCIMENTO_HOJE: return '🚨';
-      case TipoAlerta.VENCIMENTO_ATRASO: return '🔴';
-      case TipoAlerta.PERSONALIZADO: return '📝';
-      default: return '📋';
-    }
+  public voltarParaLista(): void {
+    this.voltar();
   }
 
   /**
@@ -202,31 +150,5 @@ export class NotificacaoDetalheComponent implements OnInit, OnDestroy {
     if (diffDias < 7) return `há ${diffDias} dia${diffDias !== 1 ? 's' : ''}`;
 
     return this.formatarDataHora(data);
-  }
-
-  /**
-   * Obter prioridade visual baseada no tipo
-   */
-  public obterPrioridade(tipo: TipoAlerta): string {
-    switch (tipo) {
-      case TipoAlerta.VENCIMENTO_ATRASO: return 'ALTA';
-      case TipoAlerta.VENCIMENTO_HOJE: return 'MÉDIA';
-      case TipoAlerta.VENCIMENTO_AMANHA: return 'BAIXA';
-      case TipoAlerta.PERSONALIZADO: return 'NORMAL';
-      default: return 'NORMAL';
-    }
-  }
-
-  /**
-   * Obter cor da prioridade
-   */
-  public obterCorPrioridade(tipo: TipoAlerta): string {
-    switch (tipo) {
-      case TipoAlerta.VENCIMENTO_ATRASO: return 'text-red-600 bg-red-50 border-red-200';
-      case TipoAlerta.VENCIMENTO_HOJE: return 'text-orange-600 bg-orange-50 border-orange-200';
-      case TipoAlerta.VENCIMENTO_AMANHA: return 'text-yellow-600 bg-yellow-50 border-yellow-200';
-      case TipoAlerta.PERSONALIZADO: return 'text-blue-600 bg-blue-50 border-blue-200';
-      default: return 'text-gray-600 bg-gray-50 border-gray-200';
-    }
   }
 }

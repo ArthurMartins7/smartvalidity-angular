@@ -88,7 +88,6 @@ export class AlertaEditarComponent implements OnInit, OnDestroy {
       debounceTime(300),
       distinctUntilChanged(),
       switchMap(termo => {
-        console.log('🔍 Buscando produtos com termo:', termo);
         return termo.length >= 2
           ? this.produtoService.buscarPorTermo(termo)
           : of([]);
@@ -96,13 +95,11 @@ export class AlertaEditarComponent implements OnInit, OnDestroy {
       takeUntil(this.destroy$)
     ).subscribe({
       next: produtos => {
-        console.log('✅ Produtos encontrados:', produtos);
         this.produtosFiltrados = produtos;
         this.mostrarDropdown = produtos.length > 0;
-        console.log('📋 Dropdown deve mostrar?', this.mostrarDropdown, 'Total produtos:', produtos.length);
       },
       error: error => {
-        console.error('❌ Erro na busca de produtos:', error);
+        console.error('Erro na busca de produtos:', error);
         this.produtosFiltrados = [];
         this.mostrarDropdown = false;
       }
@@ -113,10 +110,8 @@ export class AlertaEditarComponent implements OnInit, OnDestroy {
    * Método chamado quando o usuário digita na busca de produto
    */
   public onBuscaProdutoChange(): void {
-    console.log('⌨️ Usuário digitou:', this.termoBuscaProduto);
     this.searchSubject.next(this.termoBuscaProduto);
     if (this.termoBuscaProduto.length < 2) {
-      console.log('🚫 Termo muito curto, ocultando dropdown');
       this.mostrarDropdown = false;
       this.produtosFiltrados = [];
     }
@@ -271,8 +266,18 @@ export class AlertaEditarComponent implements OnInit, OnDestroy {
   }
 
   private criarAlerta(): void {
-// Garantir que o tipo seja sempre PERSONALIZADO para alertas criados pelo usuário
+    // Garantir que o tipo seja sempre PERSONALIZADO para alertas criados pelo usuário
     this.alertaDTO.tipo = TipoAlerta.PERSONALIZADO;
+
+    // Converter a data para o formato correto se necessário
+    if (this.alertaDTO.dataHoraDisparo) {
+      // Se for string, converter para Date primeiro
+      if (typeof this.alertaDTO.dataHoraDisparo === 'string') {
+        this.alertaDTO.dataHoraDisparo = new Date(this.alertaDTO.dataHoraDisparo);
+      }
+    }
+
+    console.log('DTO sendo enviado:', this.alertaDTO);
 
     this.alertaService.criarAlerta(this.alertaDTO).subscribe({
       next: (alertaCriado) => {
@@ -344,12 +349,6 @@ export class AlertaEditarComponent implements OnInit, OnDestroy {
     return this.isEdicao ? 'Editar Alerta' : 'Criar Alerta';
   }
 
-  public formatarDataHoraInput(data: Date): string {
-    if (!data) return '';
-    const d = new Date(data);
-    return d.toISOString().slice(0, 16);
-  }
-
   public toggleUsuario(usuarioId: string): void {
     const index = this.usuariosSelecionados.indexOf(usuarioId);
     if (index > -1) {
@@ -394,9 +393,7 @@ export class AlertaEditarComponent implements OnInit, OnDestroy {
    */
   public executarBuscaProduto(): void {
     const termo = this.termoBuscaProduto?.trim();
-    console.log('🔎 (Botão) Executando busca para termo:', termo);
     if (!termo || termo.length < 2) {
-      console.log('🚫 Termo muito curto para busca manual');
       this.mostrarDropdown = false;
       this.produtosFiltrados = [];
       return;
@@ -404,12 +401,11 @@ export class AlertaEditarComponent implements OnInit, OnDestroy {
 
     this.produtoService.buscarPorTermo(termo).subscribe({
       next: produtos => {
-        console.log('✅ (Botão) Produtos encontrados:', produtos);
         this.produtosFiltrados = produtos;
         this.mostrarDropdown = produtos.length > 0;
       },
       error: erro => {
-        console.error('❌ (Botão) Erro na busca de produtos:', erro);
+        console.error('Erro na busca de produtos:', erro);
         this.produtosFiltrados = [];
         this.mostrarDropdown = false;
       }
@@ -466,5 +462,31 @@ export class AlertaEditarComponent implements OnInit, OnDestroy {
 
   public obterUsuarioPorId(id: string): Usuario | undefined {
     return this.usuarios.find(u => u.id === id);
+  }
+
+  public get dataHoraDisparoInput(): string {
+    if (!this.alertaDTO.dataHoraDisparo) return '';
+    const data = new Date(this.alertaDTO.dataHoraDisparo);
+    return data.toISOString().slice(0, 16);
+  }
+
+  public set dataHoraDisparoInput(value: string) {
+    if (value) {
+      // Criar a data no formato local sem conversão de timezone
+      const data = new Date(value);
+      // Converter para formato ISO local (sem timezone)
+      const ano = data.getFullYear();
+      const mes = String(data.getMonth() + 1).padStart(2, '0');
+      const dia = String(data.getDate()).padStart(2, '0');
+      const hora = String(data.getHours()).padStart(2, '0');
+      const minuto = String(data.getMinutes()).padStart(2, '0');
+      const segundo = String(data.getSeconds()).padStart(2, '0');
+
+      // Criar string no formato esperado pelo backend: yyyy-MM-ddTHH:mm:ss
+      const dataFormatada = `${ano}-${mes}-${dia}T${hora}:${minuto}:${segundo}`;
+      this.alertaDTO.dataHoraDisparo = dataFormatada as any;
+    } else {
+      this.alertaDTO.dataHoraDisparo = undefined as any;
+    }
   }
 }

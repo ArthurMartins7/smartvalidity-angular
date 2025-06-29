@@ -153,15 +153,6 @@
               * Digite pelo menos 2 caracteres para buscar produtos com itens não inspecionados
             </p>
 
-            <!-- DEBUG: Estado das variáveis -->
-            <div class="mt-2 p-2 bg-gray-100 text-xs rounded">
-              <strong>Debug:</strong><br>
-              termoBuscaProduto: "{{ termoBuscaProduto }}" ({{ termoBuscaProduto.length }} chars)<br>
-              produtosFiltrados.length: {{ produtosFiltrados.length }}<br>
-              mostrarDropdown: {{ mostrarDropdown }}<br>
-              produtoSelecionado: "{{ produtoSelecionado }}"
-            </div>
-
             <!-- Informações dos itens-produto encontrados -->
             <div *ngIf="produtoSelecionado && itensProdutoNaoInspecionados.length > 0"
                  class="mt-3 p-4 bg-blue-50 border border-blue-200 rounded-md">
@@ -211,6 +202,64 @@
               max="365"
               class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               placeholder="Ex: 7">
+          </div>
+
+          <!-- Colaboradores (Usuários) -->
+          <div class="md:col-span-2">
+            <label class="block text-sm font-medium text-gray-700 mb-2">
+              Colaboradores que receberão o alerta
+            </label>
+            <div class="relative">
+              <input type="text"
+                     name="termoBuscaUsuario"
+                     [(ngModel)]="termoBuscaUsuario"
+                     (input)="onBuscaUsuarioChange()"
+                     (focus)="mostrarDropdownUsuarios = usuariosFiltrados.length > 0"
+                     placeholder="Digite para buscar colaboradores..."
+                     class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                     autocomplete="off">
+
+              <!-- Ícone de busca -->
+              <button type="button"
+                      (click)="onBuscaUsuarioChange()"
+                      class="absolute right-2 top-2 text-gray-400 hover:text-gray-600">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35M11 19a8 8 0 100-16 8 8 0 000 16z"></path>
+                </svg>
+              </button>
+
+              <!-- Dropdown de resultados -->
+              <div *ngIf="mostrarDropdownUsuarios && usuariosFiltrados.length > 0"
+                   class="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-y-auto">
+                <div *ngFor="let u of usuariosFiltrados"
+                     (click)="selecionarUsuario(u)"
+                     class="px-3 py-2 hover:bg-blue-50 cursor-pointer border-b border-gray-100 last:border-b-0">
+                  <div class="font-medium text-gray-900">{{ u.nome }}</div>
+                  <div class="text-sm text-gray-500">{{ u.email }}</div>
+                </div>
+              </div>
+
+              <!-- Mensagem quando não há resultados -->
+              <div *ngIf="mostrarDropdownUsuarios && usuariosFiltrados.length === 0 && termoBuscaUsuario.length >= 2"
+                   class="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg p-3">
+                <div class="text-sm text-gray-500 text-center">
+                  Nenhum colaborador encontrado
+                </div>
+              </div>
+            </div>
+
+            <!-- Chips de selecionados -->
+            <div *ngIf="usuariosSelecionados.length > 0" class="flex flex-wrap gap-2 mt-3">
+              <span *ngFor="let uid of usuariosSelecionados"
+                    class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded flex items-center space-x-1">
+                <span>{{ obterUsuarioPorId(uid)?.nome || 'Usuário' }}</span>
+                <button type="button" (click)="removerUsuario(uid)" class="text-blue-600 hover:text-blue-800">✕</button>
+              </span>
+            </div>
+
+            <p class="text-xs text-gray-500 mt-1">
+              Digite pelo menos 2 caracteres para buscar colaboradores
+            </p>
           </div>
 
           <!-- Switches -->

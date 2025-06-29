@@ -50,6 +50,12 @@ export class AlertaEditarComponent implements OnInit, OnDestroy {
   public mostrarDropdown: boolean = false;
   private searchSubject = new Subject<string>();
 
+  // Campos para busca dinâmica de usuários
+  public termoBuscaUsuario: string = '';
+  public usuariosFiltrados: Usuario[] = [];
+  public mostrarDropdownUsuarios: boolean = false;
+  private searchUsuarioSubject = new Subject<string>();
+
   // Enums para template
   public TipoAlerta = TipoAlerta;
 
@@ -66,6 +72,7 @@ export class AlertaEditarComponent implements OnInit, OnDestroy {
     this.carregarUsuarios();
     this.inicializarAlerta();
     this.setupProdutoSearch();
+    this.setupUsuarioSearch();
   }
 
   ngOnDestroy(): void {
@@ -407,5 +414,57 @@ export class AlertaEditarComponent implements OnInit, OnDestroy {
         this.mostrarDropdown = false;
       }
     });
+  }
+
+  private setupUsuarioSearch(): void {
+    this.searchUsuarioSubject.pipe(
+      debounceTime(300),
+      distinctUntilChanged(),
+      switchMap(termo => {
+        const t = termo.trim().toLowerCase();
+        return of(
+          t.length >= 2
+            ? this.usuarios.filter(u => u.nome.toLowerCase().includes(t) || u.email.toLowerCase().includes(t))
+            : []
+        );
+      }),
+      takeUntil(this.destroy$)
+    ).subscribe({
+      next: usuarios => {
+        this.usuariosFiltrados = usuarios;
+        this.mostrarDropdownUsuarios = usuarios.length > 0;
+      },
+      error: () => {
+        this.usuariosFiltrados = [];
+        this.mostrarDropdownUsuarios = false;
+      }
+    });
+  }
+
+  public onBuscaUsuarioChange(): void {
+    this.searchUsuarioSubject.next(this.termoBuscaUsuario);
+    if (this.termoBuscaUsuario.length < 2) {
+      this.mostrarDropdownUsuarios = false;
+      this.usuariosFiltrados = [];
+    }
+  }
+
+  public selecionarUsuario(usuario: Usuario): void {
+    if (!this.usuariosSelecionados.includes(usuario.id)) {
+      this.usuariosSelecionados.push(usuario.id);
+    }
+    this.termoBuscaUsuario = '';
+    this.mostrarDropdownUsuarios = false;
+  }
+
+  public removerUsuario(usuarioId: string): void {
+    const index = this.usuariosSelecionados.indexOf(usuarioId);
+    if (index > -1) {
+      this.usuariosSelecionados.splice(index, 1);
+    }
+  }
+
+  public obterUsuarioPorId(id: string): Usuario | undefined {
+    return this.usuarios.find(u => u.id === id);
   }
 }

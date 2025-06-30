@@ -13,6 +13,7 @@ import { Usuario } from '../../../shared/model/entity/usuario.model';
 import { TipoAlerta } from '../../../shared/model/enum/tipo-alerta.enum';
 import { AlertaSeletor } from '../../../shared/model/seletor/alerta.seletor';
 import { AlertaService } from '../../../shared/service/alerta.service';
+import { NotificacaoService } from '../../../shared/service/notificacao.service';
 import { ProdutoService } from '../../../shared/service/produto.service';
 import { UsuarioService } from '../../../shared/service/usuario.service';
 
@@ -25,6 +26,7 @@ import { UsuarioService } from '../../../shared/service/usuario.service';
 })
 export class AlertaListagemComponent implements OnInit, OnDestroy {
   private alertaService = inject(AlertaService);
+  private notificacaoService = inject(NotificacaoService);
   private produtoService = inject(ProdutoService);
   private usuarioService = inject(UsuarioService);
   private router = inject(Router);
@@ -277,44 +279,38 @@ export class AlertaListagemComponent implements OnInit, OnDestroy {
     });
   }
 
+  /**
+   * Formatar data apenas (sem hora)
+   * Responsabilidade: VIEW - Delega formatação para o SERVICE
+   */
   public formatarData(data: Date): string {
     if (!data) return '-';
-    return new Date(data).toLocaleDateString('pt-BR');
+    return this.notificacaoService.formatarData(data);
   }
 
+  /**
+   * Formatar data/hora completa
+   * Responsabilidade: VIEW - Delega formatação para o SERVICE
+   */
   public formatarDataHora(data: Date): string {
     if (!data) return '-';
-    return new Date(data).toLocaleString('pt-BR');
+    return this.notificacaoService.formatarDataHora(data);
   }
 
+  /**
+   * Obter descrição do tipo de alerta
+   * Responsabilidade: VIEW - Delega formatação para o SERVICE
+   */
   public obterDescricaoTipo(tipo: TipoAlerta): string {
-    switch (tipo) {
-      case TipoAlerta.VENCIMENTO_HOJE:
-        return 'Vencimento Hoje';
-      case TipoAlerta.VENCIMENTO_AMANHA:
-        return 'Vencimento Amanhã';
-      case TipoAlerta.VENCIMENTO_ATRASO:
-        return 'Vencimento em Atraso';
-      case TipoAlerta.PERSONALIZADO:
-        return 'Personalizado';
-      default:
-        return tipo;
-    }
+    return this.notificacaoService.obterDescricaoTipo(tipo);
   }
 
+  /**
+   * Obter cor do tipo de alerta
+   * Responsabilidade: VIEW - Delega formatação para o SERVICE
+   */
   public obterCorTipo(tipo: TipoAlerta): string {
-    switch (tipo) {
-      case TipoAlerta.VENCIMENTO_HOJE:
-        return 'bg-orange-100 text-orange-800';
-      case TipoAlerta.VENCIMENTO_AMANHA:
-        return 'bg-yellow-100 text-yellow-800';
-      case TipoAlerta.VENCIMENTO_ATRASO:
-        return 'bg-red-100 text-red-800';
-      case TipoAlerta.PERSONALIZADO:
-        return 'bg-blue-100 text-blue-800';
-      default:
-        return 'bg-gray-100 text-gray-800';
-    }
+    return this.notificacaoService.obterCorTipo(tipo);
   }
 
   public trackByAlerta(index: number, alerta: AlertaDTO.Listagem): number {

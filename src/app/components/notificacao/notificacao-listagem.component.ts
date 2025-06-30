@@ -162,24 +162,16 @@ export class NotificacaoListagemComponent implements OnInit, OnDestroy {
 
   /**
    * Navegar para o item no mural
+   * Responsabilidade: VIEW - Coordena ações de marcar como lida e navegação
    */
   public irParaMural(notificacao: AlertaDTO.Listagem): void {
     if (!notificacao.lida && notificacao.id) {
       this.marcarComoLida(notificacao);
     }
 
-    let tab = 'proximo';
-    switch (notificacao.tipo) {
-      case TipoAlerta.VENCIMENTO_ATRASO:
-        tab = 'vencido';
-        break;
-      case TipoAlerta.VENCIMENTO_AMANHA:
-      default:
-        tab = 'proximo';
-        break;
-    }
-
-    this.router.navigate(['/mural'], { queryParams: { tab } });
+    // Delega a lógica de mapeamento para o SERVICE
+    const parametros = this.notificacaoService.gerarParametrosMuralBasico(notificacao.tipo);
+    this.router.navigate(['/mural-listagem'], { queryParams: parametros });
   }
 
   /**
@@ -193,42 +185,33 @@ export class NotificacaoListagemComponent implements OnInit, OnDestroy {
 
   /**
    * Obter descrição do tipo de alerta
+   * Responsabilidade: VIEW - Delega formatação para o SERVICE
    */
   public obterDescricaoTipo(tipo: TipoAlerta): string {
-    switch (tipo) {
-      case TipoAlerta.VENCIMENTO_AMANHA: return 'Vence Amanhã';
-      case TipoAlerta.VENCIMENTO_HOJE: return 'Vence Hoje';
-      case TipoAlerta.VENCIMENTO_ATRASO: return 'Vencido';
-      case TipoAlerta.PERSONALIZADO: return 'Personalizado';
-      default: return 'Desconhecido';
-    }
+    return this.notificacaoService.obterDescricaoTipo(tipo);
   }
 
   /**
    * Obter cor do tipo de alerta
+   * Responsabilidade: VIEW - Delega formatação para o SERVICE
    */
   public obterCorTipo(tipo: TipoAlerta): string {
-    switch (tipo) {
-      case TipoAlerta.VENCIMENTO_AMANHA: return 'bg-yellow-100 text-yellow-800';
-      case TipoAlerta.VENCIMENTO_HOJE: return 'bg-orange-100 text-orange-800';
-      case TipoAlerta.VENCIMENTO_ATRASO: return 'bg-red-100 text-red-800';
-      case TipoAlerta.PERSONALIZADO: return 'bg-blue-100 text-blue-800';
-      default: return 'bg-gray-100 text-gray-800';
-    }
+    return this.notificacaoService.obterCorTipo(tipo);
   }
 
 
 
   /**
    * Formatar data/hora
+   * Responsabilidade: VIEW - Delega formatação para o SERVICE
    */
   public formatarDataHora(data: Date): string {
-    if (!data) return '';
-    return new Date(data).toLocaleString('pt-BR');
+    return this.notificacaoService.formatarDataHora(data);
   }
 
   /**
    * Voltar para página anterior
+   * Responsabilidade: VIEW - Navegação
    */
   public voltar(): void {
     this.router.navigate(['/mural-listagem']);
@@ -236,24 +219,10 @@ export class NotificacaoListagemComponent implements OnInit, OnDestroy {
 
   /**
    * Obter tempo relativo (ex: "há 2 horas")
+   * Responsabilidade: VIEW - Delega cálculo para o SERVICE
    */
   public obterTempoRelativo(data: Date): string {
-    if (!data) return '';
-
-    const agora = new Date();
-    const dataNotificacao = new Date(data);
-    const diferencaMs = agora.getTime() - dataNotificacao.getTime();
-    const diferencaMin = Math.floor(diferencaMs / (1000 * 60));
-    const diferencaHoras = Math.floor(diferencaMin / 60);
-    const diferencaDias = Math.floor(diferencaHoras / 24);
-
-    if (diferencaMin < 1) return 'agora mesmo';
-    if (diferencaMin < 60) return `há ${diferencaMin} min`;
-    if (diferencaHoras < 24) return `há ${diferencaHoras}h`;
-    if (diferencaDias === 1) return 'há 1 dia';
-    if (diferencaDias < 7) return `há ${diferencaDias} dias`;
-
-    return this.formatarDataHora(data);
+    return this.notificacaoService.obterTempoRelativo(data);
   }
 
   /**

@@ -69,6 +69,7 @@ export class NotificacaoDetalheComponent implements OnInit, OnDestroy {
           if (!this.notificacao) {
             this.erro = 'Notificação não encontrada';
           } else if (!this.notificacao.lida) {
+            // Marcar como lida quando o usuário visualiza os detalhes
             this.marcarComoLida();
           }
           this.carregando = false;
@@ -119,36 +120,63 @@ export class NotificacaoDetalheComponent implements OnInit, OnDestroy {
 
   /**
    * Formatar data/hora para exibição
+   * Responsabilidade: VIEW - Delega formatação para o SERVICE
    */
   public formatarDataHora(data: Date | string): string {
     if (!data) return '';
-    return new Date(data).toLocaleString('pt-BR', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
+    return this.notificacaoService.formatarDataHora(new Date(data));
   }
 
   /**
    * Obter tempo relativo (ex: "há 2 horas")
+   * Responsabilidade: VIEW - Delega cálculo para o SERVICE
    */
   public obterTempoRelativo(data: Date | string): string {
     if (!data) return '';
+    return this.notificacaoService.obterTempoRelativo(new Date(data));
+  }
 
-    const agora = new Date();
-    const dataNotificacao = new Date(data);
-    const diffMs = agora.getTime() - dataNotificacao.getTime();
-    const diffMinutos = Math.floor(diffMs / (1000 * 60));
-    const diffHoras = Math.floor(diffMinutos / 60);
-    const diffDias = Math.floor(diffHoras / 24);
+  /**
+   * Navega para o item específico ou mural com filtros aplicados
+   * Responsabilidade: VIEW - Apenas coordena a navegação usando o SERVICE
+   */
+  public visualizarItem(): void {
+    if (!this.notificacao) return;
 
-    if (diffMinutos < 1) return 'Agora mesmo';
-    if (diffMinutos < 60) return `há ${diffMinutos} minuto${diffMinutos !== 1 ? 's' : ''}`;
-    if (diffHoras < 24) return `há ${diffHoras} hora${diffHoras !== 1 ? 's' : ''}`;
-    if (diffDias < 7) return `há ${diffDias} dia${diffDias !== 1 ? 's' : ''}`;
+    // Delega a lógica de decisão de navegação para o SERVICE
+    this.notificacaoService.obterDadosNavegacaoItem(this.notificacao)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (resultado) => {
+          if (resultado.tipo === 'detalhe' && resultado.dados) {
+            // Navegar para detalhe específico do item
+            this.router.navigate(['/mural-detalhe', resultado.dados.itemId], {
+              queryParams: resultado.dados.queryParams
+            });
+          } else if (resultado.tipo === 'listagem' && resultado.dados) {
+            // Navegar para listagem com filtros
+            this.router.navigate(['/mural-listagem'], {
+              queryParams: resultado.dados
+            });
+          } else {
+            // Fallback: navega para mural geral
+            this.router.navigate(['/mural-listagem']);
+          }
+        },
+        error: (error) => {
+          console.error('Erro ao obter dados de navegação:', error);
+          // Fallback em caso de erro
+          this.router.navigate(['/mural-listagem']);
+        }
+      });
+  }
 
-    return this.formatarDataHora(data);
+  /**
+   * Verifica se a notificação tem informações de item que podem ser visualizadas
+   * Responsabilidade: VIEW - Apenas delega a validação para o SERVICE
+   */
+  public podeVisualizarItem(): boolean {
+    // Delega a lógica de validação para o SERVICE
+    return this.notificacaoService.podeVisualizarItem(this.notificacao);
   }
 }

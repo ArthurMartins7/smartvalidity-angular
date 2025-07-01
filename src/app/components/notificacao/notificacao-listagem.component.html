@@ -76,7 +76,7 @@
                 <!-- Título -->
                 <h3 class="text-lg font-semibold text-gray-900 truncate"
                     [class.text-gray-600]="notificacao.lida">
-                  {{ notificacao.titulo }}
+                  {{ removerEmojis(notificacao.titulo) }}
                 </h3>
 
                 <!-- Badge do tipo -->

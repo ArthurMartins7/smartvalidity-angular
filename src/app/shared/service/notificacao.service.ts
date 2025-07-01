@@ -312,4 +312,17 @@ export class NotificacaoService {
     if (!data) return '';
     return new Date(data).toLocaleString('pt-BR');
   }
+
+  /**
+   * Remove emojis do título de alertas/notificações para exibição limpa
+   * RESPONSABILIDADE SERVICE: Lógica de formatação e processamento de dados
+   * PRINCÍPIO MVC: Centraliza lógica reutilizável, evitando duplicação nos COMPONENTS
+   * @param titulo Título original com possíveis emojis
+   * @returns Título sem emojis, com espaços extras removidos
+   */
+  removerEmojis(titulo: string): string {
+    if (!titulo) return '';
+    // Remove emojis comuns dos alertas/notificações usando regex Unicode
+    return titulo.replace(/🔴|🚨|⚠️|📦|🟡|⭕|●|❗|‼️|[\u{1F600}-\u{1F64F}]|[\u{1F300}-\u{1F5FF}]|[\u{1F680}-\u{1F6FF}]|[\u{1F1E0}-\u{1F1FF}]/gu, '').trim();
+  }
 }

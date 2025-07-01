@@ -172,6 +172,14 @@ export class NotificacaoDetalheComponent implements OnInit, OnDestroy {
   }
 
   /**
+   * Remove emojis do título da notificação para exibição
+   * Responsabilidade: VIEW - Delega formatação para o SERVICE
+   */
+  public removerEmojis(titulo: string): string {
+    return this.notificacaoService.removerEmojis(titulo);
+  }
+
+  /**
    * Verifica se a notificação tem informações de item que podem ser visualizadas
    * Responsabilidade: VIEW - Apenas delega a validação para o SERVICE
    */

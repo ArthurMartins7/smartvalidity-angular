@@ -226,6 +226,14 @@ export class NotificacaoListagemComponent implements OnInit, OnDestroy {
   }
 
   /**
+   * Remove emojis do título da notificação para exibição
+   * Responsabilidade: VIEW - Delega formatação para o SERVICE
+   */
+  public removerEmojis(titulo: string): string {
+    return this.notificacaoService.removerEmojis(titulo);
+  }
+
+  /**
    * Track by function para ngFor
    */
   public trackByNotificacao(index: number, item: AlertaDTO.Listagem): any {

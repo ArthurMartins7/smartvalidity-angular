@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { map, tap } from 'rxjs/operators';
+import { tap } from 'rxjs/operators';
 import { AlertaDTO } from '../model/dto/alerta.dto';
 import { AlertaSeletor } from '../model/seletor/alerta.seletor';
 
@@ -56,8 +56,13 @@ export class AlertaService {
     );
   }
 
+  /**
+   * Alterna o status ativo de um alerta
+   * RESPONSABILIDADE SERVICE: Comunicação HTTP com backend
+   * PRINCÍPIO MVC: Isola COMPONENT da implementação HTTP específica
+   */
   toggleAtivo(id: number): Observable<AlertaDTO.Listagem> {
-    return this.httpClient.patch<AlertaDTO.Listagem>(`${this.API}/${id}/toggle-ativo`, {}).pipe(
+    return this.httpClient.put<AlertaDTO.Listagem>(`${this.API}/${id}/toggle-ativo`, {}).pipe(
       tap({
         next: (response) => console.log('Status ativo alterado:', response),
         error: (error) => console.error('Erro ao alterar status ativo:', error)

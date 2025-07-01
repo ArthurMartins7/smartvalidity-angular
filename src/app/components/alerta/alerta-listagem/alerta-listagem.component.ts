@@ -235,20 +235,42 @@ export class AlertaListagemComponent implements OnInit, OnDestroy {
     this.router.navigate(['/alerta-detalhe', alerta.id]);
   }
 
+  /**
+   * Alterna o status ativo/inativo do alerta
+   */
   public toggleAtivoAlerta(alerta: AlertaDTO.Listagem): void {
     this.alertaService.toggleAtivo(alerta.id).subscribe({
       next: (alertaAtualizado) => {
+        // Atualizar o item específico na lista e forçar detecção de mudanças
         const index = this.alertas.findIndex(a => a.id === alerta.id);
         if (index !== -1) {
-          this.alertas[index] = alertaAtualizado;
+          // Criar uma nova instância do array para forçar detecção de mudanças
+          this.alertas = [...this.alertas];
+          this.alertas[index] = { ...alertaAtualizado };
         }
-        Swal.fire('Sucesso!',
-          `Alerta ${alertaAtualizado.ativo ? 'ativado' : 'desativado'} com sucesso.`,
-          'success');
+        
+        const statusTexto = alertaAtualizado.ativo ? 'ativado' : 'desativado';
+        Swal.fire({
+          title: 'Sucesso!',
+          text: `Alerta ${statusTexto} com sucesso.`,
+          icon: 'success',
+          timer: 2000,
+          showConfirmButton: false
+        });
       },
       error: (erro) => {
         console.error('Erro ao alterar status do alerta:', erro);
-        Swal.fire('Erro!', 'Não foi possível alterar o status do alerta.', 'error');
+        
+        let mensagemErro = 'Não foi possível alterar o status do alerta.';
+        if (erro.status === 0) {
+          mensagemErro = 'Erro de conexão. Verifique se o servidor está rodando.';
+        }
+        
+        Swal.fire({
+          title: 'Erro!',
+          text: mensagemErro,
+          icon: 'error'
+        });
       }
     });
   }
@@ -256,7 +278,7 @@ export class AlertaListagemComponent implements OnInit, OnDestroy {
   public excluirAlerta(alerta: AlertaDTO.Listagem): void {
     Swal.fire({
       title: 'Tem certeza?',
-      text: `Deseja excluir o alerta "${alerta.titulo}"?`,
+      text: `Deseja excluir o alerta "${this.removerEmojis(alerta.titulo)}"?`,
       icon: 'warning',
       showCancelButton: true,
       confirmButtonColor: '#3085d6',
@@ -312,6 +334,16 @@ export class AlertaListagemComponent implements OnInit, OnDestroy {
   public obterCorTipo(tipo: TipoAlerta): string {
     return this.notificacaoService.obterCorTipo(tipo);
   }
+
+  /**
+   * Remove emojis do título do alerta
+   * Responsabilidade: VIEW - Delega formatação para o SERVICE
+   */
+  public removerEmojis(titulo: string): string {
+    return this.notificacaoService.removerEmojis(titulo);
+  }
+
+
 
   public trackByAlerta(index: number, alerta: AlertaDTO.Listagem): number {
     return alerta.id;

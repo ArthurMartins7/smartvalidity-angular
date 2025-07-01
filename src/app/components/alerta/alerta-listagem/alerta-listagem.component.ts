@@ -204,11 +204,37 @@ export class AlertaListagemComponent implements OnInit, OnDestroy {
     this.buscarAlertas();
   }
 
-  public criarArrayPaginas(): number[] {
-    const paginas = [];
-    for (let i = 1; i <= this.totalPaginas; i++) {
-      paginas.push(i);
+  public irParaPaginaSegura(pagina: number | string): void {
+    if (typeof pagina === 'number') {
+      this.irParaPagina(pagina);
     }
+  }
+
+  public criarArrayPaginas(): (number | string)[] {
+    const paginaAtual = this.seletor.pagina;
+    const totalPaginas = this.totalPaginas;
+    const paginas: (number | string)[] = [];
+    
+    // Se tiver 4 páginas ou menos, mostra todas
+    if (totalPaginas <= 4) {
+      for (let i = 1; i <= totalPaginas; i++) {
+        paginas.push(i);
+      }
+      return paginas;
+    }
+    
+    // Para mais de 4 páginas, mostra no máximo 4 elementos
+    if (paginaAtual <= 2) {
+      // Páginas iniciais: [1] [2] [3] ...
+      paginas.push(1, 2, 3, '...');
+    } else if (paginaAtual >= totalPaginas - 1) {
+      // Páginas finais: ... [n-2] [n-1] [n]
+      paginas.push('...', totalPaginas - 2, totalPaginas - 1, totalPaginas);
+    } else {
+      // Páginas do meio: [1] ... [atual] [atual+1]
+      paginas.push(1, '...', paginaAtual, paginaAtual + 1);
+    }
+    
     return paginas;
   }
 

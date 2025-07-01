@@ -13,6 +13,7 @@ import { Usuario } from '../../../shared/model/entity/usuario.model';
 import { TipoAlerta } from '../../../shared/model/enum/tipo-alerta.enum';
 import { AlertaSeletor } from '../../../shared/model/seletor/alerta.seletor';
 import { AlertaService } from '../../../shared/service/alerta.service';
+import { NotificacaoService } from '../../../shared/service/notificacao.service';
 import { ProdutoService } from '../../../shared/service/produto.service';
 import { UsuarioService } from '../../../shared/service/usuario.service';
 
@@ -25,6 +26,7 @@ import { UsuarioService } from '../../../shared/service/usuario.service';
 })
 export class AlertaListagemComponent implements OnInit, OnDestroy {
   private alertaService = inject(AlertaService);
+  private notificacaoService = inject(NotificacaoService);
   private produtoService = inject(ProdutoService);
   private usuarioService = inject(UsuarioService);
   private router = inject(Router);
@@ -233,20 +235,42 @@ export class AlertaListagemComponent implements OnInit, OnDestroy {
     this.router.navigate(['/alerta-detalhe', alerta.id]);
   }
 
+  /**
+   * Alterna o status ativo/inativo do alerta
+   */
   public toggleAtivoAlerta(alerta: AlertaDTO.Listagem): void {
     this.alertaService.toggleAtivo(alerta.id).subscribe({
       next: (alertaAtualizado) => {
+        // Atualizar o item específico na lista e forçar detecção de mudanças
         const index = this.alertas.findIndex(a => a.id === alerta.id);
         if (index !== -1) {
-          this.alertas[index] = alertaAtualizado;
+          // Criar uma nova instância do array para forçar detecção de mudanças
+          this.alertas = [...this.alertas];
+          this.alertas[index] = { ...alertaAtualizado };
         }
-        Swal.fire('Sucesso!',
-          `Alerta ${alertaAtualizado.ativo ? 'ativado' : 'desativado'} com sucesso.`,
-          'success');
+        
+        const statusTexto = alertaAtualizado.ativo ? 'ativado' : 'desativado';
+        Swal.fire({
+          title: 'Sucesso!',
+          text: `Alerta ${statusTexto} com sucesso.`,
+          icon: 'success',
+          timer: 2000,
+          showConfirmButton: false
+        });
       },
       error: (erro) => {
         console.error('Erro ao alterar status do alerta:', erro);
-        Swal.fire('Erro!', 'Não foi possível alterar o status do alerta.', 'error');
+        
+        let mensagemErro = 'Não foi possível alterar o status do alerta.';
+        if (erro.status === 0) {
+          mensagemErro = 'Erro de conexão. Verifique se o servidor está rodando.';
+        }
+        
+        Swal.fire({
+          title: 'Erro!',
+          text: mensagemErro,
+          icon: 'error'
+        });
       }
     });
   }
@@ -254,7 +278,7 @@ export class AlertaListagemComponent implements OnInit, OnDestroy {
   public excluirAlerta(alerta: AlertaDTO.Listagem): void {
     Swal.fire({
       title: 'Tem certeza?',
-      text: `Deseja excluir o alerta "${alerta.titulo}"?`,
+      text: `Deseja excluir o alerta "${this.removerEmojis(alerta.titulo)}"?`,
       icon: 'warning',
       showCancelButton: true,
       confirmButtonColor: '#3085d6',
@@ -277,45 +301,49 @@ export class AlertaListagemComponent implements OnInit, OnDestroy {
     });
   }
 
+  /**
+   * Formatar data apenas (sem hora)
+   * Responsabilidade: VIEW - Delega formatação para o SERVICE
+   */
   public formatarData(data: Date): string {
     if (!data) return '-';
-    return new Date(data).toLocaleDateString('pt-BR');
+    return this.notificacaoService.formatarData(data);
   }
 
+  /**
+   * Formatar data/hora completa
+   * Responsabilidade: VIEW - Delega formatação para o SERVICE
+   */
   public formatarDataHora(data: Date): string {
     if (!data) return '-';
-    return new Date(data).toLocaleString('pt-BR');
+    return this.notificacaoService.formatarDataHora(data);
   }
 
+  /**
+   * Obter descrição do tipo de alerta
+   * Responsabilidade: VIEW - Delega formatação para o SERVICE
+   */
   public obterDescricaoTipo(tipo: TipoAlerta): string {
-    switch (tipo) {
-      case TipoAlerta.VENCIMENTO_HOJE:
-        return 'Vencimento Hoje';
-      case TipoAlerta.VENCIMENTO_AMANHA:
-        return 'Vencimento Amanhã';
-      case TipoAlerta.VENCIMENTO_ATRASO:
-        return 'Vencimento em Atraso';
-      case TipoAlerta.PERSONALIZADO:
-        return 'Personalizado';
-      default:
-        return tipo;
-    }
+    return this.notificacaoService.obterDescricaoTipo(tipo);
   }
 
+  /**
+   * Obter cor do tipo de alerta
+   * Responsabilidade: VIEW - Delega formatação para o SERVICE
+   */
   public obterCorTipo(tipo: TipoAlerta): string {
-    switch (tipo) {
-      case TipoAlerta.VENCIMENTO_HOJE:
-        return 'bg-orange-100 text-orange-800';
-      case TipoAlerta.VENCIMENTO_AMANHA:
-        return 'bg-yellow-100 text-yellow-800';
-      case TipoAlerta.VENCIMENTO_ATRASO:
-        return 'bg-red-100 text-red-800';
-      case TipoAlerta.PERSONALIZADO:
-        return 'bg-blue-100 text-blue-800';
-      default:
-        return 'bg-gray-100 text-gray-800';
-    }
+    return this.notificacaoService.obterCorTipo(tipo);
   }
+
+  /**
+   * Remove emojis do título do alerta
+   * Responsabilidade: VIEW - Delega formatação para o SERVICE
+   */
+  public removerEmojis(titulo: string): string {
+    return this.notificacaoService.removerEmojis(titulo);
+  }
+
+
 
   public trackByAlerta(index: number, alerta: AlertaDTO.Listagem): number {
     return alerta.id;

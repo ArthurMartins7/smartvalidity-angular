@@ -1,9 +1,9 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
-import { AuthenticationService } from '../../../core/auth/services/auth.service';
-import { Subject } from 'rxjs';
+import { Subject, interval } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
+import { AuthenticationService } from '../../../core/auth/services/auth.service';
 
 import { NotificacaoService } from '../../service/notificacao.service';
 
@@ -27,6 +27,7 @@ interface MenuItem {
 })
 export class SidebarComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
+  private pollingSubscription?: any;
 
   activeMenuItem = 'mural'; // Default active menu item
   isSidebarOpen = true; // Control sidebar visibility
@@ -69,11 +70,19 @@ export class SidebarComponent implements OnInit, OnDestroy {
     setTimeout(() => {
       this.notificacaoService.atualizarContadorNaoLidas();
     }, 1000);
+
+    // Atualização periódica a cada 15 s
+    this.pollingSubscription = interval(15000)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(() => this.notificacaoService.atualizarContadorNaoLidas());
   }
 
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
+    if (this.pollingSubscription) {
+      this.pollingSubscription.unsubscribe();
+    }
   }
 
   toggleSidebar(): void {

@@ -162,14 +162,13 @@
             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tipo</th>
             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Data Disparo</th>
             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Recorrente</th>
             <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Ações</th>
           </tr>
         </thead>
         <tbody class="bg-white divide-y divide-gray-200">
           <tr *ngFor="let alerta of alertas; trackBy: trackByAlerta" class="hover:bg-gray-50">
             <td class="px-6 py-4 whitespace-nowrap">
-              <div class="text-sm font-medium text-gray-900">{{ alerta.titulo }}</div>
+              <div class="text-sm font-medium text-gray-900">{{ removerEmojis(alerta.titulo) }}</div>
               <div class="text-sm text-gray-500 max-w-xs truncate" [title]="alerta.descricao">{{ alerta.descricao }}</div>
             </td>
             <td class="px-6 py-4 whitespace-nowrap">
@@ -185,16 +184,6 @@
               <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
                     [class]="alerta.ativo ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'">
                 {{ alerta.ativo ? 'Ativo' : 'Inativo' }}
-              </span>
-            </td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-              <span class="inline-flex items-center">
-                <svg *ngIf="alerta.recorrente" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4 text-green-600">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
-                </svg>
-                <svg *ngIf="!alerta.recorrente" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4 text-gray-400">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-                </svg>
               </span>
             </td>
             <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
@@ -216,19 +205,21 @@
                   </svg>
                 </button>
 
+                <!-- Ícone Toggle Status - Simples e funcional -->
                 <button (click)="toggleAtivoAlerta(alerta)"
-                        [class]="alerta.ativo ? 'text-orange-600 hover:text-orange-900' : 'text-green-600 hover:text-green-900'"
-                        [title]="alerta.ativo ? 'Desativar' : 'Ativar'">
-                  <svg *ngIf="alerta.ativo" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728L5.636 5.636m12.728 12.728L18.364 5.636M5.636 18.364l12.728-12.728" />
-                  </svg>
-                  <svg *ngIf="!alerta.ativo" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
+                        class="p-1 rounded hover:bg-gray-100 transition-colors"
+                        [title]="alerta.ativo ? 'Clique para desativar alerta' : 'Clique para ativar alerta'">
+                  
+                  <!-- Ícone Power/Toggle - Verde quando ativo, Vermelho quando inativo -->
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" 
+                       class="w-4 h-4"
+                       [class]="alerta.ativo ? 'text-green-600 hover:text-green-700' : 'text-red-600 hover:text-red-700'">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M5.636 5.636a9 9 0 1012.728 0M12 3v9" />
                   </svg>
                 </button>
 
                 <button (click)="excluirAlerta(alerta)"
-                        class="text-red-600 hover:text-red-900"
+                        class="text-gray-700 hover:text-black"
                         title="Excluir">
                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
@@ -240,7 +231,7 @@
 
           <!-- Mensagem quando não há alertas -->
           <tr *ngIf="alertas.length === 0">
-            <td colspan="6" class="px-6 py-8 text-center text-gray-500">
+            <td colspan="5" class="px-6 py-8 text-center text-gray-500">
               <div class="flex flex-col items-center">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1" stroke="currentColor" class="w-12 h-12 text-gray-300 mb-2">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0" />

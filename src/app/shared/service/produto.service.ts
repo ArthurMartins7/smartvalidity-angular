@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { Produto } from '../model/entity/produto';
 import { ProdutoSeletor } from '../model/seletor/produto.seletor';
@@ -31,6 +31,24 @@ export class ProdutoService {
       tap({
         next: (response) => console.log('Produtos com itens não inspecionados:', response),
         error: (error) => console.error('Erro ao listar produtos com itens não inspecionados:', error)
+      })
+    );
+  }
+
+  /**
+   * Busca produtos com itens não inspecionados por termo
+   * Para busca dinâmica em alertas personalizados
+   */
+  buscarPorTermo(termo: string, limite: number = 10): Observable<Produto[]> {
+    if (!termo || termo.trim().length < 2) {
+      return of([]);
+    }
+    return this.httpClient.get<Produto[]>(`${this.API}/buscar`, {
+      params: { termo: termo.trim(), limite: limite.toString() }
+    }).pipe(
+      tap({
+        next: (response) => console.log('Produtos encontrados por termo:', response),
+        error: (error) => console.error('Erro ao buscar produtos por termo:', error)
       })
     );
   }

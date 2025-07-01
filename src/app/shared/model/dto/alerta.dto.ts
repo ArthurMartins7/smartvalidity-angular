@@ -20,6 +20,7 @@ export namespace AlertaDTO {
     usuariosAlertaIds?: string[]; // IDs
     produtosAlertaIds?: string[]; // IDs
     produto?: { id: number; nome: string }; // Produto individual para compatibilidade
+    lida?: boolean; // Status de leitura da notificação
   }
 
   export class Cadastro {

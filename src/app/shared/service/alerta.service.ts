@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { map, tap } from 'rxjs/operators';
+import { tap } from 'rxjs/operators';
 import { AlertaDTO } from '../model/dto/alerta.dto';
 import { AlertaSeletor } from '../model/seletor/alerta.seletor';
 
@@ -20,11 +20,11 @@ export class AlertaService {
 
   constructor(private httpClient: HttpClient) {}
 
-  listarTodos(): Observable<AlertaDTO.Listagem[]> {
-    return this.httpClient.get<AlertaDTO.Listagem[]>(this.API).pipe(
+  criarAlerta(alerta: AlertaDTO.Cadastro): Observable<AlertaDTO.Listagem> {
+    return this.httpClient.post<AlertaDTO.Listagem>(this.API, alerta).pipe(
       tap({
-        next: (response) => console.log('Lista de alertas:', response),
-        error: (error) => console.error('Erro ao listar alertas:', error)
+        next: (response) => console.log('Alerta criado:', response),
+        error: (error) => console.error('Erro ao criar alerta:', error)
       })
     );
   }
@@ -47,51 +47,43 @@ export class AlertaService {
     );
   }
 
-  contarAlertas(seletor: AlertaSeletor): Observable<number> {
-    return this.httpClient.post<{ total: number }>(`${this.API}/count`, seletor).pipe(
+  atualizarAlerta(id: number, alerta: AlertaDTO.Edicao): Observable<AlertaDTO.Listagem> {
+    return this.httpClient.put<AlertaDTO.Listagem>(`${this.API}/${id}`, alerta).pipe(
       tap({
-        next: (response) => console.log('Total de alertas:', response.total),
-        error: (error) => console.error('Erro ao contar alertas:', error)
-      }),
-      map(resp => resp.total)
-    );
-  }
-
-  criarAlerta(novoAlerta: AlertaDTO.Cadastro, usuarioCriadorId?: string): Observable<AlertaDTO.Listagem> {
-    const url = usuarioCriadorId ? `${this.API}?usuarioCriadorId=${usuarioCriadorId}` : this.API;
-    console.log('Enviando alerta para criação:', novoAlerta);
-    return this.httpClient.post<AlertaDTO.Listagem>(url, novoAlerta).pipe(
-      tap({
-        next: (response) => console.log('Alerta criado com sucesso:', response),
-        error: (error) => console.error('Erro ao criar alerta:', error)
-      })
-    );
-  }
-
-  atualizarAlerta(id: number, alertaAtualizado: AlertaDTO.Edicao): Observable<AlertaDTO.Listagem> {
-    console.log('Enviando alerta para atualização:', alertaAtualizado);
-    return this.httpClient.put<AlertaDTO.Listagem>(`${this.API}/${id}`, alertaAtualizado).pipe(
-      tap({
-        next: (response) => console.log('Alerta atualizado com sucesso:', response),
+        next: (response) => console.log('Alerta atualizado:', response),
         error: (error) => console.error('Erro ao atualizar alerta:', error)
       })
     );
   }
 
-  excluirAlerta(id: number): Observable<void> {
-    return this.httpClient.delete<void>(`${this.API}/${id}`).pipe(
+  /**
+   * Alterna o status ativo de um alerta
+   * RESPONSABILIDADE SERVICE: Comunicação HTTP com backend
+   * PRINCÍPIO MVC: Isola COMPONENT da implementação HTTP específica
+   */
+  toggleAtivo(id: number): Observable<AlertaDTO.Listagem> {
+    return this.httpClient.put<AlertaDTO.Listagem>(`${this.API}/${id}/toggle-ativo`, {}).pipe(
       tap({
-        next: () => console.log('Alerta excluído com sucesso'),
-        error: (error) => console.error('Erro ao excluir alerta:', error)
+        next: (response) => console.log('Status ativo alterado:', response),
+        error: (error) => console.error('Erro ao alterar status ativo:', error)
       })
     );
   }
 
-  toggleAtivo(id: number): Observable<AlertaDTO.Listagem> {
-    return this.httpClient.patch<AlertaDTO.Listagem>(`${this.API}/${id}/toggle-ativo`, {}).pipe(
+  contarAlertas(seletor: AlertaSeletor): Observable<number> {
+    return this.httpClient.post<number>(`${this.API}/contar`, seletor).pipe(
       tap({
-        next: (response) => console.log('Status do alerta alterado:', response),
-        error: (error) => console.error('Erro ao alterar status do alerta:', error)
+        next: (count) => console.log('Total de alertas:', count),
+        error: (error) => console.error('Erro ao contar alertas:', error)
+      })
+    );
+  }
+
+  listarTodos(): Observable<AlertaDTO.Listagem[]> {
+    return this.httpClient.get<AlertaDTO.Listagem[]>(this.API).pipe(
+      tap({
+        next: (response) => console.log('Lista de alertas:', response),
+        error: (error) => console.error('Erro ao listar alertas:', error)
       })
     );
   }
@@ -101,6 +93,15 @@ export class AlertaService {
       tap({
         next: (response) => console.log('Total de alertas:', response),
         error: (error) => console.error('Erro ao contar alertas:', error)
+      })
+    );
+  }
+
+  excluirAlerta(id: number): Observable<void> {
+    return this.httpClient.delete<void>(`${this.API}/${id}`).pipe(
+      tap({
+        next: () => console.log('Alerta excluído com sucesso'),
+        error: (error) => console.error('Erro ao excluir alerta:', error)
       })
     );
   }

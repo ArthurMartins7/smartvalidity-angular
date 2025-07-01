@@ -1,7 +1,9 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
+import { of, Subject } from 'rxjs';
+import { debounceTime, distinctUntilChanged, switchMap, takeUntil } from 'rxjs/operators';
 import Swal from 'sweetalert2';
 
 import { AlertaDTO } from '../../../shared/model/dto/alerta.dto';
@@ -21,13 +23,14 @@ import { UsuarioService } from '../../../shared/service/usuario.service';
   templateUrl: './alerta-editar.component.html',
   styleUrl: './alerta-editar.component.css'
 })
-export class AlertaEditarComponent implements OnInit {
+export class AlertaEditarComponent implements OnInit, OnDestroy {
   private alertaService = inject(AlertaService);
   private produtoService = inject(ProdutoService);
   private usuarioService = inject(UsuarioService);
   private itemProdutoService = inject(ItemProdutoService);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
+  private destroy$ = new Subject<void>();
 
   public alertaDTO: AlertaDTO.Cadastro = new AlertaDTO.Cadastro();
   public produtos: Produto[] = [];
@@ -40,6 +43,18 @@ export class AlertaEditarComponent implements OnInit {
   public produtoSelecionado: string = '';
   public usuariosSelecionados: string[] = [];
   public itensProdutoNaoInspecionados: ItemProdutoDTO[] = [];
+
+  // Campos para busca dinâmica de produtos
+  public termoBuscaProduto: string = '';
+  public produtosFiltrados: Produto[] = [];
+  public mostrarDropdown: boolean = false;
+  private searchSubject = new Subject<string>();
+
+  // Campos para busca dinâmica de usuários
+  public termoBuscaUsuario: string = '';
+  public usuariosFiltrados: Usuario[] = [];
+  public mostrarDropdownUsuarios: boolean = false;
+  private searchUsuarioSubject = new Subject<string>();
 
   // Enums para template
   public TipoAlerta = TipoAlerta;
@@ -54,9 +69,109 @@ export class AlertaEditarComponent implements OnInit {
       }
     });
 
-    this.carregarProdutos();
     this.carregarUsuarios();
     this.inicializarAlerta();
+    this.setupProdutoSearch();
+    this.setupUsuarioSearch();
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
+  /**
+   * Configura a busca de produtos com debounce
+   */
+  private setupProdutoSearch(): void {
+    this.searchSubject.pipe(
+      debounceTime(300),
+      distinctUntilChanged(),
+      switchMap(termo => {
+        return termo.length >= 2
+          ? this.produtoService.buscarPorTermo(termo)
+          : of([]);
+      }),
+      takeUntil(this.destroy$)
+    ).subscribe({
+      next: produtos => {
+        this.produtosFiltrados = produtos;
+        this.mostrarDropdown = produtos.length > 0;
+      },
+      error: error => {
+        console.error('Erro na busca de produtos:', error);
+        this.produtosFiltrados = [];
+        this.mostrarDropdown = false;
+      }
+    });
+  }
+
+  /**
+   * Método chamado quando o usuário digita na busca de produto
+   */
+  public onBuscaProdutoChange(): void {
+    this.searchSubject.next(this.termoBuscaProduto);
+    if (this.termoBuscaProduto.length < 2) {
+      this.mostrarDropdown = false;
+      this.produtosFiltrados = [];
+    }
+  }
+
+  /**
+   * Método chamado quando o usuário seleciona um produto do dropdown
+   */
+  public selecionarProduto(produto: Produto): void {
+    this.produtoSelecionado = produto.id;
+    this.termoBuscaProduto = produto.descricao;
+    this.mostrarDropdown = false;
+    this.onProdutoSelecionado();
+  }
+
+  /**
+   * Limpa a seleção de produto
+   */
+  public limparSelecaoProduto(): void {
+    this.produtoSelecionado = '';
+    this.termoBuscaProduto = '';
+    this.itensProdutoNaoInspecionados = [];
+    this.mostrarDropdown = false;
+  }
+
+  /**
+   * Método para fechar dropdown com delay (para permitir clique nos itens)
+   */
+  public fecharDropdownComDelay(): void {
+    setTimeout(() => {
+      this.mostrarDropdown = false;
+    }, 200);
+  }
+
+  /**
+   * Obtém a classe CSS para o status de vencimento
+   */
+  public getStatusVencimento(dataVencimento: Date | string): string {
+    const hoje = new Date();
+    const vencimento = new Date(dataVencimento);
+    const diffDays = Math.ceil((vencimento.getTime() - hoje.getTime()) / (1000 * 60 * 60 * 24));
+
+    if (diffDays < 0) return 'bg-red-100 text-red-800';
+    if (diffDays === 0) return 'bg-orange-100 text-orange-800';
+    if (diffDays <= 3) return 'bg-yellow-100 text-yellow-800';
+    return 'bg-green-100 text-green-800';
+  }
+
+  /**
+   * Obtém o texto do status de vencimento
+   */
+  public getTextoVencimento(dataVencimento: Date | string): string {
+    const hoje = new Date();
+    const vencimento = new Date(dataVencimento);
+    const diffDays = Math.ceil((vencimento.getTime() - hoje.getTime()) / (1000 * 60 * 60 * 24));
+
+    if (diffDays < 0) return 'Vencido';
+    if (diffDays === 0) return 'Vence hoje';
+    if (diffDays === 1) return 'Vence amanhã';
+    return `${diffDays} dias`;
   }
 
   private inicializarAlerta(): void {
@@ -97,6 +212,17 @@ export class AlertaEditarComponent implements OnInit {
 
         if (alerta.produtosAlertaIds && alerta.produtosAlertaIds.length > 0) {
           this.produtoSelecionado = alerta.produtosAlertaIds[0];
+          // Buscar o produto para preencher o campo de busca
+          this.produtoService.buscarPorId(this.produtoSelecionado).subscribe({
+            next: (produto) => {
+              this.termoBuscaProduto = produto.descricao;
+              this.onProdutoSelecionado();
+            },
+            error: (error) => {
+              console.warn('Produto não encontrado para preenchimento do campo:', error);
+              this.termoBuscaProduto = '';
+            }
+          });
         }
 
         this.carregando = false;
@@ -106,18 +232,6 @@ export class AlertaEditarComponent implements OnInit {
         Swal.fire('Erro!', 'Não foi possível carregar o alerta.', 'error');
         this.carregando = false;
         this.voltar();
-      }
-    });
-  }
-
-  private carregarProdutos(): void {
-    // Carrega apenas produtos que possuem itens-produto não inspecionados
-    this.produtoService.listarProdutosComItensNaoInspecionados().subscribe({
-      next: (produtos) => {
-        this.produtos = produtos;
-      },
-      error: (erro) => {
-        console.error('Erro ao carregar produtos com itens não inspecionados:', erro);
       }
     });
   }
@@ -154,7 +268,17 @@ export class AlertaEditarComponent implements OnInit {
   private criarAlerta(): void {
     // Garantir que o tipo seja sempre PERSONALIZADO para alertas criados pelo usuário
     this.alertaDTO.tipo = TipoAlerta.PERSONALIZADO;
-    
+
+    // Converter a data para o formato correto se necessário
+    if (this.alertaDTO.dataHoraDisparo) {
+      // Se for string, converter para Date primeiro
+      if (typeof this.alertaDTO.dataHoraDisparo === 'string') {
+        this.alertaDTO.dataHoraDisparo = new Date(this.alertaDTO.dataHoraDisparo);
+      }
+    }
+
+    console.log('DTO sendo enviado:', this.alertaDTO);
+
     this.alertaService.criarAlerta(this.alertaDTO).subscribe({
       next: (alertaCriado) => {
         Swal.fire('Sucesso!', 'Alerta criado com sucesso.', 'success');
@@ -225,14 +349,6 @@ export class AlertaEditarComponent implements OnInit {
     return this.isEdicao ? 'Editar Alerta' : 'Criar Alerta';
   }
 
-
-
-  public formatarDataHoraInput(data: Date): string {
-    if (!data) return '';
-    const d = new Date(data);
-    return d.toISOString().slice(0, 16);
-  }
-
   public toggleUsuario(usuarioId: string): void {
     const index = this.usuariosSelecionados.indexOf(usuarioId);
     if (index > -1) {
@@ -253,7 +369,7 @@ export class AlertaEditarComponent implements OnInit {
   public onProdutoSelecionado(): void {
     if (this.produtoSelecionado) {
       console.log('Produto selecionado:', this.produtoSelecionado);
-      
+
       // Buscar itens-produto não inspecionados do produto selecionado
       this.itemProdutoService.buscarItensProdutoNaoInspecionadosPorProduto(this.produtoSelecionado)
         .subscribe({
@@ -269,6 +385,108 @@ export class AlertaEditarComponent implements OnInit {
     } else {
       // Se nenhum produto selecionado, limpar lista de itens
       this.itensProdutoNaoInspecionados = [];
+    }
+  }
+
+  /**
+   * Executa busca imediata pelo termo atual (botão de lupa)
+   */
+  public executarBuscaProduto(): void {
+    const termo = this.termoBuscaProduto?.trim();
+    if (!termo || termo.length < 2) {
+      this.mostrarDropdown = false;
+      this.produtosFiltrados = [];
+      return;
+    }
+
+    this.produtoService.buscarPorTermo(termo).subscribe({
+      next: produtos => {
+        this.produtosFiltrados = produtos;
+        this.mostrarDropdown = produtos.length > 0;
+      },
+      error: erro => {
+        console.error('Erro na busca de produtos:', erro);
+        this.produtosFiltrados = [];
+        this.mostrarDropdown = false;
+      }
+    });
+  }
+
+  private setupUsuarioSearch(): void {
+    this.searchUsuarioSubject.pipe(
+      debounceTime(300),
+      distinctUntilChanged(),
+      switchMap(termo => {
+        const t = termo.trim().toLowerCase();
+        return of(
+          t.length >= 2
+            ? this.usuarios.filter(u => u.nome.toLowerCase().includes(t) || u.email.toLowerCase().includes(t))
+            : []
+        );
+      }),
+      takeUntil(this.destroy$)
+    ).subscribe({
+      next: usuarios => {
+        this.usuariosFiltrados = usuarios;
+        this.mostrarDropdownUsuarios = usuarios.length > 0;
+      },
+      error: () => {
+        this.usuariosFiltrados = [];
+        this.mostrarDropdownUsuarios = false;
+      }
+    });
+  }
+
+  public onBuscaUsuarioChange(): void {
+    this.searchUsuarioSubject.next(this.termoBuscaUsuario);
+    if (this.termoBuscaUsuario.length < 2) {
+      this.mostrarDropdownUsuarios = false;
+      this.usuariosFiltrados = [];
+    }
+  }
+
+  public selecionarUsuario(usuario: Usuario): void {
+    if (!this.usuariosSelecionados.includes(usuario.id)) {
+      this.usuariosSelecionados.push(usuario.id);
+    }
+    this.termoBuscaUsuario = '';
+    this.mostrarDropdownUsuarios = false;
+  }
+
+  public removerUsuario(usuarioId: string): void {
+    const index = this.usuariosSelecionados.indexOf(usuarioId);
+    if (index > -1) {
+      this.usuariosSelecionados.splice(index, 1);
+    }
+  }
+
+  public obterUsuarioPorId(id: string): Usuario | undefined {
+    return this.usuarios.find(u => u.id === id);
+  }
+
+  public get dataHoraDisparoInput(): string {
+    if (!this.alertaDTO.dataHoraDisparo) return '';
+    const data = new Date(this.alertaDTO.dataHoraDisparo);
+    return data.toISOString().slice(0, 16);
+  }
+
+  public set dataHoraDisparoInput(value: string) {
+    if (value) {
+      // Criar a data no formato local sem conversão de timezone
+      const data = new Date(value);
+      // Converter para formato ISO local (sem timezone)
+      const ano = data.getFullYear();
+      const mes = String(data.getMonth() + 1).padStart(2, '0');
+      const dia = String(data.getDate()).padStart(2, '0');
+      const hora = String(data.getHours()).padStart(2, '0');
+      const minuto = String(data.getMinutes()).padStart(2, '0');
+      const segundo = String(data.getSeconds()).padStart(2, '0');
+
+      // Criar string no formato esperado pelo backend: yyyy-MM-ddTHH:mm:ss
+      const dataFormatada = `${ano}-${mes}-${dia}T${hora}:${minuto}:${segundo}`;
+      this.alertaDTO.dataHoraDisparo = dataFormatada as any;
+    } else {
+      this.alertaDTO.dataHoraDisparo = undefined as any;
     }
   }
 }

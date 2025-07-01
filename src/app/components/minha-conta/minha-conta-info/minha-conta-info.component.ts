@@ -46,6 +46,6 @@ export class MinhaContaInfoComponent implements OnInit {
   }
 
   alterarSenha(): void {
-    this.router.navigate(['/alterar-senha']);
+    this.router.navigate(['minha-conta-senha-validar-identidade']);
   }
 }

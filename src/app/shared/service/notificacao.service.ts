@@ -61,6 +61,16 @@ export class NotificacaoService {
   }
 
 
+  excluirNotificacao(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.API_URL}/${id}`)
+      .pipe(
+        tap(() => {
+          this.atualizarContadorNaoLidas();
+        })
+      );
+  }
+
+
   atualizarContadorNaoLidas(): void {
     this.contarNotificacoesNaoLidas().subscribe({
       next: (count) => {

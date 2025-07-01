@@ -1,0 +1,39 @@
+/* Estilos específicos para o componente de detalhe de alerta */
+
+.loading-spinner {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Responsividade aprimorada */
+@media (max-width: 768px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .flex {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+}
+
+/* Transições suaves */
+.transition-colors {
+  transition: color 0.2s ease-in-out;
+}
+
+/* Hover states melhorados */
+button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease-in-out;
+}
+
+/* Cards com sombra suave */
+.bg-gray-50 {
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+} 

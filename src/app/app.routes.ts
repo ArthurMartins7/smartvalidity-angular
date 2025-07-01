@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { AlertaDetalheComponent } from './components/alerta/alerta-detalhe/alerta-detalhe.component';
 import { AlertaEditarComponent } from './components/alerta/alerta-editar/alerta-editar.component';
 import { AlertaListagemComponent } from './components/alerta/alerta-listagem/alerta-listagem.component';
 import { CategoriaDetalheComponent } from './components/categoria/categoria-detalhe/categoria-detalhe/categoria-detalhe.component';
@@ -64,6 +65,7 @@ export const routes: Routes = [
 
   // Rotas de Alertas
   { path: 'alertas', component: AlertaListagemComponent },
+  { path: 'alerta-detalhe/:id', component: AlertaDetalheComponent },
   { path: 'alerta-editar', component: AlertaEditarComponent },
   { path: 'alerta-editar/:id', component: AlertaEditarComponent },
 

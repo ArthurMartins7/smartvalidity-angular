@@ -71,11 +71,23 @@ export class SigninComponent {
   }
 
   realizarCadastro() {
-    // Aqui poderia haver chamada a um endpoint para verificar se já existe assinatura.
-    // Para fins de teste, vamos apenas exibir o modal.
-    this.exibirModalAssinaturaExistente = true;
-    // Caso não exista assinatura, navegue para o fluxo de cadastro:
-    // this.router.navigate(['/signup-info-pessoais']);
+    this.authenticationService.verificarAssinaturaExistente().subscribe({
+      next: (existeAssinante) => {
+        console.log('existeAssinante: ', existeAssinante);
+        if (existeAssinante) {
+          // Já existe um usuário assinante, exibe modal e impede cadastro
+          this.exibirModalAssinaturaExistente = true;
+        } else {
+          // Nenhum assinante encontrado, prossegue para fluxo de cadastro
+          this.router.navigate(['/signup-info-pessoais']);
+        }
+      },
+      error: (erro) => {
+        console.error('Erro ao verificar assinatura:', erro);
+        // Em caso de erro na verificação, por segurança impedir cadastro e notificar usuário
+        this.exibirModalAssinaturaExistente = true;
+      }
+    });
   }
 
   public esqueceuSenha() {

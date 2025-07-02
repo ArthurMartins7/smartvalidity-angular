@@ -62,7 +62,7 @@ export class SignupVerificacaoComponent {
     // Persistir a senha (exemplo) e navegar para verificação
     sessionStorage.setItem('signup_senha', this.senha);
 
-    this.router.navigate(['signup-verificacao']);
+    this.router.navigate(['signup-validar-identidade']);
   }
 
   /**

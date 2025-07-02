@@ -21,7 +21,6 @@ import { ProdutoDetalheComponent } from './components/produto/produto-listagem/p
 import { ProdutoListagemComponent } from './components/produto/produto-listagem/produto-listagem.component';
 import { UsuariosPerfisListagemComponent } from './components/usuarios-perfis/usuarios-perfis-listagem/usuarios-perfis-listagem.component';
 import { UsuariosPerfisPendentesComponent } from './components/usuarios-perfis/usuarios-perfis-pendentes/usuarios-perfis-pendentes.component';
-import { RegisterComponent } from './core/auth/pages/register/register/register.component';
 import { SigninComponent } from './core/auth/pages/signin/signin.component';
 import { SignupInfoPessoaisComponent } from './core/auth/pages/signup/signup-info-pessoais/signup-info-pessoais.component';
 import { SignupSenhaComponent } from './core/auth/pages/signup/signup-senha/signup-senha.component';
@@ -37,7 +36,6 @@ import { PasswordRecoveryAlterarSenhaComponent } from './core/auth/pages/passwor
 
 export const routes: Routes = [
   //{ path: 'login', component: LoginComponent },
-  { path: 'register', component: RegisterComponent },
   { path: 'corredor', component: CorredorListagemComponent },
   { path: 'corredor-detalhe', component: CorredorDetalheComponent },
   { path: 'corredor-editar/:id', component: CorredorEditarComponent },

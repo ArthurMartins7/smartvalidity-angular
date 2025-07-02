@@ -3,6 +3,8 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 //import { UsuarioDTO } from '../../model/dto/UsuarioDTO';
 import { Usuario } from '../../../shared/model/entity/usuario.model';
+import { EmpresaUsuarioDto } from '../../../shared/model/dto/empresaUsuario.dto';
+import { Empresa } from '../../../shared/model/entity/empresa';
 
 @Injectable({
   providedIn: 'root',
@@ -37,5 +39,13 @@ export class AuthenticationService {
     localStorage.removeItem('tokenUsuarioAutenticado');
     sessionStorage.removeItem('usuarioEmail');
     sessionStorage.removeItem('usuarioNome');
+  }
+
+  public verificarAssinaturaExistente(): Observable<boolean> {
+    return this.httpClient.get<boolean>(this.API + '/verificar-assinatura');
+  }
+
+  public registrarEmpresa(dto: EmpresaUsuarioDto): Observable<Empresa> {
+    return this.httpClient.post<Empresa>(this.API + '/registrar-empresa', dto);
   }
 }

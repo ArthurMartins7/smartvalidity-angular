@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+import { CommonModule, Location } from '@angular/common';
 import { Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -30,6 +30,7 @@ export class AlertaEditarComponent implements OnInit, OnDestroy {
   private itemProdutoService = inject(ItemProdutoService);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
+  private location = inject(Location);
   private destroy$ = new Subject<void>();
 
   public alertaDTO: AlertaDTO.Cadastro = new AlertaDTO.Cadastro();
@@ -342,7 +343,7 @@ export class AlertaEditarComponent implements OnInit, OnDestroy {
   }
 
   public voltar(): void {
-    this.router.navigate(['/alertas']);
+    this.location.back();
   }
 
   public obterTituloTela(): string {

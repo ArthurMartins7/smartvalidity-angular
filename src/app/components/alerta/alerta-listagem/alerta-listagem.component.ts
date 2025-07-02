@@ -53,6 +53,10 @@ export class AlertaListagemComponent implements OnInit, OnDestroy {
   public filtroDataInicio: string = '';
   public filtroDataFim: string = '';
 
+  // Propriedades para busca
+  public buscando: boolean = false;
+  public ultimaBusca: string = '';
+
   private searchSubject = new Subject<string>();
 
   // Enums para template
@@ -80,7 +84,30 @@ export class AlertaListagemComponent implements OnInit, OnDestroy {
   }
 
   public onSearchInput(): void {
+    // Se o usuário limpar o campo, reseta a busca
+    if (!this.filtroTitulo) {
+      this.limparFiltros();
+      return;
+    }
     this.searchSubject.next(this.filtroTitulo);
+  }
+
+  public realizarPesquisa(): void {
+    if (!this.filtroTitulo || this.filtroTitulo.trim() === '') {
+      this.limparFiltros();
+      return;
+    }
+
+    this.buscando = true;
+    this.ultimaBusca = this.filtroTitulo;
+
+    // Reset selector search parameters
+    this.seletor = new AlertaSeletor();
+    this.seletor.pagina = 1;
+    this.seletor.limite = this.itensPorPagina;
+    this.seletor.titulo = this.filtroTitulo.trim();
+
+    this.buscarAlertas();
   }
 
   public buscarAlertas(): void {
@@ -88,9 +115,23 @@ export class AlertaListagemComponent implements OnInit, OnDestroy {
       next: (resultado) => {
         this.alertas = resultado;
         this.calcularTotalPaginas();
+        this.buscando = false;
+
+        // Feedback se a busca não retornou resultados
+        if (this.alertas.length === 0 && this.ultimaBusca) {
+          Swal.fire({
+            title: 'Nenhum resultado encontrado',
+            text: `Não foram encontrados alertas para a busca "${this.ultimaBusca}"`,
+            icon: 'info',
+            confirmButtonText: 'Ok',
+            confirmButtonColor: '#5084C1'
+          });
+        }
       },
       error: (erro) => {
         console.error('Erro ao buscar alertas:', erro);
+        this.buscando = false;
+
         // Só exibe erro se não for um erro 404 (sem alertas) ou similar
         if (erro.status !== 404 && erro.status !== 204) {
           Swal.fire('Erro!', 'Não foi possível carregar os alertas.', 'error');
@@ -177,6 +218,7 @@ export class AlertaListagemComponent implements OnInit, OnDestroy {
     this.filtroUsuario = null;
     this.filtroDataInicio = '';
     this.filtroDataFim = '';
+    this.ultimaBusca = '';
 
     this.seletor = new AlertaSeletor();
     this.seletor.pagina = 1;
@@ -214,7 +256,7 @@ export class AlertaListagemComponent implements OnInit, OnDestroy {
     const paginaAtual = this.seletor.pagina;
     const totalPaginas = this.totalPaginas;
     const paginas: (number | string)[] = [];
-    
+
     // Se tiver 4 páginas ou menos, mostra todas
     if (totalPaginas <= 4) {
       for (let i = 1; i <= totalPaginas; i++) {
@@ -222,7 +264,7 @@ export class AlertaListagemComponent implements OnInit, OnDestroy {
       }
       return paginas;
     }
-    
+
     // Para mais de 4 páginas, mostra no máximo 4 elementos
     if (paginaAtual <= 2) {
       // Páginas iniciais: [1] [2] [3] ...
@@ -234,7 +276,7 @@ export class AlertaListagemComponent implements OnInit, OnDestroy {
       // Páginas do meio: [1] ... [atual] [atual+1]
       paginas.push(1, '...', paginaAtual, paginaAtual + 1);
     }
-    
+
     return paginas;
   }
 
@@ -274,31 +316,41 @@ export class AlertaListagemComponent implements OnInit, OnDestroy {
           this.alertas = [...this.alertas];
           this.alertas[index] = { ...alertaAtualizado };
         }
-        
+
         const statusTexto = alertaAtualizado.ativo ? 'ativado' : 'desativado';
         Swal.fire({
           title: 'Sucesso!',
-          text: `Alerta ${statusTexto} com sucesso.`,
+          text: `Alerta ${statusTexto} com sucesso!`,
           icon: 'success',
-          timer: 2000,
-          showConfirmButton: false
+          confirmButtonText: 'Ok'
         });
       },
       error: (erro) => {
-        console.error('Erro ao alterar status do alerta:', erro);
-        
-        let mensagemErro = 'Não foi possível alterar o status do alerta.';
-        if (erro.status === 0) {
-          mensagemErro = 'Erro de conexão. Verifique se o servidor está rodando.';
-        }
-        
-        Swal.fire({
-          title: 'Erro!',
-          text: mensagemErro,
-          icon: 'error'
-        });
+        console.error('Erro ao atualizar status do alerta:', erro);
+        Swal.fire('Erro!', 'Não foi possível atualizar o status do alerta.', 'error');
       }
     });
+  }
+
+  public formatarDataHora(data: Date): string {
+    if (!data) return '-';
+    return this.notificacaoService.formatarDataHora(data);
+  }
+
+  public obterDescricaoTipo(tipo: TipoAlerta): string {
+    return this.notificacaoService.obterDescricaoTipo(tipo);
+  }
+
+  public obterCorTipo(tipo: TipoAlerta): string {
+    return this.notificacaoService.obterCorTipo(tipo);
+  }
+
+  public removerEmojis(titulo: string): string {
+    return this.notificacaoService.removerEmojis(titulo);
+  }
+
+  public trackByAlerta(index: number, alerta: AlertaDTO.Listagem): number {
+    return alerta.id;
   }
 
   public excluirAlerta(alerta: AlertaDTO.Listagem): void {
@@ -325,54 +377,6 @@ export class AlertaListagemComponent implements OnInit, OnDestroy {
         });
       }
     });
-  }
-
-  /**
-   * Formatar data apenas (sem hora)
-   * Responsabilidade: VIEW - Delega formatação para o SERVICE
-   */
-  public formatarData(data: Date): string {
-    if (!data) return '-';
-    return this.notificacaoService.formatarData(data);
-  }
-
-  /**
-   * Formatar data/hora completa
-   * Responsabilidade: VIEW - Delega formatação para o SERVICE
-   */
-  public formatarDataHora(data: Date): string {
-    if (!data) return '-';
-    return this.notificacaoService.formatarDataHora(data);
-  }
-
-  /**
-   * Obter descrição do tipo de alerta
-   * Responsabilidade: VIEW - Delega formatação para o SERVICE
-   */
-  public obterDescricaoTipo(tipo: TipoAlerta): string {
-    return this.notificacaoService.obterDescricaoTipo(tipo);
-  }
-
-  /**
-   * Obter cor do tipo de alerta
-   * Responsabilidade: VIEW - Delega formatação para o SERVICE
-   */
-  public obterCorTipo(tipo: TipoAlerta): string {
-    return this.notificacaoService.obterCorTipo(tipo);
-  }
-
-  /**
-   * Remove emojis do título do alerta
-   * Responsabilidade: VIEW - Delega formatação para o SERVICE
-   */
-  public removerEmojis(titulo: string): string {
-    return this.notificacaoService.removerEmojis(titulo);
-  }
-
-
-
-  public trackByAlerta(index: number, alerta: AlertaDTO.Listagem): number {
-    return alerta.id;
   }
 
   ngOnDestroy(): void {

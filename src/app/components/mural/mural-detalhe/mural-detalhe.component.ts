@@ -4,12 +4,13 @@ import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { MuralListagemDTO } from '../../../shared/model/dto/mural.dto';
-import { MuralService } from '../../../shared/service/mural.service';
+import { MuralService, MuralSelecaoService } from '../../../shared/service/mural.service';
+import { ModalInspecaoComponent } from '../mural-modal-inspecao/modal-inspecao.component';
 
 @Component({
   selector: 'app-mural-detalhe',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule, HttpClientModule],
+  imports: [CommonModule, RouterModule, FormsModule, HttpClientModule, ModalInspecaoComponent],
   templateUrl: './mural-detalhe.component.html',
   styleUrl: './mural-detalhe.component.css'
 })
@@ -19,17 +20,13 @@ export class MuralDetalheComponent implements OnInit {
   loading: boolean = true;
   error: string | null = null;
   activeTab: string = 'proximo';
-  motivoInspecao: string = '';
-  motivoCustomizado: string = '';
-  showMotivosDropdown: boolean = false;
-  motivosInspecao: string[] = ['Avaria/Quebra', 'Promoção', 'Outro'];
-  motivoError: string | null = null;
   processandoInspecao: boolean = false;
 
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private muralService: MuralService
+    private muralService: MuralService,
+    private selecaoService: MuralSelecaoService
   ) {}
 
   ngOnInit(): void {
@@ -64,38 +61,30 @@ export class MuralDetalheComponent implements OnInit {
     });
   }
 
-  marcarInspecionado(): void {
+  abrirModalInspecao(): void {
+    if (!this.item) return;
+    
+    // Limpa seleções anteriores
+    this.selecaoService.updateSelectedItems([this.itemId]);
+    
+    // Abre o modal
+    this.selecaoService.openInspecaoModal();
+  }
+
+  onInspecaoConfirmada(): void {
     if (!this.item) return;
 
     // Já está processando, não permitir cliques duplicados
     if (this.processandoInspecao) return;
 
-    // Limpa erros anteriores
-    this.motivoError = null;
-
-    // Validação específica para o motivo da inspeção
-    if (!this.motivoInspecao) {
-      this.motivoError = 'Por favor, selecione um motivo para a inspeção.';
-      return;
-    }
-
-    // Validação para motivo customizado
-    if (this.motivoInspecao === 'Outro' && !this.motivoCustomizado) {
-      this.motivoError = 'Por favor, informe o motivo da inspeção.';
-      return;
-    }
-
     // Atualiza o status para processando
     this.processandoInspecao = true;
 
-    // Se for motivo "Outro", usa o motivo customizado
-    const motivoFinal = this.motivoInspecao === 'Outro' ? this.motivoCustomizado : this.motivoInspecao;
-
-    this.muralService.marcarInspecionado(this.itemId, this.motivoInspecao, this.motivoCustomizado).subscribe({
-      next: (item) => {
-        // Atualiza o estado local com o item retornado
-        if (item) {
-          this.item = item;
+    // Obtém o motivo e motivo customizado do serviço
+    this.selecaoService.confirmarInspecao([this.item]).subscribe({
+      next: (itens) => {
+        if (itens && itens.length > 0) {
+          this.item = itens[0];
         }
 
         // Adiciona um pequeno atraso para permitir que o usuário veja a mudança
@@ -132,20 +121,5 @@ export class MuralDetalheComponent implements OnInit {
         preserveFilters: true // Sempre preserva os filtros
       }
     });
-  }
-
-  toggleMotivosDropdown(): void {
-    this.showMotivosDropdown = !this.showMotivosDropdown;
-    // Limpa o erro de motivo quando o dropdown é aberto/fechado
-    if (this.motivoError) {
-      this.motivoError = null;
-    }
-  }
-
-  selecionarMotivo(motivo: string): void {
-    this.motivoInspecao = motivo;
-    this.showMotivosDropdown = false;
-    // Limpa o erro de motivo quando um motivo é selecionado
-    this.motivoError = null;
   }
 }

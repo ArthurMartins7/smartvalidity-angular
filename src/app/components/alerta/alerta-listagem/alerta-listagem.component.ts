@@ -353,6 +353,52 @@ export class AlertaListagemComponent implements OnInit, OnDestroy {
     return alerta.id;
   }
 
+  public obterPrioridadeAlerta(alerta: AlertaDTO.Listagem): 'alta' | 'media' | 'normal' {
+    // Lógica de prioridade baseada no tipo e status
+    if (!alerta.ativo) {
+      return 'alta'; // Alertas inativos têm prioridade alta
+    }
+    
+    if (alerta.tipo === TipoAlerta.VENCIMENTO_ATRASO) {
+      return 'alta'; // Produtos em atraso têm alta prioridade
+    }
+    
+    if (alerta.tipo === TipoAlerta.VENCIMENTO_HOJE || alerta.tipo === TipoAlerta.VENCIMENTO_AMANHA) {
+      return 'media'; // Produtos vencendo em breve têm média prioridade
+    }
+    
+    return 'normal';
+  }
+
+  public isUrgente(alerta: AlertaDTO.Listagem): boolean {
+    // Considera urgente se for produto vencido em atraso ou inativo
+    return alerta.tipo === TipoAlerta.VENCIMENTO_ATRASO || !alerta.ativo;
+  }
+
+  public isProximoVencimento(alerta: AlertaDTO.Listagem): boolean {
+    // Verifica se é um alerta de produto vencendo hoje ou amanhã
+    return alerta.tipo === TipoAlerta.VENCIMENTO_HOJE || alerta.tipo === TipoAlerta.VENCIMENTO_AMANHA;
+  }
+
+  public calcularDiasParaVencimento(alerta: AlertaDTO.Listagem): number {
+    // Cálculo baseado no tipo de alerta
+    switch (alerta.tipo) {
+      case TipoAlerta.VENCIMENTO_HOJE:
+        return 0;
+      case TipoAlerta.VENCIMENTO_AMANHA:
+        return 1;
+      case TipoAlerta.VENCIMENTO_ATRASO:
+        // Calcula quantos dias em atraso
+        const hoje = new Date();
+        const dataDisparo = new Date(alerta.dataHoraDisparo);
+        const diffTime = hoje.getTime() - dataDisparo.getTime();
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        return Math.max(diffDays, 1);
+      default:
+        return 0;
+    }
+  }
+
   public excluirAlerta(alerta: AlertaDTO.Listagem): void {
     Swal.fire({
       title: 'Tem certeza?',

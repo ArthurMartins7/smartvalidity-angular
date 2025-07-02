@@ -170,16 +170,48 @@
 
             <!-- Itens monitorados -->
             <div *ngIf="produtoSelecionado && itensProdutoNaoInspecionados.length > 0"
-                 class="mt-2 p-2 bg-blue-50 border border-blue-200 rounded text-sm">
-              <div class="text-blue-800 font-medium mb-1">
-                {{ itensProdutoNaoInspecionados.length }} item(ns) monitorado(s)
+                 class="mt-2 border border-blue-200 rounded">
+              <!-- Cabeçalho -->
+              <div class="bg-blue-50 text-blue-800 text-xs font-semibold px-3 py-1 rounded-t">
+                {{ itensProdutoNaoInspecionados.length }} {{ itensProdutoNaoInspecionados.length === 1 ? 'item monitorado' : 'itens monitorados' }}
               </div>
-              <div class="space-y-1 max-h-20 overflow-y-auto">
-                <div *ngFor="let item of itensProdutoNaoInspecionados"
-                     class="flex justify-between text-xs text-blue-700">
-                  <span>{{ item.lote }}</span>
-                  <span>{{ item.dataVencimento | date:'dd/MM/yyyy' }}</span>
-                </div>
+              <div class="px-3 py-1 text-gray-600 text-xs bg-blue-50 border-t border-blue-200">
+                Itens monitorados correspondem aos itens de um produto que ainda não foram inspecionados. Após a inspeção, deixam de aparecer nesta lista.
+                  </div>
+              <!-- Lista -->
+              <div class="max-h-40 overflow-y-auto bg-white">
+                <table class="min-w-full text-xs table-fixed border-collapse">
+                  <thead class="bg-blue-50 sticky top-0">
+                    <tr>
+                      <th class="w-2/5 px-2 py-1 text-left text-blue-800 font-semibold">Nome</th>
+                      <th class="w-1/5 px-2 py-1 text-left text-blue-800 font-semibold">Lote</th>
+                      <th class="w-1/5 px-2 py-1 text-left text-blue-800 font-semibold">Data de vencimento</th>
+                      <th class="w-1/5 px-2 py-1 text-left text-blue-800 font-semibold">Vence em</th>
+                      <th class="w-1/5 px-2 py-1 text-left text-blue-800 font-semibold">Ações</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let item of itensProdutoNaoInspecionados" class="hover:bg-blue-50">
+                      <td class="px-2 py-1 text-gray-600 truncate">{{ item.produto?.descricao || descricaoProdutoSelecionado }}</td>
+                      <td class="px-2 py-1 font-medium text-gray-700 truncate">{{ item.lote }}</td>
+                      <td class="px-2 py-1 text-gray-600">{{ item.dataVencimento | date:'dd/MM/yyyy' }}</td>
+                      <td class="px-2 py-1">
+                        <span [class]="getStatusVencimento(item.dataVencimento) + ' rounded-full px-2 py-0.5 whitespace-nowrap'">
+                    {{ getTextoVencimento(item.dataVencimento) }}
+                        </span>
+                      </td>
+                      <td class="px-2 py-1">
+                        <button type="button" (click)="visualizarItem(item)"
+                                class="text-white text-xs font-medium px-3 py-1 rounded transition-colors"
+                                style="background-color: #5084C1;"
+                                onmouseover="this.style.backgroundColor='#3d6ba3'"
+                                onmouseout="this.style.backgroundColor='#5084C1'">
+                          Visualizar item
+                        </button>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
               </div>
             </div>
           </td>

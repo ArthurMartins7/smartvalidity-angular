@@ -1,26 +1,28 @@
-<div class="container mx-auto p-4">
-  <!-- Cabeçalho com navegação -->
-  <div class="mb-3">
-    <div class="flex items-center mb-2">
-      <button class="text-blue-600 mr-3" routerLink="/dashboard">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-        </svg>
-      </button>
-      <div>
-        <h5 class="text-gray-500 text-sm">Mural</h5>
-        <h2 class="text-xl font-bold" *ngIf="activeTab === 'proximo'">Produtos próximos do vencimento</h2>
-        <h2 class="text-xl font-bold" *ngIf="activeTab === 'hoje'">Produtos que vencem hoje</h2>
-        <h2 class="text-xl font-bold" *ngIf="activeTab === 'vencido'">Produtos vencidos</h2>
-      </div>
+<!-- Cabeçalho unificado -->
+<div class="bg-gray-100 -mx-6 md:-mx-6 py-6 mb-10">
+  <div class="flex items-center gap-2 px-6">
+    <!-- Ícone seta -->
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6 text-gray-600">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+    </svg>
+
+    <!-- Títulos -->
+    <div>
+      <div class="text-gray-500 text-base">Home</div>
+      <div class="text-3xl font-bold">Mural de Produtos</div>
+      <p class="text-gray-800 text-base mt-1">Monitore produtos próximos ao vencimento, vencidos e gerencie inspeções para manter a qualidade do estoque.</p>
     </div>
-    <div class="w-full h-1 mt-2"
-      [ngClass]="{
-        'bg-yellow-500': activeTab === 'proximo',
-        'bg-red-500': activeTab === 'hoje',
-        'bg-black': activeTab === 'vencido'
-      }"></div>
   </div>
+</div>
+
+<div class="px-6">
+  <!-- Linha de cor indicativa da tab ativa -->
+  <div class="w-full h-1 mb-3"
+       [ngClass]="{
+         'bg-yellow-500': activeTab === 'proximo',
+         'bg-red-500': activeTab === 'hoje',
+         'bg-black': activeTab === 'vencido'
+       }"></div>
 
   <!-- Filtro rápido e pesquisa com botão de ordenação -->
   <div class="mb-3">
@@ -69,8 +71,6 @@
     (resetAllFilters)="resetAllFilters()"
     (removeFilterValue)="onRemoveFilterValue($event)">
   </app-filtro-tags>
-
-
 
   <!-- Tabela incorporada diretamente -->
   <div class="bg-white rounded-lg shadow-md overflow-hidden border border-gray-200">

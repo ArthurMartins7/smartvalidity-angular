@@ -21,7 +21,7 @@
 <div *ngIf="carregando" class="flex justify-center items-center py-12">
   <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
   <span class="ml-3 text-gray-600">{{ isEdicao ? 'Carregando alerta...' : 'Processando...' }}</span>
-</div>
+    </div>
 
 <!-- Formulário -->
 <div *ngIf="!carregando" class="bg-white rounded-lg shadow-sm border border-gray-200">
@@ -30,10 +30,10 @@
     <table class="w-full border-collapse">
       <tbody>
 
-        <!-- Título -->
+          <!-- Título -->
         <tr class="border-b border-gray-200">
-          <td class="py-4 pr-6 w-1/3 text-sm font-medium text-gray-700 align-top">
-            Título *
+          <td class="py-2 pr-1 w-1/6 text-sm font-medium text-gray-700 whitespace-nowrap align-middle">
+              Título *
           </td>
           <td class="py-4">
             <input
@@ -52,10 +52,10 @@
           </td>
         </tr>
 
-        <!-- Descrição -->
+          <!-- Descrição -->
         <tr class="border-b border-gray-200">
-          <td class="py-4 pr-6 text-sm font-medium text-gray-700 align-top">
-            Descrição *
+          <td class="py-2 pr-1 w-1/6 text-sm font-medium text-gray-700 whitespace-nowrap align-middle">
+              Descrição *
           </td>
           <td class="py-4">
             <input
@@ -76,8 +76,8 @@
 
         <!-- Data/Hora de Disparo -->
         <tr class="border-b border-gray-200">
-          <td class="py-4 pr-6 text-sm font-medium text-gray-700 align-top">
-            Data/Hora de Disparo *
+          <td class="py-2 pr-1 w-1/6 text-sm font-medium text-gray-700 whitespace-nowrap align-middle">
+              Data/Hora de Disparo *
           </td>
           <td class="py-4">
             <input
@@ -96,7 +96,7 @@
 
         <!-- Dias de Antecedência -->
         <tr class="border-b border-gray-200">
-          <td class="py-4 pr-6 text-sm font-medium text-gray-700 align-top">
+          <td class="py-2 pr-1 w-1/6 text-sm font-medium text-gray-700 whitespace-nowrap align-middle">
             Dias de Antecedência
           </td>
           <td class="py-4">
@@ -114,15 +114,15 @@
 
         <!-- Produto Relacionado -->
         <tr class="border-b border-gray-200">
-          <td class="py-4 pr-6 text-sm font-medium text-gray-700 align-top">
-            Produto Relacionado
+          <td class="py-2 pr-1 w-1/6 text-sm font-medium text-gray-700 whitespace-nowrap align-middle">
+              Produto Relacionado
           </td>
           <td class="py-4">
             <div class="relative">
               <input
                 type="text"
-                id="produto"
-                name="produto"
+              id="produto"
+              name="produto"
                 [(ngModel)]="termoBuscaProduto"
                 (input)="onBuscaProdutoChange()"
                 (focus)="mostrarDropdown = produtosFiltrados.length > 0"
@@ -132,23 +132,23 @@
                 autocomplete="off">
 
               <div class="absolute right-2 top-2 flex items-center gap-1">
-                <button
-                  type="button"
-                  (click)="executarBuscaProduto()"
+              <button
+                type="button"
+                (click)="executarBuscaProduto()"
                   class="p-1 text-gray-400 hover:text-gray-600">
                   <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35M11 19a8 8 0 100-16 8 8 0 000 16z"></path>
-                  </svg>
-                </button>
-                <button
-                  *ngIf="produtoSelecionado"
-                  type="button"
-                  (click)="limparSelecaoProduto()"
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35M11 19a8 8 0 100-16 8 8 0 000 16z"></path>
+                </svg>
+              </button>
+              <button
+                *ngIf="produtoSelecionado"
+                type="button"
+                (click)="limparSelecaoProduto()"
                   class="p-1 text-gray-400 hover:text-gray-600">
                   <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                  </svg>
-                </button>
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+              </button>
               </div>
 
               <!-- Dropdown de produtos -->
@@ -187,7 +187,7 @@
 
         <!-- Colaboradores -->
         <tr class="border-b border-gray-200">
-          <td class="py-4 pr-6 text-sm font-medium text-gray-700 align-top">
+          <td class="py-2 pr-1 w-1/6 text-sm font-medium text-gray-700 whitespace-nowrap align-middle">
             Colaboradores
           </td>
           <td class="py-4">
@@ -195,13 +195,13 @@
               <input
                 type="text"
                 id="colaboradores"
-                name="termoBuscaUsuario"
-                [(ngModel)]="termoBuscaUsuario"
-                (input)="onBuscaUsuarioChange()"
-                (focus)="mostrarDropdownUsuarios = usuariosFiltrados.length > 0"
-                placeholder="Digite para buscar colaboradores..."
+                     name="termoBuscaUsuario"
+                     [(ngModel)]="termoBuscaUsuario"
+                     (input)="onBuscaUsuarioChange()"
+                     (focus)="mostrarDropdownUsuarios = usuariosFiltrados.length > 0"
+                     placeholder="Digite para buscar colaboradores..."
                 class="w-full px-3 py-2 pr-8 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-[#5084C1] focus:border-[#5084C1]"
-                autocomplete="off">
+                     autocomplete="off">
 
               <button type="button"
                       (click)="onBuscaUsuarioChange()"
@@ -243,7 +243,7 @@
 
         <!-- Recorrência -->
         <tr class="border-b border-gray-200">
-          <td class="py-4 pr-6 text-sm font-medium text-gray-700 align-top">
+          <td class="py-2 pr-1 w-1/6 text-sm font-medium text-gray-700 whitespace-nowrap align-middle">
             Recorrência
           </td>
           <td class="py-4">
@@ -256,18 +256,18 @@
                   [(ngModel)]="alertaDTO.recorrente"
                   class="h-4 w-4 text-[#5084C1] focus:ring-[#5084C1] border-gray-300 rounded">
                 <span class="ml-2 text-sm text-gray-700">Alerta recorrente</span>
-              </label>
+                </label>
 
-              <input
+            <input
                 *ngIf="alertaDTO.recorrente"
-                type="text"
-                id="configuracaoRecorrencia"
-                name="configuracaoRecorrencia"
-                [(ngModel)]="alertaDTO.configuracaoRecorrencia"
-                maxlength="100"
+              type="text"
+              id="configuracaoRecorrencia"
+              name="configuracaoRecorrencia"
+              [(ngModel)]="alertaDTO.configuracaoRecorrencia"
+              maxlength="100"
                 class="flex-1 px-3 py-1.5 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-[#5084C1] focus:border-[#5084C1]"
-                placeholder="Ex: Diário, Semanal, Mensal">
-            </div>
+              placeholder="Ex: Diário, Semanal, Mensal">
+          </div>
           </td>
         </tr>
 
@@ -276,26 +276,26 @@
 
     <!-- Botões -->
     <div class="flex justify-end gap-3 mt-6 pt-4 border-t border-gray-200">
-      <button
-        type="button"
-        (click)="voltar()"
+          <button
+            type="button"
+            (click)="voltar()"
         class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-50 transition-colors">
-        Cancelar
-      </button>
+            Cancelar
+          </button>
 
-      <button
-        type="submit"
-        [disabled]="alertaForm.invalid || carregando"
+          <button
+            type="submit"
+            [disabled]="alertaForm.invalid || carregando"
         class="px-4 py-2 text-sm font-medium text-white bg-[#5084C1] border border-transparent rounded hover:bg-[#4071a8] transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
         <span *ngIf="!carregando">{{ isEdicao ? 'Atualizar' : 'Criar' }}</span>
-        <span *ngIf="carregando" class="flex items-center">
-          <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
-            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-          </svg>
-          Processando...
-        </span>
-      </button>
-    </div>
-  </form>
+            <span *ngIf="carregando" class="flex items-center">
+              <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              Processando...
+            </span>
+          </button>
+        </div>
+      </form>
 </div>

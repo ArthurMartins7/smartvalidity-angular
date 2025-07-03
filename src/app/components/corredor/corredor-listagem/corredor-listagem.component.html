@@ -107,11 +107,17 @@
     @for (corredor of corredores; track corredor.id) {
     <div class="bg-white rounded-lg shadow-lg flex flex-col">
       <div class="mb-2">
-        <img
-          [src]="corredor.imagemEmBase64 ? 'data:image/jpeg;base64,' + corredor.imagemEmBase64 : '/assets/images/placeholder.png'"
-          alt="Imagem do Corredor"
-          class="w-full h-24 object-cover rounded-t-lg"
-        />
+        <ng-container *ngIf="corredor.imagemEmBase64; else semImagem">
+          <img
+            [src]="'data:image/jpeg;base64,' + corredor.imagemEmBase64"
+            alt="Imagem do Corredor"
+            class="w-full h-24 object-cover rounded-t-lg" />
+        </ng-container>
+        <ng-template #semImagem>
+          <div class="w-full h-24 flex items-center justify-center bg-gray-100 rounded-t-lg">
+            <i class="material-icons text-gray-400 text-4xl">image_not_supported</i>
+          </div>
+        </ng-template>
       </div>
       <div class="flex items-center justify-between mb-2 px-4">
         <h3 class="text-lg font-bold text-gray-800 truncate">{{ corredor.nome }}</h3>

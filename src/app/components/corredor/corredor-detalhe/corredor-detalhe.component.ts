@@ -9,6 +9,7 @@ import { Usuario } from '../../../shared/model/entity/usuario.model';
 import { CommonModule } from '@angular/common';
 import { catchError, throwError } from 'rxjs';
 import { HttpErrorResponse } from '@angular/common/http';
+import { Location } from '@angular/common';
 
 @Component({
   selector: 'app-corredor-detalhe',
@@ -30,7 +31,8 @@ export class CorredorDetalheComponent implements OnInit {
     private corredorService: CorredorService,
     private usuarioService: UsuarioService,
     private router: Router,
-    private activatedRoute: ActivatedRoute
+    private activatedRoute: ActivatedRoute,
+    private location: Location
   ) { }
 
   ngOnInit(): void {
@@ -167,6 +169,6 @@ export class CorredorDetalheComponent implements OnInit {
   }
 
   public voltar(): void {
-    this.router.navigate(['corredor']);
+    this.location.back();
   }
 }

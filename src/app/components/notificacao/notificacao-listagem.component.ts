@@ -37,6 +37,26 @@ export class NotificacaoListagemComponent implements OnInit, OnDestroy {
   // Enums para template
   public TipoAlerta = TipoAlerta;
 
+  public itensPorPagina: number = 10;
+  public opcoesItensPorPagina: number[] = [5,10,15,20,25,50];
+  public paginaAtual: number = 1;
+  public activeTab: 'todas' | 'naoLidas' | 'lidas' = 'todas';
+
+  public get notificacoesFiltradas(): AlertaDTO.Listagem[] {
+    switch (this.activeTab) {
+      case 'naoLidas':
+        return this.notificacoes.filter(n => !n.lida);
+      case 'lidas':
+        return this.notificacoes.filter(n => n.lida);
+      default:
+        return this.notificacoes;
+    }
+  }
+
+  public get totalPaginas(): number {
+    return Math.max(1, Math.ceil(this.notificacoesFiltradas.length / this.itensPorPagina));
+  }
+
   constructor(
     private notificacaoService: NotificacaoService,
     private router: Router
@@ -199,8 +219,6 @@ export class NotificacaoListagemComponent implements OnInit, OnDestroy {
     return this.notificacaoService.obterCorTipo(tipo);
   }
 
-
-
   /**
    * Formatar data/hora
    * Responsabilidade: VIEW - Delega formatação para o SERVICE
@@ -238,5 +256,38 @@ export class NotificacaoListagemComponent implements OnInit, OnDestroy {
    */
   public trackByNotificacao(index: number, item: AlertaDTO.Listagem): any {
     return item.id;
+  }
+
+  public alterarItensPorPagina(valor: number): void {
+    this.itensPorPagina = valor;
+    this.paginaAtual = 1;
+  }
+
+  public voltarPagina(): void {
+    if (this.paginaAtual > 1) {
+      this.paginaAtual--;
+    }
+  }
+
+  public avancarPagina(): void {
+    if (this.paginaAtual < this.totalPaginas) {
+      this.paginaAtual++;
+    }
+  }
+
+  public irParaPagina(pagina: number): void {
+    if (pagina >= 1 && pagina <= this.totalPaginas) {
+      this.paginaAtual = pagina;
+    }
+  }
+
+  public setActiveTab(tab: 'todas' | 'naoLidas' | 'lidas'): void {
+    if (this.activeTab !== tab) {
+      this.activeTab = tab;
+      this.paginaAtual = 1;
+      // Atualiza filtro para otimizar carregamento do backend
+      this.filtrarApenasNaoLidas = (tab === 'naoLidas');
+      this.carregarNotificacoes();
+    }
   }
 }

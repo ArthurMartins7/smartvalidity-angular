@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+import { CommonModule, Location } from '@angular/common';
 import { Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -30,6 +30,7 @@ export class AlertaEditarComponent implements OnInit, OnDestroy {
   private itemProdutoService = inject(ItemProdutoService);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
+  private location = inject(Location);
   private destroy$ = new Subject<void>();
 
   public alertaDTO: AlertaDTO.Cadastro = new AlertaDTO.Cadastro();
@@ -41,6 +42,7 @@ export class AlertaEditarComponent implements OnInit, OnDestroy {
 
   // Campos auxiliares para o formulário
   public produtoSelecionado: string = '';
+  public descricaoProdutoSelecionado: string = '';
   public usuariosSelecionados: string[] = [];
   public itensProdutoNaoInspecionados: ItemProdutoDTO[] = [];
 
@@ -122,6 +124,7 @@ export class AlertaEditarComponent implements OnInit, OnDestroy {
    */
   public selecionarProduto(produto: Produto): void {
     this.produtoSelecionado = produto.id;
+    this.descricaoProdutoSelecionado = produto.descricao;
     this.termoBuscaProduto = produto.descricao;
     this.mostrarDropdown = false;
     this.onProdutoSelecionado();
@@ -132,6 +135,7 @@ export class AlertaEditarComponent implements OnInit, OnDestroy {
    */
   public limparSelecaoProduto(): void {
     this.produtoSelecionado = '';
+    this.descricaoProdutoSelecionado = '';
     this.termoBuscaProduto = '';
     this.itensProdutoNaoInspecionados = [];
     this.mostrarDropdown = false;
@@ -216,6 +220,7 @@ export class AlertaEditarComponent implements OnInit, OnDestroy {
           this.produtoService.buscarPorId(this.produtoSelecionado).subscribe({
             next: (produto) => {
               this.termoBuscaProduto = produto.descricao;
+              this.descricaoProdutoSelecionado = produto.descricao;
               this.onProdutoSelecionado();
             },
             error: (error) => {
@@ -342,7 +347,7 @@ export class AlertaEditarComponent implements OnInit, OnDestroy {
   }
 
   public voltar(): void {
-    this.router.navigate(['/alertas']);
+    this.location.back();
   }
 
   public obterTituloTela(): string {
@@ -488,5 +493,10 @@ export class AlertaEditarComponent implements OnInit, OnDestroy {
     } else {
       this.alertaDTO.dataHoraDisparo = undefined as any;
     }
+  }
+
+  public visualizarItem(item: ItemProdutoDTO): void {
+    if (!item.id) return;
+    this.router.navigate(['/mural-detalhe', item.id], { queryParams: { tab: 'proximo' } });
   }
 }

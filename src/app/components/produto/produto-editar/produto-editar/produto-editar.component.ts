@@ -6,6 +6,7 @@ import { Fornecedor } from '../../../../shared/model/entity/fornecedor';
 import { ProdutoService } from '../../../../shared/service/produto.service';
 import { FornecedorService } from '../../../../shared/service/fornecedor.service';
 import { ActivatedRoute, Router } from '@angular/router';
+import { Location } from '@angular/common';
 import Swal from 'sweetalert2';
 import { catchError, throwError } from 'rxjs';
 import { HttpErrorResponse } from '@angular/common/http';
@@ -30,7 +31,8 @@ export class ProdutoEditarComponent implements OnInit {
     private produtoService: ProdutoService,
     private fornecedorService: FornecedorService,
     private router: Router,
-    private activatedRoute: ActivatedRoute
+    private activatedRoute: ActivatedRoute,
+    private location: Location
   ) { }
 
   ngOnInit(): void {
@@ -79,7 +81,7 @@ export class ProdutoEditarComponent implements OnInit {
 
   atualizar(event: Event): void {
     event.preventDefault();
-    
+
     if (!this.produto.codigoBarras || !this.produto.descricao || !this.produto.quantidade || !this.fornecedorSelecionado) {
       Swal.fire('Preencha todos os campos obrigatórios!', '', 'warning');
       return;
@@ -122,15 +124,6 @@ export class ProdutoEditarComponent implements OnInit {
   }
 
   public voltar(): void {
-    if (this.categoriaId) {
-      this.router.navigate(['/produto-listagem'], { 
-        queryParams: { 
-          categoriaId: this.categoriaId,
-          categoriaNome: this.categoriaNome 
-        } 
-      });
-    } else {
-      this.router.navigate(['/produto-listagem']);
-    }
+    this.location.back();
   }
 }

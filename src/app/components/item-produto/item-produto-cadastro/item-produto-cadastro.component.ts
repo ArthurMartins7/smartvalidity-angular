@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
+import { Location } from '@angular/common';
 import { ProdutoService } from '../../../shared/service/produto.service';
 import { Produto } from '../../../shared/model/entity/produto';
 import { ItemProdutoService } from '../../../shared/service/item-produto.service';
@@ -36,6 +37,7 @@ export class ItemProdutoCadastroComponent implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private router: Router,
+    private location: Location,
     private produtoService: ProdutoService,
     private itemProdutoService: ItemProdutoService
   ) {}
@@ -166,6 +168,6 @@ export class ItemProdutoCadastroComponent implements OnInit {
   }
 
   voltar(): void {
-    this.router.navigate(['/mural-listagem']);
+    this.location.back();
   }
 }

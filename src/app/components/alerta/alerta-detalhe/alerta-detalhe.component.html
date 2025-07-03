@@ -1,26 +1,23 @@
-<!-- Cabeçalho -->
-<div class="flex items-center gap-2 mb-8">
+<!-- Cabeçalho padrão do sistema -->
+<div class="bg-gray-100 -mx-6 md:-mx-6 py-6 mb-10">
+  <div class="flex items-center gap-2 px-6">
+    <!-- Ícone seta - clicável para voltar -->
+    <button (click)="voltarParaLista()" class="p-1 hover:bg-gray-200 rounded transition-colors">
   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6 text-gray-600">
-    <path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0" />
+        <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
   </svg>
+    </button>
+
+    <!-- Títulos -->
   <div>
-    <div class="text-gray-500">Sistema</div>
-    <div class="text-2xl font-bold">Detalhe do Alerta</div>
+      <div class="text-gray-500 text-base cursor-pointer hover:underline" (click)="voltarParaLista()">Gestão de Alertas</div>
+      <div class="text-3xl font-bold">Detalhe do Alerta</div>
+      <p class="text-gray-800 text-base mt-1">Visualize todas as informações deste alerta e, se necessário, edite-as.</p>
+    </div>
   </div>
 </div>
 
-<!-- Botão Voltar -->
-<div class="mb-6">
-  <button (click)="voltarParaLista()" 
-          class="flex items-center gap-2 text-gray-600 hover:text-gray-800 transition-colors">
-    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
-      <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
-    </svg>
-    <span>Voltar para Lista de Alertas</span>
-  </button>
-</div>
-
-<!-- Loading State -->
+<!-- Estado de carregamento -->
 <div *ngIf="carregando" class="flex justify-center items-center py-12">
   <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
   <span class="ml-3 text-gray-600">Carregando...</span>
@@ -28,121 +25,82 @@
 
 <!-- Conteúdo Principal -->
 <div *ngIf="!carregando && alerta" class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-  
+
   <!-- Header do Card -->
-  <div class="bg-gray-50 px-6 py-4 border-b border-gray-200">
-    <div class="flex items-center justify-between">
-      <div class="flex items-center gap-3">
-        <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium"
-              [class]="obterCorTipo(alerta.tipo)">
-          {{ obterDescricaoTipo(alerta.tipo) }}
-        </span>
-        <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium"
-              [class]="alerta.ativo ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'">
-          {{ alerta.ativo ? 'Ativo' : 'Inativo' }}
-        </span>
-      </div>
-      
-      <!-- Botões de Ação -->
-      <div class="flex items-center gap-2">
-        <button *ngIf="podeEditar()" 
-                (click)="editarAlerta()"
-                class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
-          </svg>
-          Editar
-        </button>
-      </div>
+  <div class="flex items-center justify-between px-6 py-1 border-b border-gray-200 bg-gray-50">
+    <h1 class="text-xl font-bold text-gray-900">{{ removerEmojis(alerta.titulo) }}</h1>
+    <div class="flex items-center gap-2">
+      <button *ngIf="podeEditar()" (click)="editarAlerta()" class="bg-gradient-to-r from-[#5084C1] to-[#4071a8] hover:from-[#4071a8] hover:to-[#365f8a] text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-all duration-200 transform hover:scale-105 shadow-md hover:shadow-lg">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
+        </svg>
+        Editar
+      </button>
     </div>
   </div>
-  
-  <!-- Conteúdo do Card -->
-  <div class="p-6">
-    
-    <!-- Título -->
-    <div class="mb-6">
-      <h1 class="text-2xl font-bold text-gray-900 mb-2">
-        {{ removerEmojis(alerta.titulo) }}
-      </h1>
-      <p class="text-gray-600 leading-relaxed" [innerHTML]="alerta.descricao"></p>
-    </div>
-    
-    <!-- Informações em Grid -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-      
-      <!-- Data/Hora de Disparo -->
-      <div class="bg-gray-50 p-4 rounded-lg">
-        <dt class="text-sm font-medium text-gray-500 mb-1">Data/Hora de Disparo</dt>
-        <dd class="text-lg font-semibold text-gray-900">
-          {{ formatarDataHora(alerta.dataHoraDisparo) }}
-        </dd>
-      </div>
-      
-      <!-- Data de Criação -->
-      <div class="bg-gray-50 p-4 rounded-lg">
-        <dt class="text-sm font-medium text-gray-500 mb-1">Data de Criação</dt>
-        <dd class="text-lg font-semibold text-gray-900">
-          {{ formatarDataHora(alerta.dataCriacao) }}
-        </dd>
-      </div>
-      
-      <!-- Dias de Antecedência -->
-      <div class="bg-gray-50 p-4 rounded-lg" *ngIf="alerta.diasAntecedencia">
-        <dt class="text-sm font-medium text-gray-500 mb-1">Dias de Antecedência</dt>
-        <dd class="text-lg font-semibold text-gray-900">
-          {{ alerta.diasAntecedencia }} dia(s)
-        </dd>
-      </div>
-      
-      <!-- Recorrente -->
-      <div class="bg-gray-50 p-4 rounded-lg">
-        <dt class="text-sm font-medium text-gray-500 mb-1">Recorrente</dt>
-        <dd class="text-lg font-semibold text-gray-900">
-          {{ alerta.recorrente ? 'Sim' : 'Não' }}
-        </dd>
-      </div>
-      
-      <!-- Configuração de Recorrência -->
-      <div class="bg-gray-50 p-4 rounded-lg" *ngIf="alerta.recorrente && alerta.configuracaoRecorrencia">
-        <dt class="text-sm font-medium text-gray-500 mb-1">Configuração de Recorrência</dt>
-        <dd class="text-lg font-semibold text-gray-900">
-          {{ alerta.configuracaoRecorrencia }}
-        </dd>
-      </div>
-      
-      <!-- Usuário Criador -->
-      <div class="bg-gray-50 p-4 rounded-lg" *ngIf="alerta.usuarioCriador">
-        <dt class="text-sm font-medium text-gray-500 mb-1">Criado por</dt>
-        <dd class="text-lg font-semibold text-gray-900">
-          {{ alerta.usuarioCriador }}
-        </dd>
-      </div>
-      
-    </div>
-    
-    <!-- Usuários do Alerta -->
-    <div class="mb-6" *ngIf="alerta.usuariosAlerta && alerta.usuariosAlerta.length > 0">
-      <h3 class="text-lg font-semibold text-gray-900 mb-3">Usuários que Recebem este Alerta</h3>
-      <div class="flex flex-wrap gap-2">
-        <span *ngFor="let usuario of alerta.usuariosAlerta" 
-              class="inline-flex items-center px-3 py-1 rounded-full text-sm bg-blue-100 text-blue-800">
+
+  <!-- Tabela de Detalhes -->
+  <div class="p-6 overflow-x-auto">
+    <table class="min-w-full divide-y divide-gray-200 text-base">
+      <tbody class="divide-y divide-gray-200">
+        <tr *ngIf="alerta.descricao">
+          <th class="w-1/3 text-left font-semibold text-gray-600 py-3 text-base">Descrição</th>
+          <td class="py-3 text-gray-800 text-lg" [innerHTML]="alerta.descricao"></td>
+        </tr>
+        <tr>
+          <th class="w-1/3 text-left font-semibold text-gray-600 py-3 text-base">Data/Hora de Disparo</th>
+          <td class="py-3 text-gray-800 text-lg">{{ formatarDataHora(alerta.dataHoraDisparo) }}</td>
+        </tr>
+        <tr>
+          <th class="text-left font-semibold text-gray-600 py-3 text-base">Data de Criação</th>
+          <td class="py-3 text-gray-800 text-lg">{{ formatarDataHora(alerta.dataCriacao) }}</td>
+        </tr>
+        <tr *ngIf="alerta.diasAntecedencia">
+          <th class="text-left font-semibold text-gray-600 py-3 text-base">Dias de Antecedência</th>
+          <td class="py-3 text-gray-800 text-lg">{{ alerta.diasAntecedencia }} dia(s)</td>
+        </tr>
+        <tr>
+          <th class="text-left font-semibold text-gray-600 py-3 text-base">Recorrente</th>
+          <td class="py-3 text-gray-800 text-lg">{{ alerta.recorrente ? 'Sim' : 'Não' }}</td>
+        </tr>
+        <tr *ngIf="alerta.recorrente && alerta.configuracaoRecorrencia">
+          <th class="text-left font-semibold text-gray-600 py-3 text-base">Configuração de Recorrência</th>
+          <td class="py-3 text-gray-800 text-lg">{{ alerta.configuracaoRecorrencia }}</td>
+        </tr>
+        <tr *ngIf="alerta.usuarioCriador">
+          <th class="text-left font-semibold text-gray-600 py-3 text-base">Criado por</th>
+          <td class="py-3 text-gray-800 text-lg">{{ alerta.usuarioCriador }}</td>
+        </tr>
+        <tr *ngIf="alerta.usuariosAlerta && alerta.usuariosAlerta.length > 0">
+          <th class="text-left font-semibold text-gray-600 py-3 text-base align-top">Usuários que Recebem</th>
+          <td class="py-3 text-gray-800">
+            <div class="flex gap-1 overflow-x-auto whitespace-nowrap">
+              <span *ngFor="let usuario of alerta.usuariosAlerta" class="inline-flex items-center px-2 py-0.5 text-base rounded-full bg-blue-100 text-blue-800">
           {{ usuario }}
         </span>
       </div>
-    </div>
-    
-    <!-- Produtos do Alerta -->
-    <div class="mb-6" *ngIf="alerta.produtosAlerta && alerta.produtosAlerta.length > 0">
-      <h3 class="text-lg font-semibold text-gray-900 mb-3">Produtos Relacionados</h3>
-      <div class="flex flex-wrap gap-2">
-        <span *ngFor="let produto of alerta.produtosAlerta" 
-              class="inline-flex items-center px-3 py-1 rounded-full text-sm bg-green-100 text-green-800">
+          </td>
+        </tr>
+        <tr *ngIf="alerta.produtosAlerta && alerta.produtosAlerta.length > 0">
+          <th class="text-left font-semibold text-gray-600 py-3 text-base align-top">Produtos Relacionados</th>
+          <td class="py-3 text-gray-800">
+            <div class="flex gap-1 overflow-x-auto whitespace-nowrap">
+              <span *ngFor="let produto of alerta.produtosAlerta" class="inline-flex items-center px-2 py-0.5 text-base rounded-full bg-green-100 text-green-800">
           {{ produto }}
         </span>
       </div>
-    </div>
-    
+          </td>
+        </tr>
+        <tr>
+          <th class="w-1/3 text-left font-semibold text-gray-600 py-3 text-base">Tipo</th>
+          <td class="py-3 text-gray-800 text-lg">{{ obterDescricaoTipo(alerta.tipo) }}</td>
+        </tr>
+        <tr>
+          <th class="w-1/3 text-left font-semibold text-gray-600 py-3 text-base">Status</th>
+          <td class="py-3 text-gray-800 text-lg">{{ alerta.ativo ? 'Ativo' : 'Inativo' }}</td>
+        </tr>
+      </tbody>
+    </table>
   </div>
 </div>
 
@@ -153,4 +111,4 @@
   </svg>
   <h3 class="text-lg font-semibold text-gray-900 mb-2">Alerta não encontrado</h3>
   <p class="text-gray-600">O alerta solicitado não foi encontrado ou foi excluído.</p>
-</div> 
+</div>

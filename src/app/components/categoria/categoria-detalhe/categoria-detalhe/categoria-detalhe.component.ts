@@ -3,6 +3,7 @@ import { FormsModule } from '@angular/forms';
 import { Categoria } from '../../../../shared/model/entity/categoria';
 import { CategoriaService } from '../../../../shared/service/categoria.service';
 import { ActivatedRoute, Router } from '@angular/router';
+import { Location } from '@angular/common';
 import Swal from 'sweetalert2';
 
 @Component({
@@ -20,7 +21,8 @@ export class CategoriaDetalheComponent implements OnInit {
   constructor(
     private categoriaService: CategoriaService,
     private router: Router,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private location: Location
   ) {}
 
   ngOnInit(): void {
@@ -122,6 +124,6 @@ export class CategoriaDetalheComponent implements OnInit {
   }
 
   voltar(): void {
-    this.router.navigate(['/corredor']);
+    this.location.back();
   }
 }

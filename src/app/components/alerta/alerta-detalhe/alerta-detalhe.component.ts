@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+import { CommonModule, Location } from '@angular/common';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subject } from 'rxjs';
@@ -40,6 +40,7 @@ export class AlertaDetalheComponent implements OnInit, OnDestroy {
   constructor(
     private route: ActivatedRoute,
     private router: Router,
+    private location: Location,
     private alertaService: AlertaService,
     private notificacaoService: NotificacaoService
   ) {}
@@ -78,7 +79,7 @@ export class AlertaDetalheComponent implements OnInit, OnDestroy {
         error: (error) => {
           this.carregando = false;
           console.error('Erro ao carregar alerta:', error);
-          
+
           if (error.status === 404) {
             Swal.fire({
               title: 'Alerta não encontrado',
@@ -101,10 +102,10 @@ export class AlertaDetalheComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Voltar para a listagem de alertas
+   * Voltar para a página anterior
    */
   public voltarParaLista(): void {
-    this.router.navigate(['/alertas']);
+    this.location.back();
   }
 
   /**
@@ -165,4 +166,4 @@ export class AlertaDetalheComponent implements OnInit, OnDestroy {
   public podeEditar(): boolean {
     return this.alerta?.tipo === TipoAlerta.PERSONALIZADO;
   }
-} 
+}

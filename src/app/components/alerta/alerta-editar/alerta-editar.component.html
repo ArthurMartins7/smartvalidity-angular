@@ -1,40 +1,41 @@
-<div class="min-h-screen bg-gray-50 p-6">
-  <div class="max-w-4xl mx-auto">
-    <!-- Header -->
-    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
-      <div class="flex items-center justify-between">
-        <div class="flex items-center space-x-3">
-          <button
-            (click)="voltar()"
-            class="p-2 text-gray-400 hover:text-gray-600 transition-colors">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+<!-- Cabeçalho padrão do sistema -->
+<div class="bg-gray-100 -mx-6 md:-mx-6 py-6 mb-10">
+  <div class="flex items-center gap-2 px-6">
+    <!-- Ícone seta - clicável para voltar -->
+    <button (click)="voltar()" class="p-1 hover:bg-gray-200 rounded transition-colors">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6 text-gray-600">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
             </svg>
           </button>
+
+    <!-- Títulos -->
           <div>
-            <h1 class="text-2xl font-bold text-gray-900">{{ obterTituloTela() }}</h1>
-            <p class="text-sm text-gray-500">{{ isEdicao ? 'Edite as informações do alerta' : 'Preencha os dados para criar um novo alerta' }}</p>
-          </div>
+      <div class="text-gray-500 text-base cursor-pointer hover:underline" (click)="voltar()">Gestão de Alertas</div>
+      <div class="text-3xl font-bold">{{ obterTituloTela() }}</div>
+      <p class="text-gray-800 text-base mt-1">{{ isEdicao ? 'Edite as informações do alerta personalizado' : 'Preencha os dados para criar um novo alerta personalizado' }}</p>
         </div>
       </div>
     </div>
 
-    <!-- Loading State -->
-    <div *ngIf="carregando" class="bg-white rounded-lg shadow-sm border border-gray-200 p-12 text-center">
-      <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-      <p class="text-gray-500">{{ isEdicao ? 'Carregando alerta...' : 'Processando...' }}</p>
+<!-- Estado de carregamento -->
+<div *ngIf="carregando" class="flex justify-center items-center py-12">
+  <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+  <span class="ml-3 text-gray-600">{{ isEdicao ? 'Carregando alerta...' : 'Processando...' }}</span>
     </div>
 
-    <!-- Form -->
-    <div *ngIf="!carregando" class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-      <form (ngSubmit)="salvar()" #alertaForm="ngForm">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+<!-- Formulário -->
+<div *ngIf="!carregando" class="bg-white rounded-lg shadow-sm border border-gray-200">
+  <form (ngSubmit)="salvar()" #alertaForm="ngForm" class="p-6">
+
+    <table class="w-full border-collapse">
+      <tbody>
 
           <!-- Título -->
-          <div class="md:col-span-2">
-            <label for="titulo" class="block text-sm font-medium text-gray-700 mb-2">
+        <tr class="border-b border-gray-200">
+          <td class="py-2 pr-1 w-1/6 text-sm font-medium text-gray-700 whitespace-nowrap align-middle">
               Título *
-            </label>
+          </td>
+          <td class="py-4">
             <input
               type="text"
               id="titulo"
@@ -43,38 +44,42 @@
               #titulo="ngModel"
               required
               maxlength="100"
-              class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-[#5084C1] focus:border-[#5084C1]"
               placeholder="Digite o título do alerta">
             <div *ngIf="titulo.invalid && titulo.touched" class="text-red-500 text-sm mt-1">
               Título é obrigatório
             </div>
-          </div>
+          </td>
+        </tr>
 
           <!-- Descrição -->
-          <div class="md:col-span-2">
-            <label for="descricao" class="block text-sm font-medium text-gray-700 mb-2">
+        <tr class="border-b border-gray-200">
+          <td class="py-2 pr-1 w-1/6 text-sm font-medium text-gray-700 whitespace-nowrap align-middle">
               Descrição *
-            </label>
-            <textarea
+          </td>
+          <td class="py-4">
+            <input
+              type="text"
               id="descricao"
               name="descricao"
               [(ngModel)]="alertaDTO.descricao"
               #descricao="ngModel"
               required
-              rows="3"
               maxlength="500"
-              class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              placeholder="Descreva o alerta em detalhes"></textarea>
+              class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-[#5084C1] focus:border-[#5084C1]"
+              placeholder="Descreva o alerta...">
             <div *ngIf="descricao.invalid && descricao.touched" class="text-red-500 text-sm mt-1">
               Descrição é obrigatória
             </div>
-          </div>
+          </td>
+        </tr>
 
-          <!-- Data/Hora Disparo -->
-          <div>
-            <label for="dataHoraDisparo" class="block text-sm font-medium text-gray-700 mb-2">
+        <!-- Data/Hora de Disparo -->
+        <tr class="border-b border-gray-200">
+          <td class="py-2 pr-1 w-1/6 text-sm font-medium text-gray-700 whitespace-nowrap align-middle">
               Data/Hora de Disparo *
-            </label>
+          </td>
+          <td class="py-4">
             <input
               type="datetime-local"
               id="dataHoraDisparo"
@@ -82,19 +87,37 @@
               [(ngModel)]="dataHoraDisparoInput"
               #dataHoraDisparo="ngModel"
               required
-              class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+              class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-[#5084C1] focus:border-[#5084C1]">
             <div *ngIf="dataHoraDisparo.invalid && dataHoraDisparo.touched" class="text-red-500 text-sm mt-1">
-              Data/hora de disparo é obrigatória
+              Data/hora é obrigatória
             </div>
-          </div>
+          </td>
+        </tr>
 
-          <!-- Produto -->
-          <div>
-            <label for="produto" class="block text-sm font-medium text-gray-700 mb-2">
+        <!-- Dias de Antecedência -->
+        <tr class="border-b border-gray-200">
+          <td class="py-2 pr-1 w-1/6 text-sm font-medium text-gray-700 whitespace-nowrap align-middle">
+            Dias de Antecedência
+          </td>
+          <td class="py-4">
+            <input
+              type="number"
+              id="diasAntecedencia"
+              name="diasAntecedencia"
+              [(ngModel)]="alertaDTO.diasAntecedencia"
+              min="0"
+              max="365"
+              class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-[#5084C1] focus:border-[#5084C1]"
+              placeholder="Ex: 7">
+          </td>
+        </tr>
+
+        <!-- Produto Relacionado -->
+        <tr class="border-b border-gray-200">
+          <td class="py-2 pr-1 w-1/6 text-sm font-medium text-gray-700 whitespace-nowrap align-middle">
               Produto Relacionado
-            </label>
-
-            <!-- Campo de busca com autocomplete -->
+          </td>
+          <td class="py-4">
             <div class="relative">
               <input
                 type="text"
@@ -105,211 +128,198 @@
                 (focus)="mostrarDropdown = produtosFiltrados.length > 0"
                 (blur)="fecharDropdownComDelay()"
                 placeholder="Digite para buscar produtos..."
-                class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                class="w-full px-3 py-2 pr-16 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-[#5084C1] focus:border-[#5084C1]"
                 autocomplete="off">
 
-              <!-- Botão de confirmar busca -->
+              <div class="absolute right-2 top-2 flex items-center gap-1">
               <button
                 type="button"
                 (click)="executarBuscaProduto()"
-                class="absolute right-8 top-2 text-gray-400 hover:text-gray-600">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  class="p-1 text-gray-400 hover:text-gray-600">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35M11 19a8 8 0 100-16 8 8 0 000 16z"></path>
                 </svg>
               </button>
-
-              <!-- Botão para limpar seleção -->
               <button
                 *ngIf="produtoSelecionado"
                 type="button"
                 (click)="limparSelecaoProduto()"
-                class="absolute right-2 top-2 text-gray-400 hover:text-gray-600">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  class="p-1 text-gray-400 hover:text-gray-600">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                 </svg>
               </button>
+              </div>
 
-              <!-- Dropdown de resultados -->
+              <!-- Dropdown de produtos -->
               <div *ngIf="mostrarDropdown && produtosFiltrados.length > 0"
-                   class="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-y-auto">
+                   class="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded shadow-lg max-h-48 overflow-y-auto">
                 <div *ngFor="let produto of produtosFiltrados"
                      (click)="selecionarProduto(produto)"
-                     class="px-3 py-2 hover:bg-blue-50 cursor-pointer border-b border-gray-100 last:border-b-0">
-                  <div class="font-medium text-gray-900">{{ produto.descricao }}</div>
-                  <div class="text-sm text-gray-500">{{ produto.marca }}</div>
+                     class="px-3 py-2 hover:bg-gray-50 cursor-pointer border-b border-gray-100 last:border-b-0">
+                  <div class="font-medium text-gray-900 text-sm">{{ produto.descricao }}</div>
+                  <div class="text-xs text-gray-500">{{ produto.marca }}</div>
                 </div>
               </div>
 
-              <!-- Mensagem quando não há resultados -->
               <div *ngIf="mostrarDropdown && produtosFiltrados.length === 0 && termoBuscaProduto.length >= 2"
-                   class="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg p-3">
-                <div class="text-sm text-gray-500 text-center">
-                  Nenhum produto encontrado com itens não inspecionados
-                </div>
+                   class="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded shadow-lg p-3">
+                <div class="text-sm text-gray-500 text-center">Nenhum produto encontrado</div>
               </div>
             </div>
 
-            <p class="text-xs text-gray-500 mt-1">
-              * Digite pelo menos 2 caracteres para buscar produtos com itens não inspecionados
-            </p>
-
-            <!-- Informações dos itens-produto encontrados -->
+            <!-- Itens monitorados -->
             <div *ngIf="produtoSelecionado && itensProdutoNaoInspecionados.length > 0"
-                 class="mt-3 p-4 bg-blue-50 border border-blue-200 rounded-md">
-              <h4 class="text-sm font-medium text-blue-800 mb-3 flex items-center">
-                📦 Itens que serão monitorados por este alerta:
-              </h4>
-              <div class="space-y-2 max-h-32 overflow-y-auto">
-                <div *ngFor="let item of itensProdutoNaoInspecionados"
-                     class="flex justify-between items-center p-2 bg-white rounded border">
-                  <div class="flex-1">
-                    <span class="font-medium text-gray-900">Lote: {{ item.lote }}</span>
-                    <span class="text-sm text-gray-600 ml-2">
-                      Vence: {{ item.dataVencimento | date:'dd/MM/yyyy' }}
-                    </span>
-                  </div>
-                  <div class="text-xs px-2 py-1 rounded"
-                       [class]="getStatusVencimento(item.dataVencimento)">
-                    {{ getTextoVencimento(item.dataVencimento) }}
-                  </div>
-                </div>
+                 class="mt-2 border border-blue-200 rounded">
+              <!-- Cabeçalho -->
+              <div class="bg-blue-50 text-blue-800 text-xs font-semibold px-3 py-1 rounded-t">
+                {{ itensProdutoNaoInspecionados.length }} {{ itensProdutoNaoInspecionados.length === 1 ? 'item monitorado' : 'itens monitorados' }}
               </div>
-              <p class="text-xs text-blue-600 mt-2">
-                Total: {{ itensProdutoNaoInspecionados.length }} item(ns) será(ão) monitorado(s)
-              </p>
+              <div class="px-3 py-1 text-gray-600 text-xs bg-blue-50 border-t border-blue-200">
+                Itens monitorados correspondem aos itens de um produto que ainda não foram inspecionados. Após a inspeção, deixam de aparecer nesta lista.
+                  </div>
+              <!-- Lista -->
+              <div class="max-h-40 overflow-y-auto bg-white">
+                <table class="min-w-full text-xs table-fixed border-collapse">
+                  <thead class="bg-blue-50 sticky top-0">
+                    <tr>
+                      <th class="w-2/5 px-2 py-1 text-left text-blue-800 font-semibold">Nome</th>
+                      <th class="w-1/5 px-2 py-1 text-left text-blue-800 font-semibold">Lote</th>
+                      <th class="w-1/5 px-2 py-1 text-left text-blue-800 font-semibold">Data de vencimento</th>
+                      <th class="w-1/5 px-2 py-1 text-left text-blue-800 font-semibold">Vence em</th>
+                      <th class="w-1/5 px-2 py-1 text-left text-blue-800 font-semibold">Ações</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let item of itensProdutoNaoInspecionados" class="hover:bg-blue-50">
+                      <td class="px-2 py-1 text-gray-600 truncate">{{ item.produto?.descricao || descricaoProdutoSelecionado }}</td>
+                      <td class="px-2 py-1 font-medium text-gray-700 truncate">{{ item.lote }}</td>
+                      <td class="px-2 py-1 text-gray-600">{{ item.dataVencimento | date:'dd/MM/yyyy' }}</td>
+                      <td class="px-2 py-1">
+                        <span [class]="getStatusVencimento(item.dataVencimento) + ' rounded-full px-2 py-0.5 whitespace-nowrap'">
+                    {{ getTextoVencimento(item.dataVencimento) }}
+                        </span>
+                      </td>
+                      <td class="px-2 py-1">
+                        <button type="button" (click)="visualizarItem(item)"
+                                class="text-white text-xs font-medium px-3 py-1 rounded transition-colors"
+                                style="background-color: #5084C1;"
+                                onmouseover="this.style.backgroundColor='#3d6ba3'"
+                                onmouseout="this.style.backgroundColor='#5084C1'">
+                          Visualizar item
+                        </button>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
             </div>
+          </td>
+        </tr>
 
-            <!-- Mensagem quando não há itens -->
-            <div *ngIf="produtoSelecionado && itensProdutoNaoInspecionados.length === 0"
-                 class="mt-3 p-3 bg-yellow-50 border border-yellow-200 rounded-md">
-              <p class="text-sm text-yellow-800">
-                ⚠️ Nenhum item-produto não inspecionado encontrado para este produto.
-              </p>
-            </div>
-          </div>
-
-          <!-- Dias de Antecedência -->
-          <div>
-            <label for="diasAntecedencia" class="block text-sm font-medium text-gray-700 mb-2">
-              Dias de Antecedência
-            </label>
-            <input
-              type="number"
-              id="diasAntecedencia"
-              name="diasAntecedencia"
-              [(ngModel)]="alertaDTO.diasAntecedencia"
-              min="0"
-              max="365"
-              class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              placeholder="Ex: 7">
-          </div>
-
-          <!-- Colaboradores (Usuários) -->
-          <div class="md:col-span-2">
-            <label class="block text-sm font-medium text-gray-700 mb-2">
-              Colaboradores que receberão o alerta
-            </label>
+        <!-- Colaboradores -->
+        <tr class="border-b border-gray-200">
+          <td class="py-2 pr-1 w-1/6 text-sm font-medium text-gray-700 whitespace-nowrap align-middle">
+            Colaboradores
+          </td>
+          <td class="py-4">
             <div class="relative">
-              <input type="text"
+              <input
+                type="text"
+                id="colaboradores"
                      name="termoBuscaUsuario"
                      [(ngModel)]="termoBuscaUsuario"
                      (input)="onBuscaUsuarioChange()"
                      (focus)="mostrarDropdownUsuarios = usuariosFiltrados.length > 0"
                      placeholder="Digite para buscar colaboradores..."
-                     class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                class="w-full px-3 py-2 pr-8 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-[#5084C1] focus:border-[#5084C1]"
                      autocomplete="off">
 
-              <!-- Ícone de busca -->
               <button type="button"
                       (click)="onBuscaUsuarioChange()"
                       class="absolute right-2 top-2 text-gray-400 hover:text-gray-600">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35M11 19a8 8 0 100-16 8 8 0 000 16z"></path>
                 </svg>
               </button>
 
-              <!-- Dropdown de resultados -->
+              <!-- Dropdown colaboradores -->
               <div *ngIf="mostrarDropdownUsuarios && usuariosFiltrados.length > 0"
-                   class="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-y-auto">
+                   class="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded shadow-lg max-h-48 overflow-y-auto">
                 <div *ngFor="let u of usuariosFiltrados"
                      (click)="selecionarUsuario(u)"
-                     class="px-3 py-2 hover:bg-blue-50 cursor-pointer border-b border-gray-100 last:border-b-0">
-                  <div class="font-medium text-gray-900">{{ u.nome }}</div>
-                  <div class="text-sm text-gray-500">{{ u.email }}</div>
+                     class="px-3 py-2 hover:bg-gray-50 cursor-pointer border-b border-gray-100 last:border-b-0">
+                  <div class="font-medium text-gray-900 text-sm">{{ u.nome }}</div>
+                  <div class="text-xs text-gray-500">{{ u.email }}</div>
                 </div>
               </div>
 
-              <!-- Mensagem quando não há resultados -->
               <div *ngIf="mostrarDropdownUsuarios && usuariosFiltrados.length === 0 && termoBuscaUsuario.length >= 2"
-                   class="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg p-3">
-                <div class="text-sm text-gray-500 text-center">
-                  Nenhum colaborador encontrado
-                </div>
+                   class="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded shadow-lg p-3">
+                <div class="text-sm text-gray-500 text-center">Nenhum colaborador encontrado</div>
               </div>
             </div>
 
-            <!-- Chips de selecionados -->
-            <div *ngIf="usuariosSelecionados.length > 0" class="flex flex-wrap gap-2 mt-3">
+            <!-- Colaboradores selecionados -->
+            <div *ngIf="usuariosSelecionados.length > 0" class="mt-2 flex flex-wrap gap-1">
               <span *ngFor="let uid of usuariosSelecionados"
-                    class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded flex items-center space-x-1">
-                <span>{{ obterUsuarioPorId(uid)?.nome || 'Usuário' }}</span>
-                <button type="button" (click)="removerUsuario(uid)" class="text-blue-600 hover:text-blue-800">✕</button>
+                    class="inline-flex items-center gap-1 bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">
+                {{ obterUsuarioPorId(uid)?.nome || 'Usuário' }}
+                <button type="button"
+                        (click)="removerUsuario(uid)"
+                        class="text-blue-600 hover:text-blue-800 font-bold">×</button>
               </span>
             </div>
+          </td>
+        </tr>
 
-            <p class="text-xs text-gray-500 mt-1">
-              Digite pelo menos 2 caracteres para buscar colaboradores
-            </p>
-          </div>
-
-          <!-- Switches -->
-          <div class="md:col-span-2">
-            <div class="flex flex-wrap gap-6">
-              <!-- Recorrente -->
-              <div class="flex items-center">
+        <!-- Recorrência -->
+        <tr class="border-b border-gray-200">
+          <td class="py-2 pr-1 w-1/6 text-sm font-medium text-gray-700 whitespace-nowrap align-middle">
+            Recorrência
+          </td>
+          <td class="py-4">
+            <div class="flex items-center gap-3">
+              <label class="flex items-center">
                 <input
                   type="checkbox"
                   id="recorrente"
                   name="recorrente"
                   [(ngModel)]="alertaDTO.recorrente"
-                  class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
-                <label for="recorrente" class="ml-2 block text-sm text-gray-700">
-                  Alerta recorrente
+                  class="h-4 w-4 text-[#5084C1] focus:ring-[#5084C1] border-gray-300 rounded">
+                <span class="ml-2 text-sm text-gray-700">Alerta recorrente</span>
                 </label>
-              </div>
-            </div>
-          </div>
 
-          <!-- Configuração de Recorrência -->
-          <div *ngIf="alertaDTO.recorrente" class="md:col-span-2">
-            <label for="configuracaoRecorrencia" class="block text-sm font-medium text-gray-700 mb-2">
-              Configuração de Recorrência
-            </label>
             <input
+                *ngIf="alertaDTO.recorrente"
               type="text"
               id="configuracaoRecorrencia"
               name="configuracaoRecorrencia"
               [(ngModel)]="alertaDTO.configuracaoRecorrencia"
               maxlength="100"
-              class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                class="flex-1 px-3 py-1.5 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-[#5084C1] focus:border-[#5084C1]"
               placeholder="Ex: Diário, Semanal, Mensal">
           </div>
-        </div>
+          </td>
+        </tr>
 
-        <!-- Actions -->
-        <div class="flex justify-end space-x-3 mt-8 pt-6 border-t border-gray-200">
+      </tbody>
+    </table>
+
+    <!-- Botões -->
+    <div class="flex justify-end gap-3 mt-6 pt-4 border-t border-gray-200">
           <button
             type="button"
             (click)="voltar()"
-            class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+        class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-50 transition-colors">
             Cancelar
           </button>
 
           <button
             type="submit"
             [disabled]="alertaForm.invalid || carregando"
-            class="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed">
-            <span *ngIf="!carregando">{{ isEdicao ? 'Atualizar' : 'Criar' }} Alerta</span>
+        class="px-4 py-2 text-sm font-medium text-white bg-[#5084C1] border border-transparent rounded hover:bg-[#4071a8] transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+        <span *ngIf="!carregando">{{ isEdicao ? 'Atualizar' : 'Criar' }}</span>
             <span *ngIf="carregando" class="flex items-center">
               <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
@@ -320,6 +330,4 @@
           </button>
         </div>
       </form>
-    </div>
-  </div>
 </div>

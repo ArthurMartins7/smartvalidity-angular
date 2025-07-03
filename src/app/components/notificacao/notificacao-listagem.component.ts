@@ -323,8 +323,9 @@ export class NotificacaoListagemComponent implements OnInit, OnDestroy {
                 showConfirmButton: false
               });
             },
-            error: () => {
-              Swal.fire('Erro', 'Não foi possível excluir a notificação.', 'error');
+            error: (error) => {
+              const msg = error.error?.message || 'Não foi possível excluir a notificação.';
+              Swal.fire('Aviso', msg, 'warning');
             }
           });
       }

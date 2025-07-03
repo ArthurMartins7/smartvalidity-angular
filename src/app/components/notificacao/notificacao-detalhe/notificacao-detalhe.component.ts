@@ -179,7 +179,7 @@ export class NotificacaoDetalheComponent implements OnInit, OnDestroy {
               timer: 2000,
               showConfirmButton: false
             }).then(() => {
-              this.router.navigate(['/mural-listagem']);
+            this.router.navigate(['/mural-listagem']);
             });
           }
         },
@@ -235,8 +235,9 @@ export class NotificacaoDetalheComponent implements OnInit, OnDestroy {
               Swal.fire('Excluída!', 'Notificação removida com sucesso.', 'success');
               this.voltarParaLista();
             },
-            error: () => {
-              Swal.fire('Erro', 'Não foi possível excluir a notificação.', 'error');
+            error: (error) => {
+              const msg = error.error?.message || 'Não foi possível excluir a notificação.';
+              Swal.fire('Aviso', msg, 'warning');
             }
           });
       }

@@ -358,15 +358,15 @@ export class AlertaListagemComponent implements OnInit, OnDestroy {
     if (!alerta.ativo) {
       return 'alta'; // Alertas inativos têm prioridade alta
     }
-    
+
     if (alerta.tipo === TipoAlerta.VENCIMENTO_ATRASO) {
       return 'alta'; // Produtos em atraso têm alta prioridade
     }
-    
+
     if (alerta.tipo === TipoAlerta.VENCIMENTO_HOJE || alerta.tipo === TipoAlerta.VENCIMENTO_AMANHA) {
       return 'media'; // Produtos vencendo em breve têm média prioridade
     }
-    
+
     return 'normal';
   }
 
@@ -418,7 +418,8 @@ export class AlertaListagemComponent implements OnInit, OnDestroy {
           },
           error: (erro) => {
             console.error('Erro ao excluir alerta:', erro);
-            Swal.fire('Erro!', 'Não foi possível excluir o alerta.', 'error');
+            const msg = erro.error?.message || 'Não foi possível excluir o alerta.';
+            Swal.fire('Aviso', msg, 'warning');
           }
         });
       }

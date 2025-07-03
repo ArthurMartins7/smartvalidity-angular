@@ -1,11 +1,14 @@
-<!-- Cabeçalho -->
-<div class="flex items-center gap-2 mb-8">
-  <button (click)="voltar()" class="text-gray-600 hover:text-gray-800">
-    <i class="material-icons">arrow_back</i>
-  </button>
-  <div>
-    <div class="text-gray-500">{{ categoriaNome || 'Produto' }}</div>
-    <div class="text-2xl font-bold">Listagem</div>
+<!-- Header explicativo -->
+<div class="bg-gray-100 -mx-6 md:-mx-6 py-6 px-8 mb-10">
+  <div class="flex items-center gap-2">
+    <button (click)="voltar()" class="text-gray-600 hover:text-gray-800 flex items-center">
+      <i class="material-icons">arrow_back</i>
+    </button>
+    <div>
+      <div class="text-gray-500 text-base">{{ categoriaNome || 'Produtos' }}</div>
+      <div class="text-3xl font-bold">Gerenciar produtos</div>
+      <p class="text-gray-800 text-base mt-1 whitespace-nowrap">Aqui você pode listar, editar e excluir os produtos do sistema</p>
+    </div>
   </div>
 </div>
 
@@ -20,9 +23,9 @@
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
           </svg>
         </div>
-        <input 
-          type="text" 
-          placeholder="Pesquisar por código de barras..." 
+        <input
+          type="text"
+          placeholder="Pesquisar por código de barras..."
           class="w-full pl-12 pr-12 py-3 border rounded-full bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-200 text-lg"
           [(ngModel)]="filtroCodigoBarras"
           (ngModelChange)="onSearchInput()">
@@ -130,12 +133,12 @@
       </button>
 
       <button *ngIf="categoriaId" (click)="editarCategoria()" class="bg-white hover:bg-gray-50 text-gray-800 px-4 py-2 rounded-full flex items-center transition-all transform hover:scale-105 shadow-sm hover:shadow-md border border-gray-200">
-        <img src="/icons/edit.png" alt="Editar" class="w-5 h-5 mr-2">
+        <span class="material-icons text-base mr-2">edit</span>
         <span class="font-medium">Editar Categoria</span>
       </button>
 
       <button *ngIf="categoriaId" (click)="excluirCategoria()" class="bg-white hover:bg-gray-50 text-gray-800 px-4 py-2 rounded-full flex items-center transition-all transform hover:scale-105 shadow-sm hover:shadow-md border border-gray-200">
-        <img src="https://cdn-icons-png.flaticon.com/512/1214/1214428.png" alt="Excluir" class="w-5 h-5 mr-2">
+        <span class="material-icons text-base mr-2 text-red-600">delete</span>
         <span class="font-medium">Excluir Categoria</span>
       </button>
     </div>
@@ -188,15 +191,15 @@
               </span>
             </td>
             <td class="border border-gray-300 p-2">
-              <div class="flex justify-center space-x-4">
-                <button (click)="irParaEntradaEstoque(produto)" class="text-gray-600 hover:text-blue-500 flex items-center gap-1" title="Entrada de estoque">
-                  <i class="material-icons text-gray-600" style="cursor: pointer;">inventory</i>
+              <div class="flex justify-center gap-3">
+                <button (click)="irParaEntradaEstoque(produto)" class="w-9 h-9 flex items-center justify-center border border-gray-300 rounded text-gray-700 hover:text-gray-900 hover:bg-gray-100 transition" title="Entrada de estoque">
+                  <span class="material-icons text-base">inventory</span>
                 </button>
-                <button (click)="editar(produto)" class="text-gray-600 hover:text-blue-500 flex items-center gap-1" title="Editar produto">
-                  <img src="/icons/edit.png" alt="Editar" class="w-5 h-5">
+                <button (click)="editar(produto)" class="w-9 h-9 flex items-center justify-center border border-gray-300 rounded text-gray-700 hover:text-gray-900 hover:bg-gray-100 transition" title="Editar produto">
+                  <span class="material-icons text-base">edit</span>
                 </button>
-                <button (click)="excluir(produto)" class="text-gray-600 hover:text-red-500 flex items-center gap-1" title="Excluir produto">
-                  <img src="https://cdn-icons-png.flaticon.com/512/1214/1214428.png" alt="Excluir" class="w-5 h-5">
+                <button (click)="excluir(produto)" class="w-9 h-9 flex items-center justify-center border border-gray-300 rounded text-red-600 hover:text-red-800 hover:bg-gray-100 transition" title="Excluir produto">
+                  <span class="material-icons text-base">delete</span>
                 </button>
               </div>
             </td>
@@ -206,31 +209,23 @@
     </div>
 
     <!-- Controles de Paginação -->
-    <div class="mt-4 flex justify-between items-center">
-      <!-- Botões de navegação -->
-      <div class="flex space-x-4">
-        <button
-          (click)="voltarPagina()"
-          [disabled]="seletor.pagina === 1"
-          class="px-4 py-2 bg-gray-200 text-gray-600 rounded-lg hover:bg-gray-300 disabled:opacity-50">
-          Anterior
-        </button>
-        <button
-          (click)="avancarPagina()"
-          [disabled]="seletor.pagina === totalPaginas"
-          class="px-4 py-2 bg-gray-200 text-gray-600 rounded-lg hover:bg-gray-300 disabled:opacity-50">
-          Próxima
-        </button>
+    <div class="flex items-center justify-between mt-4">
+      <!-- Seletor de itens por página -->
+      <div class="flex items-center gap-2">
+        <span class="text-gray-700">Itens por página:</span>
+        <select class="border rounded w-12 h-7 text-center text-sm" [(ngModel)]="itensPorPagina" (change)="alterarItensPorPagina()">
+          <option *ngFor="let opcao of opcoesItensPorPagina" [value]="opcao">{{ opcao }}</option>
+        </select>
       </div>
 
-      <!-- Páginas -->
-      <div class="flex space-x-2">
-        <button
-          *ngFor="let pagina of criarArrayPaginas()"
-          (click)="irParaPagina(pagina)"
-          [class.bg-blue-500]="pagina === seletor.pagina"
-          class="px-4 py-2 rounded-lg text-white hover:bg-blue-600">
-          {{ pagina }}
+      <!-- Navegação de páginas -->
+      <div class="flex items-center gap-2">
+        <button (click)="voltarPagina()" [disabled]="seletor.pagina === 1" class="w-8 h-8 flex items-center justify-center rounded bg-gray-200 disabled:opacity-50">
+          <span class="material-icons text-sm">chevron_left</span>
+        </button>
+        <span class="w-8 h-8 flex items-center justify-center rounded bg-[#5084C1] text-white select-none">{{ seletor.pagina }}</span>
+        <button (click)="avancarPagina()" [disabled]="seletor.pagina === totalPaginas" class="w-8 h-8 flex items-center justify-center rounded bg-gray-200 disabled:opacity-50">
+          <span class="material-icons text-sm">chevron_right</span>
         </button>
       </div>
     </div>

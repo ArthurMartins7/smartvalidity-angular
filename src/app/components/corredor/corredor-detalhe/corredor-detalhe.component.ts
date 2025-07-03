@@ -9,6 +9,7 @@ import { Usuario } from '../../../shared/model/entity/usuario.model';
 import { CommonModule } from '@angular/common';
 import { catchError, throwError } from 'rxjs';
 import { HttpErrorResponse } from '@angular/common/http';
+import { Location } from '@angular/common';
 
 @Component({
   selector: 'app-corredor-detalhe',
@@ -30,7 +31,8 @@ export class CorredorDetalheComponent implements OnInit {
     private corredorService: CorredorService,
     private usuarioService: UsuarioService,
     private router: Router,
-    private activatedRoute: ActivatedRoute
+    private activatedRoute: ActivatedRoute,
+    private location: Location
   ) { }
 
   ngOnInit(): void {
@@ -83,8 +85,21 @@ export class CorredorDetalheComponent implements OnInit {
   }
 
   public adicionarResponsavel(): void {
-    if (this.responsavelSelecionado && !this.corredor.responsaveis.some(r => r.id === this.responsavelSelecionado!.id)) {
-      this.corredor.responsaveis.push(this.responsavelSelecionado);
+    if (
+      this.responsavelSelecionado &&
+      !this.corredor.responsaveis.some(r => r.id === this.responsavelSelecionado!.id)
+    ) {
+      // Cria um clone limpo, sem authorities e campos do Spring Security
+      const responsavelLimpo: Usuario = {
+        id: this.responsavelSelecionado.id,
+        nome: this.responsavelSelecionado.nome,
+        email: this.responsavelSelecionado.email,
+        perfilAcesso: this.responsavelSelecionado.perfilAcesso,
+        senha: this.responsavelSelecionado.senha,
+        cargo: this.responsavelSelecionado.cargo,
+        empresa: this.responsavelSelecionado.empresa
+      };
+      this.corredor.responsaveis.push(responsavelLimpo);
       this.responsavelSelecionado = null;
     }
   }
@@ -99,20 +114,7 @@ export class CorredorDetalheComponent implements OnInit {
       return;
     }
 
-    // Limpa os campos do Spring Security do responsável
-    const responsavelLimpo: Usuario = {
-      id: this.responsavelSelecionado!.id,
-      perfilAcesso: this.responsavelSelecionado!.perfilAcesso,
-      //cpf: this.responsavelSelecionado.cpf,
-      nome: this.responsavelSelecionado!.nome,
-      email: this.responsavelSelecionado!.email,
-      senha: this.responsavelSelecionado!.senha,
-      cargo: this.responsavelSelecionado!.cargo,
-      empresa: this.responsavelSelecionado!.empresa
-    };
-
-    this.corredor.responsaveis = [responsavelLimpo];
-
+    // Não sobrescreve os responsáveis, apenas salva o corredor com os responsáveis já adicionados
     if (this.idCorredor) {
       this.atualizar();
     } else {
@@ -167,6 +169,6 @@ export class CorredorDetalheComponent implements OnInit {
   }
 
   public voltar(): void {
-    this.router.navigate(['corredor']);
+    this.location.back();
   }
 }

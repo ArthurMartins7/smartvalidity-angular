@@ -5,6 +5,8 @@ import { Empresa } from '../../../../../shared/model/entity/empresa';
 import { Usuario } from '../../../../../shared/model/entity/usuario.model';
 import { CommonModule } from '@angular/common';
 import { HeaderPasswordRecoveryComponent } from '../../../../../shared/ui/headers/header-password-recovery/header-password-recovery.component';
+import { AuthenticationService } from '../../../services/auth.service';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-password-recovery-codigo-verificacao',
@@ -31,43 +33,63 @@ export class PasswordRecoveryCodigoVerificacaoComponent {
   public emailDestino: string = '';
 
   private router = inject(Router);
+  private authenticationService = inject(AuthenticationService);
 
   constructor() {
     // Tenta recuperar o e-mail salvo na etapa 1
-    const usuarioJson = sessionStorage.getItem('signup_usuario');
-    if (usuarioJson) {
-      try {
-        const usuario = JSON.parse(usuarioJson);
-        this.emailDestino = usuario.email || '';
-      } catch (_) {}
+    const email = sessionStorage.getItem('password_recovery_email');
+    if (email) {
+      this.emailDestino = email;
     }
   }
 
   /**
    * Finaliza criação da conta após validar código
    */
-  public criarConta(): void {
+  public confirmarCodigo(): void {
     if (this.codigo.length !== 6) {
-      alert('Informe o código de 6 dígitos.');
+      Swal.fire({
+        icon: 'warning',
+        title: 'Atenção',
+        text: 'Informe o código de 6 dígitos.',
+        confirmButtonColor: '#5084C1'
+      });
       return;
     }
 
-    // Aqui você validaria o código com o backend.
-    alert('Conta criada com sucesso!');
-
-    this.router.navigate(['password-recovery-alterar-senha']);
+    this.authenticationService.validarOtpRecuperacao(this.emailDestino, this.codigo).subscribe({
+      next: () => {
+        sessionStorage.setItem('password_recovery_token', this.codigo);
+        this.router.navigate(['password-recovery-alterar-senha']);
+      },
+      error: (err) => {
+        const mensagem = err?.error || 'Código inválido ou expirado';
+        Swal.fire({
+          icon: 'error',
+          title: 'Erro',
+          text: mensagem,
+          confirmButtonColor: '#5084C1'
+        });
+      }
+    });
   }
 
   /**
    * Retorna para a etapa anterior (informações pessoais)
    */
   public voltar(): void {
-    this.router.navigate(['signup-senha']);
+    this.router.navigate(['password-recovery-validar-identidade']);
   }
 
   // Reenvia o código para o e-mail do usuário
   public reenviarCodigo(): void {
-    alert('Novo código enviado para ' + this.emailDestino);
+    this.authenticationService.solicitarOtpRecuperacao(this.emailDestino).subscribe({
+      next: () => Swal.fire({ icon: 'success', title: 'Sucesso', text: 'Código enviado', confirmButtonColor: '#5084C1' }),
+      error: (err) => {
+        const mensagem = err?.error || 'Não foi possível enviar o código.';
+        Swal.fire({ icon: 'error', title: 'Erro', text: mensagem, confirmButtonColor: '#5084C1' });
+      }
+    });
   }
 
 }

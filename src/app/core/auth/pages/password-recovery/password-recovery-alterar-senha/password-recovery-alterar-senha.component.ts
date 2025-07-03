@@ -5,6 +5,8 @@ import { Empresa } from '../../../../../shared/model/entity/empresa';
 import { Usuario } from '../../../../../shared/model/entity/usuario.model';
 import { CommonModule } from '@angular/common';
 import { HeaderPasswordRecoveryComponent } from '../../../../../shared/ui/headers/header-password-recovery/header-password-recovery.component';
+import { AuthenticationService } from '../../../services/auth.service';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-password-recovery-alterar-senha',
@@ -33,30 +35,49 @@ export class PasswordRecoveryAlterarSenhaComponent {
   public showConfirmarSenha: boolean = false;
 
   private router = inject(Router);
+  private authenticationService = inject(AuthenticationService);
+
+  private email: string = '';
+  private token: string = '';
+
+  constructor() {
+    const storedEmail = sessionStorage.getItem('password_recovery_email');
+    const storedToken = sessionStorage.getItem('password_recovery_token');
+    if (storedEmail) this.email = storedEmail;
+    if (storedToken) this.token = storedToken;
+  }
 
   /**
    * Avança para a próxima etapa do cadastro.
    * Por enquanto apenas persiste as informações no sessionStorage
    * e redireciona para a etapa de criação de senha.
    */
-  public avancar(): void {
-
+  public criarNovaSenha(): void {
     if (this.senha !== this.confirmarSenha) {
-      alert('As senhas não coincidem.');
+      Swal.fire({ icon: 'warning', title: 'Atenção', text: 'As senhas não coincidem.', confirmButtonColor: '#5084C1' });
       return;
     }
 
-    // Persistir a senha (exemplo) e navegar para verificação
-    sessionStorage.setItem('signup_senha', this.senha);
-
-    this.router.navigate(['signup-verificacao']);
+    this.authenticationService.redefinirSenha(this.email, this.token, this.senha).subscribe({
+      next: () => {
+        Swal.fire({ icon: 'success', title: 'Sucesso', text: 'Senha redefinida com sucesso', confirmButtonColor: '#5084C1' });
+        // limpar session storage
+        sessionStorage.removeItem('password_recovery_email');
+        sessionStorage.removeItem('password_recovery_token');
+        this.router.navigate(['']);
+      },
+      error: (err) => {
+        const mensagem = err?.error || 'Não foi possível redefinir a senha.';
+        Swal.fire({ icon: 'error', title: 'Erro', text: mensagem, confirmButtonColor: '#5084C1' });
+      }
+    });
   }
 
   /**
    * Retorna para a etapa anterior (informações pessoais)
    */
   public voltar(): void {
-    this.router.navigate(['']);
+    this.router.navigate(['password-recovery-codigo-verificacao']);
   }
 
   public toggleShowSenha(): void {

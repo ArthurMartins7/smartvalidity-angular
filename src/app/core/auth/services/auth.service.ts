@@ -58,4 +58,19 @@ export class AuthenticationService {
     const payload = { email };
     return this.httpClient.post<void>(this.API + '/enviar-otp-email', payload);
   }
+
+  /* Passo 1 – Solicitar OTP de recuperação (Esqueceu Senha) */
+  public solicitarOtpRecuperacao(email: string): Observable<void> {
+    return this.httpClient.post<void>(this.API + '/enviar-otp-esqueceu-senha', { email });
+  }
+
+  /* Passo 2 – Validar OTP recebido */
+  public validarOtpRecuperacao(email: string, token: string): Observable<void> {
+    return this.httpClient.post<void>(this.API + '/validar-otp-esqueceu-senha', { email, token });
+  }
+
+  /* Passo 3 – Redefinir senha */
+  public redefinirSenha(email: string, token: string, novaSenha: string): Observable<void> {
+    return this.httpClient.post<void>(this.API + '/resetar-senha', { email, token, novaSenha });
+  }
 }

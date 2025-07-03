@@ -29,7 +29,12 @@ export class SigninComponent {
     localStorage.removeItem('tokenUsuarioAutenticado');
     this.authenticationService.authenticate(this.usuario).subscribe({
       next: (jwt) => {
-        Swal.fire('Sucesso', 'Usuário autenticado com sucesso', 'success');
+        Swal.fire({
+          icon: 'success',
+          title: 'Sucesso',
+          text: 'Usuário autenticado com sucesso',
+          confirmButtonColor: '#5084C1'
+        });
         let token: string = jwt.body + '';
         localStorage.setItem('tokenUsuarioAutenticado', token);
 
@@ -37,14 +42,20 @@ export class SigninComponent {
         this.buscarPerfilUsuario();
       },
       error: (erro) => {
-        var mensagem: string;
+        let mensagem: string;
+        console.log('erro: ', erro);
         if (erro.status == 401) {
           mensagem = 'Usuário ou senha inválidos, tente novamente';
         } else {
           mensagem = erro.error;
         }
 
-        Swal.fire('Erro', mensagem, 'error');
+        Swal.fire({
+          icon: 'error',
+          title: 'Erro',
+          text: mensagem,
+          confirmButtonColor: '#5084C1'
+        });
       },
     });
   }

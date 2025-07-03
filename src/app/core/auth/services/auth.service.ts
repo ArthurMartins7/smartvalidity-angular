@@ -48,4 +48,14 @@ export class AuthenticationService {
   public registrarEmpresa(dto: EmpresaUsuarioDto): Observable<Empresa> {
     return this.httpClient.post<Empresa>(this.API + '/registrar-empresa', dto);
   }
+
+  /**
+   * Solicita o envio de um código OTP para o e-mail informado.
+   * O backend responde 204 (No Content) em caso de sucesso.
+   * @param email e-mail do usuário que receberá o código
+   */
+  public enviarOtpEmail(email: string): Observable<void> {
+    const payload = { email };
+    return this.httpClient.post<void>(this.API + '/enviar-otp-email', payload);
+  }
 }

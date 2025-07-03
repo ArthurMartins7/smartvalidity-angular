@@ -3,6 +3,7 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Empresa } from '../../../../../shared/model/entity/empresa';
 import { Usuario } from '../../../../../shared/model/entity/usuario.model';
+import { AuthenticationService } from '../../../services/auth.service';
 import { HeaderAuthComponent } from "../../../../../shared/ui/headers/header-auth/header-auth.component";
 
 
@@ -35,6 +36,7 @@ export class SignupVerificacaoComponent {
   public emailDestino: string = '';
 
   private router = inject(Router);
+  private authenticationService = inject(AuthenticationService);
 
   constructor() {
     // Tenta recuperar o e-mail salvo na etapa 1
@@ -80,12 +82,31 @@ export class SignupVerificacaoComponent {
     this.showConfirmarSenha = !this.showConfirmarSenha;
   }
 
-  // Envia código de verificação e navega para próxima etapa
+  /**
+   * Solicita o envio do código de verificação para o e-mail informado
+   * e navega para a próxima etapa em caso de sucesso.
+   */
   public receberCodigo(): void {
-    // Aqui poderia chamar serviço para enviar e-mail
-    alert('Código enviado para ' + this.emailDestino);
+    if (!this.emailDestino) {
+      alert('E-mail não informado. Volte e preencha os dados novamente.');
+      return;
+    }
 
-    this.router.navigate(['signup-validar-identidade']);
+    this.authenticationService.enviarOtpEmail(this.emailDestino).subscribe({
+      next: () => {
+        alert('Código enviado');
+        // Persistir a senha (caso ainda não esteja) e navegar para validar identidade
+        if (this.senha && !sessionStorage.getItem('signup_senha')) {
+          sessionStorage.setItem('signup_senha', this.senha);
+        }
+        this.router.navigate(['signup-validar-identidade']);
+      },
+      error: (err) => {
+        // Backend pode retornar mensagem de e-mail já cadastrado ou outra 4xx
+        const mensagem = err?.error || 'Não foi possível enviar o código. Verifique os dados e tente novamente.';
+        alert(mensagem);
+      }
+    });
   }
 
 }

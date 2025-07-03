@@ -73,7 +73,8 @@ export class SignupValidarIdentidadeComponent {
       nomeUsuario: usuarioObj.nome,
       email: usuarioObj.email,
       senha: senha,
-      cargo: usuarioObj.cargo
+      cargo: usuarioObj.cargo,
+      token: this.codigo
     } as EmpresaUsuarioDto;
 
     // Chamar backend para registrar empresa e usuário assinante
@@ -88,7 +89,8 @@ export class SignupValidarIdentidadeComponent {
       },
       error: (erro) => {
         console.error('Erro ao criar conta:', erro);
-        alert(erro.error || 'Houve um problema ao criar a conta. Tente novamente.');
+        const mensagem = erro?.error || 'Código inválido ou expirado';
+        alert(mensagem);
       }
     });
   }
@@ -102,7 +104,18 @@ export class SignupValidarIdentidadeComponent {
 
   // Reenvia o código para o e-mail do usuário
   public reenviarCodigo(): void {
-    alert('Novo código enviado para ' + this.emailDestino);
+    if (!this.emailDestino) {
+      alert('E-mail não informado.');
+      return;
+    }
+
+    this.authenticationService.enviarOtpEmail(this.emailDestino).subscribe({
+      next: () => alert('Código enviado'),
+      error: (err) => {
+        const mensagem = err?.error || 'Não foi possível enviar o código.';
+        alert(mensagem);
+      }
+    });
   }
 
 }

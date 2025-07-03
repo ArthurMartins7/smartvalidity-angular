@@ -60,7 +60,7 @@
       <div
         *ngFor="let notificacao of notificacoesFiltradas | slice:(paginaAtual-1)*itensPorPagina:(paginaAtual*itensPorPagina); trackBy: trackByNotificacao"
         class="bg-white rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow"
-        [class.opacity-60]="notificacao.lida"
+        [class.opacity-80]="notificacao.lida"
         [class.border-l-4]="!notificacao.lida"
         [class.border-l-blue-500]="!notificacao.lida">
 
@@ -110,24 +110,24 @@
             </div>
 
             <!-- Ações -->
-            <div class="flex items-start gap-2 ml-4">
+            <div class="flex items-center gap-2 ml-4">
+              <!-- Indicador de lida -->
+              <div
+                *ngIf="notificacao.lida"
+                class="inline-flex items-center h-9 px-3 bg-green-100 text-green-700 rounded-lg text-sm font-medium border border-green-200">
+                <span class="material-icons text-base mr-1">check</span>
+                Lida
+              </div>
+
               <!-- Botão Marcar como lida (apenas para não lidas) -->
               <button
                 *ngIf="!notificacao.lida"
                 (click)="marcarComoLida(notificacao)"
-                class="bg-gray-100 text-gray-700 px-3 py-2 rounded-lg hover:bg-gray-200 transition-colors text-sm font-medium flex items-center"
+                class="inline-flex items-center h-9 px-3 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors text-sm font-medium"
                 title="Marcar como lida">
                 <span class="material-icons text-base mr-1">check</span>
                 Marcar como lida
               </button>
-
-              <!-- Indicador de lida -->
-              <div
-                *ngIf="notificacao.lida"
-                class="bg-green-100 text-green-700 px-3 py-2 rounded-lg text-sm font-medium flex items-center border border-green-200">
-                <span class="material-icons text-base mr-1">check</span>
-                Lida
-              </div>
 
               <!-- Botão Ver Detalhes -->
               <button

@@ -219,3 +219,206 @@
 * {
   transition: all 0.2s ease-in-out;
 }
+
+/* Material Icons styling */
+.material-icons {
+  vertical-align: middle;
+  font-size: 20px;
+  width: 20px;
+  height: 20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.material-icons.text-sm {
+  font-size: 16px;
+  width: 16px;
+  height: 16px;
+}
+
+.material-icons.text-4xl {
+  font-size: 36px;
+  width: 36px;
+  height: 36px;
+}
+
+.material-icons.text-5xl {
+  font-size: 48px;
+  width: 48px;
+  height: 48px;
+}
+
+/* Animação específica para o ícone de loading */
+.material-icons.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Ajuste de alinhamento para ícones em botões */
+button .material-icons {
+  margin-top: -2px;
+}
+
+/* Estilos gerais */
+.material-icons {
+  vertical-align: middle;
+  font-size: 20px;
+  width: 20px;
+  height: 20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.material-icons.text-sm {
+  font-size: 16px;
+  width: 16px;
+  height: 16px;
+}
+
+.material-icons.text-4xl {
+  font-size: 36px;
+  width: 36px;
+  height: 36px;
+}
+
+/* Animações */
+@keyframes slideInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Cards */
+.card {
+  transition: all 0.2s ease-in-out;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+/* Status badges */
+.status-badge {
+  transition: all 0.2s ease-in-out;
+}
+
+.status-badge:hover {
+  transform: translateY(-1px);
+}
+
+/* Botões */
+button {
+  transition: all 0.2s ease-in-out;
+}
+
+button:hover {
+  transform: translateY(-1px);
+}
+
+button:active {
+  transform: translateY(0);
+}
+
+/* Cores personalizadas */
+.primary-color {
+  color: #5084C1;
+}
+
+.primary-bg {
+  background-color: #5084C1;
+}
+
+.primary-border {
+  border-color: #5084C1;
+}
+
+.primary-hover:hover {
+  background-color: #3d6ba3;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+
+  .flex-wrap {
+    flex-wrap: wrap;
+  }
+
+  button {
+    width: 100%;
+    margin-bottom: 0.5rem;
+  }
+
+  .action-buttons {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+}
+
+/* Efeitos de hover nos cards */
+.rounded-lg {
+  transition: all 0.2s ease-in-out;
+}
+
+.rounded-lg:hover {
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+/* Ajustes de espaçamento para ícones em botões */
+button .material-icons {
+  margin-top: -2px;
+}
+
+/* Gradientes e cores de fundo */
+.bg-gradient {
+  background: linear-gradient(to right, #5084C1, #3d6ba3);
+}
+
+.bg-hover:hover {
+  background-color: rgba(80, 132, 193, 0.1);
+}
+
+/* Sombras suaves */
+.shadow-soft {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.shadow-soft:hover {
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Transições suaves */
+* {
+  transition: all 0.2s ease-in-out;
+}

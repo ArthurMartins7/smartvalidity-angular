@@ -166,4 +166,11 @@ export class AlertaDetalheComponent implements OnInit, OnDestroy {
   public podeEditar(): boolean {
     return this.alerta?.tipo === TipoAlerta.PERSONALIZADO;
   }
+
+  /**
+   * Navegar para a página de detalhes do item no mural
+   */
+  public visualizarItem(itemId: string): void {
+    this.router.navigate(['/mural-detalhe', itemId]);
+  }
 }

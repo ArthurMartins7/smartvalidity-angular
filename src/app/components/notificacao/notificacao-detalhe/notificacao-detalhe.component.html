@@ -1,11 +1,9 @@
-<!-- Cabeçalho padrão do sistema -->
+<!-- Cabeçalho unificado -->
 <div class="bg-gray-100 -mx-6 md:-mx-6 py-6 mb-10">
   <div class="flex items-center gap-2 px-6">
-    <!-- Ícone seta - clicável para voltar -->
+    <!-- Botão voltar -->
     <button (click)="voltarParaLista()" class="p-1 hover:bg-gray-200 rounded transition-colors">
-      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6 text-gray-600">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
-      </svg>
+      <span class="material-icons text-gray-600">keyboard_arrow_left</span>
     </button>
 
     <!-- Títulos -->
@@ -17,211 +15,172 @@
   </div>
 </div>
 
-<div class="min-h-screen bg-gray-50 p-6">
-  <div class="max-w-4xl mx-auto">
+<!-- Loading State -->
+<div *ngIf="carregando" class="flex justify-center items-center py-10">
+  <span class="material-icons animate-spin text-4xl" style="color: #5084C1;">refresh</span>
+</div>
 
-    <!-- Loading State -->
-    <div *ngIf="carregando" class="bg-white rounded-lg shadow-sm border border-gray-200 p-12 text-center">
-      <div class="animate-spin rounded-full h-12 w-12 border-b-2 mx-auto mb-4" style="border-bottom-color: #5084C1;"></div>
-      <p class="text-gray-500">Carregando detalhes da notificação...</p>
+<!-- Error State -->
+<div *ngIf="erro && !carregando" class="bg-red-100 border-l-4 border-red-500 text-red-700 px-4 py-3 rounded mb-4 mx-6">
+  <div class="flex items-center">
+    <span class="material-icons mr-2">error_outline</span>
+    <p>{{ erro }}</p>
+  </div>
+</div>
+
+<!-- Card principal -->
+<div *ngIf="notificacao && !carregando" class="bg-white rounded-lg shadow-md overflow-hidden mx-6">
+  <!-- Cabeçalho do card -->
+  <div class="p-6 bg-gray-50 border-b border-gray-200">
+    <div class="flex items-start justify-between">
+      <div>
+        <h1 class="text-2xl font-bold text-gray-800 mb-2">{{ removerEmojis(notificacao.titulo) }}</h1>
+      </div>
+    </div>
+  </div>
+
+  <!-- Conteúdo -->
+  <div class="p-6 space-y-6">
+    <!-- Card Descrição -->
+    <div class="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200 px-6 py-4 border-l-4 border-emerald-400">
+      <div class="flex items-center gap-3 mb-4">
+        <div class="p-2 rounded-full bg-emerald-100">
+          <span class="material-icons text-emerald-600">description</span>
+        </div>
+        <h3 class="text-lg font-semibold text-gray-800">Descrição</h3>
+      </div>
+      <p class="text-gray-700 leading-relaxed">{{ notificacao.descricao }}</p>
     </div>
 
-    <!-- Error State -->
-    <div *ngIf="erro && !carregando" class="bg-white rounded-lg shadow-sm border border-gray-200 p-12 text-center">
-      <div class="text-red-600 mb-4">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.732-.833-2.5 0L4.268 18.5c-.77.833.192 2.5 1.732 2.5z" />
-        </svg>
+    <!-- Grid de Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <!-- Card Informações de Tempo -->
+      <div class="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200 px-6 py-4 border-l-4 border-purple-400">
+        <div class="flex items-center gap-3 mb-4">
+          <div class="p-2 rounded-full bg-purple-100">
+            <span class="material-icons text-purple-600">schedule</span>
+          </div>
+          <h3 class="text-lg font-semibold text-gray-800">Informações de Tempo</h3>
+        </div>
+        <div class="space-y-4">
+          <div class="flex justify-between items-center">
+            <span class="text-base font-medium text-gray-600">Criada</span>
+            <div class="text-right">
+              <div class="text-lg text-gray-800">{{ formatarDataHora(notificacao.dataCriacao!) }}</div>
+              <div class="text-sm text-gray-500">{{ obterTempoRelativo(notificacao.dataCriacao!) }}</div>
+            </div>
+          </div>
+          <div *ngIf="notificacao.dataHoraDisparo" class="flex justify-between items-center">
+            <span class="text-base font-medium text-gray-600">Disparo programado</span>
+            <div class="text-lg text-gray-800">{{ formatarDataHora(notificacao.dataHoraDisparo) }}</div>
+          </div>
+        </div>
       </div>
-      <h3 class="text-lg font-medium text-gray-900 mb-2">Erro</h3>
-      <p class="text-gray-500 mb-4">{{ erro }}</p>
+
+      <!-- Card Informações Adicionais -->
+      <div class="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200 px-6 py-4 border-l-4 border-amber-400">
+        <div class="flex items-center gap-3 mb-4">
+          <div class="p-2 rounded-full bg-amber-100">
+            <span class="material-icons text-amber-600">info</span>
+          </div>
+          <h3 class="text-lg font-semibold text-gray-800">Informações Adicionais</h3>
+        </div>
+        <div class="space-y-4">
+          <div class="flex justify-between items-center">
+            <span class="text-base font-medium text-gray-600">Status de Leitura</span>
+            <span class="inline-flex items-center text-lg text-gray-800">
+              <span class="material-icons text-sm mr-2" [class.text-green-600]="notificacao.lida" [class.text-yellow-600]="!notificacao.lida">
+                {{ notificacao.lida ? 'check_circle' : 'schedule' }}
+              </span>
+              {{ notificacao.lida ? 'Lida' : 'Não lida' }}
+            </span>
+          </div>
+          <div class="flex justify-between items-center">
+            <span class="text-base font-medium text-gray-600">Status</span>
+            <span class="text-lg text-gray-800">{{ notificacao.ativo ? 'Ativo' : 'Inativo' }}</span>
+          </div>
+          <div *ngIf="notificacao.recorrente" class="flex justify-between items-center">
+            <span class="text-base font-medium text-gray-600">Recorrente</span>
+            <span class="text-lg text-gray-800">Sim</span>
+          </div>
+          <div *ngIf="notificacao.diasAntecedencia" class="flex justify-between items-center">
+            <span class="text-base font-medium text-gray-600">Dias antecedência</span>
+            <span class="text-lg text-gray-800">{{ notificacao.diasAntecedencia }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card Produtos Relacionados -->
+    <div *ngIf="notificacao.produtosAlerta && notificacao.produtosAlerta.length > 0"
+         class="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200 px-6 py-4 border-l-4 border-green-400">
+      <div class="flex items-center gap-3 mb-4">
+        <div class="p-2 rounded-full bg-green-100">
+          <span class="material-icons text-green-600">inventory_2</span>
+        </div>
+        <h3 class="text-lg font-semibold text-gray-800">Produtos Relacionados</h3>
+      </div>
+      <div class="flex flex-wrap gap-2">
+        <span *ngFor="let produto of notificacao.produtosAlerta"
+              class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800 border border-green-200">
+          {{ produto }}
+        </span>
+      </div>
+    </div>
+
+    <!-- Card Criador -->
+    <div *ngIf="notificacao.usuarioCriador"
+         class="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200 px-6 py-4 border-l-4 border-orange-400">
+      <div class="flex items-center gap-3 mb-4">
+        <div class="p-2 rounded-full bg-orange-100">
+          <span class="material-icons text-orange-600">person</span>
+        </div>
+        <h3 class="text-lg font-semibold text-gray-800">Criado por</h3>
+      </div>
+      <span class="text-lg text-gray-800">{{ notificacao.usuarioCriador }}</span>
+    </div>
+  </div>
+
+  <!-- Ações -->
+  <div class="bg-gray-50 px-6 py-4 border-t border-gray-200">
+    <div class="flex items-center justify-between">
       <button
         (click)="voltarParaLista()"
-        class="text-white px-4 py-2 rounded-lg transition-colors"
-        style="background-color: #5084C1;"
-        onmouseover="this.style.backgroundColor='#3d6ba3'"
-        onmouseout="this.style.backgroundColor='#5084C1'">
-        Voltar para Notificações
+        class="bg-gray-100 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-200 transition-colors font-medium">
+        <span class="material-icons text-sm mr-2 align-text-bottom">keyboard_arrow_left</span>
+        Voltar para Lista
       </button>
-    </div>
 
-    <!-- Notification Detail -->
-    <div *ngIf="notificacao && !carregando" class="space-y-6">
+      <div class="flex gap-3">
+        <!-- Botão Marcar como Lida -->
+        <button
+          *ngIf="!notificacao.lida"
+          (click)="marcarComoLida()"
+          class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors font-medium">
+          <span class="material-icons text-sm mr-2 align-text-bottom">check</span>
+          Marcar como Lida
+        </button>
 
-      <!-- Main Card -->
-      <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+        <!-- Botão Visualizar Item -->
+        <button
+          *ngIf="podeVisualizarItem()"
+          (click)="visualizarItem()"
+          class="text-white px-4 py-2 rounded-lg transition-colors font-medium"
+          style="background-color: #5084C1;"
+          onmouseover="this.style.backgroundColor='#3d6ba3'"
+          onmouseout="this.style.backgroundColor='#5084C1'">
+          <span class="material-icons text-sm mr-2 align-text-bottom">visibility</span>
+          Visualizar Item
+        </button>
 
-        <!-- Header -->
-        <div class="p-6 text-white" style="background: linear-gradient(to right, #5084C1, #3d6ba3);">
-          <div class="flex items-start justify-between">
-            <div class="flex items-center gap-4">
-              <div>
-                <h1 class="text-2xl font-bold mb-2">{{ removerEmojis(notificacao.titulo) }}</h1>
-              </div>
-            </div>
-
-            <!-- Status Badge -->
-            <div class="text-right">
-              <span *ngIf="notificacao.lida"
-                    class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800 border border-green-200">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                </svg>
-                Lida
-              </span>
-              <span *ngIf="!notificacao.lida"
-                    class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-yellow-100 text-yellow-800 border border-yellow-200">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                Não lida
-              </span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Content -->
-        <div class="p-6">
-
-          <!-- Description -->
-          <div class="mb-6">
-            <h3 class="text-lg font-semibold text-gray-900 mb-3">Descrição</h3>
-            <p class="text-gray-700 leading-relaxed text-base">{{ notificacao.descricao }}</p>
-          </div>
-
-          <!-- Details Grid -->
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-
-            <!-- Timing Information -->
-            <div class="bg-gray-50 rounded-lg p-4">
-              <h4 class="font-semibold text-gray-900 mb-3 flex items-center">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="color: #5084C1;">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                Informações de Tempo
-              </h4>
-              <div class="space-y-2 text-sm">
-                <div class="flex justify-between">
-                  <span class="text-gray-600">Criada:</span>
-                  <span class="font-medium">{{ formatarDataHora(notificacao.dataCriacao!) }}</span>
-                </div>
-                <div class="flex justify-between">
-                  <span class="text-gray-600">Tempo decorrido:</span>
-                  <span class="font-medium">{{ obterTempoRelativo(notificacao.dataCriacao!) }}</span>
-                </div>
-                <div *ngIf="notificacao.dataHoraDisparo" class="flex justify-between">
-                  <span class="text-gray-600">Disparo programado:</span>
-                  <span class="font-medium">{{ formatarDataHora(notificacao.dataHoraDisparo) }}</span>
-                </div>
-              </div>
-            </div>
-
-            <!-- Additional Information -->
-            <div class="bg-gray-50 rounded-lg p-4">
-              <h4 class="font-semibold text-gray-900 mb-3 flex items-center">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="color: #5084C1;">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                Informações Adicionais
-              </h4>
-              <div class="space-y-2 text-sm">
-                <div class="flex justify-between">
-                  <span class="text-gray-600">Status:</span>
-                  <span class="font-medium">{{ notificacao.ativo ? 'Ativo' : 'Inativo' }}</span>
-                </div>
-                <div *ngIf="notificacao.recorrente" class="flex justify-between">
-                  <span class="text-gray-600">Recorrente:</span>
-                  <span class="font-medium">Sim</span>
-                </div>
-                <div *ngIf="notificacao.diasAntecedencia" class="flex justify-between">
-                  <span class="text-gray-600">Dias antecedência:</span>
-                  <span class="font-medium">{{ notificacao.diasAntecedencia }}</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Related Information -->
-          <div *ngIf="notificacao.produtosAlerta && notificacao.produtosAlerta.length > 0" class="mb-6">
-            <h4 class="font-semibold text-gray-900 mb-3 flex items-center">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="color: #5084C1;">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-              </svg>
-              Produtos Relacionados
-            </h4>
-            <div class="rounded-lg p-4" style="background-color: rgba(80, 132, 193, 0.1);">
-              <div class="flex flex-wrap gap-2">
-                <span *ngFor="let produto of notificacao.produtosAlerta"
-                      class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium border"
-                      style="background-color: rgba(80, 132, 193, 0.2); color: #5084C1; border-color: rgba(80, 132, 193, 0.3);">
-                  {{ produto }}
-                </span>
-              </div>
-            </div>
-          </div>
-
-          <div *ngIf="notificacao.usuarioCriador" class="mb-6">
-            <h4 class="font-semibold text-gray-900 mb-3 flex items-center">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="color: #5084C1;">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-              </svg>
-              Criado por
-            </h4>
-            <div class="bg-gray-50 rounded-lg p-4">
-              <span class="font-medium text-gray-900">{{ notificacao.usuarioCriador }}</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Actions -->
-        <div class="bg-gray-50 px-6 py-4 border-t border-gray-200">
-          <div class="flex items-center justify-between">
-            <button
-              (click)="voltarParaLista()"
-              class="bg-gray-100 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-200 transition-colors font-medium">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-              </svg>
-              Voltar para Lista
-            </button>
-
-            <div class="flex gap-3">
-              <!-- Botão Visualizar Item -->
-              <button
-                *ngIf="podeVisualizarItem()"
-                (click)="visualizarItem()"
-                class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors font-medium">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                </svg>
-                Visualizar Item
-              </button>
-
-              <!-- Botão Marcar como Lida -->
-              <button
-                *ngIf="!notificacao.lida"
-                (click)="marcarComoLida()"
-                class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors font-medium">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                </svg>
-                Marcar como Lida
-              </button>
-
-              <!-- Botão Excluir Notificação - SEMPRE VISÍVEL -->
-              <button
-                (click)="excluirNotificacao()"
-                class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors font-medium"
-                title="Excluir esta notificação">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                </svg>
-                Excluir
-              </button>
-            </div>
-          </div>
-        </div>
+        <!-- Botão Excluir -->
+        <button
+          (click)="excluirNotificacao()"
+          class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors font-medium"
+          title="Excluir esta notificação">
+          <span class="material-icons text-sm mr-2 align-text-bottom">delete</span>
+          Excluir
+        </button>
       </div>
     </div>
   </div>

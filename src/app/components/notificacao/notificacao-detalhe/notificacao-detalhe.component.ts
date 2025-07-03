@@ -144,11 +144,22 @@ export class NotificacaoDetalheComponent implements OnInit, OnDestroy {
   public visualizarItem(): void {
     if (!this.notificacao) return;
 
+    // Mostrar loading
+    Swal.fire({
+      title: 'Carregando...',
+      text: 'Buscando informações do item',
+      allowOutsideClick: false,
+      didOpen: () => {
+        Swal.showLoading();
+      }
+    });
+
     // Delega a lógica de decisão de navegação para o SERVICE
     this.notificacaoService.obterDadosNavegacaoItem(this.notificacao)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (resultado) => {
+          Swal.close();
           if (resultado.tipo === 'detalhe' && resultado.dados) {
             // Navegar para detalhe específico do item
             this.router.navigate(['/mural-detalhe', resultado.dados.itemId], {
@@ -160,14 +171,27 @@ export class NotificacaoDetalheComponent implements OnInit, OnDestroy {
               queryParams: resultado.dados
             });
           } else {
-            // Fallback: navega para mural geral
-            this.router.navigate(['/mural-listagem']);
+            // Fallback: navega para mural geral com mensagem
+            Swal.fire({
+              title: 'Atenção',
+              text: 'Não foi possível encontrar o item específico. Redirecionando para o mural.',
+              icon: 'info',
+              timer: 2000,
+              showConfirmButton: false
+            }).then(() => {
+              this.router.navigate(['/mural-listagem']);
+            });
           }
         },
         error: (error) => {
           console.error('Erro ao obter dados de navegação:', error);
-          // Fallback em caso de erro
-          this.router.navigate(['/mural-listagem']);
+          // Feedback de erro para o usuário
+          Swal.fire({
+            title: 'Erro',
+            text: 'Não foi possível carregar as informações do item. Tente novamente mais tarde.',
+            icon: 'error',
+            confirmButtonText: 'OK'
+          });
         }
       });
   }

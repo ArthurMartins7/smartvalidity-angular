@@ -1,10 +1,10 @@
-import { CommonModule } from '@angular/common';
+import { CommonModule, Location } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { MuralListagemDTO } from '../../../shared/model/dto/mural.dto';
-import { MuralService, MuralSelecaoService } from '../../../shared/service/mural.service';
+import { MuralSelecaoService, MuralService } from '../../../shared/service/mural.service';
 import { ModalInspecaoComponent } from '../mural-modal-inspecao/modal-inspecao.component';
 
 @Component({
@@ -26,7 +26,8 @@ export class MuralDetalheComponent implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private muralService: MuralService,
-    private selecaoService: MuralSelecaoService
+    private selecaoService: MuralSelecaoService,
+    private location: Location
   ) {}
 
   ngOnInit(): void {
@@ -63,10 +64,10 @@ export class MuralDetalheComponent implements OnInit {
 
   abrirModalInspecao(): void {
     if (!this.item) return;
-    
+
     // Limpa seleções anteriores
     this.selecaoService.updateSelectedItems([this.itemId]);
-    
+
     // Abre o modal
     this.selecaoService.openInspecaoModal();
   }
@@ -113,13 +114,6 @@ export class MuralDetalheComponent implements OnInit {
   }
 
   voltar(): void {
-    // Sempre navega de volta para a listagem preservando os filtros
-    this.router.navigate(['/mural-listagem'], {
-      queryParams: { tab: this.activeTab },
-      state: {
-        activeTab: this.activeTab,
-        preserveFilters: true // Sempre preserva os filtros
-      }
-    });
+    this.location.back();
   }
 }

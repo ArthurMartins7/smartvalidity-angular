@@ -3,10 +3,8 @@
   <div class="flex items-center gap-2 px-6">
     <!-- Ícone seta - clicável para voltar -->
     <button (click)="voltar()" class="p-1 hover:bg-gray-200 rounded transition-colors">
-      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6 text-gray-600">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
-            </svg>
-          </button>
+      <span class="material-icons text-gray-600" style="font-size: 24px;">keyboard_arrow_left</span>
+    </button>
 
     <!-- Títulos -->
           <div>
@@ -136,18 +134,14 @@
                 type="button"
                 (click)="executarBuscaProduto()"
                   class="p-1 text-gray-400 hover:text-gray-600">
-                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35M11 19a8 8 0 100-16 8 8 0 000 16z"></path>
-                </svg>
+                  <span class="material-icons text-base">search</span>
               </button>
               <button
                 *ngIf="produtoSelecionado"
                 type="button"
                 (click)="limparSelecaoProduto()"
                   class="p-1 text-gray-400 hover:text-gray-600">
-                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                </svg>
+                  <span class="material-icons text-base">close</span>
               </button>
               </div>
 
@@ -187,7 +181,6 @@
                       <th class="w-1/5 px-2 py-1 text-left text-blue-800 font-semibold">Lote</th>
                       <th class="w-1/5 px-2 py-1 text-left text-blue-800 font-semibold">Data de vencimento</th>
                       <th class="w-1/5 px-2 py-1 text-left text-blue-800 font-semibold">Vence em</th>
-                      <th class="w-1/5 px-2 py-1 text-left text-blue-800 font-semibold">Ações</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -199,15 +192,6 @@
                         <span [class]="getStatusVencimento(item.dataVencimento) + ' rounded-full px-2 py-0.5 whitespace-nowrap'">
                     {{ getTextoVencimento(item.dataVencimento) }}
                         </span>
-                      </td>
-                      <td class="px-2 py-1">
-                        <button type="button" (click)="visualizarItem(item)"
-                                class="text-white text-xs font-medium px-3 py-1 rounded transition-colors"
-                                style="background-color: #5084C1;"
-                                onmouseover="this.style.backgroundColor='#3d6ba3'"
-                                onmouseout="this.style.backgroundColor='#5084C1'">
-                          Visualizar item
-                        </button>
                       </td>
                     </tr>
                   </tbody>
@@ -238,9 +222,7 @@
               <button type="button"
                       (click)="onBuscaUsuarioChange()"
                       class="absolute right-2 top-2 text-gray-400 hover:text-gray-600">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35M11 19a8 8 0 100-16 8 8 0 000 16z"></path>
-                </svg>
+                <span class="material-icons text-base">search</span>
               </button>
 
               <!-- Dropdown colaboradores -->

@@ -111,38 +111,39 @@
 
             <!-- Ações -->
             <div class="flex items-start gap-2 ml-4">
-              <!-- Botão Ver Detalhes -->
-              <button
-                (click)="verDetalhes(notificacao)"
-                class="bg-green-600 text-white px-3 py-2 rounded-lg hover:bg-green-700 transition-colors text-sm font-medium"
-                title="Ver detalhes">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                Detalhes
-              </button>
-
               <!-- Botão Marcar como lida (apenas para não lidas) -->
               <button
                 *ngIf="!notificacao.lida"
                 (click)="marcarComoLida(notificacao)"
-                class="bg-gray-100 text-gray-700 px-3 py-2 rounded-lg hover:bg-gray-200 transition-colors text-sm font-medium"
+                class="bg-gray-100 text-gray-700 px-3 py-2 rounded-lg hover:bg-gray-200 transition-colors text-sm font-medium flex items-center"
                 title="Marcar como lida">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                </svg>
+                <span class="material-icons text-base mr-1">check</span>
                 Marcar como lida
               </button>
 
               <!-- Indicador de lida -->
               <div
                 *ngIf="notificacao.lida"
-                class="bg-green-100 text-green-700 px-3 py-2 rounded-lg text-sm font-medium flex items-center">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                </svg>
+                class="bg-green-100 text-green-700 px-3 py-2 rounded-lg text-sm font-medium flex items-center border border-green-200">
+                <span class="material-icons text-base mr-1">check</span>
                 Lida
               </div>
+
+              <!-- Botão Ver Detalhes -->
+              <button
+                (click)="verDetalhes(notificacao)"
+                class="w-9 h-9 flex items-center justify-center border border-gray-300 rounded text-gray-700 hover:text-gray-900 hover:bg-gray-100 transition"
+                title="Ver detalhes">
+                <span class="material-icons text-base">visibility</span>
+              </button>
+
+              <!-- Botão Excluir -->
+              <button
+                (click)="excluirNotificacao(notificacao)"
+                class="w-9 h-9 flex items-center justify-center border border-gray-300 rounded text-red-600 hover:text-red-800 hover:bg-gray-100 transition"
+                title="Excluir notificação">
+                <span class="material-icons text-base">delete</span>
+              </button>
             </div>
           </div>
         </div>

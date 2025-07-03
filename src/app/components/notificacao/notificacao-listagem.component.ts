@@ -290,4 +290,44 @@ export class NotificacaoListagemComponent implements OnInit, OnDestroy {
       this.carregarNotificacoes();
     }
   }
+
+  /**
+   * Excluir uma notificação
+   */
+  public excluirNotificacao(notificacao: AlertaDTO.Listagem): void {
+    if (!notificacao.id) return;
+
+    Swal.fire({
+      title: 'Excluir notificação?',
+      text: 'Esta ação removerá a notificação, mas não afetará o alerta associado.',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: 'Sim, excluir',
+      cancelButtonText: 'Cancelar'
+    }).then(result => {
+      if (result.isConfirmed) {
+        this.notificacaoService.excluirNotificacao(notificacao.id!)
+          .pipe(takeUntil(this.destroy$))
+          .subscribe({
+            next: () => {
+              // Remover da lista local
+              this.notificacoes = this.notificacoes.filter(n => n.id !== notificacao.id);
+
+              Swal.fire({
+                title: 'Excluída!',
+                text: 'Notificação removida com sucesso.',
+                icon: 'success',
+                timer: 2000,
+                showConfirmButton: false
+              });
+            },
+            error: () => {
+              Swal.fire('Erro', 'Não foi possível excluir a notificação.', 'error');
+            }
+          });
+      }
+    });
+  }
 }

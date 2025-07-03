@@ -1,22 +1,24 @@
+<!-- Cabeçalho padrão do sistema -->
+<div class="bg-gray-100 -mx-6 md:-mx-6 py-6 mb-10">
+  <div class="flex items-center gap-2 px-6">
+    <!-- Ícone seta - clicável para voltar -->
+    <button (click)="voltarParaLista()" class="p-1 hover:bg-gray-200 rounded transition-colors">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6 text-gray-600">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+      </svg>
+    </button>
+
+    <!-- Títulos -->
+    <div>
+      <div class="text-gray-500 text-base cursor-pointer hover:underline" (click)="voltarParaLista()">Notificações</div>
+      <div class="text-3xl font-bold">Detalhes da Notificação</div>
+      <p class="text-gray-800 text-base mt-1">Visualize todas as informações desta notificação e gerencie suas ações.</p>
+    </div>
+  </div>
+</div>
+
 <div class="min-h-screen bg-gray-50 p-6">
   <div class="max-w-4xl mx-auto">
-
-    <!-- Cabeçalho -->
-    <div class="flex items-center gap-3 mb-8">
-      <button (click)="voltarParaLista()" class="text-gray-600 hover:text-gray-800 transition-colors">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-        </svg>
-      </button>
-      <div class="flex items-center gap-3">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-7 h-7" style="color: #5084C1;">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0" />
-        </svg>
-        <div>
-          <div class="text-2xl font-bold text-gray-900">Detalhes da Notificação</div>
-        </div>
-      </div>
-    </div>
 
     <!-- Loading State -->
     <div *ngIf="carregando" class="bg-white rounded-lg shadow-sm border border-gray-200 p-12 text-center">
@@ -205,6 +207,17 @@
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                 </svg>
                 Marcar como Lida
+              </button>
+
+              <!-- Botão Excluir Notificação - SEMPRE VISÍVEL -->
+              <button
+                (click)="excluirNotificacao()"
+                class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors font-medium"
+                title="Excluir esta notificação">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                </svg>
+                Excluir
               </button>
             </div>
           </div>

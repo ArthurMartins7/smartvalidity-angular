@@ -3,6 +3,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
+import Swal from 'sweetalert2';
 
 import { AlertaDTO } from '../../../shared/model/dto/alerta.dto';
 import { TipoAlerta } from '../../../shared/model/enum/tipo-alerta.enum';
@@ -186,5 +187,35 @@ export class NotificacaoDetalheComponent implements OnInit, OnDestroy {
   public podeVisualizarItem(): boolean {
     // Delega a lógica de validação para o SERVICE
     return this.notificacaoService.podeVisualizarItem(this.notificacao);
+  }
+
+  public excluirNotificacao(): void {
+    console.log('Método excluirNotificacao chamado', this.notificacao?.id);
+    if (!this.notificacao?.id) return;
+
+    Swal.fire({
+      title: 'Excluir notificação?',
+      text: 'Esta ação removerá a notificação, mas não afetará o alerta associado.',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: 'Sim, excluir',
+      cancelButtonText: 'Cancelar'
+    }).then(result => {
+      if (result.isConfirmed) {
+        this.notificacaoService.excluirNotificacao(this.notificacao!.id!)
+          .pipe(takeUntil(this.destroy$))
+          .subscribe({
+            next: () => {
+              Swal.fire('Excluída!', 'Notificação removida com sucesso.', 'success');
+              this.voltarParaLista();
+            },
+            error: () => {
+              Swal.fire('Erro', 'Não foi possível excluir a notificação.', 'error');
+            }
+          });
+      }
+    });
   }
 }

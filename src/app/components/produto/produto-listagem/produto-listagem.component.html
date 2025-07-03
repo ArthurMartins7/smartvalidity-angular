@@ -126,37 +126,21 @@
       </div>
     </div>
 
-    <div class="mb-4 flex gap-4">
+    <div class="mb-4 flex flex-col sm:flex-row gap-4">
       <button (click)="adicionarProduto()" class="bg-white hover:bg-gray-50 text-gray-800 px-4 py-2 rounded-full flex items-center transition-all transform hover:scale-105 shadow-sm hover:shadow-md border border-gray-200">
         <span class="mr-2 text-xl font-semibold">+</span>
         <span class="font-medium">Adicionar Produto</span>
       </button>
 
-      <button *ngIf="categoriaId" (click)="editarCategoria()" class="bg-white hover:bg-gray-50 text-gray-800 px-4 py-2 rounded-full flex items-center transition-all transform hover:scale-105 shadow-sm hover:shadow-md border border-gray-200">
+      <button *ngIf="categoriaId" (click)="editarCategoria()" class="bg-white hover:bg-gray-50 text-gray-800 px-4 py-2 rounded-full flex items-center transition-all transform hover:scale-105 shadow-sm hover:shadow-md border border-gray-200 w-full sm:w-auto">
         <span class="material-icons text-base mr-2">edit</span>
         <span class="font-medium">Editar Categoria</span>
       </button>
 
-      <button *ngIf="categoriaId" (click)="excluirCategoria()" class="bg-white hover:bg-gray-50 text-gray-800 px-4 py-2 rounded-full flex items-center transition-all transform hover:scale-105 shadow-sm hover:shadow-md border border-gray-200">
+      <button *ngIf="categoriaId" (click)="excluirCategoria()" class="bg-white hover:bg-gray-50 text-gray-800 px-4 py-2 rounded-full flex items-center transition-all transform hover:scale-105 shadow-sm hover:shadow-md border border-gray-200 w-full sm:w-auto">
         <span class="material-icons text-base mr-2 text-red-600">delete</span>
         <span class="font-medium">Excluir Categoria</span>
       </button>
-    </div>
-
-    <!-- Seletor de itens por página -->
-    <div class="flex justify-end items-center mb-4">
-      <div class="flex items-center gap-2">
-        <label for="itensPorPagina" class="text-sm text-gray-600">Itens por página:</label>
-        <select
-          id="itensPorPagina"
-          [(ngModel)]="itensPorPagina"
-          (ngModelChange)="alterarItensPorPagina()"
-          class="bg-white border border-gray-300 text-gray-700 py-2 px-4 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-          <option *ngFor="let opcao of opcoesItensPorPagina" [value]="opcao">
-            {{ opcao }}
-          </option>
-        </select>
-      </div>
     </div>
 
     <!-- Container da tabela -->
@@ -170,7 +154,7 @@
             <th class="border border-gray-300 p-2 text-left">Unidade de Medida</th>
             <th class="border border-gray-300 p-2 text-left">Quantidade</th>
             <th class="border border-gray-300 p-2 text-left">Fornecedores</th>
-            <th class="border border-gray-300 p-2 text-center w-32">Ações</th>
+            <th class="border border-gray-300 p-2 text-center w-32" [ngClass]="{ 'sticky right-0 bg-gray-200 z-10': !mostrarFiltros }">Ações</th>
           </tr>
         </thead>
         <tbody>
@@ -190,7 +174,7 @@
                 Nenhum fornecedor
               </span>
             </td>
-            <td class="border border-gray-300 p-2">
+            <td class="border border-gray-300 p-2" [ngClass]="{ 'sticky right-0 bg-white z-10': !mostrarFiltros }">
               <div class="flex justify-center gap-3">
                 <button (click)="irParaEntradaEstoque(produto)" class="w-9 h-9 flex items-center justify-center border border-gray-300 rounded text-gray-700 hover:text-gray-900 hover:bg-gray-100 transition" title="Entrada de estoque">
                   <span class="material-icons text-base">inventory</span>

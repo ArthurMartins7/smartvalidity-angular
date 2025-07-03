@@ -108,14 +108,6 @@
         <span class="mr-2 text-xl font-semibold">+</span>
         <span class="font-medium">Adicionar Fornecedor</span>
       </button>
-
-      <!-- Seletor de itens por página -->
-      <div class="flex items-center gap-2">
-        <span class="text-gray-700">Itens por página:</span>
-        <select class="border rounded w-12 h-7 text-center text-sm" [(ngModel)]="itensPorPagina" (change)="alterarItensPorPagina()">
-          <option *ngFor="let opcao of opcoesItensPorPagina" [value]="opcao">{{ opcao }}</option>
-        </select>
-      </div>
     </div>
 
     <!-- Container da tabela -->
@@ -127,7 +119,7 @@
             <th class="border border-gray-300 p-2 text-left">Telefone</th>
             <th class="border border-gray-300 p-2 text-left">CNPJ</th>
             <th class="border border-gray-300 p-2 text-left">Endereço</th>
-            <th class="border border-gray-300 p-2 text-center">Ações</th>
+            <th class="border border-gray-300 p-2 text-center" [ngClass]="{ 'sticky right-0 bg-gray-200 z-10': !mostrarFiltros }">Ações</th>
           </tr>
         </thead>
         <tbody>
@@ -139,7 +131,7 @@
               {{ fornecedor.endereco.logradouro }}, {{ fornecedor.endereco.numero }} -
               {{ fornecedor.endereco.bairro }}, {{ fornecedor.endereco.cidade }}/{{ fornecedor.endereco.estado }}
             </td>
-            <td class="p-2 text-center flex justify-center gap-3">
+            <td class="p-2 flex justify-center gap-3" [ngClass]="{ 'sticky right-0 bg-white z-10': !mostrarFiltros }">
               <button (click)="editar(fornecedor)" class="w-9 h-9 flex items-center justify-center border border-gray-300 rounded text-gray-700 hover:text-gray-900 hover:bg-gray-100 transition" title="Editar fornecedor">
                 <span class="material-icons text-base">edit</span>
               </button>
@@ -154,14 +146,6 @@
 
     <!-- Controles de Paginação -->
     <div class="flex items-center justify-between mt-4">
-      <!-- Seletor de itens por página -->
-      <div class="flex items-center gap-2">
-        <span class="text-gray-700">Itens por página:</span>
-        <select class="border rounded w-12 h-7 text-center text-sm" [(ngModel)]="itensPorPagina" (change)="alterarItensPorPagina()">
-          <option *ngFor="let opcao of opcoesItensPorPagina" [value]="opcao">{{ opcao }}</option>
-        </select>
-      </div>
-
       <!-- Navegação de páginas -->
       <div class="flex items-center gap-2">
         <button (click)="voltarPagina()" [disabled]="seletor.pagina === 1" class="w-8 h-8 flex items-center justify-center rounded bg-gray-200 disabled:opacity-50">

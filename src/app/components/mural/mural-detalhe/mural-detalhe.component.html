@@ -33,20 +33,6 @@
     <div class="flex items-center justify-between">
       <div class="flex items-center gap-3">
       <h3 class="text-lg font-bold text-gray-800">{{ item.produto.descricao }}</h3>
-        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
-              [class]="item.inspecionado ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'">
-          {{ item.inspecionado ? 'Inspecionado' : 'Não inspecionado' }}
-        </span>
-        <div class="px-2.5 py-0.5 rounded-full text-xs font-medium"
-           [ngClass]="{
-             'bg-yellow-100 text-yellow-800': item.status === 'proximo',
-             'bg-orange-100 text-orange-800': item.status === 'hoje',
-             'bg-red-100 text-red-800': item.status === 'vencido'
-           }">
-        {{ item.status === 'proximo' ? 'Próximo a vencer' :
-           item.status === 'hoje' ? 'Vence hoje' :
-           'Vencido' }}
-    </div>
   </div>
 
       <!-- Botão Inspecionar -->
@@ -69,6 +55,14 @@
         Processando...
       </ng-container>
     </button>
+
+      <!-- Aviso: Produto já inspecionado -->
+      <div *ngIf="item.inspecionado" class="flex items-center px-4 py-1.5 bg-green-100 text-green-800 rounded-md text-sm font-medium">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+        </svg>
+        <span>Produto já inspecionado</span>
+      </div>
     </div>
   </div>
 
@@ -76,11 +70,21 @@
   <div class="p-6 overflow-x-auto">
     <table class="min-w-full divide-y divide-gray-200 text-sm">
       <tbody class="divide-y divide-gray-200">
-        <!-- Informações do produto -->
+        <!-- Status do produto -->
         <tr>
-          <th class="w-1/3 text-left font-semibold text-gray-600 py-2">Descrição</th>
-          <td class="py-2 text-gray-800">{{ item.produto.descricao }}</td>
+          <th class="w-1/3 text-left font-semibold text-gray-600 py-2">Status</th>
+          <td class="py-2 text-gray-800 font-bold"
+              [ngClass]="{
+                'text-yellow-700': item.status === 'proximo',
+                'text-orange-700': item.status === 'hoje',
+                'text-red-700': item.status === 'vencido'
+              }">
+            {{ item.status === 'proximo' ? 'Próximo a vencer' :
+               item.status === 'hoje' ? 'Vence hoje' :
+               'Vencido' }}
+          </td>
         </tr>
+        <!-- Informações do produto -->
         <tr>
           <th class="text-left font-semibold text-gray-600 py-2">Código de Barras</th>
           <td class="py-2 text-gray-800">{{ item.produto.codigoBarras }}</td>
@@ -136,13 +140,7 @@
     </table>
   </div>
 
-  <!-- Rodapé: aviso de já inspecionado -->
-  <div *ngIf="item.inspecionado" class="border-t px-5 py-3 flex items-center text-green-600">
-      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-      </svg>
-      <span class="font-medium">Produto já inspecionado</span>
-    </div>
+
 </div>
 
 <!-- Modal de inspeção -->

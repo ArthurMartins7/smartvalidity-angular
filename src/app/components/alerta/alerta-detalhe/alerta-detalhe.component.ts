@@ -168,9 +168,65 @@ export class AlertaDetalheComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Navegar para a página de detalhes do item no mural
+   * Navegar para a página de detalhes do item no mural utilizando a mesma
+   * lógica que a tela de Notificação. Exibe loading, delega a obtenção dos
+   * dados de navegação ao NotificacaoService e trata os cenários de detalhe
+   * específico ou listagem com filtros.
    */
-  public visualizarItem(itemId: string): void {
-    this.router.navigate(['/mural-detalhe', itemId]);
+  public visualizarItem(_unused?: any): void {
+    if (!this.alerta) return;
+
+    // Exibe loading enquanto busca informações
+    Swal.fire({
+      title: 'Carregando...',
+      text: 'Buscando informações do item',
+      allowOutsideClick: false,
+      didOpen: () => {
+        Swal.showLoading();
+      }
+    });
+
+    this.notificacaoService.obterDadosNavegacaoItem(this.alerta)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (resultado) => {
+          Swal.close();
+
+          if (resultado.tipo === 'detalhe' && resultado.dados) {
+            // Navega diretamente para o detalhe do item
+            this.router.navigate([
+              '/mural-detalhe',
+              resultado.dados.itemId
+            ], {
+              queryParams: resultado.dados.queryParams
+            });
+          } else if (resultado.tipo === 'listagem' && resultado.dados) {
+            // Navega para listagem do mural com filtros aplicados
+            this.router.navigate(['/mural-listagem'], {
+              queryParams: resultado.dados
+            });
+          } else {
+            // Fallback: redireciona para mural genérico
+            Swal.fire({
+              title: 'Atenção',
+              text: 'Não foi possível encontrar o item específico. Redirecionando para o mural.',
+              icon: 'info',
+              timer: 2000,
+              showConfirmButton: false
+            }).then(() => {
+              this.router.navigate(['/mural-listagem']);
+            });
+          }
+        },
+        error: () => {
+          Swal.close();
+          Swal.fire({
+            title: 'Erro',
+            text: 'Não foi possível carregar as informações do item. Tente novamente mais tarde.',
+            icon: 'error',
+            confirmButtonText: 'OK'
+          });
+        }
+      });
   }
 }

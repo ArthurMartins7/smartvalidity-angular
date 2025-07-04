@@ -67,7 +67,8 @@ export class PasswordRecoveryAlterarSenhaComponent {
         this.router.navigate(['']);
       },
       error: (err) => {
-        const mensagem = err?.error || 'Não foi possível redefinir a senha.';
+        console.log('erro', err);
+        const mensagem = err?.error.novaSenha || err?.error.message || 'Não foi possível redefinir a senha.';
         Swal.fire({ icon: 'error', title: 'Erro', text: mensagem, confirmButtonColor: '#5084C1' });
       }
     });

@@ -63,7 +63,8 @@ export class PasswordRecoveryCodigoVerificacaoComponent {
         this.router.navigate(['password-recovery-alterar-senha']);
       },
       error: (err) => {
-        const mensagem = err?.error || 'Código inválido ou expirado';
+        console.log('erro', err);
+        const mensagem = err?.error?.message || 'Código inválido ou expirado';
         Swal.fire({
           icon: 'error',
           title: 'Erro',

@@ -206,7 +206,7 @@
               <button class="w-6 h-6 md:w-7 md:h-7 lg:w-8 lg:h-8 flex items-center justify-center border border-gray-300 rounded text-gray-700 hover:text-gray-900 hover:bg-gray-100 transition" (click)="visualizarAlerta(alerta)" title="Visualizar">
                 <span class="material-icons text-[10px] md:text-xs lg:text-sm">visibility</span>
               </button>
-              <button class="w-6 h-6 md:w-7 md:h-7 lg:w-8 lg:h-8 flex items-center justify-center border border-gray-300 rounded text-gray-700 hover:text-gray-900 hover:bg-gray-100 transition" (click)="editarAlerta(alerta)" title="Editar">
+              <button *ngIf="alerta.tipo === 'PERSONALIZADO'" class="w-6 h-6 md:w-7 md:h-7 lg:w-8 lg:h-8 flex items-center justify-center border border-gray-300 rounded text-gray-700 hover:text-gray-900 hover:bg-gray-100 transition" (click)="editarAlerta(alerta)" title="Editar">
                 <span class="material-icons text-[10px] md:text-xs lg:text-sm">edit</span>
               </button>
               <button class="w-6 h-6 md:w-7 md:h-7 lg:w-8 lg:h-8 flex items-center justify-center border border-gray-300 rounded transition"

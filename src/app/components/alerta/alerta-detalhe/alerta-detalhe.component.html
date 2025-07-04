@@ -137,18 +137,20 @@
         <h3 class="text-lg font-semibold text-gray-800">Produtos Relacionados</h3>
       </div>
       <div class="flex flex-wrap gap-2">
-        <div *ngFor="let produto of alerta.produtosAlerta" class="flex items-center gap-2">
+        <div *ngFor="let produto of alerta.produtosAlerta" class="flex items-center gap-2 w-full">
           <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800 border border-green-200">
           {{ produto }}
         </span>
-          <button (click)="visualizarItem(produto)"
-                  class="text-white px-3 py-1 rounded-lg transition-colors font-medium text-sm flex items-center gap-1"
-                  style="background-color: #5084C1;"
-                  onmouseover="this.style.backgroundColor='#3d6ba3'"
-                  onmouseout="this.style.backgroundColor='#5084C1'">
-            <span class="material-icons text-sm">visibility</span>
-            Visualizar Item
-          </button>
+          <div class="flex-1 flex justify-end">
+            <button (click)="visualizarItem(produto)"
+                    class="text-white px-3 py-1 rounded-lg transition-colors font-medium text-sm flex items-center gap-1"
+                    style="background-color: #5084C1;"
+                    onmouseover="this.style.backgroundColor='#3d6ba3'"
+                    onmouseout="this.style.backgroundColor='#5084C1'">
+              <span class="material-icons text-sm">visibility</span>
+              Visualizar Item
+            </button>
+          </div>
         </div>
       </div>
     </div>

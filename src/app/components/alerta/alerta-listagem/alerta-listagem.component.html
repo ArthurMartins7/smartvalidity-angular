@@ -16,12 +16,12 @@
 <div class="px-3 pt-2 pb-3 bg-white-100">
   <!-- Barra de pesquisa e botão criar alerta na mesma linha -->
   <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4 mb-4">
-    <div class="flex items-center gap-4">
+    <div class="flex flex-col md:flex-row items-stretch md:items-center gap-4">
       <!-- Campo de pesquisa -->
       <div class="flex-1 relative">
         <input
           type="text"
-          placeholder="Buscar alertas por título..."
+          placeholder="Buscar alertas por título ou descrição..."
           class="w-full pr-10 pl-4 py-2.5 border rounded-full bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-[#5084C1]/20 focus:border-[#5084C1] text-base"
           [(ngModel)]="filtroTitulo"
           (ngModelChange)="onSearchInput()"
@@ -40,9 +40,9 @@
 
       <!-- Botão Criar Alerta -->
       <button (click)="adicionarAlerta()"
-        class="bg-gradient-to-r from-[#5084C1] to-[#4071a8] hover:from-[#4071a8] hover:to-[#365f8a] text-white px-4 py-2.5 rounded-xl flex items-center transition-all duration-200 transform hover:scale-105 shadow-md hover:shadow-lg font-medium whitespace-nowrap">
-        <span class="material-icons text-base mr-2">add</span>
-        <span class="text-sm font-semibold">Criar Alerta</span>
+        class="bg-gradient-to-r from-[#5084C1] to-[#4071a8] hover:from-[#4071a8] hover:to-[#365f8a] text-white px-3 md:px-4 py-2.5 rounded-xl flex items-center justify-center transition-all duration-200 transform hover:scale-105 shadow-md hover:shadow-lg font-medium">
+        <span class="material-icons text-base mr-0 md:mr-2">add</span>
+        <span class="hidden md:inline text-sm font-semibold">Criar Alerta</span>
       </button>
     </div>
 
@@ -151,20 +151,18 @@
                 Alerta
               </div>
             </th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tipo</th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Data Disparo</th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden md:table-cell">Tipo</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden lg:table-cell">Data Disparo</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden lg:table-cell">Status</th>
             <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Ações</th>
           </tr>
         </thead>
         <tbody class="bg-white divide-y divide-gray-200">
           <tr *ngFor="let alerta of alertas; trackBy: trackByAlerta"
               class="hover:bg-gray-50 transition-colors duration-150"
-              [class.border-l-4]="obterPrioridadeAlerta(alerta) !== 'normal'"
-              [class.border-l-red-500]="obterPrioridadeAlerta(alerta) === 'alta'"
-              [class.border-l-yellow-500]="obterPrioridadeAlerta(alerta) === 'media'"
-              [class.bg-red-50]="obterPrioridadeAlerta(alerta) === 'alta' && !alerta.ativo"
-              [class.bg-yellow-50]="obterPrioridadeAlerta(alerta) === 'media' && isProximoVencimento(alerta)">
+              [class.border-l-2]="obterPrioridadeAlerta(alerta) !== 'normal'"
+              [class.border-l-gray-300]="obterPrioridadeAlerta(alerta) !== 'normal'"
+              [class.bg-gray-50]="false">
             <td class="px-6 py-4 whitespace-nowrap">
               <div class="flex items-start gap-3">
                 <!-- Indicador de Prioridade -->
@@ -184,47 +182,41 @@
                 <div class="flex-1 min-w-0">
                   <div class="flex items-center gap-2">
                     <div class="text-sm font-medium text-gray-900 truncate">{{ removerEmojis(alerta.titulo) }}</div>
-                    <!-- Badge de Urgência -->
-                    <span *ngIf="isUrgente(alerta)"
-                          class="inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 animate-pulse">
-                      <span class="material-icons text-xs mr-1">priority_high</span>
-                      URGENTE
-                    </span>
                   </div>
                   <div class="text-sm text-gray-500 max-w-xs truncate mt-1" [title]="alerta.descricao">{{ alerta.descricao }}</div>
                 </div>
               </div>
             </td>
-            <td class="px-6 py-4 whitespace-nowrap">
+            <td class="px-6 py-4 whitespace-nowrap hidden md:table-cell">
               <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
                     [class]="obterCorTipo(alerta.tipo)">
                 {{ obterDescricaoTipo(alerta.tipo) }}
               </span>
             </td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 hidden lg:table-cell">
               {{ formatarDataHora(alerta.dataHoraDisparo) }}
             </td>
-            <td class="px-6 py-4 whitespace-nowrap">
+            <td class="px-6 py-4 whitespace-nowrap hidden lg:table-cell">
               <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
                     [class]="alerta.ativo ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'">
                 {{ alerta.ativo ? 'Ativo' : 'Inativo' }}
               </span>
             </td>
-            <td class="pl-0 pr-4 py-3 flex items-center gap-3 justify-end sticky right-0 bg-white z-10">
-              <button class="w-9 h-9 flex items-center justify-center border border-gray-300 rounded text-gray-700 hover:text-gray-900 hover:bg-gray-100 transition" (click)="visualizarAlerta(alerta)" title="Visualizar">
-                <span class="material-icons text-base">visibility</span>
+            <td class="pl-0 pr-4 py-3 flex items-center gap-1 md:gap-1.5 lg:gap-2 justify-end sticky right-0 bg-inherit z-10">
+              <button class="w-6 h-6 md:w-7 md:h-7 lg:w-8 lg:h-8 flex items-center justify-center border border-gray-300 rounded text-gray-700 hover:text-gray-900 hover:bg-gray-100 transition" (click)="visualizarAlerta(alerta)" title="Visualizar">
+                <span class="material-icons text-[10px] md:text-xs lg:text-sm">visibility</span>
               </button>
-              <button class="w-9 h-9 flex items-center justify-center border border-gray-300 rounded text-gray-700 hover:text-gray-900 hover:bg-gray-100 transition" (click)="editarAlerta(alerta)" title="Editar">
-                <span class="material-icons text-base">edit</span>
+              <button class="w-6 h-6 md:w-7 md:h-7 lg:w-8 lg:h-8 flex items-center justify-center border border-gray-300 rounded text-gray-700 hover:text-gray-900 hover:bg-gray-100 transition" (click)="editarAlerta(alerta)" title="Editar">
+                <span class="material-icons text-[10px] md:text-xs lg:text-sm">edit</span>
               </button>
-              <button class="w-9 h-9 flex items-center justify-center border border-gray-300 rounded transition"
+              <button class="w-6 h-6 md:w-7 md:h-7 lg:w-8 lg:h-8 flex items-center justify-center border border-gray-300 rounded transition"
                       (click)="toggleAtivoAlerta(alerta)"
                       [class]="alerta.ativo ? 'text-green-600 hover:text-green-800 hover:bg-green-50' : 'text-red-600 hover:text-red-800 hover:bg-red-50'"
                       [title]="alerta.ativo ? 'Clique para desativar alerta' : 'Clique para ativar alerta'">
-                <span class="material-icons text-base">power_settings_new</span>
+                <span class="material-icons text-[10px] md:text-xs lg:text-sm">power_settings_new</span>
               </button>
-              <button class="w-9 h-9 flex items-center justify-center border border-gray-300 rounded text-red-600 hover:text-red-800 hover:bg-gray-100 transition" (click)="excluirAlerta(alerta)" title="Excluir">
-                <span class="material-icons text-base">delete</span>
+              <button class="w-6 h-6 md:w-7 md:h-7 lg:w-8 lg:h-8 flex items-center justify-center border border-gray-300 rounded text-red-600 hover:text-red-800 hover:bg-gray-100 transition" (click)="excluirAlerta(alerta)" title="Excluir">
+                <span class="material-icons text-[10px] md:text-xs lg:text-sm">delete</span>
               </button>
             </td>
           </tr>

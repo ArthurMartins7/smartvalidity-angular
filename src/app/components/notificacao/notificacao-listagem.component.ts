@@ -3,7 +3,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { debounceTime, distinctUntilChanged, takeUntil } from 'rxjs/operators';
 import Swal from 'sweetalert2';
 
 import { AlertaDTO } from '../../shared/model/dto/alerta.dto';
@@ -42,15 +42,37 @@ export class NotificacaoListagemComponent implements OnInit, OnDestroy {
   public paginaAtual: number = 1;
   public activeTab: 'todas' | 'naoLidas' | 'lidas' = 'todas';
 
+  // Campo de busca
+  filtroTitulo: string = '';
+  buscando: boolean = false;
+  private searchSubject = new Subject<string>();
+
   public get notificacoesFiltradas(): AlertaDTO.Listagem[] {
+    // Primeiro, filtra pela aba selecionada (todas, lidas, não lidas)
+    let lista: AlertaDTO.Listagem[];
+
     switch (this.activeTab) {
       case 'naoLidas':
-        return this.notificacoes.filter(n => !n.lida);
+        lista = this.notificacoes.filter(n => !n.lida);
+        break;
       case 'lidas':
-        return this.notificacoes.filter(n => n.lida);
+        lista = this.notificacoes.filter(n => n.lida);
+        break;
       default:
-        return this.notificacoes;
+        lista = this.notificacoes;
+        break;
     }
+
+    // Em seguida, aplica filtro por título ou descrição, se houver termo de busca
+    if (this.filtroTitulo && this.filtroTitulo.trim() !== '') {
+      const termo = this.filtroTitulo.trim().toLowerCase();
+      lista = lista.filter(n =>
+        (this.removerEmojis(n.titulo).toLowerCase().includes(termo)) ||
+        (n.descricao ? n.descricao.toLowerCase().includes(termo) : false)
+      );
+    }
+
+    return lista;
   }
 
   public get totalPaginas(): number {
@@ -64,6 +86,16 @@ export class NotificacaoListagemComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.carregarNotificacoes();
+
+    // Configurar observador de busca com debounce
+    this.searchSubject.pipe(
+      debounceTime(500),
+      distinctUntilChanged(),
+      takeUntil(this.destroy$)
+    ).subscribe(termo => {
+      this.filtroTitulo = termo;
+      this.paginaAtual = 1;
+    });
   }
 
   ngOnDestroy(): void {
@@ -330,5 +362,34 @@ export class NotificacaoListagemComponent implements OnInit, OnDestroy {
           });
       }
     });
+  }
+
+  /**
+   * Handler para evento de digitação no campo de busca
+   */
+  public onSearchInput(): void {
+    // Se campo vazio, limpa busca
+    if (!this.filtroTitulo) {
+      this.searchSubject.next('');
+      return;
+    }
+    this.searchSubject.next(this.filtroTitulo);
+  }
+
+  /**
+   * Classe de cor da borda lateral baseada no tipo de alerta
+   */
+  public obterClasseBordaTipo(tipo: TipoAlerta): string {
+    switch (tipo) {
+      case TipoAlerta.VENCIMENTO_ATRASO:
+        return 'border-l-red-500';
+      case TipoAlerta.VENCIMENTO_HOJE:
+        return 'border-l-orange-500';
+      case TipoAlerta.VENCIMENTO_AMANHA:
+        return 'border-l-yellow-500';
+      case TipoAlerta.PERSONALIZADO:
+      default:
+        return 'border-l-blue-500';
+    }
   }
 }

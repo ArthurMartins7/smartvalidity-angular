@@ -266,13 +266,13 @@ export class NotificacaoService {
   obterCorTipo(tipo: TipoAlerta): string {
     // Mapeamento tipado conforme o enum
     const cores: Record<TipoAlerta, string> = {
-      [TipoAlerta.VENCIMENTO_AMANHA]: 'bg-yellow-100 text-yellow-800',
-      [TipoAlerta.VENCIMENTO_HOJE]: 'bg-orange-100 text-orange-800',
-      [TipoAlerta.VENCIMENTO_ATRASO]: 'bg-red-100 text-red-800',
-      [TipoAlerta.PERSONALIZADO]: 'bg-blue-100 text-blue-800'
+      [TipoAlerta.VENCIMENTO_AMANHA]: 'bg-yellow-50 text-yellow-700',
+      [TipoAlerta.VENCIMENTO_HOJE]: 'bg-orange-50 text-orange-700',
+      [TipoAlerta.VENCIMENTO_ATRASO]: 'bg-red-50 text-red-700',
+      [TipoAlerta.PERSONALIZADO]: 'bg-blue-50 text-blue-700'
     };
 
-    return cores[tipo] || 'bg-gray-100 text-gray-800';
+    return cores[tipo] || 'bg-gray-50 text-gray-700';
   }
 
   /**

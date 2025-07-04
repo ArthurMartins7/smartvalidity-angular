@@ -47,6 +47,27 @@
       </button>
     </div>
 
+    <!-- Barra de pesquisa -->
+    <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4 mb-4">
+      <div class="flex items-center gap-4">
+        <div class="flex-1 relative">
+          <input
+            type="text"
+            placeholder="Buscar notificações por título ou descrição..."
+            class="w-full pr-10 pl-4 py-2.5 border rounded-full bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-[#5084C1]/20 focus:border-[#5084C1] text-base"
+            [(ngModel)]="filtroTitulo"
+            (ngModelChange)="onSearchInput()"
+            (keyup.enter)="onSearchInput()">
+          <button
+            (click)="onSearchInput()"
+            class="absolute inset-y-0 right-3 flex items-center text-gray-400 hover:text-gray-600 transition-colors duration-200"
+            title="Buscar">
+            <span class="material-icons text-xl">search</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
     <!-- Loading State -->
     <div *ngIf="carregando" class="bg-white rounded-lg shadow-sm border border-gray-200 p-12 text-center">
       <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
@@ -61,8 +82,8 @@
         *ngFor="let notificacao of notificacoesFiltradas | slice:(paginaAtual-1)*itensPorPagina:(paginaAtual*itensPorPagina); trackBy: trackByNotificacao"
         class="bg-white rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow"
         [class.opacity-80]="notificacao.lida"
-        [class.border-l-4]="!notificacao.lida"
-        [class.border-l-blue-500]="!notificacao.lida">
+        [class.border-l-4]="true"
+        [ngClass]="obterClasseBordaTipo(notificacao.tipo)">
 
         <div class="p-6 relative">
           <div class="flex items-start justify-between">
@@ -82,6 +103,13 @@
                 <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium whitespace-nowrap"
                       [class]="obterCorTipo(notificacao.tipo)">
                   {{ obterDescricaoTipo(notificacao.tipo) }}
+                </span>
+
+                <!-- Badge de Urgência para produtos vencidos -->
+                <span *ngIf="notificacao.tipo === TipoAlerta.VENCIMENTO_ATRASO"
+                      class="inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 animate-pulse ml-1">
+                  <span class="material-icons text-xs mr-1">priority_high</span>
+                  URGENTE
                 </span>
               </div>
 

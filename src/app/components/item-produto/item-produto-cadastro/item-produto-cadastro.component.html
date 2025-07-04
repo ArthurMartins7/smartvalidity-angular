@@ -1,14 +1,17 @@
-<!-- Cabeçalho -->
-<div class="flex items-center gap-2 mb-8">
-  <i class="material-icons text-gray-600">arrow_back</i>
-  <div>
-    <div class="text-gray-500">Item produto</div>
-    <div class="text-2xl font-bold">Cadastro</div>
+<!-- Header explicativo -->
+<div class="bg-gray-100 -mx-6 md:-mx-6 py-6 px-8 mb-10">
+  <div class="flex items-center gap-2">
+    <i class="material-icons text-gray-600 cursor-pointer" (click)="voltar()">arrow_back</i>
+    <div>
+      <div class="text-gray-500 text-base">Item produto</div>
+      <div class="text-3xl font-bold">Cadastrar item produto</div>
+      <p class="text-gray-800 text-base mt-1 whitespace-nowrap">Aqui você pode cadastrar um item produto</p>
+    </div>
   </div>
 </div>
 
 <!-- Card do Formulário -->
-<div class="bg-white rounded-lg shadow-sm p-8 max-w-3xl mx-auto">
+<div class="bg-white rounded-lg shadow-sm p-4 sm:p-8 max-w-3xl mx-auto">
   <h2 class="text-xl font-medium text-gray-700 mb-6">Cadastrar um novo item</h2>
 
   <form (ngSubmit)="onSubmit()" class="space-y-6">
@@ -58,7 +61,7 @@
     <!-- Data de recebimento -->
     <div>
       <label class="block text-sm font-medium text-gray-700 mb-1">Data de recebimento</label>
-      <div class="flex gap-2">
+      <div class="flex flex-col sm:flex-row gap-2">
         <div class="relative flex-1">
           <input
             type="date"
@@ -79,10 +82,10 @@
     </div>
 
     <!-- Data de fabricação e vencimento -->
-    <div class="grid grid-cols-2 gap-4">
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
       <div>
         <label class="block text-sm font-medium text-gray-700 mb-1">Data de fabricação:</label>
-        <div class="flex gap-2">
+        <div class="flex flex-col sm:flex-row gap-2">
           <div class="relative flex-1">
             <input
               type="date"
@@ -103,7 +106,7 @@
       </div>
       <div>
         <label class="block text-sm font-medium text-gray-700 mb-1">Data de vencimento:</label>
-        <div class="flex gap-2">
+        <div class="flex flex-col sm:flex-row gap-2">
           <div class="relative flex-1">
             <input
               type="date"

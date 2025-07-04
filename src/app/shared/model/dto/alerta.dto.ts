@@ -8,10 +8,6 @@ export namespace AlertaDTO {
     descricao!: string;
     dataHoraDisparo!: Date;
     tipo!: TipoAlerta;
-    diasAntecedencia?: number;
-    ativo!: boolean;
-    recorrente!: boolean;
-    configuracaoRecorrencia?: string;
     dataCriacao!: Date;
     dataEnvio?: Date;
     usuarioCriador?: string; // Nome do usuário criador
@@ -28,9 +24,6 @@ export namespace AlertaDTO {
     descricao!: string;
     dataHoraDisparo!: Date;
     tipo!: TipoAlerta;
-    diasAntecedencia?: number;
-    recorrente?: boolean;
-    configuracaoRecorrencia?: string;
     usuariosIds?: string[]; // IDs dos usuários que receberão o alerta
     produtosIds?: string[]; // IDs dos produtos relacionados (opcional)
   }
@@ -39,10 +32,6 @@ export namespace AlertaDTO {
     titulo!: string;
     descricao!: string;
     dataHoraDisparo!: Date;
-    diasAntecedencia?: number;
-    ativo?: boolean;
-    recorrente?: boolean;
-    configuracaoRecorrencia?: string;
     usuariosIds?: string[];
     produtosIds?: string[];
   }
@@ -50,8 +39,6 @@ export namespace AlertaDTO {
   export class Filtro {
     titulo?: string;
     tipo?: TipoAlerta;
-    ativo?: boolean;
-    recorrente?: boolean;
     dataInicialDisparo?: Date;
     dataFinalDisparo?: Date;
     usuarioCriador?: string;

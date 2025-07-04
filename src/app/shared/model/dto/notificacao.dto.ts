@@ -9,10 +9,6 @@ export namespace NotificacaoDTO {
     descricao!: string;
     dataHoraDisparo!: Date;
     tipo!: TipoAlerta;
-    diasAntecedencia?: number;
-    ativo!: boolean;
-    recorrente!: boolean;
-    configuracaoRecorrencia?: string;
     dataCriacaoAlerta!: Date; // Data de criação do alerta
     dataCriacaoNotificacao!: Date; // Data de criação da notificação
     dataHoraLeitura?: Date; // Data/hora que foi lida

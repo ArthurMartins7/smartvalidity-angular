@@ -56,20 +56,6 @@ export class AlertaService {
     );
   }
 
-  /**
-   * Alterna o status ativo de um alerta
-   * RESPONSABILIDADE SERVICE: Comunicação HTTP com backend
-   * PRINCÍPIO MVC: Isola COMPONENT da implementação HTTP específica
-   */
-  toggleAtivo(id: number): Observable<AlertaDTO.Listagem> {
-    return this.httpClient.put<AlertaDTO.Listagem>(`${this.API}/${id}/toggle-ativo`, {}).pipe(
-      tap({
-        next: (response) => console.log('Status ativo alterado:', response),
-        error: (error) => console.error('Erro ao alterar status ativo:', error)
-      })
-    );
-  }
-
   contarAlertas(seletor: AlertaSeletor): Observable<number> {
     return this.httpClient.post<number>(`${this.API}/contar`, seletor).pipe(
       tap({

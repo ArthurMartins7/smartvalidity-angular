@@ -74,10 +74,6 @@
             <span class="text-base font-medium text-gray-600">Data de Criação</span>
             <div class="text-lg text-gray-800">{{ formatarDataHora(alerta.dataCriacao) }}</div>
           </div>
-          <div *ngIf="alerta.diasAntecedencia" class="flex justify-between items-center">
-            <span class="text-base font-medium text-gray-600">Dias de Antecedência</span>
-            <div class="text-lg text-gray-800">{{ alerta.diasAntecedencia }} dia(s)</div>
-          </div>
         </div>
       </div>
 
@@ -93,18 +89,6 @@
           <div class="flex justify-between items-center">
             <span class="text-base font-medium text-gray-600">Tipo</span>
             <div class="text-lg text-gray-800">{{ obterDescricaoTipo(alerta.tipo) }}</div>
-          </div>
-          <div class="flex justify-between items-center">
-            <span class="text-base font-medium text-gray-600">Status</span>
-            <div class="text-lg text-gray-800">{{ alerta.ativo ? 'Ativo' : 'Inativo' }}</div>
-          </div>
-          <div class="flex justify-between items-center">
-            <span class="text-base font-medium text-gray-600">Recorrente</span>
-            <div class="text-lg text-gray-800">{{ alerta.recorrente ? 'Sim' : 'Não' }}</div>
-          </div>
-          <div *ngIf="alerta.recorrente && alerta.configuracaoRecorrencia" class="flex justify-between items-center">
-            <span class="text-base font-medium text-gray-600">Configuração</span>
-            <div class="text-lg text-gray-800">{{ alerta.configuracaoRecorrencia }}</div>
           </div>
         </div>
       </div>

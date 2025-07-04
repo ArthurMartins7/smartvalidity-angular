@@ -1,6 +1,6 @@
 import { TipoAlerta } from "../enum/tipo-alerta.enum";
-import { Usuario } from "./usuario.model";
 import { Produto } from "./produto";
+import { Usuario } from "./usuario.model";
 
 export class Alerta {
   id: number;
@@ -9,10 +9,6 @@ export class Alerta {
   tipo: TipoAlerta;
   dataHoraCriacao: Date;
   dataHoraDisparo: Date;
-  diasAntecedencia: number;
-  ativo: boolean;
-  recorrente: boolean;
-  configuracaoRecorrencia: string;
   usuariosCriadores: Usuario[];
   produtos: Produto[];
-} 
+}

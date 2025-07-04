@@ -92,23 +92,7 @@
           </td>
         </tr>
 
-        <!-- Dias de Antecedência -->
-        <tr class="border-b border-gray-200">
-          <td class="py-2 pr-1 w-1/6 text-sm font-medium text-gray-700 whitespace-nowrap align-middle">
-            Dias de Antecedência
-          </td>
-          <td class="py-4">
-            <input
-              type="number"
-              id="diasAntecedencia"
-              name="diasAntecedencia"
-              [(ngModel)]="alertaDTO.diasAntecedencia"
-              min="0"
-              max="365"
-              class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-[#5084C1] focus:border-[#5084C1]"
-              placeholder="Ex: 7">
-          </td>
-        </tr>
+
 
         <!-- Produto Relacionado -->
         <tr class="border-b border-gray-200">
@@ -185,7 +169,7 @@
                   </thead>
                   <tbody>
                     <tr *ngFor="let item of itensProdutoNaoInspecionados" class="hover:bg-blue-50">
-                      <td class="px-2 py-1 text-gray-600 truncate">{{ item.produto?.descricao || descricaoProdutoSelecionado }}</td>
+                      <td class="px-2 py-1 text-gray-600 truncate">{{ item.produto && item.produto.descricao ? item.produto.descricao : descricaoProdutoSelecionado }}</td>
                       <td class="px-2 py-1 font-medium text-gray-700 truncate">{{ item.lote }}</td>
                       <td class="px-2 py-1 text-gray-600">{{ item.dataVencimento | date:'dd/MM/yyyy' }}</td>
                       <td class="px-2 py-1">
@@ -252,36 +236,6 @@
                         class="text-blue-600 hover:text-blue-800 font-bold">×</button>
               </span>
             </div>
-          </td>
-        </tr>
-
-        <!-- Recorrência -->
-        <tr class="border-b border-gray-200">
-          <td class="py-2 pr-1 w-1/6 text-sm font-medium text-gray-700 whitespace-nowrap align-middle">
-            Recorrência
-          </td>
-          <td class="py-4">
-            <div class="flex items-center gap-3">
-              <label class="flex items-center">
-                <input
-                  type="checkbox"
-                  id="recorrente"
-                  name="recorrente"
-                  [(ngModel)]="alertaDTO.recorrente"
-                  class="h-4 w-4 text-[#5084C1] focus:ring-[#5084C1] border-gray-300 rounded">
-                <span class="ml-2 text-sm text-gray-700">Alerta recorrente</span>
-                </label>
-
-            <input
-                *ngIf="alertaDTO.recorrente"
-              type="text"
-              id="configuracaoRecorrencia"
-              name="configuracaoRecorrencia"
-              [(ngModel)]="alertaDTO.configuracaoRecorrencia"
-              maxlength="100"
-                class="flex-1 px-3 py-1.5 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-[#5084C1] focus:border-[#5084C1]"
-              placeholder="Ex: Diário, Semanal, Mensal">
-          </div>
           </td>
         </tr>
 

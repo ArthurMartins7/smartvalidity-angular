@@ -47,7 +47,6 @@ export class AlertaListagemComponent implements OnInit, OnDestroy {
   public mostrarFiltros: boolean = false;
   public filtroTitulo: string = '';
   public filtroTipo: TipoAlerta | null = null;
-  public filtroAtivo: boolean | null = null;
   public filtroProduto: Produto | null = null;
   public filtroUsuario: Usuario | null = null;
   public filtroDataInicio: string = '';
@@ -191,7 +190,6 @@ export class AlertaListagemComponent implements OnInit, OnDestroy {
     this.seletor.pagina = 1;
     this.seletor.titulo = this.filtroTitulo || undefined;
     this.seletor.tipo = this.filtroTipo || undefined;
-    this.seletor.ativo = this.filtroAtivo ?? undefined;
     this.seletor.usuarioCriador = this.filtroUsuario?.nome || undefined;
 
     if (this.filtroDataInicio) {
@@ -213,12 +211,10 @@ export class AlertaListagemComponent implements OnInit, OnDestroy {
   public limparFiltros(): void {
     this.filtroTitulo = '';
     this.filtroTipo = null;
-    this.filtroAtivo = null;
     this.filtroProduto = null;
     this.filtroUsuario = null;
     this.filtroDataInicio = '';
     this.filtroDataFim = '';
-    this.ultimaBusca = '';
 
     this.seletor = new AlertaSeletor();
     this.seletor.pagina = 1;
@@ -303,35 +299,6 @@ export class AlertaListagemComponent implements OnInit, OnDestroy {
     this.router.navigate(['/alerta-detalhe', alerta.id]);
   }
 
-  /**
-   * Alterna o status ativo/inativo do alerta
-   */
-  public toggleAtivoAlerta(alerta: AlertaDTO.Listagem): void {
-    this.alertaService.toggleAtivo(alerta.id).subscribe({
-      next: (alertaAtualizado) => {
-        // Atualizar o item específico na lista e forçar detecção de mudanças
-        const index = this.alertas.findIndex(a => a.id === alerta.id);
-        if (index !== -1) {
-          // Criar uma nova instância do array para forçar detecção de mudanças
-          this.alertas = [...this.alertas];
-          this.alertas[index] = { ...alertaAtualizado };
-        }
-
-        const statusTexto = alertaAtualizado.ativo ? 'ativado' : 'desativado';
-        Swal.fire({
-          title: 'Sucesso!',
-          text: `Alerta ${statusTexto} com sucesso!`,
-          icon: 'success',
-          confirmButtonText: 'Ok'
-        });
-      },
-      error: (erro) => {
-        console.error('Erro ao atualizar status do alerta:', erro);
-        Swal.fire('Erro!', 'Não foi possível atualizar o status do alerta.', 'error');
-      }
-    });
-  }
-
   public formatarDataHora(data: Date): string {
     if (!data) return '-';
     return this.notificacaoService.formatarDataHora(data);
@@ -354,11 +321,7 @@ export class AlertaListagemComponent implements OnInit, OnDestroy {
   }
 
   public obterPrioridadeAlerta(alerta: AlertaDTO.Listagem): 'alta' | 'media' | 'normal' {
-    // Lógica de prioridade baseada no tipo e status
-    if (!alerta.ativo) {
-      return 'alta'; // Alertas inativos têm prioridade alta
-    }
-
+    // Lógica de prioridade baseada no tipo
     if (alerta.tipo === TipoAlerta.VENCIMENTO_ATRASO) {
       return 'alta'; // Produtos em atraso têm alta prioridade
     }
@@ -371,8 +334,8 @@ export class AlertaListagemComponent implements OnInit, OnDestroy {
   }
 
   public isUrgente(alerta: AlertaDTO.Listagem): boolean {
-    // Considera urgente se for produto vencido em atraso ou inativo
-    return alerta.tipo === TipoAlerta.VENCIMENTO_ATRASO || !alerta.ativo;
+    // Considera urgente se for produto vencido em atraso
+    return alerta.tipo === TipoAlerta.VENCIMENTO_ATRASO;
   }
 
   public isProximoVencimento(alerta: AlertaDTO.Listagem): boolean {

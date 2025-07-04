@@ -6,7 +6,9 @@ import { takeUntil } from 'rxjs/operators';
 import Swal from 'sweetalert2';
 
 import { AlertaDTO } from '../../../shared/model/dto/alerta.dto';
+import { ItemProdutoDTO } from '../../../shared/model/dto/item-Produto.dto';
 import { TipoAlerta } from '../../../shared/model/enum/tipo-alerta.enum';
+import { ItemProdutoService } from '../../../shared/service/item-produto.service';
 import { NotificacaoService } from '../../../shared/service/notificacao.service';
 
 /**
@@ -31,6 +33,7 @@ export class NotificacaoDetalheComponent implements OnInit, OnDestroy {
   notificacao: AlertaDTO.Listagem | null = null;
   carregando: boolean = true;
   erro: string | null = null;
+  itensProdutoNaoInspecionados: ItemProdutoDTO[] = [];
 
   // Enums para template
   public TipoAlerta = TipoAlerta;
@@ -38,7 +41,8 @@ export class NotificacaoDetalheComponent implements OnInit, OnDestroy {
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private notificacaoService: NotificacaoService
+    private notificacaoService: NotificacaoService,
+    private itemProdutoService: ItemProdutoService
   ) {}
 
   ngOnInit(): void {
@@ -73,6 +77,15 @@ export class NotificacaoDetalheComponent implements OnInit, OnDestroy {
             // Marcar como lida quando o usuário visualiza os detalhes
             this.marcarComoLida();
           }
+          
+          // Carregar itens-produto se houver produtos relacionados
+          if (this.notificacao && this.notificacao.produtosAlertaIds && this.notificacao.produtosAlertaIds.length > 0) {
+            this.carregarItensProduto();
+          } else {
+            // Se não houver produtos relacionados, limpar a lista
+            this.itensProdutoNaoInspecionados = [];
+          }
+          
           this.carregando = false;
         },
         error: (error) => {
@@ -82,6 +95,31 @@ export class NotificacaoDetalheComponent implements OnInit, OnDestroy {
           if (error.status === 401 || error.status === 403) {
             this.router.navigate(['/login']);
           }
+        }
+      });
+  }
+
+  /**
+   * Carregar itens-produto não inspecionados dos produtos relacionados
+   */
+  private carregarItensProduto(): void {
+    if (!this.notificacao?.produtosAlertaIds || this.notificacao.produtosAlertaIds.length === 0) {
+      return;
+    }
+
+    // Buscar itens do primeiro produto (assumindo que notificações têm apenas um produto)
+    const produtoId = this.notificacao.produtosAlertaIds[0];
+    
+    this.itemProdutoService.buscarItensProdutoNaoInspecionadosPorProduto(produtoId)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (itens: ItemProdutoDTO[]) => {
+          this.itensProdutoNaoInspecionados = itens;
+          console.log(`Encontrados ${itens.length} itens-produto não inspecionados para a notificação`);
+        },
+        error: (erro: any) => {
+          console.error('Erro ao buscar itens-produto não inspecionados:', erro);
+          this.itensProdutoNaoInspecionados = [];
         }
       });
   }
@@ -202,6 +240,34 @@ export class NotificacaoDetalheComponent implements OnInit, OnDestroy {
    */
   public removerEmojis(titulo: string): string {
     return this.notificacaoService.removerEmojis(titulo);
+  }
+
+  /**
+   * Obtém a classe CSS para o status de vencimento
+   */
+  public getStatusVencimento(dataVencimento: Date | string): string {
+    const hoje = new Date();
+    const vencimento = new Date(dataVencimento);
+    const diffDays = Math.ceil((vencimento.getTime() - hoje.getTime()) / (1000 * 60 * 60 * 24));
+
+    if (diffDays < 0) return 'bg-red-100 text-red-800';
+    if (diffDays === 0) return 'bg-orange-100 text-orange-800';
+    if (diffDays <= 3) return 'bg-yellow-100 text-yellow-800';
+    return 'bg-green-100 text-green-800';
+  }
+
+  /**
+   * Obtém o texto do status de vencimento
+   */
+  public getTextoVencimento(dataVencimento: Date | string): string {
+    const hoje = new Date();
+    const vencimento = new Date(dataVencimento);
+    const diffDays = Math.ceil((vencimento.getTime() - hoje.getTime()) / (1000 * 60 * 60 * 24));
+
+    if (diffDays < 0) return 'Vencido';
+    if (diffDays === 0) return 'Vence hoje';
+    if (diffDays === 1) return 'Vence amanhã';
+    return `${diffDays} dias`;
   }
 
   /**

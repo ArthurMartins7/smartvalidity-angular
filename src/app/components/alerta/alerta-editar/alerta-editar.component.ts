@@ -183,7 +183,6 @@ export class AlertaEditarComponent implements OnInit, OnDestroy {
       this.alertaDTO = new AlertaDTO.Cadastro();
       // Alertas criados pelo usuário são sempre do tipo PERSONALIZADO
       this.alertaDTO.tipo = TipoAlerta.PERSONALIZADO;
-      this.alertaDTO.recorrente = false;
     }
   }
 
@@ -206,10 +205,7 @@ export class AlertaEditarComponent implements OnInit, OnDestroy {
         this.alertaDTO.descricao = alerta.descricao;
         // Alertas editáveis são sempre PERSONALIZADO (garantia adicional)
         this.alertaDTO.tipo = TipoAlerta.PERSONALIZADO;
-        this.alertaDTO.recorrente = alerta.recorrente;
         this.alertaDTO.dataHoraDisparo = alerta.dataHoraDisparo;
-        this.alertaDTO.diasAntecedencia = alerta.diasAntecedencia;
-        this.alertaDTO.configuracaoRecorrencia = alerta.configuracaoRecorrencia;
         this.alertaDTO.produtosIds = alerta.produtosAlertaIds ? [...alerta.produtosAlertaIds] : [];
         this.alertaDTO.usuariosIds = alerta.usuariosAlertaIds ? [...alerta.usuariosAlertaIds] : [];
         this.usuariosSelecionados = [...this.alertaDTO.usuariosIds];
@@ -305,9 +301,6 @@ export class AlertaEditarComponent implements OnInit, OnDestroy {
       titulo: this.alertaDTO.titulo,
       descricao: this.alertaDTO.descricao,
       dataHoraDisparo: this.alertaDTO.dataHoraDisparo,
-      diasAntecedencia: this.alertaDTO.diasAntecedencia,
-      recorrente: this.alertaDTO.recorrente,
-      configuracaoRecorrencia: this.alertaDTO.configuracaoRecorrencia,
       produtosIds: this.produtoSelecionado ? [this.produtoSelecionado] : [],
       usuariosIds: this.usuariosSelecionados
     };

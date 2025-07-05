@@ -10,16 +10,6 @@ import { TipoAlerta } from '../../../shared/model/enum/tipo-alerta.enum';
 import { AlertaService } from '../../../shared/service/alerta.service';
 import { NotificacaoService } from '../../../shared/service/notificacao.service';
 
-/**
- * Componente responsável pela visualização detalhada de um alerta.
- *
- * RESPONSABILIDADES MVC (VIEW):
- * - Apresentar dados detalhados do alerta ao usuário
- * - Capturar interações básicas (voltar, editar)
- * - Chamar métodos do Service para operações de negócio
- * - Não contém lógica de negócio complexa
- * - Foco na apresentação e experiência do usuário
- */
 @Component({
   selector: 'app-alerta-detalhe',
   standalone: true,
@@ -34,7 +24,6 @@ export class AlertaDetalheComponent implements OnInit, OnDestroy {
   carregando: boolean = false;
   alertaId: number | null = null;
 
-  // Enums para template
   public TipoAlerta = TipoAlerta;
 
   constructor(
@@ -62,9 +51,6 @@ export class AlertaDetalheComponent implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 
-  /**
-   * Carregar dados do alerta
-   */
   private carregarAlerta(): void {
     if (!this.alertaId) return;
 
@@ -101,16 +87,10 @@ export class AlertaDetalheComponent implements OnInit, OnDestroy {
       });
   }
 
-  /**
-   * Voltar para a página anterior
-   */
   public voltarParaLista(): void {
     this.location.back();
   }
 
-  /**
-   * Editar o alerta atual
-   */
   public editarAlerta(): void {
     if (!this.alerta) return;
 
@@ -127,56 +107,32 @@ export class AlertaDetalheComponent implements OnInit, OnDestroy {
     this.router.navigate(['/alerta-editar', this.alerta.id]);
   }
 
-  /**
-   * Obter descrição do tipo de alerta
-   * Responsabilidade: VIEW - Delega formatação para o SERVICE
-   */
   public obterDescricaoTipo(tipo: TipoAlerta): string {
     return this.notificacaoService.obterDescricaoTipo(tipo);
   }
 
-  /**
-   * Obter cor do tipo de alerta
-   * Responsabilidade: VIEW - Delega formatação para o SERVICE
-   */
   public obterCorTipo(tipo: TipoAlerta): string {
     return this.notificacaoService.obterCorTipo(tipo);
   }
 
-  /**
-   * Formatar data/hora completa
-   * Responsabilidade: VIEW - Delega formatação para o SERVICE
-   */
   public formatarDataHora(data: Date): string {
     if (!data) return '-';
     return this.notificacaoService.formatarDataHora(data);
   }
 
-  /**
-   * Remove emojis do título do alerta
-   * Responsabilidade: VIEW - Delega formatação para o SERVICE
-   */
   public removerEmojis(titulo: string): string {
     return this.notificacaoService.removerEmojis(titulo);
   }
 
-  /**
-   * Verificar se o alerta pode ser editado
-   */
+
   public podeEditar(): boolean {
     return this.alerta?.tipo === TipoAlerta.PERSONALIZADO;
   }
 
-  /**
-   * Navegar para a página de detalhes do item no mural utilizando a mesma
-   * lógica que a tela de Notificação. Exibe loading, delega a obtenção dos
-   * dados de navegação ao NotificacaoService e trata os cenários de detalhe
-   * específico ou listagem com filtros.
-   */
   public visualizarItem(_unused?: any): void {
     if (!this.alerta) return;
 
-    // Exibe loading enquanto busca informações
+    // loading enquanto busca informações:
     Swal.fire({
       title: 'Carregando...',
       text: 'Buscando informações do item',
@@ -193,7 +149,7 @@ export class AlertaDetalheComponent implements OnInit, OnDestroy {
           Swal.close();
 
           if (resultado.tipo === 'detalhe' && resultado.dados) {
-            // Navega diretamente para o detalhe do item
+            // navega para o detalhe do item:
             this.router.navigate([
               '/mural-detalhe',
               resultado.dados.itemId
@@ -201,12 +157,12 @@ export class AlertaDetalheComponent implements OnInit, OnDestroy {
               queryParams: resultado.dados.queryParams
             });
           } else if (resultado.tipo === 'listagem' && resultado.dados) {
-            // Navega para listagem do mural com filtros aplicados
+            // navega para listagem do mural com filtros aplicados
             this.router.navigate(['/mural-listagem'], {
               queryParams: resultado.dados
             });
           } else {
-            // Fallback: redireciona para mural genérico
+            // fallback: redireciona para mural genérico
             Swal.fire({
               title: 'Atenção',
               text: 'Não foi possível encontrar o item específico. Redirecionando para o mural.',

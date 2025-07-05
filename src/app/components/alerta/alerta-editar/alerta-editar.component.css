@@ -1,11 +1,9 @@
-/* Estilos específicos para o componente de edição de alertas */
-
-/* Override para inputs datetime-local */
+/* override para inputs datetime-local */
 input[type="datetime-local"] {
   min-height: 38px;
 }
 
-/* Estados de validação personalizados */
+/* estados de validação personalizados: */
 .ng-invalid.ng-touched:not(form) {
   border-color: #ef4444;
   box-shadow: 0 0 0 1px #ef4444;
@@ -16,7 +14,7 @@ input[type="datetime-local"] {
   box-shadow: 0 0 0 1px #10b981;
 }
 
-/* Loading animation */
+/* animação de loading: */
 @keyframes spin {
   from {
     transform: rotate(0deg);
@@ -28,4 +26,4 @@ input[type="datetime-local"] {
 
 .animate-spin {
   animation: spin 1s linear infinite;
-} 
+}

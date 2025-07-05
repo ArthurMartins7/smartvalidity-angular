@@ -40,25 +40,24 @@ export class AlertaEditarComponent implements OnInit, OnDestroy {
   public alertaId: number | null = null;
   public carregando: boolean = false;
 
-  // Campos auxiliares para o formulário
+  // campos formulário
   public produtoSelecionado: string = '';
   public descricaoProdutoSelecionado: string = '';
   public usuariosSelecionados: string[] = [];
   public itensProdutoNaoInspecionados: ItemProdutoDTO[] = [];
 
-  // Campos para busca dinâmica de produtos
+  // campos de busca de produtos
   public termoBuscaProduto: string = '';
   public produtosFiltrados: Produto[] = [];
   public mostrarDropdown: boolean = false;
   private searchSubject = new Subject<string>();
 
-  // Campos para busca dinâmica de usuários
+  // usuários
   public termoBuscaUsuario: string = '';
   public usuariosFiltrados: Usuario[] = [];
   public mostrarDropdownUsuarios: boolean = false;
   private searchUsuarioSubject = new Subject<string>();
 
-  // Enums para template
   public TipoAlerta = TipoAlerta;
 
   ngOnInit(): void {
@@ -82,9 +81,7 @@ export class AlertaEditarComponent implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 
-  /**
-   * Configura a busca de produtos com debounce
-   */
+  // configura a busca de produtos com debounce:
   private setupProdutoSearch(): void {
     this.searchSubject.pipe(
       debounceTime(300),
@@ -108,9 +105,7 @@ export class AlertaEditarComponent implements OnInit, OnDestroy {
     });
   }
 
-  /**
-   * Método chamado quando o usuário digita na busca de produto
-   */
+  // chamado quando o usuário digita na busca de produto:
   public onBuscaProdutoChange(): void {
     this.searchSubject.next(this.termoBuscaProduto);
     if (this.termoBuscaProduto.length < 2) {
@@ -119,9 +114,7 @@ export class AlertaEditarComponent implements OnInit, OnDestroy {
     }
   }
 
-  /**
-   * Método chamado quando o usuário seleciona um produto do dropdown
-   */
+   // quando o usuário seleciona um produto do dropdown
   public selecionarProduto(produto: Produto): void {
     this.produtoSelecionado = produto.id;
     this.descricaoProdutoSelecionado = produto.descricao;
@@ -130,9 +123,6 @@ export class AlertaEditarComponent implements OnInit, OnDestroy {
     this.onProdutoSelecionado();
   }
 
-  /**
-   * Limpa a seleção de produto
-   */
   public limparSelecaoProduto(): void {
     this.produtoSelecionado = '';
     this.descricaoProdutoSelecionado = '';
@@ -141,18 +131,13 @@ export class AlertaEditarComponent implements OnInit, OnDestroy {
     this.mostrarDropdown = false;
   }
 
-  /**
-   * Método para fechar dropdown com delay (para permitir clique nos itens)
-   */
+   // fecha dropdown com delay (para permitir clique nos itens)
   public fecharDropdownComDelay(): void {
     setTimeout(() => {
       this.mostrarDropdown = false;
     }, 200);
   }
 
-  /**
-   * Obtém a classe CSS para o status de vencimento
-   */
   public getStatusVencimento(dataVencimento: Date | string): string {
     const hoje = new Date();
     const vencimento = new Date(dataVencimento);
@@ -164,9 +149,8 @@ export class AlertaEditarComponent implements OnInit, OnDestroy {
     return 'bg-green-100 text-green-800';
   }
 
-  /**
-   * Obtém o texto do status de vencimento
-   */
+
+  // recebe o texto do status de vencimento:
   public getTextoVencimento(dataVencimento: Date | string): string {
     const hoje = new Date();
     const vencimento = new Date(dataVencimento);
@@ -178,10 +162,10 @@ export class AlertaEditarComponent implements OnInit, OnDestroy {
     return `${diffDays} dias`;
   }
 
+  // alertas criados pelo usuário são sempre setados como personalizado
   private inicializarAlerta(): void {
     if (!this.isEdicao) {
       this.alertaDTO = new AlertaDTO.Cadastro();
-      // Alertas criados pelo usuário são sempre do tipo PERSONALIZADO
       this.alertaDTO.tipo = TipoAlerta.PERSONALIZADO;
     }
   }
@@ -191,19 +175,16 @@ export class AlertaEditarComponent implements OnInit, OnDestroy {
 
     this.carregando = true;
     this.alertaService.buscarPorId(this.alertaId).subscribe({
-      next: (alerta) => {
-        // Verificar se é um alerta automático (não editável)
+      next: (alerta) => {  // verifica se é um alerta automático
         if (alerta.tipo !== TipoAlerta.PERSONALIZADO) {
           Swal.fire('Atenção!', 'Alertas automáticos não podem ser editados.', 'warning');
           this.voltar();
           return;
         }
 
-        // No modo edição, construir um objeto adequado para o formulário
         this.alertaDTO = new AlertaDTO.Cadastro();
         this.alertaDTO.titulo = alerta.titulo;
         this.alertaDTO.descricao = alerta.descricao;
-        // Alertas editáveis são sempre PERSONALIZADO (garantia adicional)
         this.alertaDTO.tipo = TipoAlerta.PERSONALIZADO;
         this.alertaDTO.dataHoraDisparo = alerta.dataHoraDisparo;
         this.alertaDTO.produtosIds = alerta.produtosAlertaIds ? [...alerta.produtosAlertaIds] : [];
@@ -212,7 +193,6 @@ export class AlertaEditarComponent implements OnInit, OnDestroy {
 
         if (alerta.produtosAlertaIds && alerta.produtosAlertaIds.length > 0) {
           this.produtoSelecionado = alerta.produtosAlertaIds[0];
-          // Buscar o produto para preencher o campo de busca
           this.produtoService.buscarPorId(this.produtoSelecionado).subscribe({
             next: (produto) => {
               this.termoBuscaProduto = produto.descricao;
@@ -253,10 +233,8 @@ export class AlertaEditarComponent implements OnInit, OnDestroy {
       return;
     }
 
-    // Preparar arrays antes de salvar
     this.alertaDTO.produtosIds = this.produtoSelecionado ? [this.produtoSelecionado] : [];
     this.alertaDTO.usuariosIds = this.usuariosSelecionados;
-
     this.carregando = true;
 
     if (this.isEdicao && this.alertaId) {
@@ -267,12 +245,10 @@ export class AlertaEditarComponent implements OnInit, OnDestroy {
   }
 
   private criarAlerta(): void {
-    // Garantir que o tipo seja sempre PERSONALIZADO para alertas criados pelo usuário
+
     this.alertaDTO.tipo = TipoAlerta.PERSONALIZADO;
 
-    // Converter a data para o formato correto se necessário
     if (this.alertaDTO.dataHoraDisparo) {
-      // Se for string, converter para Date primeiro
       if (typeof this.alertaDTO.dataHoraDisparo === 'string') {
         this.alertaDTO.dataHoraDisparo = new Date(this.alertaDTO.dataHoraDisparo);
       }
@@ -335,7 +311,6 @@ export class AlertaEditarComponent implements OnInit, OnDestroy {
       return false;
     }
 
-    // Validação de apresentação apenas - lógica de negócio fica no backend
     return true;
   }
 
@@ -360,15 +335,10 @@ export class AlertaEditarComponent implements OnInit, OnDestroy {
     return this.usuariosSelecionados.includes(usuarioId);
   }
 
-  /**
-   * Método chamado quando o produto é selecionado
-   * Busca automaticamente os itens-produto não inspecionados
-   */
   public onProdutoSelecionado(): void {
     if (this.produtoSelecionado) {
       console.log('Produto selecionado:', this.produtoSelecionado);
 
-      // Buscar itens-produto não inspecionados do produto selecionado
       this.itemProdutoService.buscarItensProdutoNaoInspecionadosPorProduto(this.produtoSelecionado)
         .subscribe({
           next: (itens: ItemProdutoDTO[]) => {
@@ -381,14 +351,10 @@ export class AlertaEditarComponent implements OnInit, OnDestroy {
           }
         });
     } else {
-      // Se nenhum produto selecionado, limpar lista de itens
       this.itensProdutoNaoInspecionados = [];
     }
   }
 
-  /**
-   * Executa busca imediata pelo termo atual (botão de lupa)
-   */
   public executarBuscaProduto(): void {
     const termo = this.termoBuscaProduto?.trim();
     if (!termo || termo.length < 2) {
@@ -470,17 +436,13 @@ export class AlertaEditarComponent implements OnInit, OnDestroy {
 
   public set dataHoraDisparoInput(value: string) {
     if (value) {
-      // Criar a data no formato local sem conversão de timezone
       const data = new Date(value);
-      // Converter para formato ISO local (sem timezone)
       const ano = data.getFullYear();
       const mes = String(data.getMonth() + 1).padStart(2, '0');
       const dia = String(data.getDate()).padStart(2, '0');
       const hora = String(data.getHours()).padStart(2, '0');
       const minuto = String(data.getMinutes()).padStart(2, '0');
       const segundo = String(data.getSeconds()).padStart(2, '0');
-
-      // Criar string no formato esperado pelo backend: yyyy-MM-ddTHH:mm:ss
       const dataFormatada = `${ano}-${mes}-${dia}T${hora}:${minuto}:${segundo}`;
       this.alertaDTO.dataHoraDisparo = dataFormatada as any;
     } else {

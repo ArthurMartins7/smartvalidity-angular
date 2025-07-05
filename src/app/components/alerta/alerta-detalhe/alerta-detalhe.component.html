@@ -44,7 +44,7 @@
 
   <!-- Conteúdo -->
   <div class="p-6 space-y-6">
-    <!-- Card Descrição -->
+    <!-- Descrição do Card  -->
     <div *ngIf="alerta.descricao" class="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200 px-6 py-4 border-l-4 border-emerald-400">
       <div class="flex items-center gap-3 mb-4">
         <div class="p-2 rounded-full bg-emerald-100">
@@ -57,7 +57,7 @@
 
     <!-- Grid de Cards -->
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-      <!-- Card Informações de Tempo -->
+      <!-- Card com Informações de Tempo -->
       <div class="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200 px-6 py-4 border-l-4 border-purple-400">
         <div class="flex items-center gap-3 mb-4">
           <div class="p-2 rounded-full bg-purple-100">
@@ -77,7 +77,7 @@
         </div>
       </div>
 
-      <!-- Card Informações Adicionais -->
+      <!-- Card de Informações Adicionais -->
       <div class="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200 px-6 py-4 border-l-4 border-amber-400">
         <div class="flex items-center gap-3 mb-4">
           <div class="p-2 rounded-full bg-amber-100">
@@ -94,7 +94,7 @@
       </div>
     </div>
 
-    <!-- Card Usuários -->
+    <!-- Card de Usuários -->
     <div *ngIf="alerta.usuariosAlerta && alerta.usuariosAlerta.length > 0"
          class="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200 px-6 py-4 border-l-4 border-blue-400">
       <div class="flex items-center gap-3 mb-4">
@@ -111,7 +111,7 @@
       </div>
     </div>
 
-    <!-- Card Produtos -->
+    <!-- Card de Produtos -->
     <div *ngIf="alerta.produtosAlerta && alerta.produtosAlerta.length > 0"
          class="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200 px-6 py-4 border-l-4 border-green-400">
       <div class="flex items-center gap-3 mb-4">

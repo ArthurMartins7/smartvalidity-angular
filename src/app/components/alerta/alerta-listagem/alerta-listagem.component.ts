@@ -37,13 +37,11 @@ export class AlertaListagemComponent implements OnInit, OnDestroy {
   public produtos: Produto[] = [];
   public usuarios: Usuario[] = [];
 
-  // Propriedades para paginação
   public totalPaginas: number = 0;
   public tamanhoPagina: number = 10;
   public opcoesItensPorPagina: number[] = [5, 10, 15, 20, 25, 50];
   public itensPorPagina: number = 10;
 
-  // Propriedades para filtros
   public mostrarFiltros: boolean = false;
   public filtroTitulo: string = '';
   public filtroTipo: TipoAlerta | null = null;
@@ -52,13 +50,11 @@ export class AlertaListagemComponent implements OnInit, OnDestroy {
   public filtroDataInicio: string = '';
   public filtroDataFim: string = '';
 
-  // Propriedades para busca
   public buscando: boolean = false;
   public ultimaBusca: string = '';
 
   private searchSubject = new Subject<string>();
 
-  // Enums para template
   public TipoAlerta = TipoAlerta;
   public tiposAlerta = Object.values(TipoAlerta);
 
@@ -66,7 +62,6 @@ export class AlertaListagemComponent implements OnInit, OnDestroy {
     this.seletor.pagina = 1;
     this.seletor.limite = this.itensPorPagina;
 
-    // Configurar observador de busca
     this.searchSubject.pipe(
       debounceTime(500),
       distinctUntilChanged(),
@@ -83,7 +78,7 @@ export class AlertaListagemComponent implements OnInit, OnDestroy {
   }
 
   public onSearchInput(): void {
-    // Se o usuário limpar o campo, reseta a busca
+    
     if (!this.filtroTitulo) {
       this.limparFiltros();
       return;
@@ -99,8 +94,6 @@ export class AlertaListagemComponent implements OnInit, OnDestroy {
 
     this.buscando = true;
     this.ultimaBusca = this.filtroTitulo;
-
-    // Reset selector search parameters
     this.seletor = new AlertaSeletor();
     this.seletor.pagina = 1;
     this.seletor.limite = this.itensPorPagina;
@@ -116,7 +109,6 @@ export class AlertaListagemComponent implements OnInit, OnDestroy {
         this.calcularTotalPaginas();
         this.buscando = false;
 
-        // Feedback se a busca não retornou resultados
         if (this.alertas.length === 0 && this.ultimaBusca) {
           Swal.fire({
             title: 'Nenhum resultado encontrado',
@@ -131,11 +123,9 @@ export class AlertaListagemComponent implements OnInit, OnDestroy {
         console.error('Erro ao buscar alertas:', erro);
         this.buscando = false;
 
-        // Só exibe erro se não for um erro 404 (sem alertas) ou similar
         if (erro.status !== 404 && erro.status !== 204) {
           Swal.fire('Erro!', 'Não foi possível carregar os alertas.', 'error');
         }
-        // Se for 404 ou 204, apenas define lista vazia
         this.alertas = [];
       }
     });
@@ -253,7 +243,6 @@ export class AlertaListagemComponent implements OnInit, OnDestroy {
     const totalPaginas = this.totalPaginas;
     const paginas: (number | string)[] = [];
 
-    // Se tiver 4 páginas ou menos, mostra todas
     if (totalPaginas <= 4) {
       for (let i = 1; i <= totalPaginas; i++) {
         paginas.push(i);
@@ -261,15 +250,14 @@ export class AlertaListagemComponent implements OnInit, OnDestroy {
       return paginas;
     }
 
-    // Para mais de 4 páginas, mostra no máximo 4 elementos
     if (paginaAtual <= 2) {
-      // Páginas iniciais: [1] [2] [3] ...
+
       paginas.push(1, 2, 3, '...');
     } else if (paginaAtual >= totalPaginas - 1) {
-      // Páginas finais: ... [n-2] [n-1] [n]
+      
       paginas.push('...', totalPaginas - 2, totalPaginas - 1, totalPaginas);
     } else {
-      // Páginas do meio: [1] ... [atual] [atual+1]
+
       paginas.push(1, '...', paginaAtual, paginaAtual + 1);
     }
 
@@ -281,7 +269,7 @@ export class AlertaListagemComponent implements OnInit, OnDestroy {
   }
 
   public editarAlerta(alerta: AlertaDTO.Listagem): void {
-    // Verificar se é um alerta editável
+   
     if (alerta.tipo !== TipoAlerta.PERSONALIZADO) {
       Swal.fire({
         title: 'Alerta Automático',
@@ -321,30 +309,30 @@ export class AlertaListagemComponent implements OnInit, OnDestroy {
   }
 
   public obterPrioridadeAlerta(alerta: AlertaDTO.Listagem): 'alta' | 'media' | 'normal' {
-    // Lógica de prioridade baseada no tipo
+   
     if (alerta.tipo === TipoAlerta.VENCIMENTO_ATRASO) {
-      return 'alta'; // Produtos em atraso têm alta prioridade
+      return 'alta';
     }
 
     if (alerta.tipo === TipoAlerta.VENCIMENTO_HOJE || alerta.tipo === TipoAlerta.VENCIMENTO_AMANHA) {
-      return 'media'; // Produtos vencendo em breve têm média prioridade
+      return 'media'; 
     }
 
     return 'normal';
   }
 
   public isUrgente(alerta: AlertaDTO.Listagem): boolean {
-    // Considera urgente se for produto vencido em atraso
+   
     return alerta.tipo === TipoAlerta.VENCIMENTO_ATRASO;
   }
 
   public isProximoVencimento(alerta: AlertaDTO.Listagem): boolean {
-    // Verifica se é um alerta de produto vencendo hoje ou amanhã
+    
     return alerta.tipo === TipoAlerta.VENCIMENTO_HOJE || alerta.tipo === TipoAlerta.VENCIMENTO_AMANHA;
   }
 
   public calcularDiasParaVencimento(alerta: AlertaDTO.Listagem): number {
-    // Cálculo baseado no tipo de alerta
+    
     switch (alerta.tipo) {
       case TipoAlerta.VENCIMENTO_HOJE:
         return 0;

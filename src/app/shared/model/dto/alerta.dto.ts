@@ -10,13 +10,13 @@ export namespace AlertaDTO {
     tipo!: TipoAlerta;
     dataCriacao!: Date;
     dataEnvio?: Date;
-    usuarioCriador?: string; // Nome do usuário criador
-    usuariosAlerta?: string[]; // Nomes
-    produtosAlerta?: string[]; // Nomes
-    usuariosAlertaIds?: string[]; // IDs
-    produtosAlertaIds?: string[]; // IDs
-    produto?: { id: number; nome: string }; // Produto individual para compatibilidade
-    lida?: boolean; // Status de leitura da notificação
+    usuarioCriador?: string;
+    usuariosAlerta?: string[];
+    produtosAlerta?: string[];
+    usuariosAlertaIds?: string[];
+    produtosAlertaIds?: string[];
+    produto?: { id: number; nome: string };
+    lida?: boolean;
   }
 
   export class Cadastro {
@@ -24,8 +24,8 @@ export namespace AlertaDTO {
     descricao!: string;
     dataHoraDisparo!: Date;
     tipo!: TipoAlerta;
-    usuariosIds?: string[]; // IDs dos usuários que receberão o alerta
-    produtosIds?: string[]; // IDs dos produtos relacionados (opcional)
+    usuariosIds?: string[];
+    produtosIds?: string[];
   }
 
   export class Edicao {

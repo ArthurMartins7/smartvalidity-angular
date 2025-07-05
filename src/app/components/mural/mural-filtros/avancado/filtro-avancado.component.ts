@@ -263,9 +263,7 @@ export class FiltroAvancadoComponent implements OnInit, OnDestroy {
   }
 
   onColaboradorFocus(): void {
-    // Reseta a lista filtrada para mostrar todos os usuários
     this.filteredUsuariosInspecao = [...this.filterOptions.availableUsuariosInspecao];
-    // Mostra o dropdown
     this.showUsuarioInspecaoDropdown = true;
   }
 
@@ -281,13 +279,6 @@ export class FiltroAvancadoComponent implements OnInit, OnDestroy {
     }
   }
 
-  /**
-   * Seleciona uma opção de um dropdown e atualiza os filtros temporários.
-   * Responsabilidade: Controle da seleção de filtros temporários (Component Layer).
-   *
-   * Este método apenas atualiza os filtros temporários - eles só serão aplicados
-   * definitivamente quando o usuário clicar em "Aplicar filtros".
-   */
   selectOption(field: string, value: string): void {
     switch (field) {
       case 'marca':

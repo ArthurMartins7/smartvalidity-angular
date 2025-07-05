@@ -31,33 +31,25 @@ import { MuralTabsComponent } from '../mural-tabs/mural-tabs.component';
   styleUrls: ['./mural-listagem.component.css']
 })
 export class MuralListagemComponent implements OnInit, OnDestroy {
-
   filteredItems: MuralListagemDTO[] = [];
-
-
   activeTab: 'proximo' | 'hoje' | 'vencido' = 'proximo';
   searchTerm: string = '';
   sortDirection: 'asc' | 'desc' = 'asc';
   sortField: string = '';
   filtroInspecao: 'todos' | 'inspecionados' | 'naoInspecionados' = 'todos';
-
   showFilterModal: boolean = false;
   loading: boolean = false;
-
   private selectedIds: string[] = [];
   private subscriptions: Subscription[] = [];
   public totalPaginas: number = 1;
   public opcoesItensPorPagina: number[] = [5, 10, 15, 20, 25, 50];
   public totalItensAba: number = 0;
-
   public get paginaAtual(): number {
     return this.filterService['paginaAtualSubject'].value;
   }
-
   public get itensPorPagina(): number {
     return this.filterService['itensPorPaginaSubject'].value;
   }
-
   constructor(
     private muralService: MuralService,
     public filterService: MuralFilterService,
@@ -66,14 +58,12 @@ export class MuralListagemComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     private router: Router
   ) {}
-
   ngOnInit(): void {
     this.initializeFromRouting();
     this.setupFilterSubscriptions();
     this.setupSelectionSubscription();
     this.loadFilterOptions();
   }
-
   loadFilterOptions(): void {
     const subscription = this.muralService.getOpcoesFiltro().subscribe({
       next: (options) => {
@@ -87,10 +77,8 @@ export class MuralListagemComponent implements OnInit, OnDestroy {
       },
       error: (error) => console.error('Erro ao carregar opções de filtro:', error)
     });
-
     this.subscriptions.push(subscription);
   }
-
   private setupSelectionSubscription(): void {
     const subscription = this.selecaoService.selectedItems$.subscribe(
       selectedIds => {
@@ -98,10 +86,8 @@ export class MuralListagemComponent implements OnInit, OnDestroy {
         this.updateItemSelectionState();
       }
     );
-
     this.subscriptions.push(subscription);
   }
-
   private updateItemSelectionState(): void {
     if (this.filteredItems && this.filteredItems.length > 0) {
       this.filteredItems.forEach(item => {
@@ -109,61 +95,48 @@ export class MuralListagemComponent implements OnInit, OnDestroy {
       });
     }
   }
-
   selectAll(event: Event): void {
     const target = event.target as HTMLInputElement;
     const checked = target.checked;
     this.selecaoService.selectAll(this.filteredItems, checked);
     this.updateItemSelectionState();
   }
-
   onItemSelection(item: MuralListagemDTO, selected: boolean): void {
     this.selecaoService.toggleItemSelection(item, selected);
   }
-
   ngOnDestroy(): void {
     this.subscriptions.forEach(sub => sub.unsubscribe());
   }
-
   private initializeFromRouting(): void {
     const navigation = this.router.getCurrentNavigation();
     const state = navigation?.extras?.state;
-
     if (state) {
       if ('activeTab' in state) {
         this.activeTab = state['activeTab'] as 'proximo' | 'hoje' | 'vencido';
       }
-
       if (!state['preserveFilters']) {
         this.filterService.resetFilters();
         this.filterService.updatePaginaAtual(1);
-        this.filtroInspecao = 'todos'; // Reset do filtro de inspeção
+        this.filtroInspecao = 'todos';
       } else {
-
         this.filtroInspecao = this.filterService.getInspecaoFilter();
       }
-
       this.loadItems();
     } else {
-
       const subscription = this.route.queryParams.subscribe(params => {
         if (params['tab']) {
           const newTab = params['tab'] as 'proximo' | 'hoje' | 'vencido';
-
           if (newTab !== this.activeTab) {
             this.activeTab = newTab;
-
             this.filterService.updatePaginaAtual(1);
           }
         }
-
         this.filtroInspecao = this.filterService.getInspecaoFilter();
         this.loadItems();
       });
       this.subscriptions.push(subscription);
     }
   }
-
   private setupFilterSubscriptions(): void {
     const subscription = combineLatest([
       this.filterService.searchTerm$,
@@ -176,18 +149,14 @@ export class MuralListagemComponent implements OnInit, OnDestroy {
       this.sortDirection = sortDirection;
       this.applyFilters();
     });
-
     this.subscriptions.push(subscription);
   }
-
   loadItems(): void {
     this.applyFilters();
   }
-
   applyFilters(): void {
     this.loading = true;
     const filtroDTO = this.filterService.toFilterDTO();
-
     switch (this.activeTab) {
       case 'proximo':
         filtroDTO.status = 'proximo';
@@ -199,13 +168,11 @@ export class MuralListagemComponent implements OnInit, OnDestroy {
         filtroDTO.status = 'vencido';
         break;
     }
-
     if (this.filtroInspecao === 'inspecionados') {
       filtroDTO.inspecionado = true;
     } else if (this.filtroInspecao === 'naoInspecionados') {
       filtroDTO.inspecionado = false;
     }
-
     let sortDirectionToSend = this.sortDirection;
     if (this.activeTab === 'vencido' && this.sortField === 'dataVencimento') {
       sortDirectionToSend = this.sortDirection === 'asc' ? 'desc' : 'asc';
@@ -213,7 +180,6 @@ export class MuralListagemComponent implements OnInit, OnDestroy {
     filtroDTO.sortDirection = sortDirectionToSend;
     this.calcularTotalPaginas(filtroDTO);
     this.selecaoService.updateTotalItensAba(filtroDTO);
-
     const subscription = this.muralService.filtrarProdutos(filtroDTO).subscribe({
       next: (items) => {
         this.filteredItems = items.map(item => {
@@ -222,7 +188,6 @@ export class MuralListagemComponent implements OnInit, OnDestroy {
           }
           return item;
         });
-
         this.updateItemSelectionState();
         this.loading = false;
       },
@@ -231,45 +196,36 @@ export class MuralListagemComponent implements OnInit, OnDestroy {
         this.loading = false;
       }
     });
-
     this.subscriptions.push(subscription);
   }
-
   onSearchChange(term: string): void {
     this.filterService.updateSearchTerm(term);
   }
-
   openFilterModal(): void {
     this.showFilterModal = true;
   }
-
   closeFilterModal(): void {
     this.showFilterModal = false;
   }
-
   clearFilter(filterName: string): void {
     this.filterService.clearFilter(filterName as keyof MuralFilter);
     this.applyFilters();
   }
-
   clearDateFilter(): void {
     this.filterService.clearDateFilter('dataVencimento');
     this.applyFilters();
   }
-
   clearSpecificDateFilter(dateType: string): void {
     if (dateType === 'dataVencimento' || dateType === 'dataFabricacao' || dateType === 'dataRecebimento') {
       this.filterService.clearSpecificDateFilter(dateType as 'dataVencimento' | 'dataFabricacao' | 'dataRecebimento');
       this.applyFilters();
     }
   }
-
   resetAllFilters(): void {
     this.filterService.resetFilters();
     this.filterService.updateSortField('');
     this.filterService.updateSortDirection('asc');
   }
-
   toggleSortOrder(): void {
     const newDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';
     this.filterService.updateSortDirection(newDirection);
@@ -277,9 +233,7 @@ export class MuralListagemComponent implements OnInit, OnDestroy {
       this.filterService.updateSortField('nome');
     }
   }
-
   setSortField(field: string): void {
-
     if (this.sortField === field) {
       this.toggleSortOrder();
     } else {
@@ -287,17 +241,14 @@ export class MuralListagemComponent implements OnInit, OnDestroy {
       this.filterService.updateSortDirection('asc');
     }
   }
-
   onSortOptionSelected(option: {field: string, direction: 'asc' | 'desc'}): void {
     this.filterService.updateSortField(option.field);
     this.filterService.updateSortDirection(option.direction);
     this.filterService.updatePaginaAtual(1);
     this.applyFilters();
   }
-
   onInspecaoConfirmada(): void {
     try {
-
       this.selecaoService.confirmarInspecao(this.filteredItems).subscribe({
         next: (itensAtualizados) => {
           console.log('Itens inspecionados com sucesso:', itensAtualizados);
@@ -313,30 +264,23 @@ export class MuralListagemComponent implements OnInit, OnDestroy {
       console.error('Erro ao confirmar inspeção:', error);
     }
   }
-
   hasAppliedFilters(): boolean {
     return this.filterService.hasAppliedFilters() || !!this.searchTerm;
   }
-
   marcarSelecionadosComoInspecionados(): void {
     if (this.hasSelectedItems()) {
       this.selecaoService.openInspecaoModal();
     }
   }
-
   hasSelectedItems(): boolean {
     return this.selectedIds.length > 0;
   }
-
   getSelectedItemsCount(): number {
     return this.selectedIds.length;
   }
-
   setActiveTab(tab: 'proximo' | 'hoje' | 'vencido'): void {
     this.activeTab = tab;
-
     this.filterService.updatePaginaAtual(1);
-
     this.router.navigate([], {
       relativeTo: this.route,
       queryParams: { tab: tab },
@@ -345,10 +289,7 @@ export class MuralListagemComponent implements OnInit, OnDestroy {
     });
     this.loadItems();
   }
-
-
   private calcularTotalPaginas(filtro: MuralFiltroDTO): void {
-
     this.muralService.contarTotalRegistros(filtro).subscribe({
       next: (totalRegistros) => {
         this.totalItensAba = totalRegistros;
@@ -363,28 +304,24 @@ export class MuralListagemComponent implements OnInit, OnDestroy {
       }
     });
   }
-
   public avancarPagina(): void {
     if (this.paginaAtual < this.totalPaginas) {
       this.filterService.updatePaginaAtual(this.paginaAtual + 1);
       this.applyFilters();
     }
   }
-
   public voltarPagina(): void {
     if (this.paginaAtual > 1) {
       this.filterService.updatePaginaAtual(this.paginaAtual - 1);
       this.applyFilters();
     }
   }
-
   public irParaPagina(pagina: number): void {
     if (pagina !== this.paginaAtual) {
       this.filterService.updatePaginaAtual(pagina);
       this.applyFilters();
     }
   }
-
   public criarArrayPaginas(): number[] {
     const paginas = [];
     for (let i = 1; i <= this.totalPaginas; i++) {
@@ -392,12 +329,10 @@ export class MuralListagemComponent implements OnInit, OnDestroy {
     }
     return paginas;
   }
-
   public alterarItensPorPagina(quantidade: number): void {
     this.filterService.updateItensPorPagina(quantidade);
     this.applyFilters();
   }
-
   gerarRelatorio(): void {
     this.relatorioService.gerarRelatorioMural(
       'PAGINA',
@@ -410,17 +345,13 @@ export class MuralListagemComponent implements OnInit, OnDestroy {
       },
       error: (erro) => {
         console.error('Erro ao gerar relatório:', erro);
-        // TODO: Mostrar mensagem de erro para o usuário
       }
     });
   }
-
   gerarRelatorioSelecionados(): void {
     const itensSelecionados = this.filteredItems.filter(item => item.selecionado);
     if (itensSelecionados.length === 0) return;
-
     const ids = itensSelecionados.map(item => item.id);
-
     this.relatorioService.gerarRelatorioMural(
       'SELECIONADOS',
       ids,
@@ -433,16 +364,12 @@ export class MuralListagemComponent implements OnInit, OnDestroy {
       },
       error: (erro) => {
         console.error('Erro ao gerar relatório:', erro);
-        // TODO: Mostrar mensagem de erro para o usuário
       }
     });
   }
-
   private gerarRelatorioPaginaAtual(): void {
     if (this.filteredItems.length === 0) return;
-
     const ids = this.filteredItems.map(item => item.id);
-
     this.relatorioService.gerarRelatorioMural(
       'SELECIONADOS',
       ids,
@@ -454,15 +381,12 @@ export class MuralListagemComponent implements OnInit, OnDestroy {
       },
       error: (erro) => {
         console.error('Erro ao gerar relatório:', erro);
-        // TODO: Mostrar mensagem de erro para o usuário
       }
     });
   }
-
   private gerarRelatorioTodosItens(): void {
     const filtro = this.filterService.toFilterDTO();
-    filtro.status = this.activeTab; // Garante que o status da aba está incluso
-
+    filtro.status = this.activeTab;
     this.relatorioService.gerarRelatorioMural(
       'TODOS',
       null,
@@ -474,24 +398,20 @@ export class MuralListagemComponent implements OnInit, OnDestroy {
       },
       error: (erro) => {
         console.error('Erro ao gerar relatório:', erro);
-        // TODO: Mostrar mensagem de erro para o usuário
       }
     });
   }
-
   filtrarPorStatusInspecao(status: 'todos' | 'inspecionados' | 'naoInspecionados'): void {
     this.filtroInspecao = status;
     this.filterService.updatePaginaAtual(1);
     this.filterService.updateInspecaoFilter(status);
     this.applyFilters();
   }
-
   abrirModalAcoes(): void {
     if (this.hasSelectedItems()) {
       this.selecaoService.openAcoesModal();
     }
   }
-
   onAcaoSelecionada(acao: 'relatorio-selecionados' | 'relatorio-pagina' | 'relatorio-todos' | 'inspecao'): void {
     switch (acao) {
       case 'relatorio-selecionados':
@@ -508,7 +428,6 @@ export class MuralListagemComponent implements OnInit, OnDestroy {
         break;
     }
   }
-
   cancelarSelecao(): void {
     this.selecaoService.cancelarSelecaoBackend().subscribe({
       next: () => {
@@ -519,11 +438,9 @@ export class MuralListagemComponent implements OnInit, OnDestroy {
       }
     });
   }
-
   isAllSelectedOnPage(): boolean {
     return this.filteredItems.length > 0 && this.filteredItems.every(item => this.selectedIds.includes(item.id));
   }
-
   get nomeAbaAtual(): string {
     switch (this.activeTab) {
       case 'proximo': return 'Próximos a vencer';
@@ -532,7 +449,6 @@ export class MuralListagemComponent implements OnInit, OnDestroy {
       default: return '';
     }
   }
-
   onRemoveFilterValue(event: {filterName: string, value: string}): void {
     this.filterService.removeFilterValue(event.filterName as keyof MuralFilter, event.value);
     this.applyFilters();

@@ -27,10 +27,8 @@ export class ModalInspecaoComponent implements OnInit, OnDestroy {
   constructor(private selecaoService: MuralSelecaoService) { }
 
   ngOnInit(): void {
-    // Obter os motivos de inspeção do service
     this.motivosInspecao = this.selecaoService.motivosInspecao;
 
-    // Inscrever-se nas mudanças de visibilidade do modal
     const visibilitySubscription = this.selecaoService.showInspecaoModal$.subscribe(
       visible => {
         this.visible = visible;
@@ -40,17 +38,14 @@ export class ModalInspecaoComponent implements OnInit, OnDestroy {
       }
     );
 
-    // Inscrever-se nas mudanças do motivo de inspeção selecionado
     const motivoSubscription = this.selecaoService.motivoInspecao$.subscribe(
       motivo => this.motivoInspecao = motivo
     );
 
-    // Inscrever-se nas mudanças do motivo customizado
     const motivoCustomizadoSubscription = this.selecaoService.motivoCustomizado$.subscribe(
       motivo => this.motivoCustomizado = motivo
     );
 
-    // Inscrever-se nas mensagens de erro
     const errorSubscription = this.selecaoService.motivoInspecaoError$.subscribe(
       error => this.motivoInspecaoError = error
     );
@@ -64,36 +59,24 @@ export class ModalInspecaoComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    // Cancelar todas as subscriptions ativas
     this.subscriptions.forEach(sub => sub.unsubscribe());
   }
 
-  /**
-   * Fecha o modal de inspeção
-   */
   closeModal(): void {
     this.selecaoService.closeInspecaoModal();
   }
 
-  /**
-   * Seleciona um motivo de inspeção
-   */
   selecionarMotivo(motivo: string): void {
     this.selecaoService.selecionarMotivo(motivo);
   }
 
-  /**
-   * Confirma a inspeção com o motivo selecionado
-   */
   confirmarInspecao(): void {
-    // Se não houver motivo selecionado, o serviço irá emitir um erro
     if (!this.motivoInspecao) {
-      this.selecaoService.selecionarMotivo(''); // Isso vai disparar o erro no serviço
+      this.selecaoService.selecionarMotivo('');
       return;
     }
 
     try {
-      // O serviço irá fazer a chamada ao backend
       this.inspecaoConfirmada.emit();
     } catch (error) {
       console.error('Erro ao tentar confirmar inspeção:', error);

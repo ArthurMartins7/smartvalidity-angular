@@ -3,13 +3,7 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, of } from 'rxjs';
 import { MuralFiltroDTO, MuralListagemDTO } from '../model/dto/mural.dto';
 
-//-----------------------------------------------------------------------
-// INTERFACES
-//-----------------------------------------------------------------------
 
-/**
- * Interface para opções de filtro disponíveis
- */
 export interface FiltroOpcoes {
   marcas: string[];
   corredores: string[];
@@ -18,9 +12,7 @@ export interface FiltroOpcoes {
   lotes: string[];
 }
 
-/**
- * Interface para o estado do filtro aplicado
- */
+
 export interface MuralFilter {
   corredor: string[];
   categoria: string[];
@@ -44,9 +36,7 @@ export interface MuralFilter {
   usuarioInspecao: string[];
 }
 
-/**
- * Interface para opções de filtro
- */
+
 export interface MuralFilterOptions {
   availableBrands: string[];
   availableCorredores: string[];
@@ -56,9 +46,7 @@ export interface MuralFilterOptions {
   availableUsuariosInspecao: string[];
 }
 
-//-----------------------------------------------------------------------
-// SERVIÇO DE API: Comunicação com o backend
-//-----------------------------------------------------------------------
+
 @Injectable({
   providedIn: 'root'
 })
@@ -67,39 +55,28 @@ export class MuralService {
 
   constructor(private httpClient: HttpClient) { }
 
-  /**
-   * Obtém produtos próximos a vencer
-   */
+
   getProximosVencer(): Observable<MuralListagemDTO[]> {
     return this.httpClient.get<MuralListagemDTO[]>(`${this.API}/proximos-vencer`);
   }
 
-  /**
-   * Obtém produtos que vencem hoje
-   */
+
   getVencemHoje(): Observable<MuralListagemDTO[]> {
     return this.httpClient.get<MuralListagemDTO[]>(`${this.API}/vencem-hoje`);
   }
 
-  /**
-   * Obtém produtos já vencidos
-   */
+
   getVencidos(): Observable<MuralListagemDTO[]> {
     return this.httpClient.get<MuralListagemDTO[]>(`${this.API}/vencidos`);
   }
 
-  /**
-   * Obtém o nome do usuário atualmente logado
-   * @returns O nome do usuário ou 'Sistema' caso não esteja disponível
-   */
+
   private getUsuarioAtual(): string {
     const nome = sessionStorage.getItem('usuarioNome');
     return nome || 'Sistema';
   }
 
-  /**
-   * Marca um item como inspecionado
-   */
+
   marcarInspecionado(id: string, motivo: string, motivoCustomizado?: string): Observable<MuralListagemDTO> {
     const payload: any = {
       motivo: motivo,
@@ -111,9 +88,7 @@ export class MuralService {
     return this.httpClient.put<MuralListagemDTO>(`${this.API}/inspecionar/${id}`, payload);
   }
 
-  /**
-   * Marca vários itens como inspecionados
-   */
+
   marcarVariosInspecionados(ids: string[], motivo: string, motivoCustomizado?: string): Observable<MuralListagemDTO[]> {
     const payload: any = {
       ids: ids,
@@ -126,44 +101,32 @@ export class MuralService {
     return this.httpClient.put<MuralListagemDTO[]>(`${this.API}/inspecionar-lote`, payload);
   }
 
-  /**
-   * Obtém detalhes de um item específico
-   */
+
   getItemById(id: string): Observable<MuralListagemDTO> {
     return this.httpClient.get<MuralListagemDTO>(`${this.API}/item/${id}`);
   }
 
-  /**
-   * Busca produtos com filtros aplicados no backend
-   */
+
   filtrarProdutos(filtro: MuralFiltroDTO): Observable<MuralListagemDTO[]> {
     return this.httpClient.post<MuralListagemDTO[]>(`${this.API}/filtrar`, filtro);
   }
 
-  /**
-   * Obtém opções de valores para filtros
-   */
+
   getOpcoesFiltro(): Observable<FiltroOpcoes> {
     return this.httpClient.get<FiltroOpcoes>(`${this.API}/filtro-opcoes`);
   }
 
-  /**
-   * Obtém lista de usuários para filtro
-   */
+
   getUsuarios(): Observable<string[]> {
     return this.httpClient.get<string[]>(`${this.API}/usuarios-inspecao`);
   }
 
-  /**
-   * Obtém o número total de páginas com base no filtro
-   */
+
   contarPaginas(filtro: MuralFiltroDTO): Observable<number> {
     return this.httpClient.post<number>(`${this.API}/contar-paginas`, filtro);
   }
 
-  /**
-   * Obtém o número total de registros com base no filtro
-   */
+
   contarTotalRegistros(filtro: MuralFiltroDTO): Observable<number> {
     return this.httpClient.post<number>(`${this.API}/contar-registros`, filtro);
   }
@@ -180,9 +143,7 @@ export class MuralService {
   }
 }
 
-//-----------------------------------------------------------------------
-// SERVIÇO DE FILTROS: Gerencia o estado dos filtros aplicados
-//-----------------------------------------------------------------------
+
 @Injectable({
   providedIn: 'root'
 })
@@ -190,7 +151,7 @@ export class MuralFilterService {
   private readonly API = 'http://localhost:8080/smartvalidity/mural';
   private readonly FILTER_STATE_KEY = 'muralFilterState';
 
-  // Estado inicial dos filtros
+
   private initialFilter: MuralFilter = {
     corredor: [],
     categoria: [],
@@ -205,7 +166,7 @@ export class MuralFilterService {
     usuarioInspecao: []
   };
 
-  // Subjects para estado reativo
+
   private filtersSubject = new BehaviorSubject<MuralFilter>(this.loadFilterState());
   private searchTermSubject = new BehaviorSubject<string>(this.loadSearchTerm());
   private filterOptionsSubject = new BehaviorSubject<MuralFilterOptions>({
@@ -220,7 +181,6 @@ export class MuralFilterService {
   private sortDirectionSubject = new BehaviorSubject<'asc' | 'desc'>(this.loadSortDirection());
   private inspecaoFilterSubject = new BehaviorSubject<'todos' | 'inspecionados' | 'naoInspecionados'>(this.loadInspecaoFilter());
 
-  // Observables públicos
   filters$ = this.filtersSubject.asObservable();
   searchTerm$ = this.searchTermSubject.asObservable();
   filterOptions$ = this.filterOptionsSubject.asObservable();
@@ -228,19 +188,17 @@ export class MuralFilterService {
   sortDirection$ = this.sortDirectionSubject.asObservable();
   inspecaoFilter$ = this.inspecaoFilterSubject.asObservable();
 
-  // Serviço de filtros: Adicionar propriedades para paginação
+
   private paginaAtualSubject = new BehaviorSubject<number>(1);
   private itensPorPaginaSubject = new BehaviorSubject<number>(10);
   private totalPaginasSubject = new BehaviorSubject<number>(1);
 
-  // Observables públicos para paginação
   paginaAtual$ = this.paginaAtualSubject.asObservable();
   itensPorPagina$ = this.itensPorPaginaSubject.asObservable();
   totalPaginas$ = this.totalPaginasSubject.asObservable();
 
   constructor(private httpClient: HttpClient) { }
 
-  // Métodos para atualizar filtros
   updateFilters(filters: Partial<MuralFilter>): void {
     const newFilters = {
       ...this.filtersSubject.value,
@@ -272,7 +230,7 @@ export class MuralFilterService {
     this.saveFilterState();
   }
 
-  // Método para adicionar um filtro cumulativo
+
   addFilter(filterName: keyof MuralFilter, value: string): void {
     const currentFilters = this.filtersSubject.value;
 
@@ -292,7 +250,7 @@ export class MuralFilterService {
     }
   }
 
-  // Método para remover um valor específico de um filtro array
+
   removeFilterValue(filterName: keyof MuralFilter, value: string): void {
     const currentFilters = this.filtersSubject.value;
 
@@ -350,7 +308,7 @@ export class MuralFilterService {
     this.saveFilterState();
   }
 
-  // Limpar filtro de data
+
   clearDateFilter(dateFieldName: keyof MuralFilter): void {
     const currentFilters = this.filtersSubject.value;
     if (dateFieldName === 'dataVencimento' || dateFieldName === 'dataFabricacao' || dateFieldName === 'dataRecebimento') {
@@ -488,18 +446,12 @@ export class MuralFilterService {
     return dateFilters;
   }
 
-  // Obter o valor atual dos filtros
+
   getCurrentFilters(): MuralFilter {
     return this.filtersSubject.value;
   }
 
-  /**
-   * Converte o estado atual dos filtros para o formato DTO esperado pelo backend.
-   * Responsabilidade: Transformação de dados do modelo de view para o modelo de dados.
-   * Arquitetura MVC: Service layer - conversão entre modelos.
-   *
-   * @returns DTO formatado para envio ao backend
-   */
+
   toFilterDTO(): MuralFiltroDTO {
     const filters = this.filtersSubject.value;
     const searchTerm = this.searchTermSubject.value;
@@ -509,25 +461,18 @@ export class MuralFilterService {
     const itensPorPagina = this.itensPorPaginaSubject.value;
     const inspecaoFilter = this.inspecaoFilterSubject.value;
 
-    /**
-     * Função auxiliar para converter data string para formato LocalDateTime do backend.
-     * Responsabilidade: Formatação de dados para comunicação com API.
-     */
+
     const convertDate = (dateStr: string | null | undefined): string | undefined => {
       if (!dateStr) return undefined;
 
       try {
-        // Se já está no formato ISO, só adiciona o tempo se necessário
-        if (dateStr.includes('T')) {
-          return dateStr;
-        }
+              if (dateStr.includes('T')) {
+        return dateStr;
+      }
 
-        // Se está no formato yyyy-mm-dd, adiciona o horário apropriado
-        if (dateStr.match(/^\d{4}-\d{2}-\d{2}$/)) {
-          return dateStr + 'T00:00:00';
-        }
-
-        // Tenta fazer o parse da data para garantir que é válida
+      if (dateStr.match(/^\d{4}-\d{2}-\d{2}$/)) {
+        return dateStr + 'T00:00:00';
+      }
         const date = new Date(dateStr);
         if (isNaN(date.getTime())) {
           console.warn('Data inválida:', dateStr);
@@ -542,7 +487,6 @@ export class MuralFilterService {
     };
 
     return {
-      // Novos campos para múltiplos valores (arrays)
       marcas: filters.marca && filters.marca.length > 0 ? filters.marca : undefined,
       corredores: filters.corredor && filters.corredor.length > 0 ? filters.corredor : undefined,
       categorias: filters.categoria && filters.categoria.length > 0 ? filters.categoria : undefined,
@@ -551,7 +495,6 @@ export class MuralFilterService {
       motivosInspecao: filters.motivoInspecao && filters.motivoInspecao.length > 0 ? filters.motivoInspecao : undefined,
       usuariosInspecao: filters.usuarioInspecao && filters.usuarioInspecao.length > 0 ? filters.usuarioInspecao : undefined,
 
-      // Campos legados para compatibilidade - pega o primeiro valor ou string vazia
       marca: filters.marca && filters.marca.length > 0 ? filters.marca[0] : '',
       corredor: filters.corredor && filters.corredor.length > 0 ? filters.corredor[0] : '',
       categoria: filters.categoria && filters.categoria.length > 0 ? filters.categoria[0] : '',
@@ -560,7 +503,6 @@ export class MuralFilterService {
       motivoInspecao: filters.motivoInspecao && filters.motivoInspecao.length > 0 ? filters.motivoInspecao[0] : '',
       usuarioInspecao: filters.usuarioInspecao && filters.usuarioInspecao.length > 0 ? filters.usuarioInspecao[0] : '',
 
-      // Campos de data com validação melhorada
       dataVencimentoInicio: convertDate(filters.dataVencimento?.startDate),
       dataVencimentoFim: convertDate(filters.dataVencimento?.endDate),
       dataFabricacaoInicio: convertDate(filters.dataFabricacao?.startDate),
@@ -568,7 +510,6 @@ export class MuralFilterService {
       dataRecebimentoInicio: convertDate(filters.dataRecebimento?.startDate),
       dataRecebimentoFim: convertDate(filters.dataRecebimento?.endDate),
 
-      // Aplicar filtro de inspeção corretamente
       inspecionado: inspecaoFilter === 'todos' ? undefined :
                    inspecaoFilter === 'inspecionados' ? true : false,
       searchTerm: searchTerm,
@@ -579,7 +520,7 @@ export class MuralFilterService {
     };
   }
 
-  // Verifica se há filtros aplicados
+
   hasAppliedFilters(): boolean {
     const filters = this.filtersSubject.value;
     const searchTerm = this.searchTermSubject.value;
@@ -603,14 +544,14 @@ export class MuralFilterService {
     );
   }
 
-  // Métodos para gerenciar paginação
+
   updatePaginaAtual(pagina: number): void {
     this.paginaAtualSubject.next(pagina);
   }
 
   updateItensPorPagina(itens: number): void {
     this.itensPorPaginaSubject.next(itens);
-    // Reset para a primeira página quando muda o número de itens
+
     this.paginaAtualSubject.next(1);
   }
 
@@ -618,9 +559,9 @@ export class MuralFilterService {
     this.totalPaginasSubject.next(total);
   }
 
-  // Carrega as opções disponíveis para os filtros
+
   loadFilterOptions(): void {
-    // Carregar opções de filtro do backend
+
     this.httpClient.get<FiltroOpcoes>(`${this.API}/filtro-opcoes`).subscribe({
       next: (opcoes) => {
         this.updateFilterOptions({
@@ -643,7 +584,7 @@ export class MuralFilterService {
       }
     });
 
-    // Carregar lista de usuários independentemente do resultado das outras opções
+
     this.httpClient.get<string[]>(`${this.API}/usuarios-inspecao`).subscribe({
       next: (usuarios) => {
         this.updateFilterOptions({
@@ -659,7 +600,7 @@ export class MuralFilterService {
     });
   }
 
-  // Métodos para persistência do estado
+
   private saveFilterState(): void {
     const state = {
       filters: this.filtersSubject.value,
@@ -734,7 +675,7 @@ export class MuralFilterService {
     return 'asc';
   }
 
-  // Métodos para o filtro de inspeção
+
   updateInspecaoFilter(status: 'todos' | 'inspecionados' | 'naoInspecionados'): void {
     this.inspecaoFilterSubject.next(status);
     this.saveFilterState();
@@ -846,9 +787,7 @@ export class MuralFilterService {
   }
 }
 
-//-----------------------------------------------------------------------
-// SERVIÇO DE SELEÇÃO: Gerencia a seleção de itens e modal de inspeção
-//-----------------------------------------------------------------------
+
 @Injectable({
   providedIn: 'root'
 })
@@ -861,10 +800,10 @@ export class MuralSelecaoService {
   private motivoCustomizadoSubject = new BehaviorSubject<string>('');
   private totalItensAbaSubject = new BehaviorSubject<number>(0);
 
-  // Opções de motivos de inspeção
+
   readonly motivosInspecao: string[] = ['Avaria/Quebra', 'Promoção', 'Outro'];
 
-  // Observables públicos
+
   selectedItems$: Observable<string[]> = this.selectedItemsSubject.asObservable();
   showInspecaoModal$: Observable<boolean> = this.showInspecaoModalSubject.asObservable();
   showAcoesModal$: Observable<boolean> = this.showAcoesModalSubject.asObservable();
@@ -875,12 +814,11 @@ export class MuralSelecaoService {
 
   constructor(private muralService: MuralService) { }
 
-  // Atualiza os itens selecionados
   updateSelectedItems(items: string[]): void {
     this.selectedItemsSubject.next(items);
   }
 
-  // Seleciona ou desmarca todos os itens da página
+
   selectAll(items: MuralListagemDTO[], selected: boolean): void {
     const current = new Set(this.selectedItemsSubject.value);
     const pageIds = items.map(item => item.id);
@@ -892,12 +830,12 @@ export class MuralSelecaoService {
     this.selectedItemsSubject.next(Array.from(current));
   }
 
-  // Seleciona todos os itens da aba atual
+
   selectAllInTab(totalItens: number): void {
     this.totalItensAbaSubject.next(totalItens);
   }
 
-  // Alterna a seleção de um item
+
   toggleItemSelection(item: MuralListagemDTO, selected: boolean): void {
     const currentItems = [...this.selectedItemsSubject.value];
 
@@ -913,17 +851,17 @@ export class MuralSelecaoService {
     this.selectedItemsSubject.next(currentItems);
   }
 
-  // Verifica se há itens selecionados
+
   hasSelectedItems(): boolean {
     return this.selectedItemsSubject.value.length > 0;
   }
 
-  // Retorna o número de itens selecionados
+
   getSelectedItemsCount(): number {
     return this.selectedItemsSubject.value.length;
   }
 
-  // Retorna o total de itens na aba atual
+
   getTotalItensAba(): number {
     return this.totalItensAbaSubject.value;
   }

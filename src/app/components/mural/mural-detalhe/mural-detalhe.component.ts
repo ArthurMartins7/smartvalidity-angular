@@ -33,14 +33,11 @@ export class MuralDetalheComponent implements OnInit {
   ngOnInit(): void {
     this.route.params.subscribe(params => {
       this.itemId = params['id'];
-
-      // Captura a aba de onde o usuário veio
       this.route.queryParams.subscribe(queryParams => {
         if (queryParams['tab']) {
           this.activeTab = queryParams['tab'];
         }
       });
-
       this.loadItemDetails();
     });
   }
@@ -48,7 +45,6 @@ export class MuralDetalheComponent implements OnInit {
   loadItemDetails(): void {
     this.loading = true;
     this.error = null;
-
     this.muralService.getItemById(this.itemId).subscribe({
       next: (item) => {
         this.item = item;
@@ -64,45 +60,31 @@ export class MuralDetalheComponent implements OnInit {
 
   abrirModalInspecao(): void {
     if (!this.item) return;
-
-    // Limpa seleções anteriores
     this.selecaoService.updateSelectedItems([this.itemId]);
-
-    // Abre o modal
     this.selecaoService.openInspecaoModal();
   }
 
   onInspecaoConfirmada(): void {
     if (!this.item) return;
-
-    // Já está processando, não permitir cliques duplicados
     if (this.processandoInspecao) return;
-
-    // Atualiza o status para processando
     this.processandoInspecao = true;
-
-    // Obtém o motivo e motivo customizado do serviço
     this.selecaoService.confirmarInspecao([this.item]).subscribe({
       next: (itens) => {
         if (itens && itens.length > 0) {
           this.item = itens[0];
         }
-
-        // Adiciona um pequeno atraso para permitir que o usuário veja a mudança
         setTimeout(() => {
-          // Redireciona para a mesma aba de onde o usuário veio, preservando o estado dos filtros
           this.router.navigate(['/mural-listagem'], {
             queryParams: { tab: this.activeTab },
             state: {
               activeTab: this.activeTab,
-              preserveFilters: true // Indica que os filtros devem ser mantidos
+              preserveFilters: true
             }
           });
         }, 1000);
       },
       error: (err) => {
         console.error('Erro ao marcar item como inspecionado:', err);
-        // Extrai a mensagem de erro da resposta se possível
         if (err.error && err.error.message) {
           this.error = err.error.message;
         } else {

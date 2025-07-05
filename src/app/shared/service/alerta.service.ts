@@ -5,11 +5,7 @@ import { tap } from 'rxjs/operators';
 import { AlertaDTO } from '../model/dto/alerta.dto';
 import { AlertaSeletor } from '../model/seletor/alerta.seletor';
 
-/**
- * URL base da API
- * Em produção, usar URL relativa: '/smartvalidity'
- * Em desenvolvimento, usar URL completa: 'http://localhost:8080/smartvalidity'
- */
+
 const API_URL = 'http://localhost:8080/smartvalidity';
 
 @Injectable({

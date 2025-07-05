@@ -5,7 +5,6 @@ import { Subscription } from 'rxjs';
 import { MuralListagemDTO } from '../../../shared/model/dto/mural.dto';
 import { MuralSelecaoService } from '../../../shared/service/mural.service';
 
-// Tipo para as ações disponíveis
 type AcaoTipo = 'relatorio-selecionados' | 'relatorio-pagina' | 'relatorio-todos' | 'inspecao';
 
 @Component({
@@ -37,7 +36,6 @@ export class ModalAcoesComponent implements OnInit, OnDestroy {
   constructor(private selecaoService: MuralSelecaoService) { }
 
   ngOnInit(): void {
-    // Inscreve-se para receber atualizações do estado do modal
     this.subscriptions.push(
       this.selecaoService.showAcoesModal$.subscribe(
         show => {
@@ -51,13 +49,9 @@ export class ModalAcoesComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    // Cancela todas as inscrições ao destruir o componente
     this.subscriptions.forEach(sub => sub.unsubscribe());
   }
 
-  /**
-   * Atualiza os contadores de itens
-   */
   private atualizarContadores(): void {
     this.selecaoService.getSelectedItems().subscribe(items => {
       this.itensSelecionados = items;
@@ -69,7 +63,6 @@ export class ModalAcoesComponent implements OnInit, OnDestroy {
       } else {
         this.mensagemInspecao = '';
       }
-      // Lógica para seleção mista de abas (NÃO de páginas)
       this.selecoesMisturadas = false;
       this.mensagemSelecaoMisturada = '';
       if (items.length > 0) {
@@ -83,11 +76,7 @@ export class ModalAcoesComponent implements OnInit, OnDestroy {
     this.itensPaginaCount = this.itensPaginaAtual.length;
   }
 
-  /**
-   * Seleciona uma ação e emite o evento
-   */
   selecionarAcao(acao: AcaoTipo): void {
-    // Se for ação de inspeção e houver itens já inspecionados, não permite
     if (acao === 'inspecao' && this.temItensInspecionados) {
       return;
     }
@@ -96,9 +85,6 @@ export class ModalAcoesComponent implements OnInit, OnDestroy {
     this.closeModal();
   }
 
-  /**
-   * Fecha o modal de ações
-   */
   closeModal(): void {
     this.selecaoService.closeAcoesModal();
   }
@@ -119,12 +105,7 @@ export class ModalAcoesComponent implements OnInit, OnDestroy {
     });
   }
 
-  /**
-   * Quantos itens selecionados pertencem à aba atual
-   */
   get selecionadosNaAbaAtual(): number {
-    // nomeAba pode ser 'Próximos a vencer', 'Vencem hoje', 'Vencidos'
-    // status é 'proximo', 'hoje', 'vencido'
     let statusAtual = '';
     if (this.nomeAba === 'Próximos a vencer') statusAtual = 'proximo';
     else if (this.nomeAba === 'Vencem hoje') statusAtual = 'hoje';
@@ -132,12 +113,7 @@ export class ModalAcoesComponent implements OnInit, OnDestroy {
     return this.itensSelecionados.filter(item => item.status === statusAtual).length;
   }
 
-  /**
-   * Quantos itens selecionados pertencem a outras abas
-   */
   get selecionadosOutrasAbas(): number {
-    // nomeAba pode ser 'Próximos a vencer', 'Vencem hoje', 'Vencidos'
-    // status é 'proximo', 'hoje', 'vencido'
     let statusAtual = '';
     if (this.nomeAba === 'Próximos a vencer') statusAtual = 'proximo';
     else if (this.nomeAba === 'Vencem hoje') statusAtual = 'hoje';

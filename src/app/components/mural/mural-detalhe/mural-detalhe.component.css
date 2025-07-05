@@ -1,9 +1,8 @@
-/* Estilos para container principal */
+
 .container {
   transition: all 0.3s ease;
 }
 
-/* Estilos para o cabeçalho */
 h2 {
   color: #374151;
 }

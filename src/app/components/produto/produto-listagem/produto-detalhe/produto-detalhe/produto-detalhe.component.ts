@@ -138,13 +138,13 @@ export class ProdutoDetalheComponent implements OnInit, AfterViewInit, OnDestroy
     this.produtoService.criarProduto(produtoParaSalvar).subscribe({
       next: (response) => {
         console.log('Produto criado com sucesso:', response);
+        // Exibe mensagem e só navega depois do usuário confirmar
         Swal.fire({
           title: 'Sucesso!',
           text: 'Produto salvo com sucesso!',
           icon: 'success',
           confirmButtonText: 'OK'
-        });
-        this.voltar();
+        }).then(() => this.voltar());
       },
       error: (erro) => {
         console.error('Erro ao criar produto:', erro);
@@ -171,8 +171,12 @@ export class ProdutoDetalheComponent implements OnInit, AfterViewInit, OnDestroy
   atualizar(produtoParaSalvar: any): void {
     this.produtoService.atualizarProduto(this.idProduto, produtoParaSalvar).subscribe(
       () => {
-        Swal.fire('Produto atualizado com sucesso!', '', 'success');
-        this.voltar();
+        Swal.fire({
+          title: 'Sucesso!',
+          text: 'Produto atualizado com sucesso!',
+          icon: 'success',
+          confirmButtonText: 'OK'
+        }).then(() => this.voltar());
       },
       (erro) => {
         Swal.fire('Erro ao atualizar o produto: ' + erro.error, 'error');
@@ -234,8 +238,25 @@ export class ProdutoDetalheComponent implements OnInit, AfterViewInit, OnDestroy
 
   pararLeitor() {
     if (this.html5QrCode) {
-      this.html5QrCode.stop().catch(() => {});
-      this.html5QrCode.clear().catch(() => {});
+      try {
+        // stop() pode lançar erro síncrono se já não estiver rodando
+        const stopResult = this.html5QrCode.stop();
+        // Se retornar Promise, suprimir eventual rejeição
+        if (stopResult && typeof stopResult.catch === 'function') {
+          stopResult.catch(() => {});
+        }
+      } catch (e) {
+        // Ignora erro "Cannot stop, scanner is not running or paused" ou similares
+      }
+
+      try {
+        const clearResult = this.html5QrCode.clear();
+        if (clearResult && typeof clearResult.catch === 'function') {
+          clearResult.catch(() => {});
+        }
+      } catch (e) {
+        // Ignora erro se já estiver limpo
+      }
     }
   }
 
@@ -266,7 +287,9 @@ export class ProdutoDetalheComponent implements OnInit, AfterViewInit, OnDestroy
 
   buscarProdutoOpenFoodFacts(codigo: string) {
     console.log('Buscando produto na Open Food Facts para o código:', codigo);
-    this.http.get<any>(`https://world.openfoodfacts.org/api/v2/product/${codigo}.json`).subscribe({
+    // URL base do backend – mantenha consistente com outros services
+    const API_URL = 'http://localhost:8080/smartvalidity';
+    this.http.get<any>(`${API_URL}/public/openfoodfacts/product/${codigo}`).subscribe({
       next: (res) => {
         console.log('Resposta da Open Food Facts:', res);
         if (res && res.product) {

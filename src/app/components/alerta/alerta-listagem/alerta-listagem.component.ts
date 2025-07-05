@@ -51,6 +51,7 @@ export class AlertaListagemComponent implements OnInit, OnDestroy {
   public filtroDataFim: string = '';
 
   public buscando: boolean = false;
+  public loading: boolean = false;
   public ultimaBusca: string = '';
 
   private searchSubject = new Subject<string>();
@@ -72,13 +73,14 @@ export class AlertaListagemComponent implements OnInit, OnDestroy {
       this.buscarAlertas();
     });
 
+    this.loading = true;
     this.buscarAlertas();
     this.carregarProdutos();
     this.carregarUsuarios();
   }
 
   public onSearchInput(): void {
-    
+
     if (!this.filtroTitulo) {
       this.limparFiltros();
       return;
@@ -103,11 +105,13 @@ export class AlertaListagemComponent implements OnInit, OnDestroy {
   }
 
   public buscarAlertas(): void {
+    this.loading = true;
     this.alertaService.buscarComFiltros(this.seletor).subscribe({
       next: (resultado) => {
         this.alertas = resultado;
         this.calcularTotalPaginas();
         this.buscando = false;
+        this.loading = false;
 
         if (this.alertas.length === 0 && this.ultimaBusca) {
           Swal.fire({
@@ -122,6 +126,7 @@ export class AlertaListagemComponent implements OnInit, OnDestroy {
       error: (erro) => {
         console.error('Erro ao buscar alertas:', erro);
         this.buscando = false;
+        this.loading = false;
 
         if (erro.status !== 404 && erro.status !== 204) {
           Swal.fire('Erro!', 'Não foi possível carregar os alertas.', 'error');
@@ -254,7 +259,7 @@ export class AlertaListagemComponent implements OnInit, OnDestroy {
 
       paginas.push(1, 2, 3, '...');
     } else if (paginaAtual >= totalPaginas - 1) {
-      
+
       paginas.push('...', totalPaginas - 2, totalPaginas - 1, totalPaginas);
     } else {
 
@@ -269,7 +274,7 @@ export class AlertaListagemComponent implements OnInit, OnDestroy {
   }
 
   public editarAlerta(alerta: AlertaDTO.Listagem): void {
-   
+
     if (alerta.tipo !== TipoAlerta.PERSONALIZADO) {
       Swal.fire({
         title: 'Alerta Automático',
@@ -309,30 +314,30 @@ export class AlertaListagemComponent implements OnInit, OnDestroy {
   }
 
   public obterPrioridadeAlerta(alerta: AlertaDTO.Listagem): 'alta' | 'media' | 'normal' {
-   
+
     if (alerta.tipo === TipoAlerta.VENCIMENTO_ATRASO) {
       return 'alta';
     }
 
     if (alerta.tipo === TipoAlerta.VENCIMENTO_HOJE || alerta.tipo === TipoAlerta.VENCIMENTO_AMANHA) {
-      return 'media'; 
+      return 'media';
     }
 
     return 'normal';
   }
 
   public isUrgente(alerta: AlertaDTO.Listagem): boolean {
-   
+
     return alerta.tipo === TipoAlerta.VENCIMENTO_ATRASO;
   }
 
   public isProximoVencimento(alerta: AlertaDTO.Listagem): boolean {
-    
+
     return alerta.tipo === TipoAlerta.VENCIMENTO_HOJE || alerta.tipo === TipoAlerta.VENCIMENTO_AMANHA;
   }
 
   public calcularDiasParaVencimento(alerta: AlertaDTO.Listagem): number {
-    
+
     switch (alerta.tipo) {
       case TipoAlerta.VENCIMENTO_HOJE:
         return 0;

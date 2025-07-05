@@ -73,15 +73,9 @@ export class MuralDetalheComponent implements OnInit {
         if (itens && itens.length > 0) {
           this.item = itens[0];
         }
-        setTimeout(() => {
-          this.router.navigate(['/mural-listagem'], {
-            queryParams: { tab: this.activeTab },
-            state: {
-              activeTab: this.activeTab,
-              preserveFilters: true
-            }
-          });
-        }, 1000);
+        this.processandoInspecao = false;
+        this.selecaoService.closeInspecaoModal();
+        this.selecaoService.clearSelection();
       },
       error: (err) => {
         console.error('Erro ao marcar item como inspecionado:', err);

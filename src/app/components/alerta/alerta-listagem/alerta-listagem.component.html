@@ -1,7 +1,7 @@
 <!-- cabeçalho padrão -->
 <div class="bg-gray-100 -mx-6 md:-mx-6 py-6 mb-10">
   <div class="flex items-center gap-2 px-6">
- 
+
     <span class="material-icons text-gray-600" style="font-size: 24px;">keyboard_arrow_right</span>
 
     <!-- títulos -->
@@ -17,7 +17,7 @@
 
   <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4 mb-4">
     <div class="flex flex-col md:flex-row items-stretch md:items-center gap-4">
-    
+
       <div class="flex-1 relative">
         <input
           type="text"
@@ -121,7 +121,22 @@
     </div>
   </div>
 
-  <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+  <!-- Loading -->
+  <div *ngIf="loading" class="flex justify-center items-center py-10">
+    <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+  </div>
+
+  <!-- Mensagem quando não há itens -->
+  <div *ngIf="!loading && alertas.length === 0" class="flex flex-col items-center justify-center py-10 text-gray-500">
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+    </svg>
+    <p class="text-lg font-medium">Nenhum alerta encontrado</p>
+    <p class="text-sm mt-2">Crie um novo alerta ou ajuste os filtros de busca</p>
+  </div>
+
+  <!-- Tabela -->
+  <div *ngIf="!loading && alertas.length > 0" class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
     <div class="overflow-x-auto">
       <table class="min-w-full divide-y divide-gray-200">
         <thead class="bg-gray-50">
@@ -185,16 +200,6 @@
               <button class="w-6 h-6 md:w-7 md:h-7 lg:w-8 lg:h-8 flex items-center justify-center border border-gray-300 rounded text-red-600 hover:text-red-800 hover:bg-gray-100 transition" (click)="excluirAlerta(alerta)" title="Excluir">
                 <span class="material-icons text-[10px] md:text-xs lg:text-sm">delete</span>
               </button>
-            </td>
-          </tr>
-
-          <tr *ngIf="alertas.length === 0">
-            <td colspan="4" class="px-6 py-8 text-center text-gray-500">
-              <div class="flex flex-col items-center">
-                <span class="material-icons text-gray-300 mb-2" style="font-size: 48px;">notifications_none</span>
-                <p class="text-lg font-medium">Nenhum alerta encontrado</p>
-                <p class="text-sm">Crie um novo alerta ou ajuste os filtros</p>
-              </div>
             </td>
           </tr>
         </tbody>

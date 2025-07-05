@@ -72,8 +72,22 @@
     (removeFilterValue)="onRemoveFilterValue($event)">
   </app-filtro-tags>
 
+  <!-- Loading -->
+  <div *ngIf="loading" class="flex justify-center items-center py-10">
+    <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+  </div>
+
+  <!-- Mensagem quando não há itens -->
+  <div *ngIf="!loading && filteredItems.length === 0" class="flex flex-col items-center justify-center py-10 text-gray-500">
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+    </svg>
+    <p class="text-lg font-medium">Nenhum item encontrado</p>
+    <p class="text-sm mt-2">Tente ajustar os filtros ou realizar uma nova busca</p>
+  </div>
+
   <!-- Tabela incorporada diretamente -->
-  <div class="bg-white rounded-lg shadow-md overflow-hidden border border-gray-200">
+  <div *ngIf="!loading && filteredItems.length > 0" class="bg-white rounded-lg shadow-md overflow-hidden border border-gray-200">
     <table class="min-w-full divide-y divide-gray-200">
       <thead class="bg-gray-50">
         <tr>
@@ -123,7 +137,7 @@
   </div>
 
   <!-- Controles unificados: paginação e ações -->
-  <div *ngIf="filteredItems.length > 0" class="mt-4 flex justify-between items-center">
+  <div *ngIf="!loading && filteredItems.length > 0" class="mt-4 flex justify-between items-center">
     <!-- Controles à esquerda: seletor de itens por página -->
     <div class="flex items-center whitespace-nowrap">
       <span class="text-sm text-gray-600 mr-2">Itens por página:</span>

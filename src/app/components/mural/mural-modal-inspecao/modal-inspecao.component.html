@@ -1,15 +1,15 @@
-<div *ngIf="visible" class="fixed inset-0 z-50 overflow-y-auto">
+<div *ngIf="visible" class="fixed inset-0 z-[9999] overflow-y-auto">
   <!-- Overlay que impede interação com elementos abaixo do modal -->
   <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
     <!-- Fundo escuro com opacidade -->
     <div class="fixed inset-0 transition-opacity" aria-hidden="true">
-      <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
+      <div class="absolute inset-0 bg-black opacity-50"></div>
     </div>
 
     <!-- Modal -->
-    <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+    <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full relative z-[10000]">
       <!-- Cabeçalho com título e botão de fechar -->
-      <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+      <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4 modal-content">
         <div class="flex justify-between items-center mb-4">
           <h3 class="text-lg leading-6 font-medium text-gray-900">
             Motivo da inspeção

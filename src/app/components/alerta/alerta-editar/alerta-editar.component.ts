@@ -186,7 +186,7 @@ export class AlertaEditarComponent implements OnInit, OnDestroy {
         this.alertaDTO.titulo = alerta.titulo;
         this.alertaDTO.descricao = alerta.descricao;
         this.alertaDTO.tipo = TipoAlerta.PERSONALIZADO;
-        this.alertaDTO.dataHoraDisparo = alerta.dataHoraDisparo;
+        this.alertaDTO.dataHoraDisparo = alerta.dataHoraDisparo; // Campo oculto, mas mantido para edição
         this.alertaDTO.produtosIds = alerta.produtosAlertaIds ? [...alerta.produtosAlertaIds] : [];
         this.alertaDTO.usuariosIds = alerta.usuariosAlertaIds ? [...alerta.usuariosAlertaIds] : [];
         this.usuariosSelecionados = [...this.alertaDTO.usuariosIds];
@@ -248,17 +248,15 @@ export class AlertaEditarComponent implements OnInit, OnDestroy {
 
     this.alertaDTO.tipo = TipoAlerta.PERSONALIZADO;
 
-    if (this.alertaDTO.dataHoraDisparo) {
-      if (typeof this.alertaDTO.dataHoraDisparo === 'string') {
-        this.alertaDTO.dataHoraDisparo = new Date(this.alertaDTO.dataHoraDisparo);
-      }
-    }
+    // Define automaticamente a data/hora de disparo como a data/hora atual
+    // (temporariamente para testes)
+    this.alertaDTO.dataHoraDisparo = new Date();
 
     console.log('DTO sendo enviado:', this.alertaDTO);
 
     this.alertaService.criarAlerta(this.alertaDTO).subscribe({
       next: (alertaCriado) => {
-        Swal.fire('Sucesso!', 'Alerta criado com sucesso.', 'success');
+        Swal.fire('Sucesso!', 'Alerta criado com sucesso. As notificações foram geradas automaticamente.', 'success');
         this.carregando = false;
         this.voltar();
       },
@@ -273,10 +271,11 @@ export class AlertaEditarComponent implements OnInit, OnDestroy {
   private atualizarAlerta(): void {
     if (!this.alertaId) return;
 
+    // Para edição, mantém a data/hora original do alerta
     const edicaoDTO: AlertaDTO.Edicao = {
       titulo: this.alertaDTO.titulo,
       descricao: this.alertaDTO.descricao,
-      dataHoraDisparo: this.alertaDTO.dataHoraDisparo,
+      dataHoraDisparo: this.alertaDTO.dataHoraDisparo, // Mantém a data original
       produtosIds: this.produtoSelecionado ? [this.produtoSelecionado] : [],
       usuariosIds: this.usuariosSelecionados
     };
@@ -306,10 +305,11 @@ export class AlertaEditarComponent implements OnInit, OnDestroy {
       return false;
     }
 
-    if (!this.alertaDTO.dataHoraDisparo) {
-      Swal.fire('Atenção!', 'A data/hora de disparo é obrigatória.', 'warning');
-      return false;
-    }
+    // Data/hora de disparo temporariamente definida automaticamente
+    // if (!this.alertaDTO.dataHoraDisparo) {
+    //   Swal.fire('Atenção!', 'A data/hora de disparo é obrigatória.', 'warning');
+    //   return false;
+    // }
 
     return true;
   }
@@ -428,27 +428,28 @@ export class AlertaEditarComponent implements OnInit, OnDestroy {
     return this.usuarios.find(u => u.id === id);
   }
 
-  public get dataHoraDisparoInput(): string {
-    if (!this.alertaDTO.dataHoraDisparo) return '';
-    const data = new Date(this.alertaDTO.dataHoraDisparo);
-    return data.toISOString().slice(0, 16);
-  }
+  // Getter/setter temporariamente desabilitados pois o campo está oculto
+  // public get dataHoraDisparoInput(): string {
+  //   if (!this.alertaDTO.dataHoraDisparo) return '';
+  //   const data = new Date(this.alertaDTO.dataHoraDisparo);
+  //   return data.toISOString().slice(0, 16);
+  // }
 
-  public set dataHoraDisparoInput(value: string) {
-    if (value) {
-      const data = new Date(value);
-      const ano = data.getFullYear();
-      const mes = String(data.getMonth() + 1).padStart(2, '0');
-      const dia = String(data.getDate()).padStart(2, '0');
-      const hora = String(data.getHours()).padStart(2, '0');
-      const minuto = String(data.getMinutes()).padStart(2, '0');
-      const segundo = String(data.getSeconds()).padStart(2, '0');
-      const dataFormatada = `${ano}-${mes}-${dia}T${hora}:${minuto}:${segundo}`;
-      this.alertaDTO.dataHoraDisparo = dataFormatada as any;
-    } else {
-      this.alertaDTO.dataHoraDisparo = undefined as any;
-    }
-  }
+  // public set dataHoraDisparoInput(value: string) {
+  //   if (value) {
+  //     const data = new Date(value);
+  //     const ano = data.getFullYear();
+  //     const mes = String(data.getMonth() + 1).padStart(2, '0');
+  //     const dia = String(data.getDate()).padStart(2, '0');
+  //     const hora = String(data.getHours()).padStart(2, '0');
+  //     const minuto = String(data.getMinutes()).padStart(2, '0');
+  //     const segundo = String(data.getSeconds()).padStart(2, '0');
+  //     const dataFormatada = `${ano}-${mes}-${dia}T${hora}:${minuto}:${segundo}`;
+  //     this.alertaDTO.dataHoraDisparo = dataFormatada as any;
+  //   } else {
+  //     this.alertaDTO.dataHoraDisparo = undefined as any;
+  //   }
+  // }
 
   public visualizarItem(item: ItemProdutoDTO): void {
     if (!item.id) return;

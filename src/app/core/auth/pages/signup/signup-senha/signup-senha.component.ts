@@ -1,5 +1,5 @@
-import { Component, inject } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { Component, ElementRef, inject, ViewChild } from '@angular/core';
+import { FormsModule, NgForm } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Empresa } from '../../../../../shared/model/entity/empresa';
 import { Usuario } from '../../../../../shared/model/entity/usuario.model';
@@ -15,43 +15,37 @@ export class SignupSenhaComponent {
   public usuario: Usuario = new Usuario();
   public empresa: Empresa = new Empresa();
 
-  /**
-   * Flags dos checkboxes exibidos no formulário
-   */
   public aceitaTermos: boolean = false;
   public receberNoticias: boolean = false;
 
-  // Campos de senha da etapa 2
   public senha: string = '';
   public confirmarSenha: string = '';
 
-  // Flags de visibilidade dos campos de senha
   public showSenha: boolean = false;
   public showConfirmarSenha: boolean = false;
 
   private router = inject(Router);
 
-  /**
-   * Avança para a próxima etapa do cadastro.
-   * Por enquanto apenas persiste as informações no sessionStorage
-   * e redireciona para a etapa de criação de senha.
-   */
-  public avancar(): void {
+  @ViewChild('confirmSenhaInput') confirmSenhaInput!: ElementRef<HTMLInputElement>;
 
-    if (this.senha !== this.confirmarSenha) {
-      alert('As senhas não coincidem.');
+  public avancar(form: NgForm, event: Event): void {
+    if (form.invalid) {
+      (event.target as HTMLFormElement).reportValidity();
       return;
     }
 
-    // Persistir a senha (exemplo) e navegar para verificação
+    this.confirmSenhaInput.nativeElement.setCustomValidity(''); // limpa mensagem anterior
+    if (this.senha !== this.confirmarSenha) {
+      this.confirmSenhaInput.nativeElement.setCustomValidity('As senhas não coincidem');
+      (event.target as HTMLFormElement).reportValidity();
+      return;
+    }
+
     sessionStorage.setItem('signup_senha', this.senha);
 
     this.router.navigate(['signup-verificacao']);
   }
 
-  /**
-   * Retorna para a etapa anterior (informações pessoais)
-   */
   public voltar(): void {
     this.router.navigate(['']);
   }

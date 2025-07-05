@@ -38,7 +38,6 @@ export class SigninComponent {
         let token: string = jwt.body + '';
         localStorage.setItem('tokenUsuarioAutenticado', token);
 
-        // Buscar o perfil completo do usuário atual
         this.buscarPerfilUsuario();
       },
       error: (erro) => {
@@ -63,7 +62,6 @@ export class SigninComponent {
   private buscarPerfilUsuario() {
     this.authenticationService.getCurrentUser().subscribe({
       next: (usuarioLogado) => {
-        // Armazenar o nome e email do usuário no sessionStorage
         sessionStorage.setItem('usuarioEmail', usuarioLogado.email);
         sessionStorage.setItem('usuarioNome', usuarioLogado.nome);
 
@@ -71,9 +69,7 @@ export class SigninComponent {
       },
       error: (erro) => {
         console.error('Erro ao obter perfil do usuário:', erro);
-        // Como fallback, salvar apenas o email que usou para login
         sessionStorage.setItem('usuarioEmail', this.usuario.email);
-        // Como não conseguimos obter o nome, usar uma mensagem padrão
         sessionStorage.setItem('usuarioNome', 'Usuário do Sistema');
 
         this.verificarPerfilAcesso();
@@ -86,16 +82,13 @@ export class SigninComponent {
       next: (existeAssinante) => {
         console.log('existeAssinante: ', existeAssinante);
         if (existeAssinante) {
-          // Já existe um usuário assinante, exibe modal e impede cadastro
           this.exibirModalAssinaturaExistente = true;
         } else {
-          // Nenhum assinante encontrado, prossegue para fluxo de cadastro
           this.router.navigate(['/signup-info-pessoais']);
         }
       },
       error: (erro) => {
         console.error('Erro ao verificar assinatura:', erro);
-        // Em caso de erro na verificação, por segurança impedir cadastro e notificar usuário
         this.exibirModalAssinaturaExistente = true;
       }
     });

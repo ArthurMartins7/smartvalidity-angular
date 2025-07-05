@@ -48,7 +48,7 @@ export class PasswordRecoveryValidarIdentidadeComponent {
       },
       error: (err) => {
         console.log('err: ', err);
-        const mensagem = err?.error.email || 'Não foi possível enviar o código.';
+        const mensagem = err?.error.message || 'Não foi possível enviar o código.';
         Swal.fire({
           icon: 'error',
           title: 'Erro',

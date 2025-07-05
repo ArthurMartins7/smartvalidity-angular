@@ -20,17 +20,12 @@ export class PasswordRecoveryAlterarSenhaComponent {
   public usuario: Usuario = new Usuario();
   public empresa: Empresa = new Empresa();
 
-  /**
-   * Flags dos checkboxes exibidos no formulário
-   */
   public aceitaTermos: boolean = false;
   public receberNoticias: boolean = false;
 
-  // Campos de senha da etapa 2
   public senha: string = '';
   public confirmarSenha: string = '';
 
-  // Flags de visibilidade dos campos de senha
   public showSenha: boolean = false;
   public showConfirmarSenha: boolean = false;
 
@@ -47,11 +42,6 @@ export class PasswordRecoveryAlterarSenhaComponent {
     if (storedToken) this.token = storedToken;
   }
 
-  /**
-   * Avança para a próxima etapa do cadastro.
-   * Por enquanto apenas persiste as informações no sessionStorage
-   * e redireciona para a etapa de criação de senha.
-   */
   public criarNovaSenha(): void {
     if (this.senha !== this.confirmarSenha) {
       Swal.fire({ icon: 'warning', title: 'Atenção', text: 'As senhas não coincidem.', confirmButtonColor: '#5084C1' });
@@ -61,7 +51,6 @@ export class PasswordRecoveryAlterarSenhaComponent {
     this.authenticationService.redefinirSenha(this.email, this.token, this.senha).subscribe({
       next: () => {
         Swal.fire({ icon: 'success', title: 'Sucesso', text: 'Senha redefinida com sucesso', confirmButtonColor: '#5084C1' });
-        // limpar session storage
         sessionStorage.removeItem('password_recovery_email');
         sessionStorage.removeItem('password_recovery_token');
         this.router.navigate(['']);
@@ -74,9 +63,6 @@ export class PasswordRecoveryAlterarSenhaComponent {
     });
   }
 
-  /**
-   * Retorna para a etapa anterior (informações pessoais)
-   */
   public voltar(): void {
     this.router.navigate(['password-recovery-codigo-verificacao']);
   }

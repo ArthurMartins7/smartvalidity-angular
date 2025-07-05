@@ -20,32 +20,23 @@ export class PasswordRecoveryCodigoVerificacaoComponent {
   public usuario: Usuario = new Usuario();
   public empresa: Empresa = new Empresa();
 
-  /**
-   * Flags dos checkboxes exibidos no formulário
-   */
   public aceitaTermos: boolean = false;
   public receberNoticias: boolean = false;
 
-  // Código de verificação digitado pelo usuário
   public codigo: string = '';
 
-  // E-mail destino para exibição na mensagem
   public emailDestino: string = '';
 
   private router = inject(Router);
   private authenticationService = inject(AuthenticationService);
 
   constructor() {
-    // Tenta recuperar o e-mail salvo na etapa 1
     const email = sessionStorage.getItem('password_recovery_email');
     if (email) {
       this.emailDestino = email;
     }
   }
 
-  /**
-   * Finaliza criação da conta após validar código
-   */
   public confirmarCodigo(): void {
     if (this.codigo.length !== 6) {
       Swal.fire({
@@ -75,14 +66,10 @@ export class PasswordRecoveryCodigoVerificacaoComponent {
     });
   }
 
-  /**
-   * Retorna para a etapa anterior (informações pessoais)
-   */
   public voltar(): void {
     this.router.navigate(['password-recovery-validar-identidade']);
   }
 
-  // Reenvia o código para o e-mail do usuário
   public reenviarCodigo(): void {
     this.authenticationService.solicitarOtpRecuperacao(this.emailDestino).subscribe({
       next: () => Swal.fire({ icon: 'success', title: 'Sucesso', text: 'Código enviado', confirmButtonColor: '#5084C1' }),

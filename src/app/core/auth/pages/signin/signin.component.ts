@@ -29,22 +29,32 @@ export class SigninComponent {
     localStorage.removeItem('tokenUsuarioAutenticado');
     this.authenticationService.authenticate(this.usuario).subscribe({
       next: (jwt) => {
-        Swal.fire('Sucesso', 'Usuário autenticado com sucesso', 'success');
+        Swal.fire({
+          icon: 'success',
+          title: 'Sucesso',
+          text: 'Usuário autenticado com sucesso',
+          confirmButtonColor: '#5084C1'
+        });
         let token: string = jwt.body + '';
         localStorage.setItem('tokenUsuarioAutenticado', token);
 
-        // Buscar o perfil completo do usuário atual
         this.buscarPerfilUsuario();
       },
       error: (erro) => {
-        var mensagem: string;
+        let mensagem: string;
+        console.log('erro: ', erro);
         if (erro.status == 401) {
           mensagem = 'Usuário ou senha inválidos, tente novamente';
         } else {
           mensagem = erro.error;
         }
 
-        Swal.fire('Erro', mensagem, 'error');
+        Swal.fire({
+          icon: 'error',
+          title: 'Erro',
+          text: mensagem,
+          confirmButtonColor: '#5084C1'
+        });
       },
     });
   }
@@ -52,7 +62,6 @@ export class SigninComponent {
   private buscarPerfilUsuario() {
     this.authenticationService.getCurrentUser().subscribe({
       next: (usuarioLogado) => {
-        // Armazenar o nome e email do usuário no sessionStorage
         sessionStorage.setItem('usuarioEmail', usuarioLogado.email);
         sessionStorage.setItem('usuarioNome', usuarioLogado.nome);
 
@@ -60,9 +69,7 @@ export class SigninComponent {
       },
       error: (erro) => {
         console.error('Erro ao obter perfil do usuário:', erro);
-        // Como fallback, salvar apenas o email que usou para login
         sessionStorage.setItem('usuarioEmail', this.usuario.email);
-        // Como não conseguimos obter o nome, usar uma mensagem padrão
         sessionStorage.setItem('usuarioNome', 'Usuário do Sistema');
 
         this.verificarPerfilAcesso();
@@ -71,11 +78,20 @@ export class SigninComponent {
   }
 
   realizarCadastro() {
-    // Aqui poderia haver chamada a um endpoint para verificar se já existe assinatura.
-    // Para fins de teste, vamos apenas exibir o modal.
-    this.exibirModalAssinaturaExistente = true;
-    // Caso não exista assinatura, navegue para o fluxo de cadastro:
-    // this.router.navigate(['/signup-info-pessoais']);
+    this.authenticationService.verificarAssinaturaExistente().subscribe({
+      next: (existeAssinante) => {
+        console.log('existeAssinante: ', existeAssinante);
+        if (existeAssinante) {
+          this.exibirModalAssinaturaExistente = true;
+        } else {
+          this.router.navigate(['/signup-info-pessoais']);
+        }
+      },
+      error: (erro) => {
+        console.error('Erro ao verificar assinatura:', erro);
+        this.exibirModalAssinaturaExistente = true;
+      }
+    });
   }
 
   public esqueceuSenha() {

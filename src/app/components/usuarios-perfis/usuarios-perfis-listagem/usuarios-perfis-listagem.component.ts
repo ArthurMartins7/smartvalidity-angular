@@ -44,7 +44,7 @@ export class UsuariosPerfisListagemComponent implements OnInit {
     this.usuarioService.buscarTodos().subscribe(
       (response) => {
         this.usuarios = response;
-        this.currentPage = 1; // Reset page on new data
+        this.currentPage = 1; 
       },
       (erro) => {
         console.error('Erro ao buscar todos os usuários', erro);
@@ -65,7 +65,7 @@ export class UsuariosPerfisListagemComponent implements OnInit {
   onItemsPerPageChange(event: Event): void {
     const value = Number((event.target as HTMLSelectElement).value);
     this.itemsPerPage = value;
-    this.currentPage = 1; // Reset to first page when page size changes
+    this.currentPage = 1;
   }
 
   prevPage(): void {

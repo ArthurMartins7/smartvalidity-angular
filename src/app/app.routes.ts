@@ -30,7 +30,6 @@ import { UsuariosPerfisPendentesComponent } from './components/usuarios-perfis/u
 import { PasswordRecoveryAlterarSenhaComponent } from './core/auth/pages/password-recovery/password-recovery-alterar-senha/password-recovery-alterar-senha.component';
 import { PasswordRecoveryCodigoVerificacaoComponent } from './core/auth/pages/password-recovery/password-recovery-codigo-verificacao/password-recovery-codigo-verificacao.component';
 import { PasswordRecoveryValidarIdentidadeComponent } from './core/auth/pages/password-recovery/password-recovery-validar-identidade/password-recovery-validar-identidade.component';
-import { RegisterComponent } from './core/auth/pages/register/register/register.component';
 import { SigninComponent } from './core/auth/pages/signin/signin.component';
 import { SignupInfoPessoaisComponent } from './core/auth/pages/signup/signup-info-pessoais/signup-info-pessoais.component';
 import { SignupSenhaComponent } from './core/auth/pages/signup/signup-senha/signup-senha.component';
@@ -39,7 +38,6 @@ import { SignupVerificacaoComponent } from './core/auth/pages/signup/signup-veri
 
 export const routes: Routes = [
   //{ path: 'login', component: LoginComponent },
-  { path: 'register', component: RegisterComponent },
   { path: 'corredor', component: CorredorListagemComponent },
   { path: 'corredor-detalhe', component: CorredorDetalheComponent },
   { path: 'corredor-editar/:id', component: CorredorEditarComponent },

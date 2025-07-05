@@ -22,7 +22,6 @@ export class ConvidarUsuarioModalComponent {
   }
 
   enviarConvite(): void {
-    // Aqui você pode integrar com um serviço para enviar o convite
     console.log('Enviando convite para:', this.nome, this.email, 'com o perfil:', this.perfil);
     this.close.emit();
   }

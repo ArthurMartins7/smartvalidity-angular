@@ -1,9 +1,12 @@
 import { Component, inject } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, NgForm } from '@angular/forms';
 import { Router } from '@angular/router';
+import Swal from 'sweetalert2';
+import { EmpresaUsuarioDto } from '../../../../../shared/model/dto/empresaUsuario.dto';
 import { Empresa } from '../../../../../shared/model/entity/empresa';
 import { Usuario } from '../../../../../shared/model/entity/usuario.model';
 import { HeaderAuthComponent } from "../../../../../shared/ui/headers/header-auth/header-auth.component";
+import { AuthenticationService } from '../../../services/auth.service';
 
 @Component({
   selector: 'app-signup-validar-identidade',
@@ -16,22 +19,17 @@ export class SignupValidarIdentidadeComponent {
   public usuario: Usuario = new Usuario();
   public empresa: Empresa = new Empresa();
 
-  /**
-   * Flags dos checkboxes exibidos no formulário
-   */
   public aceitaTermos: boolean = false;
   public receberNoticias: boolean = false;
 
-  // Código de verificação digitado pelo usuário
   public codigo: string = '';
 
-  // E-mail destino para exibição na mensagem
   public emailDestino: string = '';
 
   private router = inject(Router);
+  private authenticationService = inject(AuthenticationService);
 
   constructor() {
-    // Tenta recuperar o e-mail salvo na etapa 1
     const usuarioJson = sessionStorage.getItem('signup_usuario');
     if (usuarioJson) {
       try {
@@ -41,31 +39,81 @@ export class SignupValidarIdentidadeComponent {
     }
   }
 
-  /**
-   * Finaliza criação da conta após validar código
-   */
-  public criarConta(): void {
-    if (this.codigo.length !== 6) {
-      alert('Informe o código de 6 dígitos.');
+  public criarConta(form: NgForm, event: Event): void {
+    const formEl = event.target as HTMLFormElement;
+    if (form.invalid || !formEl.checkValidity()) {
+      formEl.reportValidity();
       return;
     }
 
-    // Aqui você validaria o código com o backend.
-    alert('Conta criada com sucesso!');
+    const usuarioJson = sessionStorage.getItem('signup_usuario');
+    const empresaJson = sessionStorage.getItem('signup_empresa');
+    const senha = sessionStorage.getItem('signup_senha');
 
-    this.router.navigate(['']);
+    if (!usuarioJson || !empresaJson || !senha) {
+      Swal.fire({ icon: 'error', title: 'Dados incompletos', text: 'Por favor, refaça o cadastro.', confirmButtonColor: '#5084C1' });
+      this.router.navigate(['signup-info-pessoais']);
+      return;
+    }
+
+    const usuarioObj: Usuario = JSON.parse(usuarioJson);
+    const empresaObj: Empresa = JSON.parse(empresaJson);
+
+    const dto: EmpresaUsuarioDto = {
+      cnpj: empresaObj.cnpj,
+      razaoSocial: empresaObj.razaoSocial,
+      nomeUsuario: usuarioObj.nome,
+      email: usuarioObj.email,
+      senha: senha,
+      cargo: usuarioObj.cargo,
+      token: this.codigo
+    } as EmpresaUsuarioDto;
+
+    this.authenticationService.registrarEmpresa(dto).subscribe({
+      next: (_) => {
+        Swal.fire({ icon: 'success', title: 'Conta criada com sucesso!', confirmButtonColor: '#5084C1' });
+        sessionStorage.removeItem('signup_usuario');
+        sessionStorage.removeItem('signup_empresa');
+        sessionStorage.removeItem('signup_senha');
+        this.router.navigate(['']);
+      },
+      error: (erro) => {
+        console.error('Erro ao criar conta:', erro);
+        const mensagem = erro.error?.message ?? (typeof erro.error === 'string' ? erro.error : erro.message) ?? 'Código inválido ou expirado';
+        Swal.fire({ icon: 'error', title: 'Erro', text: mensagem, confirmButtonColor: '#5084C1' });
+      }
+    });
   }
 
-  /**
-   * Retorna para a etapa anterior (informações pessoais)
-   */
   public voltar(): void {
-    this.router.navigate(['signup-senha']);
+    this.router.navigate(['signup-verificacao']);
   }
 
-  // Reenvia o código para o e-mail do usuário
   public reenviarCodigo(): void {
-    alert('Novo código enviado para ' + this.emailDestino);
+    if (!this.emailDestino) {
+      Swal.fire({ icon: 'warning', title: 'E-mail não informado.', confirmButtonColor: '#5084C1' });
+      return;
+    }
+
+    this.authenticationService.enviarOtpEmail(this.emailDestino).subscribe({
+      next: () => Swal.fire({ icon: 'success', title: 'Código enviado', confirmButtonColor: '#5084C1' }),
+      error: (err) => {
+        const mensagem = err?.error || 'Não foi possível enviar o código.';
+        Swal.fire({ icon: 'error', title: 'Erro', text: mensagem, confirmButtonColor: '#5084C1' });
+      }
+    });
+  }
+
+  public onCodigoInput(input: HTMLInputElement): void {
+    const digits = input.value.replace(/\D/g, '').slice(0, 6);
+    this.codigo = digits;
+    input.value = digits;
+
+    if (digits.length < 6) {
+      input.setCustomValidity('Informe 6 dígitos.');
+    } else {
+      input.setCustomValidity('');
+    }
   }
 
 }

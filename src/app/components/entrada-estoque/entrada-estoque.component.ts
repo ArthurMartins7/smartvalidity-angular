@@ -21,6 +21,7 @@ export class EntradaEstoqueComponent implements OnInit {
   formData = {
     produto: '',
     lote: '',
+    precoVenda: null as number | null,
     quantidade: 1,
     dataRecebimento: '',
     horaRecebimento: '',
@@ -79,6 +80,7 @@ export class EntradaEstoqueComponent implements OnInit {
     const camposVazios = [];
     if (!this.formData.produto) camposVazios.push('Produto');
     if (!this.formData.lote) camposVazios.push('Lote');
+    if (this.formData.precoVenda === null) camposVazios.push('Preço de Venda');
     if (!this.formData.dataRecebimento) camposVazios.push('Data de Recebimento');
     if (!this.formData.dataFabricacao) camposVazios.push('Data de Fabricação');
     if (!this.formData.dataVencimento) camposVazios.push('Data de Vencimento');
@@ -104,7 +106,7 @@ export class EntradaEstoqueComponent implements OnInit {
 
     const itemProduto: ItemProdutoDTO = {
       lote: this.formData.lote,
-      precoVenda: 0,
+      precoVenda: Number(this.formData.precoVenda),
       dataFabricacao: formatarData(this.formData.dataFabricacao, this.formData.horaFabricacao),
       dataVencimento: formatarData(this.formData.dataVencimento, this.formData.horaVencimento),
       dataRecebimento: formatarData(this.formData.dataRecebimento, this.formData.horaRecebimento),
@@ -133,6 +135,7 @@ export class EntradaEstoqueComponent implements OnInit {
         this.formData = {
           produto: '',
           lote: '',
+          precoVenda: null,
           quantidade: 1,
           dataRecebimento: '',
           horaRecebimento: '',

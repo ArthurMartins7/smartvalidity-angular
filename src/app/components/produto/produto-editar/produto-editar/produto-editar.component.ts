@@ -82,8 +82,29 @@ export class ProdutoEditarComponent implements OnInit {
   atualizar(event: Event): void {
     event.preventDefault();
 
-    if (!this.produto.codigoBarras || !this.produto.descricao || !this.produto.quantidade || !this.fornecedorSelecionado) {
-      Swal.fire('Preencha todos os campos obrigatórios!', '', 'warning');
+    // Validações de campo – mensagens específicas
+    if (!this.produto.codigoBarras || this.produto.codigoBarras.trim() === '') {
+      Swal.fire('Código de barras obrigatório', 'Informe o código de barras do produto.', 'warning');
+      return;
+    }
+
+    if (!this.produto.descricao || this.produto.descricao.trim() === '') {
+      Swal.fire('Descrição obrigatória', 'Informe a descrição do produto.', 'warning');
+      return;
+    }
+
+    if (this.produto.quantidade == null) {
+      Swal.fire('Quantidade obrigatória', 'Informe a quantidade do produto.', 'warning');
+      return;
+    }
+
+    if (this.produto.quantidade <= 0) {
+      Swal.fire('Quantidade inválida', 'A quantidade deve ser maior ou igual a 1.', 'warning');
+      return;
+    }
+
+    if (!this.fornecedorSelecionado) {
+      Swal.fire('Fornecedor obrigatório', 'Selecione um fornecedor.', 'warning');
       return;
     }
 
@@ -111,7 +132,25 @@ export class ProdutoEditarComponent implements OnInit {
       .pipe(
         catchError((error: HttpErrorResponse) => {
           console.error('Erro ao atualizar o produto:', error);
-          Swal.fire('Erro ao atualizar o produto!', error.error?.mensagem || error.message || 'Erro desconhecido', 'error');
+
+          let mensagem = 'Erro ao atualizar o produto.';
+          if (error.error) {
+            const payload = error.error;
+            if (payload.message) {
+              mensagem = payload.message;
+            } else if (typeof payload === 'object') {
+              mensagem = Object.values(payload).join(' / ');
+            } else if (typeof payload === 'string') {
+              mensagem = payload;
+            }
+          }
+
+          Swal.fire({
+            title: 'Erro',
+            text: mensagem,
+            icon: 'error',
+            confirmButtonText: 'OK'
+          });
           return throwError(error);
         })
       )

@@ -14,7 +14,8 @@
 
 <!-- Card do Formulário -->
 <div class="bg-white rounded-lg shadow-sm p-4 sm:p-8 max-w-3xl mx-auto">
-  <h2 class="text-xl font-medium text-gray-700 mb-6">Cadastrar um novo item</h2>
+  <h2 class="mb-4 text-xl font-bold text-gray-900 text-center">Cadastrar um novo Item</h2>
+  <div class="border-b border-gray-300 mb-6 w-full"></div>
 
   <form (ngSubmit)="onSubmit()" class="space-y-6">
     <!-- Produto -->
@@ -56,6 +57,19 @@
         min="1"
         [(ngModel)]="formData.quantidade"
         name="quantidade"
+        class="block w-full px-4 py-3 bg-gray-100 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+        required>
+    </div>
+
+    <!-- Preço de venda -->
+    <div>
+      <label class="block text-sm font-medium text-gray-700 mb-1">Preço de venda:</label>
+      <input
+        type="number"
+        min="0"
+        step="0.01"
+        [(ngModel)]="formData.precoVenda"
+        name="precoVenda"
         class="block w-full px-4 py-3 bg-gray-100 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
         required>
     </div>

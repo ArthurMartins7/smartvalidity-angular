@@ -124,9 +124,124 @@ export class AlertaDetalheComponent implements OnInit, OnDestroy {
     return this.notificacaoService.removerEmojis(titulo);
   }
 
-
   public podeEditar(): boolean {
-    return this.alerta?.tipo === TipoAlerta.PERSONALIZADO;
+    if (!this.alerta) {
+      return false;
+    }
+    return this.alerta.tipo === TipoAlerta.PERSONALIZADO;
+  }
+
+  public podeVisualizarItem(): boolean {
+    if (!this.alerta || !this.alerta.produtosAlerta) {
+      return false;
+    }
+    return this.alerta.produtosAlerta.length > 0;
+  }
+
+  public obterPrimeiroProduto(): string {
+    if (!this.alerta || !this.alerta.produtosAlerta || this.alerta.produtosAlerta.length === 0) {
+      return '';
+    }
+    return this.alerta.produtosAlerta[0];
+  }
+
+  public ehAlertaAutomatico(): boolean {
+    if (!this.alerta) {
+      return false;
+    }
+    return this.alerta.tipo !== TipoAlerta.PERSONALIZADO;
+  }
+
+  public obterStatusInspecao(): string {
+    if (!this.alerta) return '';
+    
+    if (this.alerta.itemInspecionado === true) {
+      return 'Produto já inspecionado';
+    } else if (this.alerta.itemInspecionado === false) {
+      return 'Produto ainda não inspecionado';
+    }
+    
+    return 'Status de inspeção não informado';
+  }
+
+  public obterCorStatusInspecao(): string {
+    if (!this.alerta) return 'border-gray-400';
+    
+    if (this.alerta.itemInspecionado === true) {
+      return 'border-emerald-400';
+    } else if (this.alerta.itemInspecionado === false) {
+      return 'border-red-400';
+    }
+    
+    return 'border-gray-400';
+  }
+
+  public obterCorFundoStatusInspecao(): string {
+    if (!this.alerta) return 'bg-gray-100';
+    
+    if (this.alerta.itemInspecionado === true) {
+      return 'bg-emerald-100';
+    } else if (this.alerta.itemInspecionado === false) {
+      return 'bg-red-100';
+    }
+    
+    return 'bg-gray-100';
+  }
+
+  public obterCorIconeStatusInspecao(): string {
+    if (!this.alerta) return 'text-gray-600';
+    
+    if (this.alerta.itemInspecionado === true) {
+      return 'text-emerald-600';
+    } else if (this.alerta.itemInspecionado === false) {
+      return 'text-red-600';
+    }
+    
+    return 'text-gray-600';
+  }
+
+  public obterIconeStatusInspecao(): string {
+    if (!this.alerta) return 'help_outline';
+    
+    if (this.alerta.itemInspecionado === true) {
+      return 'check_circle';
+    } else if (this.alerta.itemInspecionado === false) {
+      return 'cancel';
+    }
+    
+    return 'help_outline';
+  }
+
+  public excluirAlerta(): void {
+    if (!this.alerta) return;
+
+    Swal.fire({
+      title: 'Tem certeza?',
+      text: `Deseja excluir o alerta "${this.removerEmojis(this.alerta.titulo)}"?`,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Sim, excluir!',
+      cancelButtonText: 'Cancelar'
+    }).then((result) => {
+      if (result.isConfirmed && this.alerta) {
+        this.alertaService.excluirAlerta(this.alerta.id)
+          .pipe(takeUntil(this.destroy$))
+          .subscribe({
+            next: () => {
+              Swal.fire('Excluído!', 'Alerta excluído com sucesso.', 'success').then(() => {
+                this.voltarParaLista();
+              });
+            },
+            error: (erro) => {
+              console.error('Erro ao excluir alerta:', erro);
+              const msg = erro.error?.message || 'Não foi possível excluir o alerta.';
+              Swal.fire('Aviso', msg, 'warning');
+            }
+          });
+      }
+    });
   }
 
   public visualizarItem(_unused?: any): void {

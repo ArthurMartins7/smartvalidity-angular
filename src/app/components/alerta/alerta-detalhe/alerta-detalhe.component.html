@@ -10,7 +10,7 @@
   <div>
       <div class="text-gray-500 text-base cursor-pointer hover:underline" (click)="voltarParaLista()">Gestão de Alertas</div>
       <div class="text-3xl font-bold">Detalhe do Alerta</div>
-      <p class="text-gray-800 text-base mt-1">Visualize todas as informações deste alerta e, se necessário, edite-as.</p>
+      <p class="text-gray-800 text-base mt-1">Visualize todas as informações deste alerta.</p>
     </div>
   </div>
 </div>
@@ -28,27 +28,42 @@
       <div>
         <h1 class="text-2xl font-bold text-gray-800 mb-2">{{ removerEmojis(alerta.titulo) }}</h1>
       </div>
-      <div>
-        <button *ngIf="podeEditar()"
-                (click)="editarAlerta()"
-                class="text-white px-4 py-2 rounded-lg transition-colors font-medium"
-                style="background-color: #5084C1;"
-                onmouseover="this.style.backgroundColor='#3d6ba3'"
-                onmouseout="this.style.backgroundColor='#5084C1'">
-          <span class="material-icons text-sm mr-2 align-text-bottom">edit</span>
-        Editar
-      </button>
-      </div>
+             <div class="flex items-center gap-3">
+         <button (click)="excluirAlerta()"
+                 class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors font-medium flex items-center gap-2"
+                 title="Excluir este alerta">
+           <span class="material-icons text-sm">delete</span>
+           Excluir
+         </button>
+         <button *ngIf="podeVisualizarItem()"
+                 (click)="visualizarItem(obterPrimeiroProduto())"
+                 class="text-white px-4 py-2 rounded-lg transition-colors font-medium flex items-center gap-2"
+                 style="background-color: #28a745;"
+                 onmouseover="this.style.backgroundColor='#218838'"
+                 onmouseout="this.style.backgroundColor='#28a745'">
+           <span class="material-icons text-sm">visibility</span>
+           Visualizar Item
+         </button>
+         <button *ngIf="podeEditar()"
+                 (click)="editarAlerta()"
+                 class="text-white px-4 py-2 rounded-lg transition-colors font-medium flex items-center gap-2"
+                 style="background-color: #5084C1;"
+                 onmouseover="this.style.backgroundColor='#3d6ba3'"
+                 onmouseout="this.style.backgroundColor='#5084C1'">
+           <span class="material-icons text-sm">edit</span>
+           Editar
+         </button>
+       </div>
     </div>
   </div>
 
   <!-- Conteúdo -->
   <div class="p-6 space-y-6">
     <!-- Descrição do Card  -->
-    <div *ngIf="alerta.descricao" class="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200 px-6 py-4 border-l-4 border-emerald-400">
+    <div *ngIf="alerta.descricao" class="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200 px-6 py-4 border-l-4 border-blue-400">
       <div class="flex items-center gap-3 mb-4">
-        <div class="p-2 rounded-full bg-emerald-100">
-          <span class="material-icons text-emerald-600">description</span>
+        <div class="p-2 rounded-full bg-blue-100">
+          <span class="material-icons text-blue-600">description</span>
         </div>
         <h3 class="text-lg font-semibold text-gray-800">Descrição</h3>
       </div>
@@ -94,18 +109,36 @@
       </div>
     </div>
 
+    <!-- Card de Status de Inspeção (apenas para alertas automáticos) -->
+    <div *ngIf="ehAlertaAutomatico()" 
+         class="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200 px-6 py-4 border-l-4"
+         [ngClass]="obterCorStatusInspecao()">
+      <div class="flex items-center gap-3 mb-4">
+        <div class="p-2 rounded-full" [ngClass]="obterCorFundoStatusInspecao()">
+          <span class="material-icons" [ngClass]="obterCorIconeStatusInspecao()">{{ obterIconeStatusInspecao() }}</span>
+        </div>
+        <h3 class="text-lg font-semibold text-gray-800">Status de Inspeção</h3>
+      </div>
+      <div class="space-y-4">
+        <div class="flex justify-between items-center">
+          <span class="text-base font-medium text-gray-600">Status</span>
+          <div class="text-lg text-gray-800 font-medium">{{ obterStatusInspecao() }}</div>
+        </div>
+      </div>
+    </div>
+
     <!-- Card de Usuários -->
     <div *ngIf="alerta.usuariosAlerta && alerta.usuariosAlerta.length > 0"
-         class="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200 px-6 py-4 border-l-4 border-blue-400">
+         class="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200 px-6 py-4 border-l-4 border-indigo-400">
       <div class="flex items-center gap-3 mb-4">
-        <div class="p-2 rounded-full bg-blue-100">
-          <span class="material-icons text-blue-600">group</span>
+        <div class="p-2 rounded-full bg-indigo-100">
+          <span class="material-icons text-indigo-600">group</span>
         </div>
         <h3 class="text-lg font-semibold text-gray-800">Usuários que Recebem</h3>
       </div>
       <div class="flex flex-wrap gap-2">
         <span *ngFor="let usuario of alerta.usuariosAlerta"
-              class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800 border border-blue-200">
+              class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-indigo-100 text-indigo-800 border border-indigo-200">
           {{ usuario }}
         </span>
       </div>
@@ -121,21 +154,10 @@
         <h3 class="text-lg font-semibold text-gray-800">Produtos Relacionados</h3>
       </div>
       <div class="flex flex-wrap gap-2">
-        <div *ngFor="let produto of alerta.produtosAlerta" class="flex items-center gap-2 w-full">
-          <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800 border border-green-200">
+        <span *ngFor="let produto of alerta.produtosAlerta"
+              class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800 border border-green-200">
           {{ produto }}
         </span>
-          <div class="flex-1 flex justify-end">
-            <button (click)="visualizarItem(produto)"
-                    class="text-white px-3 py-1 rounded-lg transition-colors font-medium text-sm flex items-center gap-1"
-                    style="background-color: #5084C1;"
-                    onmouseover="this.style.backgroundColor='#3d6ba3'"
-                    onmouseout="this.style.backgroundColor='#5084C1'">
-              <span class="material-icons text-sm">visibility</span>
-              Visualizar Item
-            </button>
-          </div>
-        </div>
       </div>
     </div>
 

@@ -257,6 +257,101 @@ export class NotificacaoDetalheComponent implements OnInit, OnDestroy {
     return this.notificacaoService.podeVisualizarItem(this.notificacao);
   }
 
+  /**
+   * Verifica se a notificação vem de um alerta automático
+   */
+  public ehAlertaAutomatico(): boolean {
+    if (!this.notificacao) {
+      return false;
+    }
+    return this.notificacao.tipo !== TipoAlerta.PERSONALIZADO;
+  }
+
+  /**
+   * Verifica se pode visualizar item (versão melhorada)
+   */
+  public podeVisualizarItemMelhorado(): boolean {
+    if (!this.notificacao) {
+      return false;
+    }
+    return this.notificacaoService.podeVisualizarItem(this.notificacao);
+  }
+
+  /**
+   * Obter status de inspeção da notificação
+   */
+  public obterStatusInspecao(): string {
+    if (!this.notificacao) return '';
+    
+    if (this.notificacao.itemInspecionado === true) {
+      return 'Produto já inspecionado';
+    } else if (this.notificacao.itemInspecionado === false) {
+      return 'Produto ainda não inspecionado';
+    }
+    
+    return 'Status de inspeção não informado';
+  }
+
+  /**
+   * Obter cor da borda do card de status de inspeção
+   */
+  public obterCorStatusInspecao(): string {
+    if (!this.notificacao) return 'border-gray-400';
+    
+    if (this.notificacao.itemInspecionado === true) {
+      return 'border-emerald-400';
+    } else if (this.notificacao.itemInspecionado === false) {
+      return 'border-red-400';
+    }
+    
+    return 'border-gray-400';
+  }
+
+  /**
+   * Obter cor de fundo do ícone de status de inspeção
+   */
+  public obterCorFundoStatusInspecao(): string {
+    if (!this.notificacao) return 'bg-gray-100';
+    
+    if (this.notificacao.itemInspecionado === true) {
+      return 'bg-emerald-100';
+    } else if (this.notificacao.itemInspecionado === false) {
+      return 'bg-red-100';
+    }
+    
+    return 'bg-gray-100';
+  }
+
+  /**
+   * Obter cor do ícone de status de inspeção
+   */
+  public obterCorIconeStatusInspecao(): string {
+    if (!this.notificacao) return 'text-gray-600';
+    
+    if (this.notificacao.itemInspecionado === true) {
+      return 'text-emerald-600';
+    } else if (this.notificacao.itemInspecionado === false) {
+      return 'text-red-600';
+    }
+    
+    return 'text-gray-600';
+  }
+
+  /**
+   * Obter ícone de status de inspeção
+   */
+  public obterIconeStatusInspecao(): string {
+    if (!this.notificacao) return 'help_outline';
+    
+    if (this.notificacao.itemInspecionado === true) {
+      return 'check_circle';
+    } else if (this.notificacao.itemInspecionado === false) {
+      return 'cancel';
+    }
+    
+    return 'help_outline';
+  }
+
   public excluirNotificacao(): void {
     console.log('Método excluirNotificacao chamado', this.notificacao?.id);
     if (!this.notificacao?.id) return;

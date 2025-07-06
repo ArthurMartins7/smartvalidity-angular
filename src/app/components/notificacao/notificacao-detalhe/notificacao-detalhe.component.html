@@ -36,16 +36,33 @@
       <div>
         <h1 class="text-2xl font-bold text-gray-800 mb-2">{{ removerEmojis(notificacao.titulo) }}</h1>
       </div>
+      <div class="flex items-center gap-3">
+        <button (click)="excluirNotificacao()"
+                class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors font-medium flex items-center gap-2"
+                title="Excluir esta notificação">
+          <span class="material-icons text-sm">delete</span>
+          Excluir
+        </button>
+        <button *ngIf="podeVisualizarItemMelhorado()"
+                (click)="visualizarItem()"
+                class="text-white px-4 py-2 rounded-lg transition-colors font-medium flex items-center gap-2"
+                style="background-color: #28a745;"
+                onmouseover="this.style.backgroundColor='#218838'"
+                onmouseout="this.style.backgroundColor='#28a745'">
+          <span class="material-icons text-sm">visibility</span>
+          Visualizar Item
+        </button>
+      </div>
     </div>
     </div>
 
   <!-- Conteúdo -->
   <div class="p-6 space-y-6">
     <!-- Card Descrição -->
-    <div class="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200 px-6 py-4 border-l-4 border-emerald-400">
+    <div class="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200 px-6 py-4 border-l-4 border-blue-400">
       <div class="flex items-center gap-3 mb-4">
-        <div class="p-2 rounded-full bg-emerald-100">
-          <span class="material-icons text-emerald-600">description</span>
+        <div class="p-2 rounded-full bg-blue-100">
+          <span class="material-icons text-blue-600">description</span>
         </div>
         <h3 class="text-lg font-semibold text-gray-800">Descrição</h3>
               </div>
@@ -93,6 +110,24 @@
         </div>
             </div>
           </div>
+
+    <!-- Card de Status de Inspeção (apenas para notificações automáticas) -->
+    <div *ngIf="ehAlertaAutomatico()" 
+         class="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200 px-6 py-4 border-l-4"
+         [ngClass]="obterCorStatusInspecao()">
+      <div class="flex items-center gap-3 mb-4">
+        <div class="p-2 rounded-full" [ngClass]="obterCorFundoStatusInspecao()">
+          <span class="material-icons" [ngClass]="obterCorIconeStatusInspecao()">{{ obterIconeStatusInspecao() }}</span>
+        </div>
+        <h3 class="text-lg font-semibold text-gray-800">Status de Inspeção</h3>
+      </div>
+      <div class="space-y-4">
+        <div class="flex justify-between items-center">
+          <span class="text-base font-medium text-gray-600">Status</span>
+          <div class="text-lg text-gray-800 font-medium">{{ obterStatusInspecao() }}</div>
+        </div>
+      </div>
+    </div>
 
     <!-- Card Produtos Relacionados -->
     <div *ngIf="notificacao.produtosAlerta && notificacao.produtosAlerta.length > 0"
@@ -162,30 +197,5 @@
     </div>
   </div>
 
-  <!-- Ações -->
-    <div class="bg-gray-50 px-6 py-4 border-t border-gray-200">
-      <div class="flex items-center justify-end">
-        <div class="flex gap-3">
-          <!-- Botão Visualizar Item -->
-          <button
-            *ngIf="podeVisualizarItem()"
-            (click)="visualizarItem()"
-            class="text-white px-4 py-2 rounded-lg transition-colors font-medium"
-            style="background-color: #5084C1;"
-            onmouseover="this.style.backgroundColor='#3d6ba3'"
-            onmouseout="this.style.backgroundColor='#5084C1'">
-            <span class="material-icons text-sm mr-2 align-text-bottom">visibility</span>
-            Visualizar Item
-          </button>
-          <!-- Botão Excluir -->
-          <button
-            (click)="excluirNotificacao()"
-            class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors font-medium"
-            title="Excluir esta notificação">
-            <span class="material-icons text-sm mr-2 align-text-bottom">delete</span>
-            Excluir
-          </button>
-        </div>
-      </div>
-    </div>
+
 </div>

@@ -32,7 +32,6 @@ export class NotificacaoListagemComponent implements OnInit, OnDestroy {
 
   notificacoes: AlertaDTO.Listagem[] = [];
   carregando: boolean = false;
-  filtrarApenasNaoLidas: boolean = false;
 
   // Enums para template
   public TipoAlerta = TipoAlerta;
@@ -40,7 +39,7 @@ export class NotificacaoListagemComponent implements OnInit, OnDestroy {
   public itensPorPagina: number = 10;
   public opcoesItensPorPagina: number[] = [5,10,15,20,25,50];
   public paginaAtual: number = 1;
-  public activeTab: 'todas' | 'naoLidas' | 'lidas' = 'todas';
+  public activeTab: 'pendentes' | 'jaResolvidas' = 'pendentes';
 
   // Campo de busca
   filtroTitulo: string = '';
@@ -48,16 +47,14 @@ export class NotificacaoListagemComponent implements OnInit, OnDestroy {
   private searchSubject = new Subject<string>();
 
   public get notificacoesFiltradas(): AlertaDTO.Listagem[] {
-    // Primeiro, filtra pela aba selecionada (todas, lidas, não lidas)
+    // Primeiro, filtra pela aba selecionada (pendentes ou já resolvidas)
     let lista: AlertaDTO.Listagem[];
 
     switch (this.activeTab) {
-      case 'naoLidas':
-        lista = this.notificacoes.filter(n => !n.lida);
+      case 'pendentes':
+        lista = this.notificacoes;
         break;
-      case 'lidas':
-        lista = this.notificacoes.filter(n => n.lida);
-        break;
+      case 'jaResolvidas':
       default:
         lista = this.notificacoes;
         break;
@@ -109,9 +106,17 @@ export class NotificacaoListagemComponent implements OnInit, OnDestroy {
   private carregarNotificacoes(): void {
     this.carregando = true;
 
-    const observable = this.filtrarApenasNaoLidas
-      ? this.notificacaoService.buscarNotificacoesNaoLidas()
-      : this.notificacaoService.buscarNotificacoes();
+    let observable;
+    
+    switch (this.activeTab) {
+      case 'pendentes':
+        observable = this.notificacaoService.buscarNotificacoesPendentes();
+        break;
+      case 'jaResolvidas':
+      default:
+        observable = this.notificacaoService.buscarNotificacoesJaResolvidas();
+        break;
+    }
 
     observable.pipe(takeUntil(this.destroy$))
       .subscribe({
@@ -138,89 +143,10 @@ export class NotificacaoListagemComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Alternar filtro entre todas as notificações e apenas não lidas
-   */
-  public alternarFiltro(): void {
-    this.filtrarApenasNaoLidas = !this.filtrarApenasNaoLidas;
-    this.carregarNotificacoes();
-  }
-
-  /**
-   * Marcar uma notificação como lida
-   */
-  public marcarComoLida(notificacao: AlertaDTO.Listagem): void {
-    if (!notificacao.id) return;
-
-    this.notificacaoService.marcarComoLida(notificacao.id)
-      .pipe(takeUntil(this.destroy$))
-      .subscribe({
-        next: () => {
-          // Atualizar o status da notificação localmente
-          const index = this.notificacoes.findIndex(n => n.id === notificacao.id);
-          if (index !== -1) {
-            this.notificacoes[index] = { ...this.notificacoes[index], lida: true };
-          }
-          // Se estiver filtrando apenas não lidas, remover da lista
-          if (this.filtrarApenasNaoLidas) {
-            this.carregarNotificacoes();
-          }
-        },
-        error: (error) => {
-          console.log('Informação: Problema temporário ao marcar notificação como lida');
-          // Não exibe mais alertas para ações de notificação
-          // O usuário pode tentar novamente se necessário
-        }
-      });
-  }
-
-  /**
-   * Marcar todas as notificações como lidas
-   */
-  public marcarTodasComoLidas(): void {
-    Swal.fire({
-      title: 'Confirmar',
-      text: 'Deseja marcar todas as notificações como lidas?',
-      icon: 'question',
-      showCancelButton: true,
-      confirmButtonText: 'Sim',
-      cancelButtonText: 'Não'
-    }).then((result) => {
-      if (result.isConfirmed) {
-        this.notificacaoService.marcarTodasComoLidas()
-          .pipe(takeUntil(this.destroy$))
-          .subscribe({
-            next: () => {
-              this.carregarNotificacoes();
-              Swal.fire({
-                title: 'Sucesso',
-                text: 'Todas as notificações foram marcadas como lidas',
-                icon: 'success',
-                timer: 2000,
-                showConfirmButton: false
-              });
-            },
-            error: (error) => {
-              Swal.fire({
-                title: 'Erro',
-                text: 'Erro ao marcar notificações como lidas',
-                icon: 'error',
-                confirmButtonText: 'OK'
-              });
-            }
-          });
-      }
-    });
-  }
-
-  /**
    * Navegar para o item no mural
-   * Responsabilidade: VIEW - Coordena ações de marcar como lida e navegação
+   * Responsabilidade: VIEW - Coordena ações de navegação
    */
   public irParaMural(notificacao: AlertaDTO.Listagem): void {
-    if (!notificacao.lida && notificacao.id) {
-      this.marcarComoLida(notificacao);
-    }
-
     // Delega a lógica de mapeamento para o SERVICE
     const parametros = this.notificacaoService.gerarParametrosMuralBasico(notificacao.tipo);
     this.router.navigate(['/mural-listagem'], { queryParams: parametros });
@@ -313,12 +239,11 @@ export class NotificacaoListagemComponent implements OnInit, OnDestroy {
     }
   }
 
-  public setActiveTab(tab: 'todas' | 'naoLidas' | 'lidas'): void {
+  public setActiveTab(tab: 'pendentes' | 'jaResolvidas'): void {
     if (this.activeTab !== tab) {
       this.activeTab = tab;
       this.paginaAtual = 1;
-      // Atualiza filtro para otimizar carregamento do backend
-      this.filtrarApenasNaoLidas = (tab === 'naoLidas');
+      // Remove o filtro antigo pois agora cada aba tem seu próprio endpoint
       this.carregarNotificacoes();
     }
   }
@@ -391,5 +316,39 @@ export class NotificacaoListagemComponent implements OnInit, OnDestroy {
       default:
         return 'border-l-blue-500';
     }
+  }
+
+  /**
+   * Verifica se uma notificação está pendente (item não inspecionado)
+   */
+  public isPendente(notificacao: AlertaDTO.Listagem): boolean {
+    return notificacao.itemInspecionado === false;
+  }
+
+  /**
+   * Obtém o texto do badge de dias vencidos
+   */
+  public obterTextoDiasVencidos(notificacao: AlertaDTO.Listagem): string {
+    if (notificacao.diasVencidos === undefined || notificacao.diasVencidos === null) {
+      return '';
+    }
+
+    const dias = notificacao.diasVencidos;
+    
+    if (dias > 0) {
+      // Já venceu - mostrar apenas "há X dias"
+      return dias === 1 ? 'há 1 dia' : `há ${dias} dias`;
+    }
+    
+    // Para produtos que não venceram, não mostrar badge
+    return '';
+  }
+
+  /**
+   * Verifica se deve mostrar o badge de dias vencidos
+   */
+  public deveMostrarBadgeDias(notificacao: AlertaDTO.Listagem): boolean {
+    return notificacao.diasVencidos !== undefined && 
+           notificacao.diasVencidos > 0;
   }
 }

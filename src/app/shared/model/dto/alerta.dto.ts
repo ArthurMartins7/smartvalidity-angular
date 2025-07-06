@@ -17,6 +17,9 @@ export namespace AlertaDTO {
     produtosAlertaIds?: string[];
     produto?: { id: number; nome: string };
     lida?: boolean;
+    itemInspecionado?: boolean;
+    diasVencidos?: number;
+    dataVencimentoItem?: Date;
   }
 
   export class Cadastro {

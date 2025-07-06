@@ -68,13 +68,13 @@ export class SidebarComponent implements OnInit, OnDestroy {
 
     // Atualizar contador de forma silenciosa após um pequeno delay
     setTimeout(() => {
-      this.notificacaoService.atualizarContadorNaoLidas();
+      this.notificacaoService.atualizarContadorPendentes();
     }, 1000);
 
     // Atualização periódica a cada 15 s
     this.pollingSubscription = interval(15000)
       .pipe(takeUntil(this.destroy$))
-      .subscribe(() => this.notificacaoService.atualizarContadorNaoLidas());
+      .subscribe(() => this.notificacaoService.atualizarContadorPendentes());
   }
 
   ngOnDestroy(): void {

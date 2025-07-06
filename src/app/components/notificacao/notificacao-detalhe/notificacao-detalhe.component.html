@@ -87,15 +87,10 @@
                 </div>
         <div class="space-y-4">
           <div class="flex justify-between items-center">
-            <span class="text-base font-medium text-gray-600">Status de Leitura</span>
-            <span class="inline-flex items-center text-lg text-gray-800">
-              <span class="material-icons text-sm mr-2" [class.text-green-600]="notificacao.lida" [class.text-yellow-600]="!notificacao.lida">
-                {{ notificacao.lida ? 'check_circle' : 'schedule' }}
-              </span>
-              {{ notificacao.lida ? 'Lida' : 'Não lida' }}
-            </span>
-                </div>
-              </div>
+            <span class="text-base font-medium text-gray-600">ID da Notificação</span>
+            <div class="text-lg text-gray-800">#{{ notificacao.id }}</div>
+          </div>
+        </div>
             </div>
           </div>
 
@@ -169,17 +164,7 @@
 
   <!-- Ações -->
     <div class="bg-gray-50 px-6 py-4 border-t border-gray-200">
-      <div class="flex items-center justify-between">
-        <div>
-          <!-- Botão Marcar como Lida -->
-          <button
-            *ngIf="!notificacao.lida"
-            (click)="marcarComoLida()"
-            class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors font-medium">
-            <span class="material-icons text-sm mr-2 align-text-bottom">check</span>
-            Marcar como Lida
-          </button>
-        </div>
+      <div class="flex items-center justify-end">
         <div class="flex gap-3">
           <!-- Botão Visualizar Item -->
           <button

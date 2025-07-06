@@ -54,6 +54,8 @@ export class AlertaListagemComponent implements OnInit, OnDestroy {
   public loading: boolean = false;
   public ultimaBusca: string = '';
 
+  public activeTab: 'ativos' | 'jaResolvidos' = 'ativos';
+
   private searchSubject = new Subject<string>();
 
   public TipoAlerta = TipoAlerta;
@@ -106,7 +108,22 @@ export class AlertaListagemComponent implements OnInit, OnDestroy {
 
   public buscarAlertas(): void {
     this.loading = true;
-    this.alertaService.buscarComFiltros(this.seletor).subscribe({
+    
+    let observable;
+    
+    switch (this.activeTab) {
+      case 'ativos':
+        observable = this.alertaService.buscarAlertasAtivos();
+        break;
+      case 'jaResolvidos':
+        observable = this.alertaService.buscarAlertasJaResolvidos();
+        break;
+      default:
+        observable = this.alertaService.buscarComFiltros(this.seletor);
+        break;
+    }
+    
+    observable.subscribe({
       next: (resultado) => {
         this.alertas = resultado;
         this.calcularTotalPaginas();
@@ -355,6 +372,38 @@ export class AlertaListagemComponent implements OnInit, OnDestroy {
     }
   }
 
+  /**
+   * Obtém o texto do badge de dias vencidos
+   */
+  public obterTextoDiasVencidos(alerta: AlertaDTO.Listagem): string {
+    if (alerta.diasVencidos === undefined || alerta.diasVencidos === null) {
+      return '';
+    }
+
+    const dias = alerta.diasVencidos;
+    
+    if (dias < 0) {
+      // Ainda não venceu
+      const diasRestantes = Math.abs(dias);
+      return diasRestantes === 1 ? 'vence amanhã' : `vence em ${diasRestantes} dias`;
+    } else if (dias === 0) {
+      // Vence hoje
+      return 'vence hoje';
+    } else {
+      // Já venceu
+      return dias === 1 ? 'venceu há 1 dia' : `venceu há ${dias} dias`;
+    }
+  }
+
+  /**
+   * Verifica se deve mostrar o badge de dias vencidos
+   */
+  public deveMostrarBadgeDias(alerta: AlertaDTO.Listagem): boolean {
+    return alerta.tipo === TipoAlerta.VENCIMENTO_ATRASO && 
+           alerta.diasVencidos !== undefined && 
+           alerta.diasVencidos > 0;
+  }
+
   public excluirAlerta(alerta: AlertaDTO.Listagem): void {
     Swal.fire({
       title: 'Tem certeza?',
@@ -380,6 +429,14 @@ export class AlertaListagemComponent implements OnInit, OnDestroy {
         });
       }
     });
+  }
+
+  public setActiveTab(tab: 'ativos' | 'jaResolvidos'): void {
+    if (this.activeTab !== tab) {
+      this.activeTab = tab;
+      this.limparFiltros(); // Limpa filtros ao trocar de aba
+      this.buscarAlertas();
+    }
   }
 
   ngOnDestroy(): void {

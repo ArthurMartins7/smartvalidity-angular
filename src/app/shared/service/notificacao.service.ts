@@ -26,43 +26,29 @@ export class NotificacaoService {
     return this.http.get<AlertaDTO.Listagem>(`${this.API_URL}/${id}`);
   }
 
-  buscarNotificacoesNaoLidas(): Observable<AlertaDTO.Listagem[]> {
-    return this.http.get<AlertaDTO.Listagem[]>(`${this.API_URL}/nao-lidas`);
+  buscarNotificacoesPendentes(): Observable<AlertaDTO.Listagem[]> {
+    return this.http.get<AlertaDTO.Listagem[]>(`${this.API_URL}/pendentes`);
   }
 
-  contarNotificacoesNaoLidas(): Observable<number> {
-    return this.http.get<number>(`${this.API_URL}/count-nao-lidas`);
+  buscarNotificacoesJaResolvidas(): Observable<AlertaDTO.Listagem[]> {
+    return this.http.get<AlertaDTO.Listagem[]>(`${this.API_URL}/ja-resolvidas`);
   }
 
-  marcarComoLida(id: number): Observable<void> {
-    return this.http.put<void>(`${this.API_URL}/${id}/marcar-lida`, {})
-      .pipe(
-        tap(() => {
-          this.atualizarContadorNaoLidas();
-        })
-      );
-  }
-
-  marcarTodasComoLidas(): Observable<void> {
-    return this.http.put<void>(`${this.API_URL}/marcar-todas-lidas`, {})
-      .pipe(
-        tap(() => {
-          this.unreadCountSubject.next(0);
-        })
-      );
+  contarNotificacoesPendentes(): Observable<number> {
+    return this.http.get<number>(`${this.API_URL}/count-pendentes`);
   }
 
   excluirNotificacao(id: number): Observable<void> {
     return this.http.delete<void>(`${this.API_URL}/${id}`)
       .pipe(
         tap(() => {
-          this.atualizarContadorNaoLidas();
+          this.atualizarContadorPendentes();
         })
       );
   }
 
-  atualizarContadorNaoLidas(): void {
-    this.contarNotificacoesNaoLidas().subscribe({
+  atualizarContadorPendentes(): void {
+    this.contarNotificacoesPendentes().subscribe({
       next: (count) => {
         this.unreadCountSubject.next(count || 0);
       },

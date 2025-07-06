@@ -19,32 +19,17 @@
     <!-- Abas e ação em lote -->
     <div class="flex items-center justify-between mb-6">
       <div class="flex gap-2">
-        <button (click)="setActiveTab('naoLidas')"
-                [ngClass]="activeTab==='naoLidas' ? 'bg-[#5084C1] text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'"
+        <button (click)="setActiveTab('pendentes')"
+                [ngClass]="activeTab==='pendentes' ? 'bg-[#5084C1] text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'"
                 class="px-4 py-2 rounded-lg font-medium transition-colors">
-          Não lidas
+          Pendentes
         </button>
-        <button (click)="setActiveTab('lidas')"
-                [ngClass]="activeTab==='lidas' ? 'bg-[#5084C1] text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'"
+        <button (click)="setActiveTab('jaResolvidas')"
+                [ngClass]="activeTab==='jaResolvidas' ? 'bg-[#5084C1] text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'"
                 class="px-4 py-2 rounded-lg font-medium transition-colors">
-          Lidas
-        </button>
-        <button (click)="setActiveTab('todas')"
-                [ngClass]="activeTab==='todas' ? 'bg-[#5084C1] text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'"
-                class="px-4 py-2 rounded-lg font-medium transition-colors">
-          Todas
+          Já Resolvidas
         </button>
       </div>
-
-      <button
-        *ngIf="notificacoesFiltradas.length > 0 && activeTab !== 'lidas'"
-        (click)="marcarTodasComoLidas()"
-        class="text-white px-4 py-2 rounded-lg transition-colors text-sm font-medium"
-        style="background-color:#5084C1;"
-        onmouseover="this.style.backgroundColor='#3d6ba3'"
-        onmouseout="this.style.backgroundColor='#5084C1'">
-        Marcar todas como lidas
-      </button>
     </div>
 
     <!-- Barra de pesquisa -->
@@ -81,7 +66,6 @@
       <div
         *ngFor="let notificacao of notificacoesFiltradas | slice:(paginaAtual-1)*itensPorPagina:(paginaAtual*itensPorPagina); trackBy: trackByNotificacao"
         class="bg-white rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow"
-        [class.opacity-80]="notificacao.lida"
         [class.border-l-4]="true"
         [ngClass]="obterClasseBordaTipo(notificacao.tipo)">
 
@@ -90,26 +74,23 @@
             <!-- Conteúdo Principal -->
             <div class="flex-1 min-w-0">
               <div class="flex items-center gap-3 mb-2">
-                <!-- Indicador de não lida -->
-                <div *ngIf="!notificacao.lida" class="w-2 h-2 bg-blue-500 rounded-full flex-shrink-0"></div>
-
                 <!-- Título -->
-                <h3 class="text-lg font-semibold text-gray-900 truncate"
-                    [class.text-gray-600]="notificacao.lida">
+                <h3 class="text-lg font-semibold text-gray-900 truncate">
                   {{ removerEmojis(notificacao.titulo) }}
                 </h3>
 
-                <!-- Badge do tipo -->
-                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium whitespace-nowrap"
-                      [class]="obterCorTipo(notificacao.tipo)">
-                  {{ obterDescricaoTipo(notificacao.tipo) }}
+                <!-- Badge dinâmico de dias vencidos -->
+                <span *ngIf="deveMostrarBadgeDias(notificacao)"
+                      class="inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 ml-1">
+                  <span class="material-icons text-xs mr-1">schedule</span>
+                  {{ obterTextoDiasVencidos(notificacao) }}
                 </span>
 
-                <!-- Badge de Urgência para produtos vencidos -->
-                <span *ngIf="notificacao.tipo === TipoAlerta.VENCIMENTO_ATRASO"
+                <!-- Badge de Pendente para notificações não resolvidas -->
+                <span *ngIf="isPendente(notificacao)"
                       class="inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 animate-pulse ml-1">
-                  <span class="material-icons text-xs mr-1">priority_high</span>
-                  URGENTE
+                  <span class="material-icons text-xs mr-1">warning</span>
+                  PENDENTE
                 </span>
               </div>
 
@@ -139,24 +120,6 @@
 
             <!-- Ações -->
             <div class="flex items-center gap-2 ml-4">
-              <!-- Indicador de lida -->
-              <div
-                *ngIf="notificacao.lida"
-                class="inline-flex items-center h-9 px-3 bg-green-100 text-green-700 rounded-lg text-sm font-medium border border-green-200">
-                <span class="material-icons text-base mr-1">check</span>
-                Lida
-              </div>
-
-              <!-- Botão Marcar como lida (apenas para não lidas) -->
-              <button
-                *ngIf="!notificacao.lida"
-                (click)="marcarComoLida(notificacao)"
-                class="inline-flex items-center h-9 px-3 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors text-sm font-medium"
-                title="Marcar como lida">
-                <span class="material-icons text-base mr-1">check</span>
-                Marcar como lida
-              </button>
-
               <!-- Botão Ver Detalhes -->
               <button
                 (click)="verDetalhes(notificacao)"
@@ -180,10 +143,10 @@
       <!-- Estado Vazio -->
       <div *ngIf="notificacoesFiltradas.length === 0" class="bg-white rounded-lg shadow-sm border border-gray-200 p-12 text-center">
         <h3 class="text-lg font-medium text-gray-900 mb-2">
-          Nenhuma notificação {{ activeTab === 'naoLidas' ? 'não lida' : (activeTab === 'lidas' ? 'lida' : '') }}
+          Nenhuma notificação {{ activeTab === 'pendentes' ? 'pendente' : 'já resolvida' }}
         </h3>
         <p class="text-gray-500">
-          {{ activeTab === 'naoLidas' ? 'Todas as suas notificações já foram lidas.' : 'Você não tem notificações no momento.' }}
+          {{ activeTab === 'pendentes' ? 'Não há notificações pendentes no momento.' : 'Não há notificações de produtos já inspecionados.' }}
         </p>
       </div>
 

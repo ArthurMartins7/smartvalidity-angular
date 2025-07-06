@@ -15,6 +15,28 @@
 
 <div class="px-3 pt-2 pb-3 bg-white-100">
 
+  <!-- Abas -->
+  <div class="flex items-center justify-between mb-6">
+    <div class="flex gap-2">
+      <button (click)="setActiveTab('ativos')"
+              [ngClass]="activeTab==='ativos' ? 'bg-[#5084C1] text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'"
+              class="px-4 py-2 rounded-lg font-medium transition-colors">
+        Ativos
+      </button>
+      <button (click)="setActiveTab('jaResolvidos')"
+              [ngClass]="activeTab==='jaResolvidos' ? 'bg-[#5084C1] text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'"
+              class="px-4 py-2 rounded-lg font-medium transition-colors">
+        Já Resolvidos
+      </button>
+    </div>
+
+    <button (click)="adicionarAlerta()"
+      class="bg-gradient-to-r from-[#5084C1] to-[#4071a8] hover:from-[#4071a8] hover:to-[#365f8a] text-white px-3 md:px-4 py-2.5 rounded-xl flex items-center justify-center transition-all duration-200 transform hover:scale-105 shadow-md hover:shadow-lg font-medium">
+      <span class="material-icons text-base mr-0 md:mr-2">add</span>
+      <span class="hidden md:inline text-sm font-semibold">Criar Alerta</span>
+    </button>
+  </div>
+
   <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4 mb-4">
     <div class="flex flex-col md:flex-row items-stretch md:items-center gap-4">
 
@@ -176,6 +198,13 @@
                 <div class="flex-1 min-w-0">
                   <div class="flex items-center gap-2">
                     <div class="text-sm font-medium text-gray-900 truncate">{{ removerEmojis(alerta.titulo) }}</div>
+                    
+                    <!-- Badge dinâmico de dias vencidos -->
+                    <span *ngIf="deveMostrarBadgeDias(alerta)"
+                          class="inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 ml-1">
+                      <span class="material-icons text-xs mr-1">schedule</span>
+                      {{ obterTextoDiasVencidos(alerta) }}
+                    </span>
                   </div>
                   <div class="text-sm text-gray-500 max-w-xs truncate mt-1" [title]="alerta.descricao">{{ alerta.descricao }}</div>
                 </div>

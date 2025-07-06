@@ -17,7 +17,7 @@ import { NotificacaoService } from '../../../shared/service/notificacao.service'
  * RESPONSABILIDADES MVC (VIEW):
  * - Apresentar detalhes de uma notificação específica
  * - Permitir navegação para o mural relacionado
- * - Marcar notificação como lida quando visualizada
+ * - Permitir exclusão da notificação
  * - Não contém lógica de negócio (delegada para o Service)
  */
 @Component({
@@ -73,9 +73,6 @@ export class NotificacaoDetalheComponent implements OnInit, OnDestroy {
           this.notificacao = notificacao;
           if (!this.notificacao) {
             this.erro = 'Notificação não encontrada';
-          } else if (!this.notificacao.lida) {
-            // Marcar como lida quando o usuário visualiza os detalhes
-            this.marcarComoLida();
           }
           
           // Carregar itens-produto se houver produtos relacionados
@@ -88,7 +85,7 @@ export class NotificacaoDetalheComponent implements OnInit, OnDestroy {
           
           this.carregando = false;
         },
-        error: (error) => {
+        error: (error: any) => {
           this.erro = 'Erro ao carregar detalhes da notificação';
           this.carregando = false;
 
@@ -120,25 +117,6 @@ export class NotificacaoDetalheComponent implements OnInit, OnDestroy {
         error: (erro: any) => {
           console.error('Erro ao buscar itens-produto não inspecionados:', erro);
           this.itensProdutoNaoInspecionados = [];
-        }
-      });
-  }
-
-  /**
-   * Marcar esta notificação como lida
-   */
-  public marcarComoLida(): void {
-    if (!this.notificacao?.id) return;
-
-    this.notificacaoService.marcarComoLida(this.notificacao.id)
-      .pipe(takeUntil(this.destroy$))
-      .subscribe({
-        next: () => {
-          if (this.notificacao) {
-            this.notificacao.lida = true;
-          }
-        },
-        error: (error) => {
         }
       });
   }
@@ -221,7 +199,7 @@ export class NotificacaoDetalheComponent implements OnInit, OnDestroy {
             });
           }
         },
-        error: (error) => {
+        error: (error: any) => {
           console.error('Erro ao obter dados de navegação:', error);
           // Feedback de erro para o usuário
           Swal.fire({
@@ -301,7 +279,7 @@ export class NotificacaoDetalheComponent implements OnInit, OnDestroy {
               Swal.fire('Excluída!', 'Notificação removida com sucesso.', 'success');
               this.voltarParaLista();
             },
-            error: (error) => {
+            error: (error: any) => {
               const msg = error.error?.message || 'Não foi possível excluir a notificação.';
               Swal.fire('Aviso', msg, 'warning');
             }

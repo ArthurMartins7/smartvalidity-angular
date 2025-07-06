@@ -87,4 +87,12 @@ export class AlertaService {
       })
     );
   }
+
+  buscarAlertasAtivos(): Observable<AlertaDTO.Listagem[]> {
+    return this.httpClient.get<AlertaDTO.Listagem[]>(`${this.API}/ativos`);
+  }
+
+  buscarAlertasJaResolvidos(): Observable<AlertaDTO.Listagem[]> {
+    return this.httpClient.get<AlertaDTO.Listagem[]>(`${this.API}/ja-resolvidos`);
+  }
 }

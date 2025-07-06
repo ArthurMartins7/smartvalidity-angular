@@ -21,17 +21,17 @@
       <button (click)="setActiveTab('ativos')"
               [ngClass]="activeTab==='ativos' ? 'bg-[#5084C1] text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'"
               class="px-4 py-2 rounded-lg font-medium transition-colors">
-        Ativos
-      </button>
-      <button (click)="setActiveTab('personalizados')"
-              [ngClass]="activeTab==='personalizados' ? 'bg-[#5084C1] text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'"
-              class="px-4 py-2 rounded-lg font-medium transition-colors">
-        Personalizados
+        Pendentes
       </button>
       <button (click)="setActiveTab('jaResolvidos')"
               [ngClass]="activeTab==='jaResolvidos' ? 'bg-[#5084C1] text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'"
               class="px-4 py-2 rounded-lg font-medium transition-colors">
         Já Resolvidos
+      </button>
+      <button (click)="setActiveTab('personalizados')"
+              [ngClass]="activeTab==='personalizados' ? 'bg-[#5084C1] text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'"
+              class="px-4 py-2 rounded-lg font-medium transition-colors">
+        Personalizados
       </button>
     </div>
   </div>

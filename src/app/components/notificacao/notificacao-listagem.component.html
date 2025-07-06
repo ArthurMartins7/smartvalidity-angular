@@ -24,15 +24,15 @@
                 class="px-4 py-2 rounded-lg font-medium transition-colors">
           Pendentes
         </button>
-        <button (click)="setActiveTab('personalizadas')"
-                [ngClass]="activeTab==='personalizadas' ? 'bg-[#5084C1] text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'"
-                class="px-4 py-2 rounded-lg font-medium transition-colors">
-          Personalizadas
-        </button>
         <button (click)="setActiveTab('jaResolvidas')"
                 [ngClass]="activeTab==='jaResolvidas' ? 'bg-[#5084C1] text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'"
                 class="px-4 py-2 rounded-lg font-medium transition-colors">
           Já Resolvidas
+        </button>
+        <button (click)="setActiveTab('personalizadas')"
+                [ngClass]="activeTab==='personalizadas' ? 'bg-[#5084C1] text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'"
+                class="px-4 py-2 rounded-lg font-medium transition-colors">
+          Personalizadas
         </button>
       </div>
     </div>

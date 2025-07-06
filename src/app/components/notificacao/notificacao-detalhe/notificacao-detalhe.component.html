@@ -66,65 +66,6 @@
       <p class="text-gray-700 leading-relaxed">{{ notificacao.descricao }}</p>
             </div>
 
-    <!-- Card Informações de Tempo -->
-    <div class="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200 px-6 py-4 border-l-4 border-purple-400">
-      <div class="flex items-center gap-3 mb-4">
-        <div class="p-2 rounded-full bg-purple-100">
-          <span class="material-icons text-purple-600">schedule</span>
-        </div>
-        <h3 class="text-lg font-semibold text-gray-800">Informações de Tempo</h3>
-      </div>
-      <div class="space-y-4">
-        <div class="flex justify-between items-center">
-          <span class="text-base font-medium text-gray-600">Recebida</span>
-          <div class="text-right">
-            <div class="text-lg text-gray-800">{{ formatarDataHora(notificacao.dataEnvio || notificacao.dataCriacao!) }}</div>
-            <div class="text-sm text-gray-500">{{ obterTempoRelativo(notificacao.dataEnvio || notificacao.dataCriacao!) }}</div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Card de Status de Leitura (apenas para notificações personalizadas) -->
-    <div *ngIf="ehAlertaPersonalizado()" 
-         class="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200 px-6 py-4 border-l-4"
-         [ngClass]="notificacao.lida ? 'border-green-400' : 'border-blue-400'">
-      <div class="flex items-center gap-3 mb-4">
-        <div class="p-2 rounded-full" [ngClass]="notificacao.lida ? 'bg-green-100' : 'bg-blue-100'">
-          <span class="material-icons" [ngClass]="notificacao.lida ? 'text-green-600' : 'text-blue-600'">{{ notificacao.lida ? 'check_circle' : 'mark_email_unread' }}</span>
-        </div>
-        <h3 class="text-lg font-semibold text-gray-800">Status de Leitura</h3>
-      </div>
-      <div class="space-y-4">
-        <div class="flex justify-between items-center">
-          <span class="text-base font-medium text-gray-600">Status</span>
-          <div class="text-lg text-gray-800 font-medium">{{ notificacao.lida ? 'Lida' : 'Não lida' }}</div>
-        </div>
-        <div *ngIf="notificacao.lida" class="flex justify-between items-center">
-          <span class="text-base font-medium text-gray-600">Data da leitura</span>
-          <div class="text-lg text-gray-800">{{ formatarDataHora(notificacao.dataEnvio || notificacao.dataCriacao!) }}</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Card de Status de Inspeção (apenas para notificações automáticas) -->
-    <div *ngIf="ehAlertaAutomatico()" 
-         class="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200 px-6 py-4 border-l-4"
-         [ngClass]="obterCorStatusInspecao()">
-      <div class="flex items-center gap-3 mb-4">
-        <div class="p-2 rounded-full" [ngClass]="obterCorFundoStatusInspecao()">
-          <span class="material-icons" [ngClass]="obterCorIconeStatusInspecao()">{{ obterIconeStatusInspecao() }}</span>
-        </div>
-        <h3 class="text-lg font-semibold text-gray-800">Status de Inspeção</h3>
-      </div>
-      <div class="space-y-4">
-        <div class="flex justify-between items-center">
-          <span class="text-base font-medium text-gray-600">Status</span>
-          <div class="text-lg text-gray-800 font-medium">{{ obterStatusInspecao() }}</div>
-        </div>
-      </div>
-    </div>
-
     <!-- Card Produtos Relacionados -->
     <div *ngIf="notificacao.produtosAlerta && notificacao.produtosAlerta.length > 0"
          class="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200 px-6 py-4 border-l-4 border-green-400">
@@ -176,6 +117,68 @@
               </tr>
             </tbody>
           </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Container para cards lado a lado -->
+    <div class="flex flex-col md:flex-row gap-6">
+      <!-- Card Informações de Tempo -->
+      <div class="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200 px-6 py-4 border-l-4 border-purple-400 flex-1">
+        <div class="flex items-center gap-3 mb-4">
+          <div class="p-2 rounded-full bg-purple-100">
+            <span class="material-icons text-purple-600">schedule</span>
+          </div>
+          <h3 class="text-lg font-semibold text-gray-800">Informações de Tempo</h3>
+        </div>
+        <div class="space-y-4">
+          <div class="flex justify-between items-center">
+            <span class="text-base font-medium text-gray-600">Recebida</span>
+            <div class="text-right">
+              <div class="text-lg text-gray-800">{{ formatarDataHora(notificacao.dataEnvio || notificacao.dataCriacao!) }}</div>
+              <div class="text-sm text-gray-500">{{ obterTempoRelativo(notificacao.dataEnvio || notificacao.dataCriacao!) }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card de Status de Leitura (apenas para notificações personalizadas) -->
+      <div *ngIf="ehAlertaPersonalizado()" 
+           class="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200 px-6 py-4 border-l-4 flex-1"
+           [ngClass]="notificacao.lida ? 'border-green-400' : 'border-blue-400'">
+        <div class="flex items-center gap-3 mb-4">
+          <div class="p-2 rounded-full" [ngClass]="notificacao.lida ? 'bg-green-100' : 'bg-blue-100'">
+            <span class="material-icons" [ngClass]="notificacao.lida ? 'text-green-600' : 'text-blue-600'">{{ notificacao.lida ? 'check_circle' : 'mark_email_unread' }}</span>
+          </div>
+          <h3 class="text-lg font-semibold text-gray-800">Status de Leitura</h3>
+        </div>
+        <div class="space-y-4">
+          <div class="flex justify-between items-center">
+            <span class="text-base font-medium text-gray-600">Status</span>
+            <div class="text-lg text-gray-800 font-medium">{{ notificacao.lida ? 'Lida' : 'Não lida' }}</div>
+          </div>
+          <div *ngIf="notificacao.lida" class="flex justify-between items-center">
+            <span class="text-base font-medium text-gray-600">Data da leitura</span>
+            <div class="text-lg text-gray-800">{{ formatarDataHora(notificacao.dataEnvio || notificacao.dataCriacao!) }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card de Status de Inspeção (apenas para notificações automáticas) -->
+    <div *ngIf="ehAlertaAutomatico()" 
+         class="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200 px-6 py-4 border-l-4"
+         [ngClass]="obterCorStatusInspecao()">
+      <div class="flex items-center gap-3 mb-4">
+        <div class="p-2 rounded-full" [ngClass]="obterCorFundoStatusInspecao()">
+          <span class="material-icons" [ngClass]="obterCorIconeStatusInspecao()">{{ obterIconeStatusInspecao() }}</span>
+        </div>
+        <h3 class="text-lg font-semibold text-gray-800">Status de Inspeção</h3>
+      </div>
+      <div class="space-y-4">
+        <div class="flex justify-between items-center">
+          <span class="text-base font-medium text-gray-600">Status</span>
+          <div class="text-lg text-gray-800 font-medium">{{ obterStatusInspecao() }}</div>
         </div>
       </div>
     </div>

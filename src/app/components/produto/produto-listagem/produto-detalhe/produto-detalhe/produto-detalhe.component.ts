@@ -150,17 +150,35 @@ export class ProdutoDetalheComponent implements OnInit, AfterViewInit, OnDestroy
         console.error('Erro ao criar produto:', erro);
         console.error('Detalhes do erro:', JSON.stringify(erro, null, 2));
         
+        // Tenta montar mensagem a partir do payload do backend
         let mensagemErro = 'Ocorreu um erro ao salvar o produto.';
-        
-        if (erro.error?.codigoBarras) {
-          mensagemErro = erro.error.codigoBarras;
-        } else if (erro.error?.mensagem) {
-          mensagemErro = erro.error.mensagem;
+
+        if (erro.error) {
+          const erroPayload = erro.error;
+
+          /*
+           * Formato 1 – validação de campos (@Valid):
+           *   {
+           *     "codigoBarras": "Mensagem...",
+           *     "quantidade":   "Mensagem..."
+           *   }
+           * Formato 2 – SmartValidityException:
+           *   { "message": "Mensagem..." }
+           */
+
+          if (erroPayload.message) {
+            mensagemErro = erroPayload.message;
+          } else if (typeof erroPayload === 'object') {
+            // Concatena todas as mensagens dos campos – separadas por " / "
+            mensagemErro = Object.values(erroPayload).join(' / ');
+          } else if (typeof erroPayload === 'string') {
+            mensagemErro = erroPayload;
+          }
         }
 
         Swal.fire({
           title: 'Erro ao salvar produto',
-          text: 'Código de barras formato EAN13 inválido!',
+          text: mensagemErro,
           icon: 'error',
           confirmButtonText: 'OK'
         });
@@ -179,7 +197,25 @@ export class ProdutoDetalheComponent implements OnInit, AfterViewInit, OnDestroy
         }).then(() => this.voltar());
       },
       (erro) => {
-        Swal.fire('Erro ao atualizar o produto: ' + erro.error, 'error');
+        // Monta mensagem de erro amigável
+        let mensagem = 'Erro ao atualizar o produto.';
+        if (erro.error) {
+          const payload = erro.error;
+          if (payload.message) {
+            mensagem = payload.message;
+          } else if (typeof payload === 'object') {
+            mensagem = Object.values(payload).join(' / ');
+          } else if (typeof payload === 'string') {
+            mensagem = payload;
+          }
+        }
+
+        Swal.fire({
+          title: 'Erro',
+          text: mensagem,
+          icon: 'error',
+          confirmButtonText: 'OK'
+        });
       }
     );
   }

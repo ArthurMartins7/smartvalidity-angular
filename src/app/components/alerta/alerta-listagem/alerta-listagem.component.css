@@ -1,1 +1,35 @@
-/* Estilos específicos para o componente de listagem de alertas */ 
+/* Estilos específicos para o componente de listagem de alertas */
+
+/* Indicadores de prioridade com cores específicas */
+.indicador-vencido {
+  background-color: #ef4444 !important; /* Vermelho para vencidos */
+  animation: pulse 2s infinite;
+}
+
+.indicador-hoje {
+  background-color: #f97316 !important; /* Laranja para vence hoje */
+}
+
+.indicador-amanha {
+  background-color: #eab308 !important; /* Amarelo para vence amanhã */
+}
+
+.indicador-normal {
+  background-color: #d1d5db !important; /* Cinza para normal */
+}
+
+/* Badges de tipo com cores específicas */
+.badge-vencido {
+  background-color: #fef2f2 !important;
+  color: #b91c1c !important;
+}
+
+.badge-hoje {
+  background-color: #fff7ed !important;
+  color: #c2410c !important;
+}
+
+.badge-amanha {
+  background-color: #fefce8 !important;
+  color: #a16207 !important;
+} 

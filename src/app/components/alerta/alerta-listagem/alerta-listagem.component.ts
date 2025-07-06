@@ -54,7 +54,7 @@ export class AlertaListagemComponent implements OnInit, OnDestroy {
   public loading: boolean = false;
   public ultimaBusca: string = '';
 
-  public activeTab: 'ativos' | 'jaResolvidos' = 'ativos';
+  public activeTab: 'ativos' | 'personalizados' | 'jaResolvidos' = 'ativos';
 
   private searchSubject = new Subject<string>();
 
@@ -114,6 +114,9 @@ export class AlertaListagemComponent implements OnInit, OnDestroy {
     switch (this.activeTab) {
       case 'ativos':
         observable = this.alertaService.buscarAlertasAtivos();
+        break;
+      case 'personalizados':
+        observable = this.alertaService.buscarAlertasPersonalizados();
         break;
       case 'jaResolvidos':
         observable = this.alertaService.buscarAlertasJaResolvidos();
@@ -330,17 +333,55 @@ export class AlertaListagemComponent implements OnInit, OnDestroy {
     return alerta.id;
   }
 
-  public obterPrioridadeAlerta(alerta: AlertaDTO.Listagem): 'alta' | 'media' | 'normal' {
-
+  public obterPrioridadeAlerta(alerta: AlertaDTO.Listagem): 'alta' | 'media' | 'baixa' | 'normal' {
+    // Vencimentos atrasados têm prioridade alta
     if (alerta.tipo === TipoAlerta.VENCIMENTO_ATRASO) {
       return 'alta';
     }
-
-    if (alerta.tipo === TipoAlerta.VENCIMENTO_HOJE || alerta.tipo === TipoAlerta.VENCIMENTO_AMANHA) {
+    
+    // Vencimentos hoje têm prioridade média
+    if (alerta.tipo === TipoAlerta.VENCIMENTO_HOJE) {
       return 'media';
+    }
+    
+    // Vencimentos amanhã têm prioridade baixa
+    if (alerta.tipo === TipoAlerta.VENCIMENTO_AMANHA) {
+      return 'baixa';
     }
 
     return 'normal';
+  }
+
+  /**
+   * Obtém a cor do indicador de prioridade baseado no tipo do alerta
+   */
+  public obterCorIndicadorPrioridade(alerta: AlertaDTO.Listagem): string {
+    switch (alerta.tipo) {
+      case TipoAlerta.VENCIMENTO_ATRASO:
+        return 'bg-red-500';
+      case TipoAlerta.VENCIMENTO_HOJE:
+        return 'bg-orange-500';
+      case TipoAlerta.VENCIMENTO_AMANHA:
+        return 'bg-yellow-500';
+      default:
+        return 'bg-gray-300';
+    }
+  }
+
+  /**
+   * Obtém o título do indicador de prioridade
+   */
+  public obterTituloIndicadorPrioridade(alerta: AlertaDTO.Listagem): string {
+    switch (alerta.tipo) {
+      case TipoAlerta.VENCIMENTO_ATRASO:
+        return 'Produto vencido - Alta prioridade';
+      case TipoAlerta.VENCIMENTO_HOJE:
+        return 'Produto vence hoje - Média prioridade';
+      case TipoAlerta.VENCIMENTO_AMANHA:
+        return 'Produto vence amanhã - Baixa prioridade';
+      default:
+        return 'Prioridade normal';
+    }
   }
 
   public isUrgente(alerta: AlertaDTO.Listagem): boolean {
@@ -431,7 +472,7 @@ export class AlertaListagemComponent implements OnInit, OnDestroy {
     });
   }
 
-  public setActiveTab(tab: 'ativos' | 'jaResolvidos'): void {
+  public setActiveTab(tab: 'ativos' | 'personalizados' | 'jaResolvidos'): void {
     if (this.activeTab !== tab) {
       this.activeTab = tab;
       this.limparFiltros(); // Limpa filtros ao trocar de aba

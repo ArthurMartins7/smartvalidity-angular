@@ -37,18 +37,15 @@
         <h1 class="text-2xl font-bold text-gray-800 mb-2">{{ removerEmojis(notificacao.titulo) }}</h1>
       </div>
       <div class="flex items-center gap-3">
-        <button (click)="excluirNotificacao()"
-                class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors font-medium flex items-center gap-2"
+        <button *ngIf="!ehAlertaPersonalizado()"
+                (click)="excluirNotificacao()"
+                class="btn-excluir text-white px-3 py-2 rounded-lg font-medium flex items-center justify-center w-10 h-10"
                 title="Excluir esta notificação">
-          <span class="material-icons text-sm">delete</span>
-          Excluir
+          <span class="material-icons text-base">delete</span>
         </button>
         <button *ngIf="podeVisualizarItemMelhorado()"
                 (click)="visualizarItem()"
-                class="text-white px-4 py-2 rounded-lg transition-colors font-medium flex items-center gap-2"
-                style="background-color: #28a745;"
-                onmouseover="this.style.backgroundColor='#218838'"
-                onmouseout="this.style.backgroundColor='#28a745'">
+                class="btn-visualizar px-4 py-2 rounded-lg font-medium flex items-center gap-2 text-white">
           <span class="material-icons text-sm">visibility</span>
           Visualizar Item
         </button>
@@ -69,47 +66,46 @@
       <p class="text-gray-700 leading-relaxed">{{ notificacao.descricao }}</p>
             </div>
 
-    <!-- Grid de Cards -->
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-      <!-- Card Informações de Tempo -->
-      <div class="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200 px-6 py-4 border-l-4 border-purple-400">
-        <div class="flex items-center gap-3 mb-4">
-          <div class="p-2 rounded-full bg-purple-100">
-            <span class="material-icons text-purple-600">schedule</span>
-          </div>
-          <h3 class="text-lg font-semibold text-gray-800">Informações de Tempo</h3>
+    <!-- Card Informações de Tempo -->
+    <div class="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200 px-6 py-4 border-l-4 border-purple-400">
+      <div class="flex items-center gap-3 mb-4">
+        <div class="p-2 rounded-full bg-purple-100">
+          <span class="material-icons text-purple-600">schedule</span>
         </div>
-        <div class="space-y-4">
-          <div class="flex justify-between items-center">
-            <span class="text-base font-medium text-gray-600">Criada</span>
-            <div class="text-right">
-              <div class="text-lg text-gray-800">{{ formatarDataHora(notificacao.dataCriacao!) }}</div>
-              <div class="text-sm text-gray-500">{{ obterTempoRelativo(notificacao.dataCriacao!) }}</div>
-            </div>
-          </div>
-          <div *ngIf="notificacao.dataHoraDisparo" class="flex justify-between items-center">
-            <span class="text-base font-medium text-gray-600">Disparo programado</span>
-            <div class="text-lg text-gray-800">{{ formatarDataHora(notificacao.dataHoraDisparo) }}</div>
-            </div>
+        <h3 class="text-lg font-semibold text-gray-800">Informações de Tempo</h3>
+      </div>
+      <div class="space-y-4">
+        <div class="flex justify-between items-center">
+          <span class="text-base font-medium text-gray-600">Recebida</span>
+          <div class="text-right">
+            <div class="text-lg text-gray-800">{{ formatarDataHora(notificacao.dataEnvio || notificacao.dataCriacao!) }}</div>
+            <div class="text-sm text-gray-500">{{ obterTempoRelativo(notificacao.dataEnvio || notificacao.dataCriacao!) }}</div>
           </div>
         </div>
+      </div>
+    </div>
 
-      <!-- Card Informações Adicionais -->
-      <div class="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200 px-6 py-4 border-l-4 border-amber-400">
-        <div class="flex items-center gap-3 mb-4">
-          <div class="p-2 rounded-full bg-amber-100">
-            <span class="material-icons text-amber-600">info</span>
-          </div>
-          <h3 class="text-lg font-semibold text-gray-800">Informações Adicionais</h3>
-                </div>
-        <div class="space-y-4">
-          <div class="flex justify-between items-center">
-            <span class="text-base font-medium text-gray-600">ID da Notificação</span>
-            <div class="text-lg text-gray-800">#{{ notificacao.id }}</div>
-          </div>
+    <!-- Card de Status de Leitura (apenas para notificações personalizadas) -->
+    <div *ngIf="ehAlertaPersonalizado()" 
+         class="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200 px-6 py-4 border-l-4"
+         [ngClass]="notificacao.lida ? 'border-green-400' : 'border-blue-400'">
+      <div class="flex items-center gap-3 mb-4">
+        <div class="p-2 rounded-full" [ngClass]="notificacao.lida ? 'bg-green-100' : 'bg-blue-100'">
+          <span class="material-icons" [ngClass]="notificacao.lida ? 'text-green-600' : 'text-blue-600'">{{ notificacao.lida ? 'check_circle' : 'mark_email_unread' }}</span>
         </div>
-            </div>
-          </div>
+        <h3 class="text-lg font-semibold text-gray-800">Status de Leitura</h3>
+      </div>
+      <div class="space-y-4">
+        <div class="flex justify-between items-center">
+          <span class="text-base font-medium text-gray-600">Status</span>
+          <div class="text-lg text-gray-800 font-medium">{{ notificacao.lida ? 'Lida' : 'Não lida' }}</div>
+        </div>
+        <div *ngIf="notificacao.lida" class="flex justify-between items-center">
+          <span class="text-base font-medium text-gray-600">Data da leitura</span>
+          <div class="text-lg text-gray-800">{{ formatarDataHora(notificacao.dataEnvio || notificacao.dataCriacao!) }}</div>
+        </div>
+      </div>
+    </div>
 
     <!-- Card de Status de Inspeção (apenas para notificações automáticas) -->
     <div *ngIf="ehAlertaAutomatico()" 

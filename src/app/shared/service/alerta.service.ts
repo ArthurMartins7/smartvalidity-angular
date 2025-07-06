@@ -95,4 +95,8 @@ export class AlertaService {
   buscarAlertasJaResolvidos(): Observable<AlertaDTO.Listagem[]> {
     return this.httpClient.get<AlertaDTO.Listagem[]>(`${this.API}/ja-resolvidos`);
   }
+
+  buscarAlertasPersonalizados(): Observable<AlertaDTO.Listagem[]> {
+    return this.httpClient.get<AlertaDTO.Listagem[]>(`${this.API}/personalizados`);
+  }
 }

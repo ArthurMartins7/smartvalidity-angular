@@ -73,6 +73,11 @@ export class NotificacaoDetalheComponent implements OnInit, OnDestroy {
           this.notificacao = notificacao;
           if (!this.notificacao) {
             this.erro = 'Notificação não encontrada';
+          } else {
+            // Marcar como lida se for notificação personalizada e ainda não foi lida
+            if (this.notificacao.tipo === TipoAlerta.PERSONALIZADO && !this.notificacao.lida) {
+              this.marcarComoLida();
+            }
           }
           
           // Carregar itens-produto se houver produtos relacionados
@@ -92,6 +97,27 @@ export class NotificacaoDetalheComponent implements OnInit, OnDestroy {
           if (error.status === 401 || error.status === 403) {
             this.router.navigate(['/login']);
           }
+        }
+      });
+  }
+
+  /**
+   * Marcar notificação como lida
+   */
+  private marcarComoLida(): void {
+    if (!this.notificacao?.id) return;
+
+    this.notificacaoService.marcarComoLida(this.notificacao.id)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: () => {
+          if (this.notificacao) {
+            this.notificacao.lida = true;
+            console.log('Notificação personalizada marcada como lida');
+          }
+        },
+        error: (error: any) => {
+          console.error('Erro ao marcar notificação como lida:', error);
         }
       });
   }
@@ -132,6 +158,8 @@ export class NotificacaoDetalheComponent implements OnInit, OnDestroy {
    * Voltar para lista de notificações (alias para compatibilidade com template)
    */
   public voltarParaLista(): void {
+    // Forçar atualização do contador antes de voltar
+    this.notificacaoService.forcarAtualizacaoImediata();
     this.voltar();
   }
 
@@ -265,6 +293,16 @@ export class NotificacaoDetalheComponent implements OnInit, OnDestroy {
       return false;
     }
     return this.notificacao.tipo !== TipoAlerta.PERSONALIZADO;
+  }
+
+  /**
+   * Verifica se a notificação é de um alerta personalizado
+   */
+  public ehAlertaPersonalizado(): boolean {
+    if (!this.notificacao) {
+      return false;
+    }
+    return this.notificacao.tipo === TipoAlerta.PERSONALIZADO;
   }
 
   /**

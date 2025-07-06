@@ -39,7 +39,7 @@ export class NotificacaoListagemComponent implements OnInit, OnDestroy {
   public itensPorPagina: number = 10;
   public opcoesItensPorPagina: number[] = [5,10,15,20,25,50];
   public paginaAtual: number = 1;
-  public activeTab: 'pendentes' | 'jaResolvidas' = 'pendentes';
+  public activeTab: 'pendentes' | 'personalizadas' | 'jaResolvidas' = 'pendentes';
 
   // Campo de busca
   filtroTitulo: string = '';
@@ -47,11 +47,14 @@ export class NotificacaoListagemComponent implements OnInit, OnDestroy {
   private searchSubject = new Subject<string>();
 
   public get notificacoesFiltradas(): AlertaDTO.Listagem[] {
-    // Primeiro, filtra pela aba selecionada (pendentes ou já resolvidas)
+    // Primeiro, filtra pela aba selecionada (pendentes, personalizadas ou já resolvidas)
     let lista: AlertaDTO.Listagem[];
 
     switch (this.activeTab) {
       case 'pendentes':
+        lista = this.notificacoes;
+        break;
+      case 'personalizadas':
         lista = this.notificacoes;
         break;
       case 'jaResolvidas':
@@ -93,6 +96,11 @@ export class NotificacaoListagemComponent implements OnInit, OnDestroy {
       this.filtroTitulo = termo;
       this.paginaAtual = 1;
     });
+
+    // Forçar atualização do contador ao entrar na página de notificações
+    setTimeout(() => {
+      this.notificacaoService.forcarAtualizacaoImediata();
+    }, 500);
   }
 
   ngOnDestroy(): void {
@@ -111,6 +119,9 @@ export class NotificacaoListagemComponent implements OnInit, OnDestroy {
     switch (this.activeTab) {
       case 'pendentes':
         observable = this.notificacaoService.buscarNotificacoesPendentes();
+        break;
+      case 'personalizadas':
+        observable = this.notificacaoService.buscarNotificacoesPersonalizadas();
         break;
       case 'jaResolvidas':
       default:
@@ -190,6 +201,8 @@ export class NotificacaoListagemComponent implements OnInit, OnDestroy {
    * Responsabilidade: VIEW - Navegação
    */
   public voltar(): void {
+    // Forçar atualização do contador antes de sair
+    this.notificacaoService.forcarAtualizacaoImediata();
     this.router.navigate(['/mural-listagem']);
   }
 
@@ -239,7 +252,7 @@ export class NotificacaoListagemComponent implements OnInit, OnDestroy {
     }
   }
 
-  public setActiveTab(tab: 'pendentes' | 'jaResolvidas'): void {
+  public setActiveTab(tab: 'pendentes' | 'personalizadas' | 'jaResolvidas'): void {
     if (this.activeTab !== tab) {
       this.activeTab = tab;
       this.paginaAtual = 1;
@@ -350,5 +363,12 @@ export class NotificacaoListagemComponent implements OnInit, OnDestroy {
   public deveMostrarBadgeDias(notificacao: AlertaDTO.Listagem): boolean {
     return notificacao.diasVencidos !== undefined && 
            notificacao.diasVencidos > 0;
+  }
+
+  /**
+   * Verifica se a notificação é de um alerta personalizado
+   */
+  public ehAlertaPersonalizado(notificacao: AlertaDTO.Listagem): boolean {
+    return notificacao.tipo === TipoAlerta.PERSONALIZADO;
   }
 }

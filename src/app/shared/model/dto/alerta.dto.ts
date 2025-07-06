@@ -25,7 +25,6 @@ export namespace AlertaDTO {
   export class Cadastro {
     titulo!: string;
     descricao!: string;
-    dataHoraDisparo!: Date;
     tipo!: TipoAlerta;
     usuariosIds?: string[];
     produtosIds?: string[];
@@ -34,7 +33,6 @@ export namespace AlertaDTO {
   export class Edicao {
     titulo!: string;
     descricao!: string;
-    dataHoraDisparo!: Date;
     usuariosIds?: string[];
     produtosIds?: string[];
   }

@@ -45,6 +45,9 @@ export class AlertaEditarComponent implements OnInit, OnDestroy {
   public descricaoProdutoSelecionado: string = '';
   public usuariosSelecionados: string[] = [];
   public itensProdutoNaoInspecionados: ItemProdutoDTO[] = [];
+  
+  // validação visual
+  public colaboradoresObrigatorioTouched: boolean = false;
 
   // campos de busca de produtos
   public termoBuscaProduto: string = '';
@@ -175,7 +178,9 @@ export class AlertaEditarComponent implements OnInit, OnDestroy {
 
     this.carregando = true;
     this.alertaService.buscarPorId(this.alertaId).subscribe({
-      next: (alerta) => {  // verifica se é um alerta automático
+      next: (alerta) => {
+        console.log('Alerta carregado:', alerta);  // Log para debugging
+        // verifica se é um alerta automático
         if (alerta.tipo !== TipoAlerta.PERSONALIZADO) {
           Swal.fire('Atenção!', 'Alertas automáticos não podem ser editados.', 'warning');
           this.voltar();
@@ -186,10 +191,9 @@ export class AlertaEditarComponent implements OnInit, OnDestroy {
         this.alertaDTO.titulo = alerta.titulo;
         this.alertaDTO.descricao = alerta.descricao;
         this.alertaDTO.tipo = TipoAlerta.PERSONALIZADO;
-        this.alertaDTO.dataHoraDisparo = alerta.dataHoraDisparo; // Campo oculto, mas mantido para edição
         this.alertaDTO.produtosIds = alerta.produtosAlertaIds ? [...alerta.produtosAlertaIds] : [];
         this.alertaDTO.usuariosIds = alerta.usuariosAlertaIds ? [...alerta.usuariosAlertaIds] : [];
-        this.usuariosSelecionados = [...this.alertaDTO.usuariosIds];
+        this.usuariosSelecionados = alerta.usuariosAlertaIds ? [...alerta.usuariosAlertaIds] : [];
 
         if (alerta.produtosAlertaIds && alerta.produtosAlertaIds.length > 0) {
           this.produtoSelecionado = alerta.produtosAlertaIds[0];
@@ -229,6 +233,11 @@ export class AlertaEditarComponent implements OnInit, OnDestroy {
   }
 
   public salvar(): void {
+    // Marca colaboradores como obrigatórios apenas para novos alertas
+    if (!this.isEdicao) {
+      this.colaboradoresObrigatorioTouched = true;
+    }
+    
     if (!this.validarFormulario()) {
       return;
     }
@@ -245,12 +254,7 @@ export class AlertaEditarComponent implements OnInit, OnDestroy {
   }
 
   private criarAlerta(): void {
-
     this.alertaDTO.tipo = TipoAlerta.PERSONALIZADO;
-
-    // Define automaticamente a data/hora de disparo como a data/hora atual
-    // (temporariamente para testes)
-    this.alertaDTO.dataHoraDisparo = new Date();
 
     console.log('DTO sendo enviado:', this.alertaDTO);
 
@@ -271,16 +275,9 @@ export class AlertaEditarComponent implements OnInit, OnDestroy {
   private atualizarAlerta(): void {
     if (!this.alertaId) return;
 
-    // Para edição, mantém a data/hora original do alerta
-    const edicaoDTO: AlertaDTO.Edicao = {
-      titulo: this.alertaDTO.titulo,
-      descricao: this.alertaDTO.descricao,
-      dataHoraDisparo: this.alertaDTO.dataHoraDisparo, // Mantém a data original
-      produtosIds: this.produtoSelecionado ? [this.produtoSelecionado] : [],
-      usuariosIds: this.usuariosSelecionados
-    };
+    console.log('DTO de edição sendo enviado:', this.alertaDTO);  // Log para debugging
 
-    this.alertaService.atualizarAlerta(this.alertaId, edicaoDTO).subscribe({
+    this.alertaService.atualizarAlerta(this.alertaId, this.alertaDTO).subscribe({
       next: (alertaAtualizado) => {
         Swal.fire('Sucesso!', 'Alerta atualizado com sucesso.', 'success');
         this.carregando = false;
@@ -305,11 +302,11 @@ export class AlertaEditarComponent implements OnInit, OnDestroy {
       return false;
     }
 
-    // Data/hora de disparo temporariamente definida automaticamente
-    // if (!this.alertaDTO.dataHoraDisparo) {
-    //   Swal.fire('Atenção!', 'A data/hora de disparo é obrigatória.', 'warning');
-    //   return false;
-    // }
+    // Validação de colaboradores obrigatórios apenas para novos alertas
+    if (!this.isEdicao && (!this.usuariosSelecionados || this.usuariosSelecionados.length === 0)) {
+      Swal.fire('Atenção!', 'Pelo menos um colaborador deve ser selecionado.', 'warning');
+      return false;
+    }
 
     return true;
   }
@@ -415,6 +412,7 @@ export class AlertaEditarComponent implements OnInit, OnDestroy {
     }
     this.termoBuscaUsuario = '';
     this.mostrarDropdownUsuarios = false;
+    this.colaboradoresObrigatorioTouched = true;
   }
 
   public removerUsuario(usuarioId: string): void {
@@ -422,37 +420,24 @@ export class AlertaEditarComponent implements OnInit, OnDestroy {
     if (index > -1) {
       this.usuariosSelecionados.splice(index, 1);
     }
+    this.colaboradoresObrigatorioTouched = true;
   }
 
   public obterUsuarioPorId(id: string): Usuario | undefined {
     return this.usuarios.find(u => u.id === id);
   }
 
-  // Getter/setter temporariamente desabilitados pois o campo está oculto
-  // public get dataHoraDisparoInput(): string {
-  //   if (!this.alertaDTO.dataHoraDisparo) return '';
-  //   const data = new Date(this.alertaDTO.dataHoraDisparo);
-  //   return data.toISOString().slice(0, 16);
-  // }
-
-  // public set dataHoraDisparoInput(value: string) {
-  //   if (value) {
-  //     const data = new Date(value);
-  //     const ano = data.getFullYear();
-  //     const mes = String(data.getMonth() + 1).padStart(2, '0');
-  //     const dia = String(data.getDate()).padStart(2, '0');
-  //     const hora = String(data.getHours()).padStart(2, '0');
-  //     const minuto = String(data.getMinutes()).padStart(2, '0');
-  //     const segundo = String(data.getSeconds()).padStart(2, '0');
-  //     const dataFormatada = `${ano}-${mes}-${dia}T${hora}:${minuto}:${segundo}`;
-  //     this.alertaDTO.dataHoraDisparo = dataFormatada as any;
-  //   } else {
-  //     this.alertaDTO.dataHoraDisparo = undefined as any;
-  //   }
-  // }
+  public isColaboradoresInvalido(): boolean {
+    // Mostra erro apenas para novos alertas, não para edições
+    return !this.isEdicao && this.colaboradoresObrigatorioTouched && (!this.usuariosSelecionados || this.usuariosSelecionados.length === 0);
+  }
 
   public visualizarItem(item: ItemProdutoDTO): void {
     if (!item.id) return;
     this.router.navigate(['/mural-detalhe', item.id], { queryParams: { tab: 'proximo' } });
+  }
+
+  public get dataAtual(): Date {
+    return new Date();
   }
 }

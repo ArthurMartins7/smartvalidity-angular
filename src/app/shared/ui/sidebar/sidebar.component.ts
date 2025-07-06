@@ -71,8 +71,8 @@ export class SidebarComponent implements OnInit, OnDestroy {
       this.notificacaoService.atualizarContadorPendentes();
     }, 1000);
 
-    // Atualização periódica a cada 15 s
-    this.pollingSubscription = interval(15000)
+    // Atualização periódica - reduzido para 2 segundos para máxima responsividade
+    this.pollingSubscription = interval(2000)
       .pipe(takeUntil(this.destroy$))
       .subscribe(() => this.notificacaoService.atualizarContadorPendentes());
   }
@@ -116,7 +116,10 @@ export class SidebarComponent implements OnInit, OnDestroy {
 
   goToNotifications(): void {
     this.router.navigate(['/notificacoes']);
-    // O contador será atualizado automaticamente quando as notificações forem marcadas como lidas
+    // Forçar atualização imediata do contador ao navegar para notificações
+    setTimeout(() => {
+      this.notificacaoService.forcarAtualizacaoImediata();
+    }, 500);
   }
 
   /**

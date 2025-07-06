@@ -23,6 +23,11 @@
               class="px-4 py-2 rounded-lg font-medium transition-colors">
         Ativos
       </button>
+      <button (click)="setActiveTab('personalizados')"
+              [ngClass]="activeTab==='personalizados' ? 'bg-[#5084C1] text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'"
+              class="px-4 py-2 rounded-lg font-medium transition-colors">
+        Personalizados
+      </button>
       <button (click)="setActiveTab('jaResolvidos')"
               [ngClass]="activeTab==='jaResolvidos' ? 'bg-[#5084C1] text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'"
               class="px-4 py-2 rounded-lg font-medium transition-colors">
@@ -179,14 +184,17 @@
                 <!-- Indicador de Prioridade -->
                 <div class="flex-shrink-0 mt-1">
                   <div *ngIf="obterPrioridadeAlerta(alerta) === 'alta'"
-                       class="w-2 h-2 bg-red-500 rounded-full animate-pulse"
-                       title="Alta prioridade"></div>
+                       class="w-2 h-2 rounded-full indicador-vencido"
+                       [title]="obterTituloIndicadorPrioridade(alerta)"></div>
                   <div *ngIf="obterPrioridadeAlerta(alerta) === 'media'"
-                       class="w-2 h-2 bg-yellow-500 rounded-full"
-                       title="Média prioridade"></div>
+                       class="w-2 h-2 rounded-full indicador-hoje"
+                       [title]="obterTituloIndicadorPrioridade(alerta)"></div>
+                  <div *ngIf="obterPrioridadeAlerta(alerta) === 'baixa'"
+                       class="w-2 h-2 rounded-full indicador-amanha"
+                       [title]="obterTituloIndicadorPrioridade(alerta)"></div>
                   <div *ngIf="obterPrioridadeAlerta(alerta) === 'normal'"
-                       class="w-2 h-2 bg-gray-300 rounded-full"
-                       title="Prioridade normal"></div>
+                       class="w-2 h-2 rounded-full indicador-normal"
+                       [title]="obterTituloIndicadorPrioridade(alerta)"></div>
                 </div>
 
                 <div class="flex-1 min-w-0">

@@ -34,8 +34,16 @@ export class NotificacaoService {
     return this.http.get<AlertaDTO.Listagem[]>(`${this.API_URL}/ja-resolvidas`);
   }
 
+  buscarNotificacoesPersonalizadas(): Observable<AlertaDTO.Listagem[]> {
+    return this.http.get<AlertaDTO.Listagem[]>(`${this.API_URL}/personalizadas`);
+  }
+
   contarNotificacoesPendentes(): Observable<number> {
     return this.http.get<number>(`${this.API_URL}/count-pendentes`);
+  }
+
+  contarNotificacoesNaoLidas(): Observable<number> {
+    return this.http.get<number>(`${this.API_URL}/count-nao-lidas`);
   }
 
   excluirNotificacao(id: number): Observable<void> {
@@ -47,8 +55,19 @@ export class NotificacaoService {
       );
   }
 
+  marcarComoLida(id: number): Observable<void> {
+    return this.http.put<void>(`${this.API_URL}/${id}/marcar-como-lida`, {})
+      .pipe(
+        tap(() => {
+          // Atualizar contador após marcar como lida
+          this.atualizarContadorPendentes();
+        })
+      );
+  }
+
   atualizarContadorPendentes(): void {
-    this.contarNotificacoesPendentes().subscribe({
+    // Usar o novo método que conta pendentes + personalizadas não lidas
+    this.contarNotificacoesNaoLidas().subscribe({
       next: (count) => {
         this.unreadCountSubject.next(count || 0);
       },
@@ -56,6 +75,15 @@ export class NotificacaoService {
         this.unreadCountSubject.next(0);
       }
     });
+  }
+
+  /**
+   * Força atualização imediata do contador (sem polling)
+   * Usado quando sabemos que houve mudanças relevantes
+   */
+  forcarAtualizacaoImediata(): void {
+    console.log('🔔 Forçando atualização imediata do sininho...');
+    this.atualizarContadorPendentes();
   }
 
   getUnreadCount(): number {

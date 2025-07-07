@@ -199,7 +199,10 @@ export class MuralListagemComponent implements OnInit, OnDestroy {
     this.subscriptions.push(subscription);
   }
   onSearchChange(term: string): void {
-    this.filterService.updateSearchTerm(term);
+    // Só aplica a busca se tem pelo menos 3 caracteres ou está vazio (para limpar)
+    if (!term || term.trim().length === 0 || term.trim().length >= 3) {
+      this.filterService.updateSearchTerm(term);
+    }
   }
   openFilterModal(): void {
     this.showFilterModal = true;

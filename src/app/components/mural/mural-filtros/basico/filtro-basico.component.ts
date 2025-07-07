@@ -1,6 +1,8 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { Subject } from 'rxjs';
+import { debounceTime, distinctUntilChanged, takeUntil } from 'rxjs/operators';
 
 @Component({
   selector: 'app-filtro-basico',
@@ -9,7 +11,7 @@ import { FormsModule } from '@angular/forms';
   templateUrl: './filtro-basico.component.html',
   styleUrls: ['./filtro-basico.component.css']
 })
-export class FiltroBasicoComponent {
+export class FiltroBasicoComponent implements OnDestroy, OnInit {
   @Input() searchTerm: string = '';
   @Input() sortDirection: 'asc' | 'desc' = 'asc';
   @Input() sortField: string = '';
@@ -17,6 +19,9 @@ export class FiltroBasicoComponent {
   @Input() selectedItemsCount: number = 0;
 
   showSortOptions: boolean = false;
+  
+  private destroy$ = new Subject<void>();
+  private searchSubject = new Subject<string>();
 
   @Output() searchChange = new EventEmitter<string>();
   @Output() toggleSort = new EventEmitter<void>();
@@ -25,9 +30,28 @@ export class FiltroBasicoComponent {
   @Output() sortOptionSelected = new EventEmitter<{field: string, direction: 'asc' | 'desc'}>();
   @Output() gerarRelatorio = new EventEmitter<void>();
 
+  ngOnInit(): void {
+    // Configurar observador de busca com debounce
+    this.searchSubject.pipe(
+      debounceTime(300),
+      distinctUntilChanged(),
+      takeUntil(this.destroy$)
+    ).subscribe(term => {
+      // Só emite a mudança se tem pelo menos 3 caracteres ou está vazio (para limpar)
+      if (!term || term.trim().length === 0 || term.trim().length >= 3) {
+        this.searchChange.emit(term);
+      }
+    });
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
   onSearchInput(event: Event): void {
     const input = event.target as HTMLInputElement;
-    this.searchChange.emit(input.value);
+    this.searchSubject.next(input.value);
   }
 
   onToggleSort(): void {

@@ -1,16 +1,16 @@
 <!-- Cabeçalho unificado -->
-<div class="bg-gray-100 -mx-6 md:-mx-6 py-6 mb-10">
-  <div class="flex items-center gap-2 px-6">
-    <!-- Botão voltar -->
-    <button (click)="voltarParaLista()" class="p-1 hover:bg-gray-200 rounded transition-colors">
-      <span class="material-icons text-gray-600">keyboard_arrow_left</span>
-    </button>
+<div class="bg-gray-100 -mx-4 sm:-mx-6 py-6 mb-10">
+  <div class="flex flex-col sm:flex-row items-start sm:items-center gap-2 px-4 sm:px-6 text-center sm:text-left">
+    <!-- Ícone seta -->
+    <svg (click)="voltarParaLista()" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6 text-gray-600 cursor-pointer hover:text-gray-800 transition-colors">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+    </svg>
 
     <!-- Títulos -->
     <div>
-      <div class="text-gray-500 text-base cursor-pointer hover:underline" (click)="voltarParaLista()">Notificações</div>
-      <div class="text-3xl font-bold">Detalhes da Notificação</div>
-      <p class="text-gray-800 text-base mt-1">Visualize todas as informações desta notificação.</p>
+      <div class="text-gray-500 text-sm md:text-base cursor-pointer hover:underline" (click)="voltarParaLista()">Notificações</div>
+      <div class="text-2xl md:text-3xl font-bold">Detalhes da Notificação</div>
+      <p class="text-gray-800 text-sm md:text-base mt-1">Visualize todas as informações desta notificação.</p>
     </div>
   </div>
 </div>
@@ -32,22 +32,23 @@
 <div *ngIf="notificacao && !carregando" class="bg-white rounded-lg shadow-md overflow-hidden mx-6">
   <!-- Cabeçalho do card -->
   <div class="p-6 bg-gray-50 border-b border-gray-200">
-    <div class="flex items-start justify-between">
+    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between">
       <div>
         <h1 class="text-2xl font-bold text-gray-800 mb-2">{{ removerEmojis(notificacao.titulo) }}</h1>
       </div>
-      <div class="flex items-center gap-3">
+      <div class="flex gap-2 w-full justify-center sm:w-auto mt-4 sm:mt-0">
         <button *ngIf="!ehAlertaPersonalizado()"
                 (click)="excluirNotificacao()"
-                class="btn-excluir text-white px-3 py-2 rounded-lg font-medium flex items-center justify-center w-10 h-10"
+                class="text-white w-10 h-10 rounded-lg flex items-center justify-center bg-red-500 hover:bg-red-600"
                 title="Excluir esta notificação">
           <span class="material-icons text-base">delete</span>
         </button>
         <button *ngIf="podeVisualizarItemMelhorado()"
                 (click)="visualizarItem()"
-                class="btn-visualizar px-4 py-2 rounded-lg font-medium flex items-center gap-2 text-white">
+                class="text-white w-10 h-10 rounded-lg flex items-center justify-center"
+                style="background-color:#5084C1;">
           <span class="material-icons text-sm">visibility</span>
-          Visualizar Item
+          <span class="hidden sm:inline"></span>
         </button>
       </div>
     </div>
@@ -143,7 +144,7 @@
       </div>
 
       <!-- Card de Status de Leitura (apenas para notificações personalizadas) -->
-      <div *ngIf="ehAlertaPersonalizado()" 
+      <div *ngIf="ehAlertaPersonalizado()"
            class="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200 px-6 py-4 border-l-4 flex-1"
            [ngClass]="notificacao.lida ? 'border-green-400' : 'border-blue-400'">
         <div class="flex items-center gap-3 mb-4">
@@ -166,7 +167,7 @@
     </div>
 
     <!-- Card de Status de Inspeção (apenas para notificações automáticas) -->
-    <div *ngIf="ehAlertaAutomatico()" 
+    <div *ngIf="ehAlertaAutomatico()"
          class="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200 px-6 py-4 border-l-4"
          [ngClass]="obterCorStatusInspecao()">
       <div class="flex items-center gap-3 mb-4">

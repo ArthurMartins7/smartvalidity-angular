@@ -19,22 +19,30 @@
 
   <form (ngSubmit)="onSubmit()" class="space-y-6">
     <!-- Produto -->
-    <div class="relative">
+    <div class="relative produto-dropdown-container">
       <label class="block text-sm font-medium text-gray-700 mb-1">Produto</label>
       <div class="relative">
-        <select
-          [(ngModel)]="formData.produto"
-          name="produto"
-          class="block w-full px-4 py-3 bg-gray-100 border border-gray-200 rounded-md appearance-none focus:outline-none focus:ring-2 focus:ring-blue-500"
-          required>
-          <option value="" disabled selected>Selecione um produto</option>
-          <option *ngFor="let produto of produtos" [value]="produto.id">
+        <input
+          type="text"
+          name="searchTermProduto"
+          [(ngModel)]="searchTermProduto"
+          [ngModelOptions]="{standalone: true}"
+          (input)="onProdutoSearch()"
+          (focus)="openProdutoDropdown()"
+          placeholder="Buscar produto por descrição, marca ou código de barras"
+          class="block w-full px-4 py-3 bg-gray-100 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          required
+        />
+
+        <!-- Dropdown de resultados -->
+        <div *ngIf="showProdutoDropdown && filteredProdutos.length > 0"
+             class="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg max-h-60 overflow-auto">
+          <div *ngFor="let produto of filteredProdutos"
+               class="px-4 py-2 hover:bg-gray-100 cursor-pointer"
+               (click)="selectProduto(produto)">
             {{ produto.descricao }} ({{ produto.codigoBarras }})
-          </option>
-        </select>
-        <button type="button" class="absolute right-2 top-1/2 -translate-y-1/2">
-          <i class="material-icons text-gray-500">add_circle_outline</i>
-        </button>
+          </div>
+        </div>
       </div>
     </div>
 

@@ -1,401 +1,334 @@
-/* Estilos para cabeçalho e container */
+/* Estilos Gerais - Responsivos */
 .container {
-  max-width: 1200px;
+  max-width: 100%;
+  margin: 0 auto;
+  padding: 0 1rem;
 }
 
-/* Linha preta no cabeçalho */
-.bg-black {
-  background-color: #000000;
-}
-
-/* Estilo para tabelas */
-.shadow-md {
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+/* Tabela Desktop */
+.table-container {
+  overflow-x: auto;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 table {
   width: 100%;
-  border-collapse: separate;
-  border-spacing: 0;
+  border-collapse: collapse;
+}
+
+th, td {
+  padding: 12px;
+  text-align: left;
+  border-bottom: 1px solid #e5e7eb;
 }
 
 th {
+  background-color: #f9fafb;
   font-weight: 600;
-  font-size: 0.75rem;
+  color: #374151;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: #6b7280;
-  background-color: #f9fafb;
-  padding: 0.75rem 0.5rem;
-  text-align: left;
-}
-
-td {
-  padding: 0.75rem 0.5rem;
-  vertical-align: middle;
-}
-
-tbody tr {
-  border-bottom: 1px solid #e5e7eb;
-}
-
-tbody tr:hover {
-  background-color: #f9fafb;
-}
-
-/* Estilos para inputs e checkboxes */
-input[type="checkbox"] {
-  width: 1rem;
-  height: 1rem;
-  border-radius: 0.25rem;
-  border: 1px solid #d1d5db;
-  appearance: none;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  background-color: #fff;
-  cursor: pointer;
-}
-
-input[type="checkbox"]:checked {
-  background-color: #2563eb;
-  border-color: #2563eb;
-  background-image: url("data:image/svg+xml,%3csvg viewBox='0 0 16 16' fill='white' xmlns='http://www.w3.org/2000/svg'%3e%3cpath d='M12.207 4.793a1 1 0 010 1.414l-5 5a1 1 0 01-1.414 0l-2-2a1 1 0 011.414-1.414L6.5 9.086l4.293-4.293a1 1 0 011.414 0z'/%3e%3c/svg%3e");
-  background-size: 100% 100%;
-  background-position: center;
-  background-repeat: no-repeat;
-}
-
-/* Estilos para date inputs */
-input[type="date"] {
-  position: relative;
-  padding: 0.5rem;
-  border: 1px solid #d1d5db;
-  border-radius: 0.5rem;
-  font-size: 0.875rem;
-  color: #374151;
-  line-height: 1.25rem;
-  background-color: white;
-  cursor: pointer;
-}
-
-input[type="date"]:focus {
-  outline: none;
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.25);
-}
-
-/* Estilos para select */
-select {
-  appearance: none;
-  background-color: #fff;
-  padding: 0.5rem 2rem 0.5rem 0.75rem;
-  border: 1px solid #d1d5db;
-  border-radius: 0.5rem;
-  font-size: 0.875rem;
-  color: #374151;
-  line-height: 1.25rem;
-  cursor: pointer;
-}
-
-select:focus {
-  outline: none;
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.25);
-}
-
-/* Estilos para o X vermelho */
-.text-red-500 {
-  color: #ef4444 !important;
-}
-
-/* Estilos para botões e campos de pesquisa */
-input[type="text"].rounded-full {
-  border-radius: 9999px;
-  padding-left: 2.5rem;
-  padding-right: 2.5rem;
-  border-color: #d1d5db;
-}
-
-button.rounded-full {
-  border-radius: 9999px;
-  padding: 0.5rem 1rem;
-  background-color: white;
-  border: 1px solid #d1d5db;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-/* Estilos para ações em lote */
-.bg-gray-100 {
-  background-color: #f3f4f6;
-}
-
-.rounded-lg {
-  border-radius: 0.5rem;
-}
-
-.bg-blue-600 {
-  background-color: #2563eb;
-}
-
-.bg-blue-600:hover {
-  background-color: #1d4ed8;
-}
-
-/* Estilos para tabs */
-button.bg-yellow-500 {
-  background-color: #f59e0b;
-}
-
-button.bg-red-500 {
-  background-color: #ef4444;
-}
-
-button.bg-black {
-  background-color: #000000;
-}
-
-button.bg-blue-500 {
-  background-color: #3b82f6;
-}
-
-button.bg-gray-200 {
-  background-color: #e5e7eb;
-}
-
-/* Estilo para a barra de pesquisa e ordenação */
-.search-container {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1rem;
-}
-
-.search-input {
-  padding: 0.5rem 1rem 0.5rem 2.5rem;
-  border: 1px solid #d1d5db;
-  border-radius: 0.375rem;
-  width: 100%;
-  max-width: 20rem;
-}
-
-.search-icon {
-  position: absolute;
-  left: 0.75rem;
-  top: 50%;
-  transform: translateY(-50%);
-  color: #9ca3af;
-}
-
-/* Estilo para estado vazio */
-.empty-state {
-  text-align: center;
-  padding: 2rem 0;
-  color: #6b7280;
-}
-
-/* Estilos para o modal de filtros avançados */
-.modal-backdrop {
-  position: fixed;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  background-color: rgba(0, 0, 0, 0.5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
-}
-
-.modal-content {
-  background-color: white;
-  border-radius: 0.5rem;
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-  max-width: 800px;
-  width: 95%;
-  max-height: 90vh;
-  overflow-y: auto;
-  padding: 1.5rem;
-  animation: modalFadeIn 0.3s ease-in-out;
-}
-
-@keyframes modalFadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(-20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.modal-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1.5rem;
-  padding-bottom: 0.75rem;
-  border-bottom: 1px solid #e5e7eb;
-}
-
-.modal-header h3 {
-  font-size: 1.25rem;
-  font-weight: 600;
-  color: #111827;
-}
-
-.modal-footer {
-  display: flex;
-  justify-content: flex-end;
-  gap: 0.75rem;
-  margin-top: 1.5rem;
-  padding-top: 0.75rem;
-  border-top: 1px solid #e5e7eb;
-}
-
-.filter-row {
-  margin-bottom: 1rem;
-}
-
-select, input[type="text"], input[type="date"] {
-  width: 100%;
-  padding: 0.5rem;
-  border: 1px solid #d1d5db;
-  border-radius: 0.5rem;
-  font-size: 0.875rem;
-}
-
-select:focus, input[type="text"]:focus, input[type="date"]:focus {
-  outline: none;
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.25);
-}
-
-label {
-  display: block;
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: #374151;
-  margin-bottom: 0.25rem;
-}
-
-.date-range-container {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 0.5rem;
-}
-
-.date-label {
+  letter-spacing: 0.025em;
   font-size: 0.75rem;
-  color: #6b7280;
-  margin-bottom: 0.25rem;
 }
 
-.btn-primary {
-  display: inline-flex;
-  align-items: center;
-  padding: 0.5rem 1rem;
-  background-color: #2563eb;
-  color: white;
-  font-weight: 500;
-  border-radius: 0.375rem;
-  transition: background-color 0.2s;
-  border: none;
-  cursor: pointer;
-}
-
-.btn-primary:hover {
-  background-color: #1d4ed8;
-}
-
-.btn-secondary {
-  display: inline-flex;
-  align-items: center;
-  padding: 0.5rem 1rem;
-  background-color: white;
-  color: #111827;
-  font-weight: 500;
-  border-radius: 0.375rem;
-  border: 1px solid #d1d5db;
-  transition: background-color 0.2s, border-color 0.2s;
-  cursor: pointer;
-}
-
-.btn-secondary:hover {
-  background-color: #f9fafb;
-  border-color: #9ca3af;
-}
-
-.sort-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.25rem;
-  padding: 0.5rem 0.75rem;
-  background-color: white;
-  border: 1px solid #d1d5db;
-  border-radius: 0.375rem;
-  font-size: 0.875rem;
-  cursor: pointer;
-}
-
-.sort-btn:hover {
+tr:hover {
   background-color: #f9fafb;
 }
 
-.search-box {
-  position: relative;
+/* Layout Mobile Cards - Otimizado para apresentação com 60% zoom */
+@media (max-width: 420px) {
+  .container {
+    padding: 0 0.5rem;
+    overflow-x: hidden;
+  }
+  
+  /* Cards dos itens - Maior e mais espaçado */
+  .card-item {
+    width: 100%;
+    max-width: calc(412px - 1rem);
+    margin: 0 auto 1rem auto;
+    padding: 1rem;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    border: 2px solid #e5e7eb;
+    box-sizing: border-box;
+    overflow: hidden;
+    background: white;
+  }
+  
+  /* Checkbox de seleção - Maior */
+  .card-checkbox {
+    width: 20px;
+    height: 20px;
+    margin-top: 2px;
+    flex-shrink: 0;
+  }
+  
+  /* Status de inspeção - Maior e mais visível */
+  .card-status {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+  }
+  
+  .card-status svg {
+    width: 20px;
+    height: 20px;
+  }
+  
+  .card-status span {
+    font-size: 0.875rem;
+    color: #4b5563;
+    font-weight: 600;
+  }
+  
+  /* Hierarquia de informações - Tamanhos maiores */
+  .card-item p {
+    margin: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    word-wrap: break-word;
+  }
+  
+  /* Descrição - Principal (texto muito maior e mais destacado) */
+  .card-item .text-sm.font-semibold {
+    font-size: 1.125rem !important;
+    line-height: 1.4;
+    font-weight: 700;
+    color: #111827;
+    margin-bottom: 0.75rem;
+  }
+  
+  /* Marca do produto - Visível mas secundária */
+  .card-item .text-xs.text-gray-600 {
+    font-size: 0.875rem !important;
+    font-weight: 500;
+    color: #6b7280;
+  }
+  
+  /* Data de vencimento - Segundo destaque (muito maior) */
+  .card-item .text-xs.font-bold {
+    font-size: 1rem !important;
+    font-weight: 800;
+    line-height: 1.3;
+  }
+  
+  /* Labels das informações - Mais visível */
+  .card-item .text-xs.text-gray-500.font-medium {
+    font-size: 0.875rem !important;
+    font-weight: 600;
+    color: #374151;
+    text-transform: uppercase;
+    letter-spacing: 0.025em;
+  }
+  
+  /* Valores das informações - Maior e mais legível */
+  .card-item .text-xs.font-mono {
+    font-size: 0.875rem !important;
+    font-weight: 600;
+    color: #111827;
+  }
+  
+  /* Área de vencimento - Destaque especial */
+  .card-item .bg-gray-50 {
+    background-color: #f3f4f6;
+    padding: 0.75rem;
+    border-radius: 8px;
+    border: 1px solid #d1d5db;
+  }
+  
+  /* Separadores - Mais visíveis */
+  .card-item .border-b.border-gray-100 {
+    border-bottom: 1px solid #d1d5db;
+    padding: 0.5rem 0;
+  }
+  
+  /* Botão Ver detalhes - Maior e mais visível */
+  .card-item button {
+    font-size: 0.875rem !important;
+    padding: 10px 16px;
+    border-radius: 8px;
+    font-weight: 600;
+    min-height: 44px;
+  }
+  
+  .card-item button svg {
+    width: 16px;
+    height: 16px;
+  }
+  
+  /* Controles de paginação mobile - Maiores */
+  .lg\:hidden select {
+    font-size: 1rem;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-weight: 500;
+    border: 2px solid #d1d5db;
+  }
+  
+  .lg\:hidden button {
+    font-size: 1rem;
+    padding: 10px 16px;
+    font-weight: 600;
+    min-height: 44px;
+    border-radius: 8px;
+  }
+  
+  /* Botões de navegação - Mais visíveis */
+  .lg\:hidden button svg {
+    width: 18px;
+    height: 18px;
+  }
+  
+  /* Texto "Selecionar todos" - Maior */
+  .lg\:hidden .text-sm {
+    font-size: 1rem !important;
+    font-weight: 600;
+  }
+  
+  /* Contador de itens - Maior */
+  .lg\:hidden span.text-sm {
+    font-size: 1rem !important;
+    font-weight: 500;
+  }
+  
+  /* Área de seleção - Mais espaçada */
+  .lg\:hidden .bg-white.rounded-lg.shadow-md {
+    padding: 1rem;
+    margin-bottom: 1rem;
+  }
+  
+  /* Forçar container sem overflow horizontal */
+  body, html {
+    overflow-x: hidden;
+  }
+  
+  * {
+    box-sizing: border-box;
+  }
 }
 
-.search-box input {
-  width: 100%;
-  padding: 0.5rem 0.75rem 0.5rem 2.5rem;
-  border: 1px solid #d1d5db;
-  border-radius: 0.375rem;
-  font-size: 0.875rem;
+/* Breakpoint específico para Samsung S20 Ultra (412px) */
+@media (max-width: 412px) {
+  .container {
+    max-width: 412px;
+    overflow-x: hidden;
+  }
+  
+  .card-item {
+    max-width: calc(412px - 1rem);
+    width: calc(100% - 1rem);
+    margin-left: auto;
+    margin-right: auto;
+  }
+  
+  /* Garantir que textos não quebrem o layout */
+  .card-item * {
+    max-width: 100%;
+    word-break: break-word;
+  }
 }
 
-.search-box input:focus {
-  outline: none;
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.25);
+/* Animações e transições */
+.card-item {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-.search-box .search-icon {
-  position: absolute;
-  left: 0.75rem;
-  top: 50%;
-  transform: translateY(-50%);
-  color: #9ca3af;
+.card-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
 }
 
-.filter-group {
-  margin-bottom: 1.5rem;
-  padding-bottom: 1.5rem;
-  border-bottom: 1px solid #e5e7eb;
+/* Acessibilidade */
+.card-checkbox:focus {
+  outline: 3px solid #3b82f6;
+  outline-offset: 2px;
 }
 
-.filter-item {
-  margin-bottom: 1rem;
+button:focus {
+  outline: 3px solid #3b82f6;
+  outline-offset: 2px;
 }
 
-.selected-filters span {
-  display: inline-flex;
-  align-items: center;
-  padding: 0.25rem 0.5rem;
-  background-color: #f3f4f6;
-  border-radius: 0.25rem;
-  font-size: 0.875rem;
-  margin-right: 0.5rem;
-  margin-bottom: 0.5rem;
+/* Cores personalizadas para status - Mais contrastadas */
+.text-yellow-600 {
+  color: #b45309;
+  font-weight: 700;
 }
 
-.selected-filters button {
-  margin-left: 0.25rem;
-  color: #ef4444;
-  border: none;
-  background: transparent;
-  cursor: pointer;
+.text-red-600 {
+  color: #b91c1c;
+  font-weight: 700;
+}
+
+.text-green-500 {
+  color: #059669;
+  font-weight: 700;
+}
+
+/* Estilos para elementos específicos */
+.bg-gray-50 {
+  background-color: #f9fafb;
+}
+
+.border-gray-100 {
+  border-color: #f3f4f6;
+}
+
+.border-gray-200 {
+  border-color: #e5e7eb;
+}
+
+/* Responsividade para tablets */
+@media (min-width: 421px) and (max-width: 1023px) {
+  .card-item {
+    max-width: 100%;
+    margin-bottom: 1rem;
+    padding: 1rem;
+  }
+  
+  .card-item .text-sm {
+    font-size: 0.875rem;
+  }
+  
+  .card-item .text-xs {
+    font-size: 0.75rem;
+  }
+}
+
+/* Melhorias específicas para apresentação */
+@media (max-width: 420px) {
+  /* Cabeçalho da página - Maior */
+  .text-2xl {
+    font-size: 1.875rem !important;
+    font-weight: 800;
+  }
+  
+  .text-sm {
+    font-size: 1rem !important;
+  }
+  
+  .text-base {
+    font-size: 1.125rem !important;
+  }
+  
+  /* Filtros - Mais legíveis */
+  .text-xs {
+    font-size: 0.875rem !important;
+  }
+  
+  /* Botões de filtro - Maiores */
+  .lg\:text-sm {
+    font-size: 1rem !important;
+  }
+  
+  /* Contador de selecionados - Mais visível */
+  .text-black {
+    font-size: 1rem !important;
+    font-weight: 600;
+    color: #111827;
+  }
 }

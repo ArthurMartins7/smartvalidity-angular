@@ -545,6 +545,31 @@ export class MuralFilterService {
     );
   }
 
+  /**
+   * Verifica se há filtros avançados aplicados (excluindo busca por texto simples).
+   * Usado para determinar se o botão "limpar todos" deve aparecer.
+   * Responsabilidade: Service Layer - lógica de negócio para UI.
+   */
+  hasAdvancedFilters(): boolean {
+    const filters = this.filtersSubject.value;
+
+    return (
+      (filters.marca && filters.marca.length > 0) ||
+      (filters.corredor && filters.corredor.length > 0) ||
+      (filters.categoria && filters.categoria.length > 0) ||
+      (filters.fornecedor && filters.fornecedor.length > 0) ||
+      (filters.lote && filters.lote.length > 0) ||
+      filters.inspecionado !== undefined ||
+      !!filters.dataVencimento?.startDate ||
+      !!filters.dataVencimento?.endDate ||
+      !!filters.dataFabricacao?.startDate ||
+      !!filters.dataFabricacao?.endDate ||
+      !!filters.dataRecebimento?.startDate ||
+      !!filters.dataRecebimento?.endDate ||
+      (filters.motivoInspecao && filters.motivoInspecao.length > 0) ||
+      (filters.usuarioInspecao && filters.usuarioInspecao.length > 0)
+    );
+  }
 
   updatePaginaAtual(pagina: number): void {
     this.paginaAtualSubject.next(pagina);

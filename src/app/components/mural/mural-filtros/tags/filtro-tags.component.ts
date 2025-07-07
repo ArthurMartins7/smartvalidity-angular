@@ -40,7 +40,7 @@ export class FiltroTagsComponent {
   }
 
   hasAppliedFilters(): boolean {
-    return this.filterService.hasAppliedFilters();
+    return this.filterService.hasAdvancedFilters();
   }
 
   getAppliedDateFilters() {

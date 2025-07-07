@@ -9,7 +9,7 @@
         <div>
           <div class="text-gray-500 text-base">Fornecedores</div>
           <div class="text-3xl font-bold">Gerenciar fornecedores</div>
-          <p class="text-gray-800 text-base mt-1 whitespace-nowrap">aqui você pode listar, editar e excluir os fornecedores do sistema</p>
+          <p class="text-gray-800 text-base mt-1">aqui você pode listar, editar e excluir os fornecedores do sistema</p>
         </div>
       </div>
     </div>
@@ -119,7 +119,7 @@
             <th class="border border-gray-300 p-2 text-left">Telefone</th>
             <th class="border border-gray-300 p-2 text-left">CNPJ</th>
             <th class="border border-gray-300 p-2 text-left">Endereço</th>
-            <th class="border border-gray-300 p-2 text-center" [ngClass]="{ 'sticky right-0 bg-gray-200 z-10': !mostrarFiltros }">Ações</th>
+            <th class="border border-gray-300 pl-0 pr-9 py-2 text-right" [ngClass]="{ 'sticky right-0 bg-gray-200 z-10': !mostrarFiltros }">Ações</th>
           </tr>
         </thead>
         <tbody>
@@ -131,7 +131,7 @@
               {{ fornecedor.endereco.logradouro }}, {{ fornecedor.endereco.numero }} -
               {{ fornecedor.endereco.bairro }}, {{ fornecedor.endereco.cidade }}/{{ fornecedor.endereco.estado }}
             </td>
-            <td class="p-2 flex justify-center gap-3" [ngClass]="{ 'sticky right-0 bg-white z-10': !mostrarFiltros }">
+            <td class="pl-0 pr-4 py-2 flex items-center gap-3 justify-end" [ngClass]="{ 'sticky right-0 bg-white z-10': !mostrarFiltros }">
               <button (click)="editar(fornecedor)" class="w-9 h-9 flex items-center justify-center border border-gray-300 rounded text-gray-700 hover:text-gray-900 hover:bg-gray-100 transition" title="Editar fornecedor">
                 <span class="material-icons text-base">edit</span>
               </button>

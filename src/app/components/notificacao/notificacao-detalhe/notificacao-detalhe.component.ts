@@ -79,7 +79,7 @@ export class NotificacaoDetalheComponent implements OnInit, OnDestroy {
               this.marcarComoLida();
             }
           }
-          
+
           // Carregar itens-produto se houver produtos relacionados
           if (this.notificacao && this.notificacao.produtosAlertaIds && this.notificacao.produtosAlertaIds.length > 0) {
             this.carregarItensProduto();
@@ -87,7 +87,7 @@ export class NotificacaoDetalheComponent implements OnInit, OnDestroy {
             // Se não houver produtos relacionados, limpar a lista
             this.itensProdutoNaoInspecionados = [];
           }
-          
+
           this.carregando = false;
         },
         error: (error: any) => {
@@ -132,7 +132,7 @@ export class NotificacaoDetalheComponent implements OnInit, OnDestroy {
 
     // Buscar itens do primeiro produto (assumindo que notificações têm apenas um produto)
     const produtoId = this.notificacao.produtosAlertaIds[0];
-    
+
     this.itemProdutoService.buscarItensProdutoNaoInspecionadosPorProduto(produtoId)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
@@ -305,9 +305,6 @@ export class NotificacaoDetalheComponent implements OnInit, OnDestroy {
     return this.notificacao.tipo === TipoAlerta.PERSONALIZADO;
   }
 
-  /**
-   * Verifica se pode visualizar item (versão melhorada)
-   */
   public podeVisualizarItemMelhorado(): boolean {
     if (!this.notificacao) {
       return false;
@@ -320,13 +317,13 @@ export class NotificacaoDetalheComponent implements OnInit, OnDestroy {
    */
   public obterStatusInspecao(): string {
     if (!this.notificacao) return '';
-    
+
     if (this.notificacao.itemInspecionado === true) {
       return 'Produto já inspecionado';
     } else if (this.notificacao.itemInspecionado === false) {
       return 'Produto ainda não inspecionado';
     }
-    
+
     return 'Status de inspeção não informado';
   }
 
@@ -335,13 +332,13 @@ export class NotificacaoDetalheComponent implements OnInit, OnDestroy {
    */
   public obterCorStatusInspecao(): string {
     if (!this.notificacao) return 'border-gray-400';
-    
+
     if (this.notificacao.itemInspecionado === true) {
       return 'border-emerald-400';
     } else if (this.notificacao.itemInspecionado === false) {
       return 'border-red-400';
     }
-    
+
     return 'border-gray-400';
   }
 
@@ -350,13 +347,13 @@ export class NotificacaoDetalheComponent implements OnInit, OnDestroy {
    */
   public obterCorFundoStatusInspecao(): string {
     if (!this.notificacao) return 'bg-gray-100';
-    
+
     if (this.notificacao.itemInspecionado === true) {
       return 'bg-emerald-100';
     } else if (this.notificacao.itemInspecionado === false) {
       return 'bg-red-100';
     }
-    
+
     return 'bg-gray-100';
   }
 
@@ -365,13 +362,13 @@ export class NotificacaoDetalheComponent implements OnInit, OnDestroy {
    */
   public obterCorIconeStatusInspecao(): string {
     if (!this.notificacao) return 'text-gray-600';
-    
+
     if (this.notificacao.itemInspecionado === true) {
       return 'text-emerald-600';
     } else if (this.notificacao.itemInspecionado === false) {
       return 'text-red-600';
     }
-    
+
     return 'text-gray-600';
   }
 
@@ -380,13 +377,13 @@ export class NotificacaoDetalheComponent implements OnInit, OnDestroy {
    */
   public obterIconeStatusInspecao(): string {
     if (!this.notificacao) return 'help_outline';
-    
+
     if (this.notificacao.itemInspecionado === true) {
       return 'check_circle';
     } else if (this.notificacao.itemInspecionado === false) {
       return 'cancel';
     }
-    
+
     return 'help_outline';
   }
 
@@ -402,7 +399,7 @@ export class NotificacaoDetalheComponent implements OnInit, OnDestroy {
    * Verifica se possui motivo de inspeção para exibir
    */
   public possuiMotivoInspecao(): boolean {
-    return this.notificacao?.motivoInspecao != null && 
+    return this.notificacao?.motivoInspecao != null &&
            this.notificacao.motivoInspecao.trim().length > 0;
   }
 

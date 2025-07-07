@@ -199,7 +199,10 @@ export class MuralListagemComponent implements OnInit, OnDestroy {
     this.subscriptions.push(subscription);
   }
   onSearchChange(term: string): void {
-    this.filterService.updateSearchTerm(term);
+    // Só aplica a busca se tem pelo menos 3 caracteres ou está vazio (para limpar)
+    if (!term || term.trim().length === 0 || term.trim().length >= 3) {
+      this.filterService.updateSearchTerm(term);
+    }
   }
   openFilterModal(): void {
     this.showFilterModal = true;
@@ -447,6 +450,14 @@ export class MuralListagemComponent implements OnInit, OnDestroy {
       case 'hoje': return 'Vencem hoje';
       case 'vencido': return 'Vencidos';
       default: return '';
+    }
+  }
+  get descricaoAbaAtual(): string {
+    switch (this.activeTab) {
+      case 'proximo': return 'Monitore produtos próximos ao vencimento (em até 15 dias). Gerencie inspeções e gere relatórios.';
+      case 'hoje': return 'Produtos com vencimento hoje. Ação imediata necessária. Realize inspeções e tome as medidas adequadas.';
+      case 'vencido': return 'Produtos já vencidos. Verifique o status e tome as ações necessárias para evitar perdas.';
+      default: return 'Monitore produtos próximos ao vencimento (em até 15 dias), que vencem hoje e vencidos. Gerencie inspeções e gere relatórios.';
     }
   }
   onRemoveFilterValue(event: {filterName: string, value: string}): void {

@@ -8,9 +8,9 @@
 
     <!-- Títulos -->
     <div>
-      <div class="text-gray-500 text-base">Home</div>
-      <div class="text-3xl font-bold">Mural de Produtos</div>
-      <p class="text-gray-800 text-base mt-1">Monitore produtos próximos ao vencimento (em até 15 dias), que vencem hoje e vencidos. Gerencie inspeções e gere relatórios.</p>
+      <div class="text-gray-500 text-sm md:text-base">Home</div>
+      <div class="text-2xl md:text-3xl font-bold">Mural de Produtos - {{ nomeAbaAtual }}</div>
+      <p class="text-gray-800 text-sm md:text-base mt-1">{{ descricaoAbaAtual }}</p>
     </div>
   </div>
 </div>
@@ -38,26 +38,26 @@
   </div>
 
   <!-- Tabs integradas com filtro de inspeção -->
-  <div class="flex flex-wrap justify-between items-center gap-3 mb-4">
+  <div class="flex flex-col lg:flex-row lg:justify-between lg:items-center gap-3 mb-4">
     <app-mural-tabs
       [activeTab]="activeTab"
       (tabChange)="setActiveTab($event)">
     </app-mural-tabs>
 
     <!-- Filtro de Status de Inspeção inline -->
-    <div class="flex items-center bg-gray-50 px-4 py-2 rounded-lg border border-gray-200 w-full sm:w-auto">
-      <div class="flex flex-wrap gap-3">
+    <div class="flex items-center bg-gray-50 px-4 py-2 rounded-lg border border-gray-200 w-full lg:w-auto">
+      <div class="flex flex-wrap gap-2 lg:gap-3 justify-center lg:justify-start w-full">
         <label class="inline-flex items-center cursor-pointer">
           <input type="radio" class="form-radio h-4 w-4 text-yellow-500 rounded-full" name="statusInspecao" value="todos" [(ngModel)]="filtroInspecao" (change)="filtrarPorStatusInspecao('todos')">
-          <span class="ml-2 text-sm">Todos</span>
+          <span class="ml-2 text-xs lg:text-sm">Todos</span>
         </label>
         <label class="inline-flex items-center cursor-pointer">
           <input type="radio" class="form-radio h-4 w-4 text-green-500 rounded-full" name="statusInspecao" value="inspecionados" [(ngModel)]="filtroInspecao" (change)="filtrarPorStatusInspecao('inspecionados')">
-          <span class="ml-2 text-sm">Inspecionados</span>
+          <span class="ml-2 text-xs lg:text-sm">Inspecionados</span>
         </label>
         <label class="inline-flex items-center cursor-pointer">
           <input type="radio" class="form-radio h-4 w-4 text-red-500 rounded-full" name="statusInspecao" value="naoInspecionados" [(ngModel)]="filtroInspecao" (change)="filtrarPorStatusInspecao('naoInspecionados')">
-          <span class="ml-2 text-sm">Não Inspecionados</span>
+          <span class="ml-2 text-xs lg:text-sm">Não Inspecionados</span>
         </label>
       </div>
     </div>
@@ -86,8 +86,8 @@
     <p class="text-sm mt-2">Tente ajustar os filtros ou realizar uma nova busca</p>
   </div>
 
-  <!-- Tabela incorporada diretamente -->
-  <div *ngIf="!loading && filteredItems.length > 0" class="bg-white rounded-lg shadow-md overflow-hidden border border-gray-200">
+  <!-- Tabela Desktop (hidden em mobile) -->
+  <div *ngIf="!loading && filteredItems.length > 0" class="hidden lg:block bg-white rounded-lg shadow-md overflow-hidden border border-gray-200">
     <table class="min-w-full divide-y divide-gray-200">
       <thead class="bg-gray-50">
         <tr>
@@ -126,7 +126,7 @@
           <td class="px-4 py-3 text-center">
             <button [routerLink]="['/mural-detalhe', item.id]" [queryParams]="{tab: activeTab}" class="text-gray-500 hover:text-gray-700 focus:outline-none">
               <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 616 0z" />
                 <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
               </svg>
             </button>
@@ -136,26 +136,185 @@
     </table>
   </div>
 
-  <!-- Controles unificados: paginação e ações -->
-  <div *ngIf="!loading && filteredItems.length > 0" class="mt-4 flex justify-between items-center">
-    <!-- Controles à esquerda: seletor de itens por página -->
-    <div class="flex items-center whitespace-nowrap">
-      <span class="text-sm text-gray-600 mr-2">Itens por página:</span>
-      <select
-        id="itensPorPagina"
-        [ngModel]="itensPorPagina"
-        (ngModelChange)="alterarItensPorPagina($event)"
-        class="bg-white border border-gray-300 text-gray-700 py-1 px-1 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 w-12 text-sm">
-        <option *ngFor="let opcao of opcoesItensPorPagina" [value]="opcao">
-          {{ opcao }}
-        </option>
-      </select>
+  <!-- Cards Mobile/Tablet (visible em lg:hidden) -->
+  <div *ngIf="!loading && filteredItems.length > 0" class="lg:hidden">
+    <!-- Cabeçalho com checkbox "Selecionar Todos" -->
+    <div class="bg-white rounded-lg shadow-md border border-gray-200 p-3 mb-3">
+      <div class="flex items-center justify-between">
+        <label class="flex items-center cursor-pointer">
+          <input type="checkbox" (change)="selectAll($event)"
+            class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+          <span class="ml-2 text-sm font-medium text-gray-700">Selecionar todos</span>
+        </label>
+        <span class="text-sm text-gray-500">{{ filteredItems.length }} item(ns)</span>
+      </div>
     </div>
 
-    <!-- Área central para botões e contador usando grid -->
-    <div class="grid grid-cols-[1fr_auto_1fr] gap-6 items-center">
-      <!-- Contador posicionado à esquerda -->
-      <div class="justify-self-end pr-4">
+    <!-- Cards dos itens - Layout com prioridade de informações -->
+    <div *ngFor="let item of filteredItems" class="card-item bg-white rounded-lg border border-gray-200 p-3 mb-3">
+      <div class="flex items-start justify-between mb-2">
+        <!-- Checkbox de seleção -->
+        <input type="checkbox" [(ngModel)]="item.selecionado" (ngModelChange)="onItemSelection(item, $event)"
+          class="card-checkbox w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 mt-1 flex-shrink-0">
+        
+        <!-- Status de inspeção -->
+        <div class="card-status flex items-center gap-1 flex-shrink-0">
+          <svg *ngIf="item.inspecionado" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+          </svg>
+          <svg *ngIf="!item.inspecionado" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+          <span class="text-xs text-gray-500">{{ item.inspecionado ? 'OK' : 'Pend.' }}</span>
+        </div>
+      </div>
+
+      <!-- Informações principais reorganizadas por prioridade -->
+      <div class="space-y-3">
+        <!-- 1. DESCRIÇÃO - Principal identificador (destaque máximo) -->
+        <div class="mb-3">
+          <p class="text-sm font-semibold text-gray-900 leading-tight">
+            {{ item.produto.descricao }}
+          </p>
+          <!-- Marca logo abaixo da descrição -->
+          <p class="text-xs text-gray-600 mt-1 font-medium">
+            {{ item.produto.marca }}
+          </p>
+        </div>
+        
+        <!-- 2. DATA DE VENCIMENTO - Segundo destaque -->
+        <div class="mb-3 p-3 bg-gray-50 rounded-lg">
+          <span class="text-xs text-gray-500 font-medium uppercase">Vencimento:</span>
+          <p class="text-xs font-bold mt-1"
+             [ngClass]="{
+               'text-yellow-600': activeTab === 'proximo',
+               'text-red-600': activeTab === 'hoje',
+               'text-gray-800': activeTab === 'vencido'
+             }">
+            {{ item.dataValidade | date:'dd/MM/yyyy HH:mm' }}
+          </p>
+        </div>
+        
+        <!-- 3. CÓDIGO DE BARRAS - Identificador único -->
+        <div class="flex items-center justify-between py-2 border-b border-gray-100">
+          <span class="text-xs text-gray-500 font-medium">CÓDIGO:</span>
+          <span class="text-xs font-mono text-gray-800 font-medium">{{ item.produto.codigoBarras }}</span>
+        </div>
+        
+        <!-- 4. LOTE - Informação adicional -->
+        <div class="flex items-center justify-between py-2">
+          <span class="text-xs text-gray-500 font-medium">LOTE:</span>
+          <span class="text-xs font-mono text-gray-700">{{ item.lote }}</span>
+        </div>
+      </div>
+
+      <!-- Botão Ver detalhes -->
+      <div class="mt-4 pt-3 border-t border-gray-200 text-center">
+        <button [routerLink]="['/mural-detalhe', item.id]" [queryParams]="{tab: activeTab}" 
+          class="inline-flex items-center justify-center px-4 py-2.5 text-xs font-medium text-white rounded-lg transition-colors w-full"
+          style="background-color:#5084C1;"
+          onmouseover="this.style.backgroundColor='#3d6ba3'"
+          onmouseout="this.style.backgroundColor='#5084C1'">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 616 0z" />
+            <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+          </svg>
+          Ver detalhes
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Controles unificados: paginação e ações -->
+  <div *ngIf="!loading && filteredItems.length > 0" class="mt-4">
+    
+    <!-- Para Mobile: Layout vertical compacto -->
+    <div class="lg:hidden flex flex-col items-center gap-3">
+      
+      <!-- Contador e Ações em Lote -->
+      <div class="flex flex-col items-center gap-2">
+        <div *ngIf="hasSelectedItems()" class="text-sm text-black bg-gray-50 border border-gray-200 rounded px-3 py-1 flex items-center">
+          {{ getSelectedItemsCount() }} selecionado(s)
+          <button class="ml-2 focus:outline-none" (click)="cancelarSelecao()" title="Cancelar seleção">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+        
+        <button
+          (click)="abrirModalAcoes()"
+          [disabled]="!hasSelectedItems()"
+          [class.opacity-50]="!hasSelectedItems()"
+          [class.cursor-not-allowed]="!hasSelectedItems()"
+          class="text-white px-4 py-2 rounded text-sm"
+          style="background-color:#5084C1;"
+          onmouseover="this.style.backgroundColor='#3d6ba3'"
+          onmouseout="this.style.backgroundColor='#5084C1'">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 mr-1 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16" />
+          </svg>
+          Ações em lote
+        </button>
+      </div>
+      
+      <!-- Itens por página e Navegação -->
+      <div class="flex items-center gap-4">
+        <div class="flex items-center">
+          <span class="text-sm text-gray-600 mr-2">Por página:</span>
+          <select
+            [ngModel]="itensPorPagina"
+            (ngModelChange)="alterarItensPorPagina($event)"
+            class="bg-white border border-gray-300 text-gray-700 py-1 px-2 rounded text-sm">
+            <option *ngFor="let opcao of opcoesItensPorPagina" [value]="opcao">{{ opcao }}</option>
+          </select>
+        </div>
+        
+        <!-- Paginação centralizada -->
+        <div class="flex items-center gap-1">
+          <button
+            (click)="voltarPagina()"
+            [disabled]="paginaAtual === 1"
+            class="px-2 py-1 text-white rounded text-sm"
+            style="background-color:#5084C1;"
+            [style.opacity]="paginaAtual === 1 ? 0.5 : 1">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
+            </svg>
+          </button>
+          
+          <span class="px-3 py-1 text-white rounded text-sm font-medium" style="background-color:#5084C1;">{{ paginaAtual }}</span>
+          
+          <button
+            (click)="avancarPagina()"
+            [disabled]="paginaAtual === totalPaginas"
+            class="px-2 py-1 text-white rounded text-sm"
+            style="background-color:#5084C1;"
+            [style.opacity]="paginaAtual === totalPaginas ? 0.5 : 1">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Para Desktop: Layout original -->
+    <div class="hidden lg:flex lg:justify-between lg:items-center">
+      <!-- Controles à esquerda: seletor de itens por página -->
+      <div class="flex items-center">
+        <span class="text-sm text-gray-600 mr-2">Itens por página:</span>
+        <select
+          [ngModel]="itensPorPagina"
+          (ngModelChange)="alterarItensPorPagina($event)"
+          class="bg-white border border-gray-300 text-gray-700 py-1 px-2 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-sm">
+          <option *ngFor="let opcao of opcoesItensPorPagina" [value]="opcao">{{ opcao }}</option>
+        </select>
+      </div>
+
+      <!-- Área central para botões e contador -->
+      <div class="flex items-center gap-4">
+        <!-- Contador -->
         <div *ngIf="hasSelectedItems()" class="text-sm text-black bg-gray-50 border border-gray-200 rounded px-3 py-1 flex items-center">
           Selecionado(s): {{ getSelectedItemsCount() }}
           <button class="ml-2 focus:outline-none" (click)="cancelarSelecao()" title="Cancelar seleção">
@@ -164,69 +323,50 @@
             </svg>
           </button>
         </div>
-      </div>
 
-      <!-- Botão centralizado -->
-      <div class="flex space-x-4 justify-self-center pl-4">
         <!-- Botão Ações em Lote -->
         <button
           (click)="abrirModalAcoes()"
           [disabled]="!hasSelectedItems()"
           [class.opacity-50]="!hasSelectedItems()"
           [class.cursor-not-allowed]="!hasSelectedItems()"
-          class="flex items-center text-white px-6 py-2 rounded-md transition-colors focus:outline-none"
+          class="flex items-center text-white px-6 py-2 rounded-md transition-colors focus:outline-none text-sm"
           style="background-color:#5084C1;"
           onmouseover="this.style.backgroundColor='#3d6ba3'"
           onmouseout="this.style.backgroundColor='#5084C1'">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16" />
           </svg>
           Ações em lote
         </button>
       </div>
 
-      <!-- Coluna vazia à direita para manter o balanço -->
-      <div class="w-full"></div>
-    </div>
+      <!-- Navegação de página à direita -->
+      <div class="flex items-center space-x-2">
+        <button
+          (click)="voltarPagina()"
+          [disabled]="paginaAtual === 1"
+          class="px-3 py-1 text-white rounded-lg transition-colors"
+          style="background-color:#5084C1;"
+          [style.opacity]="paginaAtual === 1 ? 0.5 : 1">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
+          </svg>
+        </button>
 
-    <!-- Navegação de página à direita -->
-    <div class="flex items-center space-x-2">
-      <!-- Botão Anterior -->
-      <button
-        (click)="voltarPagina()"
-        [disabled]="paginaAtual === 1"
-        class="px-3 py-1 text-white rounded-lg transition-colors"
-        style="background-color:#5084C1;"
-        onmouseover="this.style.backgroundColor='#3d6ba3'"
-        onmouseout="this.style.backgroundColor='#5084C1'"
-        [style.opacity]="paginaAtual === 1 ? 0.5 : 1">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-          <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
-        </svg>
-      </button>
+        <button class="px-3 py-1 text-white rounded-lg" style="background-color:#5084C1;">{{ paginaAtual }}</button>
 
-      <!-- Página atual -->
-      <button
-        class="px-3 py-1 text-white rounded-lg transition-colors"
-        style="background-color:#5084C1;"
-        onmouseover="this.style.backgroundColor='#3d6ba3'"
-        onmouseout="this.style.backgroundColor='#5084C1'">
-        {{ paginaAtual }}
-      </button>
-
-      <!-- Botão Próxima -->
-      <button
-        (click)="avancarPagina()"
-        [disabled]="paginaAtual === totalPaginas"
-        class="px-3 py-1 text-white rounded-lg transition-colors"
-        style="background-color:#5084C1;"
-        onmouseover="this.style.backgroundColor='#3d6ba3'"
-        onmouseout="this.style.backgroundColor='#5084C1'"
-        [style.opacity]="paginaAtual === totalPaginas ? 0.5 : 1">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-          <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
-        </svg>
-      </button>
+        <button
+          (click)="avancarPagina()"
+          [disabled]="paginaAtual === totalPaginas"
+          class="px-3 py-1 text-white rounded-lg transition-colors"
+          style="background-color:#5084C1;"
+          [style.opacity]="paginaAtual === totalPaginas ? 0.5 : 1">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+          </svg>
+        </button>
+      </div>
     </div>
   </div>
 

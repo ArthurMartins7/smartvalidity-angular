@@ -37,53 +37,55 @@ tr:hover {
   background-color: #f9fafb;
 }
 
-/* Layout Mobile Cards - Otimizado para Samsung S20 Ultra */
+/* Layout Mobile Cards - Otimizado para apresentação com 60% zoom */
 @media (max-width: 420px) {
   .container {
     padding: 0 0.5rem;
     overflow-x: hidden;
   }
   
-  /* Cards dos itens */
+  /* Cards dos itens - Maior e mais espaçado */
   .card-item {
     width: 100%;
     max-width: calc(412px - 1rem);
-    margin: 0 auto 0.75rem auto;
-    padding: 0.75rem;
-    border-radius: 8px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-    border: 1px solid #e5e7eb;
+    margin: 0 auto 1rem auto;
+    padding: 1rem;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    border: 2px solid #e5e7eb;
     box-sizing: border-box;
     overflow: hidden;
+    background: white;
   }
   
-  /* Checkbox de seleção */
+  /* Checkbox de seleção - Maior */
   .card-checkbox {
-    width: 16px;
-    height: 16px;
+    width: 20px;
+    height: 20px;
     margin-top: 2px;
     flex-shrink: 0;
   }
   
-  /* Status de inspeção */
+  /* Status de inspeção - Maior e mais visível */
   .card-status {
     display: flex;
     align-items: center;
-    gap: 4px;
+    gap: 6px;
     flex-shrink: 0;
   }
   
   .card-status svg {
-    width: 16px;
-    height: 16px;
+    width: 20px;
+    height: 20px;
   }
   
   .card-status span {
-    font-size: 0.75rem;
-    color: #6b7280;
+    font-size: 0.875rem;
+    color: #4b5563;
+    font-weight: 600;
   }
   
-  /* Hierarquia de informações */
+  /* Hierarquia de informações - Tamanhos maiores */
   .card-item p {
     margin: 0;
     overflow: hidden;
@@ -91,50 +93,112 @@ tr:hover {
     word-wrap: break-word;
   }
   
-  /* Descrição - Principal (texto maior) */
-  .card-item .text-sm {
-    font-size: 0.875rem;
-    line-height: 1.25;
+  /* Descrição - Principal (texto muito maior e mais destacado) */
+  .card-item .text-sm.font-semibold {
+    font-size: 1.125rem !important;
+    line-height: 1.4;
+    font-weight: 700;
+    color: #111827;
+    margin-bottom: 0.75rem;
+  }
+  
+  /* Marca do produto - Visível mas secundária */
+  .card-item .text-xs.text-gray-600 {
+    font-size: 0.875rem !important;
+    font-weight: 500;
+    color: #6b7280;
+  }
+  
+  /* Data de vencimento - Segundo destaque (muito maior) */
+  .card-item .text-xs.font-bold {
+    font-size: 1rem !important;
+    font-weight: 800;
+    line-height: 1.3;
+  }
+  
+  /* Labels das informações - Mais visível */
+  .card-item .text-xs.text-gray-500.font-medium {
+    font-size: 0.875rem !important;
+    font-weight: 600;
+    color: #374151;
+    text-transform: uppercase;
+    letter-spacing: 0.025em;
+  }
+  
+  /* Valores das informações - Maior e mais legível */
+  .card-item .text-xs.font-mono {
+    font-size: 0.875rem !important;
     font-weight: 600;
     color: #111827;
   }
   
-  /* Data de vencimento - Segundo destaque */
-  .card-item .text-xs.font-bold {
-    font-size: 0.75rem;
-    font-weight: 700;
-    line-height: 1.2;
+  /* Área de vencimento - Destaque especial */
+  .card-item .bg-gray-50 {
+    background-color: #f3f4f6;
+    padding: 0.75rem;
+    border-radius: 8px;
+    border: 1px solid #d1d5db;
   }
   
-  /* Labels e valores - Legível */
-  .card-item .text-xs {
-    font-size: 0.625rem;
-    line-height: 1.2;
+  /* Separadores - Mais visíveis */
+  .card-item .border-b.border-gray-100 {
+    border-bottom: 1px solid #d1d5db;
+    padding: 0.5rem 0;
   }
   
-  /* Códigos e lotes - Monospace */
-  .card-item .font-mono {
-    font-family: 'Courier New', Courier, monospace;
-    font-weight: 500;
-  }
-  
-  /* Botão Ver detalhes */
+  /* Botão Ver detalhes - Maior e mais visível */
   .card-item button {
-    font-size: 0.75rem;
-    padding: 6px 12px;
+    font-size: 0.875rem !important;
+    padding: 10px 16px;
+    border-radius: 8px;
+    font-weight: 600;
+    min-height: 44px;
+  }
+  
+  .card-item button svg {
+    width: 16px;
+    height: 16px;
+  }
+  
+  /* Controles de paginação mobile - Maiores */
+  .lg\:hidden select {
+    font-size: 1rem;
+    padding: 8px 12px;
     border-radius: 6px;
     font-weight: 500;
-  }
-  
-  /* Controles de paginação mobile */
-  .lg\:hidden select {
-    font-size: 0.875rem;
-    padding: 4px 8px;
+    border: 2px solid #d1d5db;
   }
   
   .lg\:hidden button {
-    font-size: 0.875rem;
-    padding: 6px 12px;
+    font-size: 1rem;
+    padding: 10px 16px;
+    font-weight: 600;
+    min-height: 44px;
+    border-radius: 8px;
+  }
+  
+  /* Botões de navegação - Mais visíveis */
+  .lg\:hidden button svg {
+    width: 18px;
+    height: 18px;
+  }
+  
+  /* Texto "Selecionar todos" - Maior */
+  .lg\:hidden .text-sm {
+    font-size: 1rem !important;
+    font-weight: 600;
+  }
+  
+  /* Contador de itens - Maior */
+  .lg\:hidden span.text-sm {
+    font-size: 1rem !important;
+    font-weight: 500;
+  }
+  
+  /* Área de seleção - Mais espaçada */
+  .lg\:hidden .bg-white.rounded-lg.shadow-md {
+    padding: 1rem;
+    margin-bottom: 1rem;
   }
   
   /* Forçar container sem overflow horizontal */
@@ -174,32 +238,35 @@ tr:hover {
 }
 
 .card-item:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
 }
 
 /* Acessibilidade */
 .card-checkbox:focus {
-  outline: 2px solid #3b82f6;
+  outline: 3px solid #3b82f6;
   outline-offset: 2px;
 }
 
 button:focus {
-  outline: 2px solid #3b82f6;
+  outline: 3px solid #3b82f6;
   outline-offset: 2px;
 }
 
-/* Cores personalizadas para status */
+/* Cores personalizadas para status - Mais contrastadas */
 .text-yellow-600 {
-  color: #d97706;
+  color: #b45309;
+  font-weight: 700;
 }
 
 .text-red-600 {
-  color: #dc2626;
+  color: #b91c1c;
+  font-weight: 700;
 }
 
 .text-green-500 {
-  color: #10b981;
+  color: #059669;
+  font-weight: 700;
 }
 
 /* Estilos para elementos específicos */
@@ -229,5 +296,39 @@ button:focus {
   
   .card-item .text-xs {
     font-size: 0.75rem;
+  }
+}
+
+/* Melhorias específicas para apresentação */
+@media (max-width: 420px) {
+  /* Cabeçalho da página - Maior */
+  .text-2xl {
+    font-size: 1.875rem !important;
+    font-weight: 800;
+  }
+  
+  .text-sm {
+    font-size: 1rem !important;
+  }
+  
+  .text-base {
+    font-size: 1.125rem !important;
+  }
+  
+  /* Filtros - Mais legíveis */
+  .text-xs {
+    font-size: 0.875rem !important;
+  }
+  
+  /* Botões de filtro - Maiores */
+  .lg\:text-sm {
+    font-size: 1rem !important;
+  }
+  
+  /* Contador de selecionados - Mais visível */
+  .text-black {
+    font-size: 1rem !important;
+    font-weight: 600;
+    color: #111827;
   }
 }

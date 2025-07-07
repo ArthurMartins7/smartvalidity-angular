@@ -444,7 +444,7 @@ export class AlertaListagemComponent implements OnInit, OnDestroy {
       return 'vence hoje';
     } else {
       // Já venceu
-      return dias === 1 ? 'venceu há 1 dia' : `venceu há ${dias} dias`;
+      return dias === 1 ? 'há 1 dia' : `há ${dias} dias`;
     }
   }
 

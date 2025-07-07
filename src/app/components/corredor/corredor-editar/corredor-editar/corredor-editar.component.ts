@@ -111,7 +111,7 @@ export class CorredorEditarComponent implements OnInit {
           email: this.responsavelSelecionado.email,
           senha: this.responsavelSelecionado.senha,
           cargo: this.responsavelSelecionado.cargo,
-          dataCriacao: this.responsavelSelecionado.dataCriacao,
+          dataCriacao: new Date(this.responsavelSelecionado.dataCriacao as any),
           empresa: this.responsavelSelecionado.empresa
         }
       ]

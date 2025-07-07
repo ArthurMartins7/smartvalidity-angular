@@ -1,0 +1,228 @@
+<!-- Cabeçalho unificado -->
+<div class="bg-gray-100 -mx-6 md:-mx-6 py-6 mb-10">
+  <div class="flex items-center gap-2 px-6">
+    <!-- Botão voltar -->
+    <button (click)="voltarParaLista()" class="p-1 hover:bg-gray-200 rounded transition-colors">
+      <span class="material-icons text-gray-600">keyboard_arrow_left</span>
+    </button>
+
+    <!-- Títulos -->
+  <div>
+      <div class="text-gray-500 text-base cursor-pointer hover:underline" (click)="voltarParaLista()">Gestão de Alertas</div>
+      <div class="text-3xl font-bold">Detalhe do Alerta</div>
+      <p class="text-gray-800 text-base mt-1">Visualize todas as informações deste alerta.</p>
+    </div>
+  </div>
+</div>
+
+<!-- Loading State -->
+<div *ngIf="carregando" class="flex justify-center items-center py-10">
+  <span class="material-icons animate-spin text-4xl" style="color: #5084C1;">refresh</span>
+</div>
+
+<!-- Card principal -->
+<div *ngIf="!carregando && alerta" class="bg-white rounded-lg shadow-md overflow-hidden mx-6">
+  <!-- Cabeçalho do card -->
+  <div class="p-6 bg-gray-50 border-b border-gray-200">
+    <div class="flex items-start justify-between">
+      <div>
+        <h1 class="text-2xl font-bold text-gray-800 mb-2">{{ removerEmojis(alerta.titulo) }}</h1>
+      </div>
+             <div class="flex items-center gap-3">
+         <button (click)="excluirAlerta()"
+                 class="bg-red-600 text-white px-3 py-2 rounded-lg hover:bg-red-700 transition-colors font-medium flex items-center justify-center w-10 h-10"
+                 title="Excluir este alerta">
+           <span class="material-icons text-base">delete</span>
+         </button>
+         <button *ngIf="podeVisualizarItem()"
+                 (click)="visualizarItem(obterPrimeiroProduto())"
+                 class="text-white px-4 py-2 rounded-lg transition-colors font-medium flex items-center gap-2"
+                 style="background-color: #5084C1;"
+                 onmouseover="this.style.backgroundColor='#4071a8'"
+                 onmouseout="this.style.backgroundColor='#5084C1'">
+           <span class="material-icons text-sm">visibility</span>
+           Visualizar Item
+         </button>
+         <button *ngIf="podeEditar()"
+                 (click)="editarAlerta()"
+                 class="text-white px-4 py-2 rounded-lg transition-colors font-medium flex items-center gap-2"
+                 style="background-color: #5084C1;"
+                 onmouseover="this.style.backgroundColor='#3d6ba3'"
+                 onmouseout="this.style.backgroundColor='#5084C1'">
+           <span class="material-icons text-sm">edit</span>
+           Editar
+         </button>
+       </div>
+    </div>
+  </div>
+
+  <!-- Conteúdo -->
+  <div class="p-6 space-y-6">
+    <!-- Descrição do Card  -->
+    <div *ngIf="alerta.descricao" class="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200 px-6 py-4 border-l-4 border-blue-400">
+      <div class="flex items-center gap-3 mb-4">
+        <div class="p-2 rounded-full bg-blue-100">
+          <span class="material-icons text-blue-600">description</span>
+        </div>
+        <h3 class="text-lg font-semibold text-gray-800">Descrição</h3>
+      </div>
+      <p class="text-gray-700 leading-relaxed" [innerHTML]="alerta.descricao"></p>
+    </div>
+
+    <!-- Card de Produtos Relacionados -->
+    <div *ngIf="alerta.produtosAlerta && alerta.produtosAlerta.length > 0"
+         class="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200 px-6 py-4 border-l-4 border-green-400">
+      <div class="flex items-center gap-3 mb-4">
+        <div class="p-2 rounded-full bg-green-100">
+          <span class="material-icons text-green-600">inventory_2</span>
+        </div>
+        <h3 class="text-lg font-semibold text-gray-800">Produtos Relacionados</h3>
+      </div>
+      <div class="flex flex-wrap gap-2 mb-4">
+        <span *ngFor="let produto of alerta.produtosAlerta"
+              class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800 border border-green-200">
+          {{ produto }}
+        </span>
+      </div>
+
+      <!-- Tabela de Itens monitorados (apenas para alertas personalizados) -->
+      <div *ngIf="ehAlertaPersonalizado() && itensProdutoNaoInspecionados.length > 0"
+           class="mt-4 border border-blue-200 rounded">
+        <!-- Cabeçalho -->
+        <div class="bg-blue-50 text-blue-800 text-xs font-semibold px-3 py-1 rounded-t">
+          {{ itensProdutoNaoInspecionados.length }} {{ itensProdutoNaoInspecionados.length === 1 ? 'item monitorado' : 'itens monitorados' }}
+        </div>
+        <div class="px-3 py-1 text-gray-600 text-xs bg-blue-50 border-t border-blue-200">
+          Itens monitorados correspondem aos itens de um produto que ainda não foram inspecionados. Após a inspeção, deixam de aparecer nesta lista.
+        </div>
+        <!-- Lista -->
+        <div class="max-h-40 overflow-y-auto bg-white">
+          <table class="min-w-full text-xs table-fixed border-collapse">
+            <thead class="bg-blue-50 sticky top-0">
+              <tr>
+                <th class="w-2/5 px-2 py-1 text-left text-blue-800 font-semibold">Nome</th>
+                <th class="w-1/5 px-2 py-1 text-left text-blue-800 font-semibold">Lote</th>
+                <th class="w-1/5 px-2 py-1 text-left text-blue-800 font-semibold">Data de vencimento</th>
+                <th class="w-1/5 px-2 py-1 text-left text-blue-800 font-semibold">Vence em</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let item of itensProdutoNaoInspecionados" class="hover:bg-blue-50">
+                <td class="px-2 py-1 text-gray-600 truncate">{{ item.produto?.descricao || alerta.produtosAlerta[0] }}</td>
+                <td class="px-2 py-1 font-medium text-gray-700 truncate">{{ item.lote }}</td>
+                <td class="px-2 py-1 text-gray-600">{{ item.dataVencimento ? (item.dataVencimento | date:'dd/MM/yyyy') : 'N/A' }}</td>
+                <td class="px-2 py-1">
+                  <span *ngIf="item.dataVencimento" [class]="getStatusVencimento(item.dataVencimento) + ' rounded-full px-2 py-0.5 whitespace-nowrap'">
+                    {{ getTextoVencimento(item.dataVencimento) }}
+                  </span>
+                  <span *ngIf="!item.dataVencimento" class="text-gray-400 text-xs">N/A</span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Grid de Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <!-- Card com Informações de Tempo -->
+      <div class="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200 px-6 py-4 border-l-4 border-purple-400">
+        <div class="flex items-center gap-3 mb-4">
+          <div class="p-2 rounded-full bg-purple-100">
+            <span class="material-icons text-purple-600">schedule</span>
+          </div>
+          <h3 class="text-lg font-semibold text-gray-800">Informações de Tempo</h3>
+        </div>
+        <div class="space-y-4">
+          <div class="flex justify-between items-center">
+            <span class="text-base font-medium text-gray-600">Data de Criação</span>
+            <div class="text-lg text-gray-800">{{ formatarDataHora(alerta.dataCriacao) }}</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card de Informações Adicionais -->
+      <div class="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200 px-6 py-4 border-l-4 border-amber-400">
+        <div class="flex items-center gap-3 mb-4">
+          <div class="p-2 rounded-full bg-amber-100">
+            <span class="material-icons text-amber-600">info</span>
+          </div>
+          <h3 class="text-lg font-semibold text-gray-800">Informações Adicionais</h3>
+        </div>
+        <div class="space-y-4">
+          <div class="flex justify-between items-center">
+            <span class="text-base font-medium text-gray-600">Tipo</span>
+            <div class="text-lg text-gray-800">{{ obterDescricaoTipo(alerta.tipo) }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card de Status de Inspeção (apenas para alertas automáticos) -->
+    <div *ngIf="ehAlertaAutomatico()" 
+         class="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200 px-6 py-4 border-l-4"
+         [ngClass]="obterCorStatusInspecao()">
+      <div class="flex items-center gap-3 mb-4">
+        <div class="p-2 rounded-full" [ngClass]="obterCorFundoStatusInspecao()">
+          <span class="material-icons" [ngClass]="obterCorIconeStatusInspecao()">{{ obterIconeStatusInspecao() }}</span>
+        </div>
+        <h3 class="text-lg font-semibold text-gray-800">Status de Inspeção</h3>
+      </div>
+      <div class="space-y-4">
+        <div class="flex justify-between items-center">
+          <span class="text-base font-medium text-gray-600">Status</span>
+          <div class="text-lg text-gray-800 font-medium">{{ obterStatusInspecao() }}</div>
+        </div>
+        <div *ngIf="possuiMotivoInspecao()" class="flex justify-between items-center">
+          <span class="text-base font-medium text-gray-600">Motivo</span>
+          <div class="text-lg text-gray-800 font-medium">{{ obterMotivoInspecao() }}</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card de Usuários -->
+    <div *ngIf="alerta.usuariosAlerta && alerta.usuariosAlerta.length > 0"
+         class="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200 px-6 py-4 border-l-4 border-indigo-400">
+      <div class="flex items-center gap-3 mb-4">
+        <div class="p-2 rounded-full bg-indigo-100">
+          <span class="material-icons text-indigo-600">group</span>
+        </div>
+        <h3 class="text-lg font-semibold text-gray-800">Usuários que Recebem</h3>
+      </div>
+      <div class="flex flex-wrap gap-2">
+        <span *ngFor="let usuario of alerta.usuariosAlerta"
+              class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-indigo-100 text-indigo-800 border border-indigo-200">
+          {{ usuario }}
+        </span>
+      </div>
+    </div>
+
+    <!-- Card Criador -->
+    <div *ngIf="alerta.usuarioCriador"
+         class="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200 px-6 py-4 border-l-4 border-orange-400">
+      <div class="flex items-center gap-3 mb-4">
+        <div class="p-2 rounded-full bg-orange-100">
+          <span class="material-icons text-orange-600">person</span>
+        </div>
+        <h3 class="text-lg font-semibold text-gray-800">Criado por</h3>
+      </div>
+      <span class="text-lg text-gray-800">{{ alerta.usuarioCriador }}</span>
+    </div>
+  </div>
+</div>
+
+<!-- Estado quando não há alerta -->
+<div *ngIf="!carregando && !alerta" class="bg-white rounded-lg shadow-md p-8 text-center mx-6">
+  <span class="material-icons text-gray-400 text-5xl mb-4">warning</span>
+  <h3 class="text-lg font-semibold text-gray-900 mb-2">Alerta não encontrado</h3>
+  <p class="text-gray-600">O alerta solicitado não foi encontrado ou foi excluído.</p>
+  <button (click)="voltarParaLista()"
+          class="mt-4 text-white px-4 py-2 rounded-lg transition-colors font-medium"
+          style="background-color: #5084C1;"
+          onmouseover="this.style.backgroundColor='#3d6ba3'"
+          onmouseout="this.style.backgroundColor='#5084C1'">
+    <span class="material-icons text-sm mr-2 align-text-bottom">keyboard_arrow_left</span>
+    Voltar para Lista
+  </button>
+</div>

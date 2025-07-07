@@ -1,0 +1,204 @@
+<!-- Cabeçalho unificado -->
+<div class="bg-gray-100 -mx-6 md:-mx-6 py-6 mb-10">
+  <div class="flex items-center gap-2 px-6">
+    <!-- Botão voltar -->
+    <button (click)="voltarParaLista()" class="p-1 hover:bg-gray-200 rounded transition-colors">
+      <span class="material-icons text-gray-600">keyboard_arrow_left</span>
+    </button>
+
+    <!-- Títulos -->
+    <div>
+      <div class="text-gray-500 text-base cursor-pointer hover:underline" (click)="voltarParaLista()">Notificações</div>
+      <div class="text-3xl font-bold">Detalhes da Notificação</div>
+      <p class="text-gray-800 text-base mt-1">Visualize todas as informações desta notificação.</p>
+    </div>
+  </div>
+</div>
+
+    <!-- Loading State -->
+<div *ngIf="carregando" class="flex justify-center items-center py-10">
+  <span class="material-icons animate-spin text-4xl" style="color: #5084C1;">refresh</span>
+    </div>
+
+    <!-- Error State -->
+<div *ngIf="erro && !carregando" class="bg-red-100 border-l-4 border-red-500 text-red-700 px-4 py-3 rounded mb-4 mx-6">
+  <div class="flex items-center">
+    <span class="material-icons mr-2">error_outline</span>
+    <p>{{ erro }}</p>
+  </div>
+</div>
+
+<!-- Card principal -->
+<div *ngIf="notificacao && !carregando" class="bg-white rounded-lg shadow-md overflow-hidden mx-6">
+  <!-- Cabeçalho do card -->
+  <div class="p-6 bg-gray-50 border-b border-gray-200">
+    <div class="flex items-start justify-between">
+      <div>
+        <h1 class="text-2xl font-bold text-gray-800 mb-2">{{ removerEmojis(notificacao.titulo) }}</h1>
+      </div>
+      <div class="flex items-center gap-3">
+        <button *ngIf="!ehAlertaPersonalizado()"
+                (click)="excluirNotificacao()"
+                class="btn-excluir text-white px-3 py-2 rounded-lg font-medium flex items-center justify-center w-10 h-10"
+                title="Excluir esta notificação">
+          <span class="material-icons text-base">delete</span>
+        </button>
+        <button *ngIf="podeVisualizarItemMelhorado()"
+                (click)="visualizarItem()"
+                class="btn-visualizar px-4 py-2 rounded-lg font-medium flex items-center gap-2 text-white">
+          <span class="material-icons text-sm">visibility</span>
+          Visualizar Item
+        </button>
+      </div>
+    </div>
+    </div>
+
+  <!-- Conteúdo -->
+  <div class="p-6 space-y-6">
+    <!-- Card Descrição -->
+    <div class="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200 px-6 py-4 border-l-4 border-blue-400">
+      <div class="flex items-center gap-3 mb-4">
+        <div class="p-2 rounded-full bg-blue-100">
+          <span class="material-icons text-blue-600">description</span>
+        </div>
+        <h3 class="text-lg font-semibold text-gray-800">Descrição</h3>
+              </div>
+      <p class="text-gray-700 leading-relaxed">{{ notificacao.descricao }}</p>
+            </div>
+
+    <!-- Card Produtos Relacionados -->
+    <div *ngIf="notificacao.produtosAlerta && notificacao.produtosAlerta.length > 0"
+         class="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200 px-6 py-4 border-l-4 border-green-400">
+      <div class="flex items-center gap-3 mb-4">
+        <div class="p-2 rounded-full bg-green-100">
+          <span class="material-icons text-green-600">inventory_2</span>
+        </div>
+        <h3 class="text-lg font-semibold text-gray-800">Produtos Relacionados</h3>
+      </div>
+      <div class="flex flex-wrap gap-2 mb-4">
+        <span *ngFor="let produto of notificacao.produtosAlerta"
+              class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800 border border-green-200">
+          {{ produto }}
+        </span>
+      </div>
+
+      <!-- Itens monitorados -->
+      <div *ngIf="itensProdutoNaoInspecionados.length > 0"
+           class="mt-4 border border-blue-200 rounded">
+        <!-- Cabeçalho -->
+        <div class="bg-blue-50 text-blue-800 text-xs font-semibold px-3 py-1 rounded-t">
+          {{ itensProdutoNaoInspecionados.length }} {{ itensProdutoNaoInspecionados.length === 1 ? 'item monitorado' : 'itens monitorados' }}
+        </div>
+        <div class="px-3 py-1 text-gray-600 text-xs bg-blue-50 border-t border-blue-200">
+          Itens monitorados correspondem aos itens de um produto que ainda não foram inspecionados. Após a inspeção, deixam de aparecer nesta lista.
+        </div>
+        <!-- Lista -->
+        <div class="max-h-40 overflow-y-auto bg-white">
+          <table class="min-w-full text-xs table-fixed border-collapse">
+            <thead class="bg-blue-50 sticky top-0">
+              <tr>
+                <th class="w-2/5 px-2 py-1 text-left text-blue-800 font-semibold">Nome</th>
+                <th class="w-1/5 px-2 py-1 text-left text-blue-800 font-semibold">Lote</th>
+                <th class="w-1/5 px-2 py-1 text-left text-blue-800 font-semibold">Data de vencimento</th>
+                <th class="w-1/5 px-2 py-1 text-left text-blue-800 font-semibold">Vence em</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let item of itensProdutoNaoInspecionados" class="hover:bg-blue-50">
+                <td class="px-2 py-1 text-gray-600 truncate">{{ item.produto?.descricao || notificacao.produtosAlerta[0] }}</td>
+                <td class="px-2 py-1 font-medium text-gray-700 truncate">{{ item.lote }}</td>
+                <td class="px-2 py-1 text-gray-600">{{ item.dataVencimento ? (item.dataVencimento | date:'dd/MM/yyyy') : 'N/A' }}</td>
+                <td class="px-2 py-1">
+                  <span *ngIf="item.dataVencimento" [class]="getStatusVencimento(item.dataVencimento) + ' rounded-full px-2 py-0.5 whitespace-nowrap'">
+                    {{ getTextoVencimento(item.dataVencimento) }}
+                  </span>
+                  <span *ngIf="!item.dataVencimento" class="text-gray-400 text-xs">N/A</span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Container para cards lado a lado -->
+    <div class="flex flex-col md:flex-row gap-6">
+      <!-- Card Informações de Tempo -->
+      <div class="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200 px-6 py-4 border-l-4 border-purple-400 flex-1">
+        <div class="flex items-center gap-3 mb-4">
+          <div class="p-2 rounded-full bg-purple-100">
+            <span class="material-icons text-purple-600">schedule</span>
+          </div>
+          <h3 class="text-lg font-semibold text-gray-800">Informações de Tempo</h3>
+        </div>
+        <div class="space-y-4">
+          <div class="flex justify-between items-center">
+            <span class="text-base font-medium text-gray-600">Recebida</span>
+            <div class="text-right">
+              <div class="text-lg text-gray-800">{{ formatarDataHora(notificacao.dataEnvio || notificacao.dataCriacao!) }}</div>
+              <div class="text-sm text-gray-500">{{ obterTempoRelativo(notificacao.dataEnvio || notificacao.dataCriacao!) }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card de Status de Leitura (apenas para notificações personalizadas) -->
+      <div *ngIf="ehAlertaPersonalizado()" 
+           class="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200 px-6 py-4 border-l-4 flex-1"
+           [ngClass]="notificacao.lida ? 'border-green-400' : 'border-blue-400'">
+        <div class="flex items-center gap-3 mb-4">
+          <div class="p-2 rounded-full" [ngClass]="notificacao.lida ? 'bg-green-100' : 'bg-blue-100'">
+            <span class="material-icons" [ngClass]="notificacao.lida ? 'text-green-600' : 'text-blue-600'">{{ notificacao.lida ? 'check_circle' : 'mark_email_unread' }}</span>
+          </div>
+          <h3 class="text-lg font-semibold text-gray-800">Status de Leitura</h3>
+        </div>
+        <div class="space-y-4">
+          <div class="flex justify-between items-center">
+            <span class="text-base font-medium text-gray-600">Status</span>
+            <div class="text-lg text-gray-800 font-medium">{{ notificacao.lida ? 'Lida' : 'Não lida' }}</div>
+          </div>
+          <div *ngIf="notificacao.lida" class="flex justify-between items-center">
+            <span class="text-base font-medium text-gray-600">Data da leitura</span>
+            <div class="text-lg text-gray-800">{{ formatarDataHora(notificacao.dataEnvio || notificacao.dataCriacao!) }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card de Status de Inspeção (apenas para notificações automáticas) -->
+    <div *ngIf="ehAlertaAutomatico()" 
+         class="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200 px-6 py-4 border-l-4"
+         [ngClass]="obterCorStatusInspecao()">
+      <div class="flex items-center gap-3 mb-4">
+        <div class="p-2 rounded-full" [ngClass]="obterCorFundoStatusInspecao()">
+          <span class="material-icons" [ngClass]="obterCorIconeStatusInspecao()">{{ obterIconeStatusInspecao() }}</span>
+        </div>
+        <h3 class="text-lg font-semibold text-gray-800">Status de Inspeção</h3>
+      </div>
+      <div class="space-y-4">
+        <div class="flex justify-between items-center">
+          <span class="text-base font-medium text-gray-600">Status</span>
+          <div class="text-lg text-gray-800 font-medium">{{ obterStatusInspecao() }}</div>
+        </div>
+        <div *ngIf="possuiMotivoInspecao()" class="flex justify-between items-center">
+          <span class="text-base font-medium text-gray-600">Motivo</span>
+          <div class="text-lg text-gray-800 font-medium">{{ obterMotivoInspecao() }}</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card Criador -->
+    <div *ngIf="notificacao.usuarioCriador"
+         class="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200 px-6 py-4 border-l-4 border-orange-400">
+      <div class="flex items-center gap-3 mb-4">
+        <div class="p-2 rounded-full bg-orange-100">
+          <span class="material-icons text-orange-600">person</span>
+          </div>
+        <h3 class="text-lg font-semibold text-gray-800">Criado por</h3>
+            </div>
+      <span class="text-lg text-gray-800">{{ notificacao.usuarioCriador }}</span>
+    </div>
+  </div>
+
+
+</div>

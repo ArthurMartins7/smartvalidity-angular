@@ -1,0 +1,212 @@
+<!-- Header padrão Validata -->
+<div class="bg-gray-100 -mx-6 md:-mx-6 py-6 px-8 mb-10">
+  <div class="flex items-center gap-2">
+    <button (click)="voltar()" class="text-gray-600 hover:text-gray-800 transition-colors mr-4">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+      </svg>
+    </button>
+    <div>
+      <div class="text-gray-500 text-base">Notificações</div>
+      <div class="text-3xl font-bold">Central de Notificações</div>
+      <p class="text-gray-800 text-base mt-1">Acompanhe e gerencie todas as notificações do sistema em tempo real.</p>
+    </div>
+  </div>
+</div>
+
+<div class="min-h-screen bg-gray-50 p-6">
+  <div class="max-w-5xl mx-auto">
+    <!-- Abas e ação em lote -->
+    <div class="flex items-center justify-between mb-6">
+      <div class="flex gap-2">
+        <button (click)="setActiveTab('pendentes')"
+                [ngClass]="activeTab==='pendentes' ? 'bg-[#5084C1] text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'"
+                class="px-4 py-2 rounded-lg font-medium transition-colors">
+          Pendentes
+        </button>
+        <button (click)="setActiveTab('jaResolvidas')"
+                [ngClass]="activeTab==='jaResolvidas' ? 'bg-[#5084C1] text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'"
+                class="px-4 py-2 rounded-lg font-medium transition-colors">
+          Já Resolvidas
+        </button>
+        <button (click)="setActiveTab('personalizadas')"
+                [ngClass]="activeTab==='personalizadas' ? 'bg-[#5084C1] text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'"
+                class="px-4 py-2 rounded-lg font-medium transition-colors">
+          Personalizadas
+        </button>
+      </div>
+    </div>
+
+    <!-- Barra de pesquisa -->
+    <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4 mb-4">
+      <div class="flex items-center gap-4">
+        <div class="flex-1 relative">
+          <input
+            type="text"
+            placeholder="Buscar notificações por título ou descrição..."
+            class="w-full pr-10 pl-4 py-2.5 border rounded-full bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-[#5084C1]/20 focus:border-[#5084C1] text-base"
+            [(ngModel)]="filtroTitulo"
+            (ngModelChange)="onSearchInput()"
+            (keyup.enter)="onSearchInput()">
+          <button
+            (click)="onSearchInput()"
+            class="absolute inset-y-0 right-3 flex items-center text-gray-400 hover:text-gray-600 transition-colors duration-200"
+            title="Buscar">
+            <span class="material-icons text-xl">search</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Loading State -->
+    <div *ngIf="carregando" class="bg-white rounded-lg shadow-sm border border-gray-200 p-12 text-center">
+      <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+      <p class="text-gray-500">Carregando notificações...</p>
+    </div>
+
+    <!-- Lista de Notificações -->
+    <div *ngIf="!carregando" class="space-y-4">
+
+      <!-- Notificação Individual -->
+      <div
+        *ngFor="let notificacao of notificacoesFiltradas | slice:(paginaAtual-1)*itensPorPagina:(paginaAtual*itensPorPagina); trackBy: trackByNotificacao"
+        class="bg-white rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow"
+        [class.border-l-4]="true"
+        [ngClass]="obterClasseBordaTipo(notificacao.tipo)">
+
+        <div class="p-6 relative">
+          <div class="flex items-start justify-between">
+            <!-- Conteúdo Principal -->
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center gap-3 mb-2">
+                <!-- Título -->
+                <h3 class="text-lg font-semibold text-gray-900 truncate">
+                  {{ removerEmojis(notificacao.titulo) }}
+                </h3>
+
+                <!-- Badge dinâmico de dias vencidos -->
+                <span *ngIf="deveMostrarBadgeDias(notificacao)"
+                      class="inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 ml-1">
+                  <span class="material-icons text-xs mr-1">schedule</span>
+                  {{ obterTextoDiasVencidos(notificacao) }}
+                </span>
+
+                <!-- Badge de Pendente para notificações não resolvidas -->
+                <span *ngIf="isPendente(notificacao)"
+                      class="inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 animate-pulse ml-1">
+                  <span class="material-icons text-xs mr-1">warning</span>
+                  PENDENTE
+                </span>
+
+                <!-- Badge de Status de Leitura para notificações personalizadas -->
+                <span *ngIf="ehAlertaPersonalizado(notificacao)"
+                      class="inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-medium ml-1"
+                      [ngClass]="notificacao.lida ? 'bg-green-100 text-green-800' : 'bg-blue-100 text-blue-800'">
+                  <span class="material-icons text-xs mr-1">{{ notificacao.lida ? 'check_circle' : 'mark_email_unread' }}</span>
+                  {{ notificacao.lida ? 'LIDA' : 'NÃO LIDA' }}
+                </span>
+              </div>
+
+              <!-- Descrição -->
+              <p class="text-gray-700 mb-3 leading-relaxed">
+                {{ notificacao.descricao }}
+              </p>
+
+              <!-- Informações adicionais -->
+              <div class="flex items-center gap-4 text-sm text-gray-500">
+                <span class="flex items-center gap-1">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  {{ obterTempoRelativo(notificacao.dataCriacao!) }}
+                </span>
+
+                <span *ngIf="notificacao.produtosAlerta && notificacao.produtosAlerta.length > 0"
+                      class="flex items-center gap-1">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                  </svg>
+                  {{ notificacao.produtosAlerta[0] }}
+                </span>
+              </div>
+            </div>
+
+            <!-- Ações -->
+            <div class="flex items-center gap-2 ml-4">
+              <!-- Botão Ver Detalhes -->
+              <button
+                (click)="verDetalhes(notificacao)"
+                class="w-9 h-9 flex items-center justify-center border border-gray-300 rounded text-gray-700 hover:text-gray-900 hover:bg-gray-100 transition"
+                title="Ver detalhes">
+                <span class="material-icons text-base">visibility</span>
+              </button>
+
+              <!-- Botão Excluir (apenas para notificações não personalizadas) -->
+              <button
+                *ngIf="!ehAlertaPersonalizado(notificacao)"
+                (click)="excluirNotificacao(notificacao)"
+                class="w-9 h-9 flex items-center justify-center border border-gray-300 rounded text-red-600 hover:text-red-800 hover:bg-gray-100 transition"
+                title="Excluir notificação">
+                <span class="material-icons text-base">delete</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Estado Vazio -->
+      <div *ngIf="notificacoesFiltradas.length === 0" class="bg-white rounded-lg shadow-sm border border-gray-200 p-12 text-center">
+        <h3 class="text-lg font-medium text-gray-900 mb-2">
+          Nenhuma notificação {{ activeTab === 'pendentes' ? 'pendente' : 'já resolvida' }}
+        </h3>
+        <p class="text-gray-500">
+          {{ activeTab === 'pendentes' ? 'Não há notificações pendentes no momento.' : 'Não há notificações de produtos já inspecionados.' }}
+        </p>
+      </div>
+
+      <!-- Paginação -->
+      <div *ngIf="notificacoesFiltradas.length > 0" class="mt-4 flex justify-between items-center">
+        <!-- Itens por página -->
+        <div class="flex items-center whitespace-nowrap">
+          <span class="text-sm text-gray-600 mr-2">Itens por página:</span>
+          <select [ngModel]="itensPorPagina" (ngModelChange)="alterarItensPorPagina($event)"
+            class="bg-white border border-gray-300 text-gray-700 py-1 px-1 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#5084C1] focus:border-[#5084C1] w-12 text-sm">
+            <option *ngFor="let opcao of opcoesItensPorPagina" [value]="opcao">{{opcao}}</option>
+          </select>
+        </div>
+        <!-- Navegacao -->
+        <div class="flex items-center space-x-2">
+          <!-- Anterior -->
+          <button (click)="voltarPagina()" [disabled]="paginaAtual===1"
+            class="px-3 py-1 text-white rounded-lg transition-colors"
+            style="background-color:#5084C1;"
+            onmouseover="this.style.backgroundColor='#3d6ba3'"
+            onmouseout="this.style.backgroundColor='#5084C1'"
+            [style.opacity]="paginaAtual===1?0.5:1">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
+            </svg>
+          </button>
+          <!-- Pagina atual -->
+          <button class="px-3 py-1 text-white rounded-lg transition-colors"
+            style="background-color:#5084C1;"
+            onmouseover="this.style.backgroundColor='#3d6ba3'"
+            onmouseout="this.style.backgroundColor='#5084C1'">
+            {{paginaAtual}}
+          </button>
+          <!-- Próxima -->
+          <button (click)="avancarPagina()" [disabled]="paginaAtual===totalPaginas"
+            class="px-3 py-1 text-white rounded-lg transition-colors"
+            style="background-color:#5084C1;"
+            onmouseover="this.style.backgroundColor='#3d6ba3'"
+            onmouseout="this.style.backgroundColor='#5084C1'"
+            [style.opacity]="paginaAtual===totalPaginas?0.5:1">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+            </svg>
+        </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

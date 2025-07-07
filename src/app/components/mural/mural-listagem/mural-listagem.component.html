@@ -1,26 +1,28 @@
-<div class="container mx-auto p-4">
-  <!-- Cabeçalho com navegação -->
-  <div class="mb-3">
-    <div class="flex items-center mb-2">
-      <button class="text-blue-600 mr-3" routerLink="/dashboard">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-        </svg>
-      </button>
-      <div>
-        <h5 class="text-gray-500 text-sm">Mural</h5>
-        <h2 class="text-xl font-bold" *ngIf="activeTab === 'proximo'">Produtos próximos do vencimento</h2>
-        <h2 class="text-xl font-bold" *ngIf="activeTab === 'hoje'">Produtos que vencem hoje</h2>
-        <h2 class="text-xl font-bold" *ngIf="activeTab === 'vencido'">Produtos vencidos</h2>
-      </div>
+<!-- Cabeçalho unificado -->
+<div class="bg-gray-100 -mx-6 md:-mx-6 py-6 mb-10">
+  <div class="flex items-center gap-2 px-6">
+    <!-- Ícone seta -->
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6 text-gray-600">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+    </svg>
+
+    <!-- Títulos -->
+    <div>
+      <div class="text-gray-500 text-base">Home</div>
+      <div class="text-3xl font-bold">Mural de Produtos</div>
+      <p class="text-gray-800 text-base mt-1">Monitore produtos próximos ao vencimento (em até 15 dias), que vencem hoje e vencidos. Gerencie inspeções e gere relatórios.</p>
     </div>
-    <div class="w-full h-1 mt-2"
-      [ngClass]="{
-        'bg-yellow-500': activeTab === 'proximo',
-        'bg-red-500': activeTab === 'hoje',
-        'bg-black': activeTab === 'vencido'
-      }"></div>
   </div>
+</div>
+
+<div class="px-6">
+  <!-- Linha de cor indicativa da tab ativa -->
+  <div class="w-full h-1 mb-3"
+       [ngClass]="{
+         'bg-yellow-500': activeTab === 'proximo',
+         'bg-red-500': activeTab === 'hoje',
+         'bg-black': activeTab === 'vencido'
+       }"></div>
 
   <!-- Filtro rápido e pesquisa com botão de ordenação -->
   <div class="mb-3">
@@ -65,13 +67,27 @@
   <app-filtro-tags
     (clearFilter)="clearFilter($event)"
     (clearDateFilter)="clearDateFilter()"
-    (resetAllFilters)="resetAllFilters()">
+    (clearSpecificDateFilter)="clearSpecificDateFilter($event)"
+    (resetAllFilters)="resetAllFilters()"
+    (removeFilterValue)="onRemoveFilterValue($event)">
   </app-filtro-tags>
 
+  <!-- Loading -->
+  <div *ngIf="loading" class="flex justify-center items-center py-10">
+    <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+  </div>
 
+  <!-- Mensagem quando não há itens -->
+  <div *ngIf="!loading && filteredItems.length === 0" class="flex flex-col items-center justify-center py-10 text-gray-500">
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+    </svg>
+    <p class="text-lg font-medium">Nenhum item encontrado</p>
+    <p class="text-sm mt-2">Tente ajustar os filtros ou realizar uma nova busca</p>
+  </div>
 
   <!-- Tabela incorporada diretamente -->
-  <div class="bg-white rounded-lg shadow-md overflow-hidden border border-gray-200">
+  <div *ngIf="!loading && filteredItems.length > 0" class="bg-white rounded-lg shadow-md overflow-hidden border border-gray-200">
     <table class="min-w-full divide-y divide-gray-200">
       <thead class="bg-gray-50">
         <tr>
@@ -121,7 +137,7 @@
   </div>
 
   <!-- Controles unificados: paginação e ações -->
-  <div *ngIf="filteredItems.length > 0" class="mt-4 flex justify-between items-center">
+  <div *ngIf="!loading && filteredItems.length > 0" class="mt-4 flex justify-between items-center">
     <!-- Controles à esquerda: seletor de itens por página -->
     <div class="flex items-center whitespace-nowrap">
       <span class="text-sm text-gray-600 mr-2">Itens por página:</span>
@@ -140,8 +156,13 @@
     <div class="grid grid-cols-[1fr_auto_1fr] gap-6 items-center">
       <!-- Contador posicionado à esquerda -->
       <div class="justify-self-end pr-4">
-        <div *ngIf="hasSelectedItems()" class="text-sm text-black bg-gray-50 border border-gray-200 rounded px-3 py-1">
+        <div *ngIf="hasSelectedItems()" class="text-sm text-black bg-gray-50 border border-gray-200 rounded px-3 py-1 flex items-center">
           Selecionado(s): {{ getSelectedItemsCount() }}
+          <button class="ml-2 focus:outline-none" (click)="cancelarSelecao()" title="Cancelar seleção">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
         </div>
       </div>
 
@@ -153,7 +174,10 @@
           [disabled]="!hasSelectedItems()"
           [class.opacity-50]="!hasSelectedItems()"
           [class.cursor-not-allowed]="!hasSelectedItems()"
-          class="flex items-center bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 transition-colors focus:outline-none">
+          class="flex items-center text-white px-6 py-2 rounded-md transition-colors focus:outline-none"
+          style="background-color:#5084C1;"
+          onmouseover="this.style.backgroundColor='#3d6ba3'"
+          onmouseout="this.style.backgroundColor='#5084C1'">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16" />
           </svg>
@@ -171,7 +195,11 @@
       <button
         (click)="voltarPagina()"
         [disabled]="paginaAtual === 1"
-        class="px-3 py-1 bg-gray-200 text-gray-600 rounded-lg hover:bg-gray-300 disabled:opacity-50">
+        class="px-3 py-1 text-white rounded-lg transition-colors"
+        style="background-color:#5084C1;"
+        onmouseover="this.style.backgroundColor='#3d6ba3'"
+        onmouseout="this.style.backgroundColor='#5084C1'"
+        [style.opacity]="paginaAtual === 1 ? 0.5 : 1">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
           <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
         </svg>
@@ -179,7 +207,10 @@
 
       <!-- Página atual -->
       <button
-        class="px-3 py-1 bg-blue-500 text-white rounded-lg">
+        class="px-3 py-1 text-white rounded-lg transition-colors"
+        style="background-color:#5084C1;"
+        onmouseover="this.style.backgroundColor='#3d6ba3'"
+        onmouseout="this.style.backgroundColor='#5084C1'">
         {{ paginaAtual }}
       </button>
 
@@ -187,7 +218,11 @@
       <button
         (click)="avancarPagina()"
         [disabled]="paginaAtual === totalPaginas"
-        class="px-3 py-1 bg-gray-200 text-gray-600 rounded-lg hover:bg-gray-300 disabled:opacity-50">
+        class="px-3 py-1 text-white rounded-lg transition-colors"
+        style="background-color:#5084C1;"
+        onmouseover="this.style.backgroundColor='#3d6ba3'"
+        onmouseout="this.style.backgroundColor='#5084C1'"
+        [style.opacity]="paginaAtual === totalPaginas ? 0.5 : 1">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
           <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
         </svg>
@@ -210,6 +245,8 @@
   <app-modal-acoes
     [itensPaginaAtual]="filteredItems"
     [totalItensAba]="totalItensAba"
+    [nomeAba]="nomeAbaAtual"
+    [numeroPaginaAtual]="paginaAtual"
     (acaoSelecionada)="onAcaoSelecionada($event)">
   </app-modal-acoes>
 </div>

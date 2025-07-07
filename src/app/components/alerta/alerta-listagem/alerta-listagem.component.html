@@ -1,0 +1,259 @@
+<!-- cabeçalho padrão -->
+<div class="bg-gray-100 -mx-6 md:-mx-6 py-6 mb-10">
+  <div class="flex items-center gap-2 px-6">
+
+    <span class="material-icons text-gray-600" style="font-size: 24px;">keyboard_arrow_right</span>
+
+    <!-- títulos -->
+    <div>
+      <div class="text-gray-500 text-base">Home</div>
+      <div class="text-3xl font-bold">Gestão de Alertas</div>
+      <p class="text-gray-800 text-base mt-1">Gerencie alertas automáticos e personalizados para manter sua equipe sempre informada sobre vencimentos e eventos importantes.</p>
+    </div>
+  </div>
+</div>
+
+<div class="px-3 pt-2 pb-3 bg-white-100">
+
+  <!-- Abas -->
+  <div class="flex items-center justify-between mb-6">
+    <div class="flex gap-2">
+      <button (click)="setActiveTab('ativos')"
+              [ngClass]="activeTab==='ativos' ? 'bg-[#5084C1] text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'"
+              class="px-4 py-2 rounded-lg font-medium transition-colors">
+        Pendentes
+      </button>
+      <button (click)="setActiveTab('jaResolvidos')"
+              [ngClass]="activeTab==='jaResolvidos' ? 'bg-[#5084C1] text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'"
+              class="px-4 py-2 rounded-lg font-medium transition-colors">
+        Já Resolvidos
+      </button>
+      <button (click)="setActiveTab('personalizados')"
+              [ngClass]="activeTab==='personalizados' ? 'bg-[#5084C1] text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'"
+              class="px-4 py-2 rounded-lg font-medium transition-colors">
+        Personalizados
+      </button>
+    </div>
+  </div>
+
+  <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4 mb-4">
+    <div class="flex flex-col md:flex-row items-stretch md:items-center gap-4">
+
+      <div class="flex-1 relative">
+        <input
+          type="text"
+          placeholder="Buscar alertas por título ou descrição..."
+          class="w-full pr-10 pl-4 py-2.5 border rounded-full bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-[#5084C1]/20 focus:border-[#5084C1] text-base"
+          [(ngModel)]="filtroTitulo"
+          (ngModelChange)="onSearchInput()"
+          (keyup.enter)="realizarPesquisa()">
+        <button
+          (click)="realizarPesquisa()"
+          class="absolute inset-y-0 right-3 flex items-center text-gray-400 hover:text-gray-600 transition-colors duration-200"
+          title="Buscar">
+          <span *ngIf="!buscando" class="material-icons text-xl">search</span>
+          <svg *ngIf="buscando" class="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+        </button>
+      </div>
+
+      <button (click)="adicionarAlerta()"
+        class="bg-gradient-to-r from-[#5084C1] to-[#4071a8] hover:from-[#4071a8] hover:to-[#365f8a] text-white px-3 md:px-4 py-2.5 rounded-xl flex items-center justify-center transition-all duration-200 transform hover:scale-105 shadow-md hover:shadow-lg font-medium">
+        <span class="material-icons text-base mr-0 md:mr-2">add</span>
+        <span class="hidden md:inline text-sm font-semibold">Criar Alerta</span>
+      </button>
+    </div>
+
+    <div *ngIf="mostrarFiltros"
+         cdkDrag
+         cdkDragBoundary=".p-3"
+         cdkDragHandle
+         class="absolute z-10 mt-2 w-96 bg-white rounded-lg shadow-lg border border-gray-200 cursor-move">
+      <div class="p-3">
+        <div class="flex justify-between items-center mb-3">
+          <h3 class="text-base font-semibold">Filtros</h3>
+          <button
+            (click)="toggleFiltros()"
+            class="text-gray-400 hover:text-gray-600">
+            <span class="material-icons text-xl">close</span>
+          </button>
+        </div>
+
+        <div class="space-y-3">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Tipo de Alerta</label>
+            <select
+              [(ngModel)]="filtroTipo"
+              class="w-full px-3 py-1.5 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#5084C1] focus:border-[#5084C1] text-sm">
+              <option [ngValue]="null">Todos os tipos</option>
+              <option *ngFor="let tipo of tiposAlerta" [ngValue]="tipo">
+                {{ obterDescricaoTipo(tipo) }}
+              </option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Produto</label>
+            <select
+              [(ngModel)]="filtroProduto"
+              class="w-full px-3 py-1.5 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#5084C1] focus:border-[#5084C1] text-sm">
+              <option [ngValue]="null">Todos os produtos</option>
+              <option *ngFor="let produto of produtos" [ngValue]="produto">
+                {{ produto.descricao }}
+              </option>
+            </select>
+          </div>
+
+          <div class="grid grid-cols-2 gap-2">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Data Início</label>
+              <input
+                type="date"
+                [(ngModel)]="filtroDataInicio"
+                class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#5084C1] focus:border-[#5084C1]">
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Data Fim</label>
+              <input
+                type="date"
+                [(ngModel)]="filtroDataFim"
+                class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#5084C1] focus:border-[#5084C1]">
+            </div>
+          </div>
+        </div>
+
+        <div class="flex justify-end space-x-2 mt-4">
+          <button
+            type="button"
+            (click)="limparFiltros()"
+            class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200">
+            Limpar
+          </button>
+          <button
+            type="button"
+            (click)="aplicarFiltros()"
+            class="px-4 py-2 text-sm font-medium text-white bg-[#5084C1] rounded-lg hover:bg-[#5084C1]/90">
+            Aplicar
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="loading" class="flex justify-center items-center py-10">
+    <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+  </div>
+
+  <!-- Mensagem quando não há itens -->
+  <div *ngIf="!loading && alertas.length === 0" class="flex flex-col items-center justify-center py-10 text-gray-500">
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+    </svg>
+    <p class="text-lg font-medium">Nenhum alerta encontrado</p>
+    <p class="text-sm mt-2">Crie um novo alerta ou ajuste os filtros de busca</p>
+  </div>
+
+  <!-- Tabela -->
+  <div *ngIf="!loading && alertas.length > 0" class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+    <div class="overflow-x-auto">
+      <table class="min-w-full divide-y divide-gray-200">
+        <thead class="bg-gray-50">
+          <tr>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <div class="flex items-center gap-2">
+                <span class="material-icons text-base">warning</span>
+                Alerta
+              </div>
+            </th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden md:table-cell">Tipo</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden lg:table-cell">Data Disparo</th>
+            <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Ações</th>
+          </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-gray-200">
+          <tr *ngFor="let alerta of alertas; trackBy: trackByAlerta"
+              class="hover:bg-gray-50 transition-colors duration-150"
+              [class.border-l-2]="obterPrioridadeAlerta(alerta) !== 'normal'"
+              [class.border-l-gray-300]="obterPrioridadeAlerta(alerta) !== 'normal'"
+              [class.bg-gray-50]="false">
+            <td class="px-6 py-4 whitespace-nowrap">
+              <div class="flex items-start gap-3">
+                <!-- Indicador de Prioridade -->
+                <div class="flex-shrink-0 mt-1">
+                  <div *ngIf="obterPrioridadeAlerta(alerta) === 'alta'"
+                       class="w-2 h-2 rounded-full indicador-vencido"
+                       [title]="obterTituloIndicadorPrioridade(alerta)"></div>
+                  <div *ngIf="obterPrioridadeAlerta(alerta) === 'media'"
+                       class="w-2 h-2 rounded-full indicador-hoje"
+                       [title]="obterTituloIndicadorPrioridade(alerta)"></div>
+                  <div *ngIf="obterPrioridadeAlerta(alerta) === 'baixa'"
+                       class="w-2 h-2 rounded-full indicador-amanha"
+                       [title]="obterTituloIndicadorPrioridade(alerta)"></div>
+                  <div *ngIf="obterPrioridadeAlerta(alerta) === 'normal'"
+                       class="w-2 h-2 rounded-full indicador-normal"
+                       [title]="obterTituloIndicadorPrioridade(alerta)"></div>
+                </div>
+
+                <div class="flex-1 min-w-0">
+                  <div class="flex items-center gap-2">
+                    <div class="text-sm font-medium text-gray-900 truncate">{{ removerEmojis(alerta.titulo) }}</div>
+                    
+                    <!-- Badge dinâmico de dias vencidos -->
+                    <span *ngIf="deveMostrarBadgeDias(alerta)"
+                          class="inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 ml-1">
+                      <span class="material-icons text-xs mr-1">schedule</span>
+                      {{ obterTextoDiasVencidos(alerta) }}
+                    </span>
+                  </div>
+                  <div class="text-sm text-gray-500 max-w-xs truncate mt-1" [title]="alerta.descricao">{{ alerta.descricao }}</div>
+                </div>
+              </div>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap hidden md:table-cell">
+              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
+                    [class]="obterCorTipo(alerta.tipo)">
+                {{ obterDescricaoTipo(alerta.tipo) }}
+              </span>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 hidden lg:table-cell">
+              {{ formatarDataHora(alerta.dataHoraDisparo) }}
+            </td>
+            <td class="pl-0 pr-4 py-3 flex items-center gap-1 md:gap-1.5 lg:gap-2 justify-end sticky right-0 bg-inherit z-10">
+              <button class="w-6 h-6 md:w-7 md:h-7 lg:w-8 lg:h-8 flex items-center justify-center border border-gray-300 rounded text-gray-700 hover:text-gray-900 hover:bg-gray-100 transition" (click)="visualizarAlerta(alerta)" title="Visualizar">
+                <span class="material-icons text-[10px] md:text-xs lg:text-sm">visibility</span>
+              </button>
+              <button *ngIf="alerta.tipo === 'PERSONALIZADO'" class="w-6 h-6 md:w-7 md:h-7 lg:w-8 lg:h-8 flex items-center justify-center border border-gray-300 rounded text-gray-700 hover:text-gray-900 hover:bg-gray-100 transition" (click)="editarAlerta(alerta)" title="Editar">
+                <span class="material-icons text-[10px] md:text-xs lg:text-sm">edit</span>
+              </button>
+              <button class="w-6 h-6 md:w-7 md:h-7 lg:w-8 lg:h-8 flex items-center justify-center border border-gray-300 rounded text-red-600 hover:text-red-800 hover:bg-gray-100 transition" (click)="excluirAlerta(alerta)" title="Excluir">
+                <span class="material-icons text-[10px] md:text-xs lg:text-sm">delete</span>
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="flex items-center justify-between mt-4" *ngIf="alertas.length > 0">
+    <div class="flex items-center gap-2">
+      <span class="text-gray-700">Itens por página:</span>
+      <select class="border rounded w-12 h-7 text-center text-sm" [(ngModel)]="itensPorPagina" (ngModelChange)="alterarItensPorPagina()">
+        <option *ngFor="let opcao of opcoesItensPorPagina" [value]="opcao">{{ opcao }}</option>
+      </select>
+    </div>
+
+    <div class="flex items-center gap-2">
+      <button (click)="voltarPagina()" [disabled]="seletor.pagina === 1" class="w-8 h-8 flex items-center justify-center rounded bg-gray-200 disabled:opacity-50">
+        <span class="material-icons text-sm">chevron_left</span>
+      </button>
+      <span class="w-8 h-8 flex items-center justify-center rounded bg-[#5084C1] text-white select-none">{{ seletor.pagina }}</span>
+      <button (click)="avancarPagina()" [disabled]="seletor.pagina === totalPaginas" class="w-8 h-8 flex items-center justify-center rounded bg-gray-200 disabled:opacity-50">
+        <span class="material-icons text-sm">chevron_right</span>
+      </button>
+    </div>
+  </div>
+</div>

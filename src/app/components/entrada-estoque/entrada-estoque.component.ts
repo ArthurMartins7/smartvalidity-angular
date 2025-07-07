@@ -21,6 +21,8 @@ export class EntradaEstoqueComponent implements OnInit {
   formData = {
     produto: '',
     lote: '',
+    precoVenda: null as number | null,
+    quantidade: 1,
     dataRecebimento: '',
     horaRecebimento: '',
     dataFabricacao: '',
@@ -74,10 +76,11 @@ export class EntradaEstoqueComponent implements OnInit {
 
   onSubmit() {
     console.log('Form Data:', this.formData);
-    
+
     const camposVazios = [];
     if (!this.formData.produto) camposVazios.push('Produto');
     if (!this.formData.lote) camposVazios.push('Lote');
+    if (this.formData.precoVenda === null) camposVazios.push('Preço de Venda');
     if (!this.formData.dataRecebimento) camposVazios.push('Data de Recebimento');
     if (!this.formData.dataFabricacao) camposVazios.push('Data de Fabricação');
     if (!this.formData.dataVencimento) camposVazios.push('Data de Vencimento');
@@ -103,7 +106,7 @@ export class EntradaEstoqueComponent implements OnInit {
 
     const itemProduto: ItemProdutoDTO = {
       lote: this.formData.lote,
-      precoVenda: 0,
+      precoVenda: Number(this.formData.precoVenda),
       dataFabricacao: formatarData(this.formData.dataFabricacao, this.formData.horaFabricacao),
       dataVencimento: formatarData(this.formData.dataVencimento, this.formData.horaVencimento),
       dataRecebimento: formatarData(this.formData.dataRecebimento, this.formData.horaRecebimento),
@@ -119,18 +122,21 @@ export class EntradaEstoqueComponent implements OnInit {
           nome: produtoSelecionado.categoria.nome,
           produtos: []
         }
-      }
+      },
+      quantidade: this.formData.quantidade
     };
 
     console.log('ItemProduto a ser enviado:', JSON.stringify(itemProduto, null, 2));
 
     this.itemProdutoService.criarItemProduto(itemProduto).subscribe({
-      next: () => {
+      next: (response) => {
         Swal.fire('Sucesso', 'Entrada de estoque registrada com sucesso', 'success');
         // Limpar formulário ou redirecionar
         this.formData = {
           produto: '',
           lote: '',
+          precoVenda: null,
+          quantidade: 1,
           dataRecebimento: '',
           horaRecebimento: '',
           dataFabricacao: '',
@@ -139,6 +145,7 @@ export class EntradaEstoqueComponent implements OnInit {
           horaVencimento: ''
         };
         this.produtoSelecionado = null;
+        this.router.navigate(['/mural-listagem']);
       },
       error: (erro) => {
         console.error('Erro completo:', erro);
@@ -149,7 +156,7 @@ export class EntradaEstoqueComponent implements OnInit {
           headers: erro.headers,
           url: erro.url
         });
-        
+
         let mensagemErro = 'Não foi possível registrar a entrada de estoque';
         if (erro.error?.message) {
           mensagemErro = erro.error.message;
@@ -162,6 +169,6 @@ export class EntradaEstoqueComponent implements OnInit {
   }
 
   voltar(): void {
-    this.router.navigate(['/produto-listagem']);
+    this.router.navigate(['/mural-listagem']);
   }
 }

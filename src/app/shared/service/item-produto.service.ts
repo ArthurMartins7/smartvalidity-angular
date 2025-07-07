@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { ItemProdutoDTO } from '../model/dto/item-Produto.dto'
@@ -23,6 +23,14 @@ export class ItemProdutoService {
 
   buscarPorProduto(produtoId: string): Observable<ItemProdutoDTO[]> {
     return this.httpClient.get<ItemProdutoDTO[]>(`${this.API}/produto/${produtoId}`);
+  }
+
+  /**
+   * Busca itens-produto não inspecionados de um produto específico
+   * Para uso em alertas personalizados
+   */
+  buscarItensProdutoNaoInspecionadosPorProduto(produtoId: string): Observable<ItemProdutoDTO[]> {
+    return this.httpClient.get<ItemProdutoDTO[]>(`${this.API}/produto/${produtoId}/nao-inspecionados`);
   }
 
   criarItemProduto(novoItemProduto: ItemProdutoDTO): Observable<ItemProdutoDTO> {

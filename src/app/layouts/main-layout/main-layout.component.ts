@@ -1,3 +1,4 @@
+/*
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
@@ -13,3 +14,4 @@ import { SidebarComponent } from '../../shared/ui/sidebar/sidebar.component';
   `
 })
 export class MainLayoutComponent {}
+*/

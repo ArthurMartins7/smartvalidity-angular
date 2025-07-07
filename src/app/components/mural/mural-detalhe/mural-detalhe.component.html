@@ -1,210 +1,227 @@
-<div class="container mx-auto px-4 py-6 max-w-4xl">
-  <!-- Cabeçalho com navegação -->
-  <div class="flex items-center mb-4">
-    <button class="text-blue-600 mr-3" [routerLink]="['/mural-listagem']" [queryParams]="{tab: activeTab}">
-      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-      </svg>
-    </button>
-    <div>
-      <h5 class="text-gray-500 text-sm font-medium">Voltar para listagem</h5>
-      <h2 class="text-xl font-bold">Detalhes do Produto</h2>
-    </div>
-  </div>
-  <div class="w-full bg-gray-300 h-px mb-6"></div>
+<!-- Cabeçalho unificado -->
+<div class="bg-gray-100 -mx-6 md:-mx-6 py-6 mb-10">
+  <div class="flex items-center gap-2 px-6">
+    <!-- Botão voltar -->
+    <button (click)="voltar()" class="p-1 hover:bg-gray-200 rounded transition-colors">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6 text-gray-600">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+    </svg>
+  </button>
 
-  <!-- Loading e erros -->
-  <div *ngIf="loading" class="flex justify-center items-center py-10">
-    <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-  </div>
-
-  <div *ngIf="error" class="bg-red-100 border-l-4 border-red-500 text-red-700 px-4 py-3 rounded mb-4">
-    <p>{{ error }}</p>
-  </div>
-
-  <!-- Card principal -->
-  <div *ngIf="item && !loading" class="bg-white rounded-lg shadow-md overflow-hidden">
-    <!-- Cabeçalho do card -->
-    <div class="bg-gray-50 p-4 border-b">
-      <div class="flex items-center justify-between">
-        <h3 class="text-lg font-bold text-gray-800">{{ item.produto.descricao }}</h3>
-        <div class="px-3 py-1 rounded-full text-xs font-semibold"
-             [ngClass]="{
-               'bg-yellow-100 text-yellow-800': item.status === 'proximo',
-               'bg-orange-100 text-orange-800': item.status === 'hoje',
-               'bg-red-100 text-red-800': item.status === 'vencido'
-             }">
-          {{ item.status === 'proximo' ? 'Próximo a vencer' :
-             item.status === 'hoje' ? 'Vence hoje' :
-             'Vencido' }}
-        </div>
-      </div>
-    </div>
-
-    <!-- Conteúdo do card -->
-    <div class="p-5">
-      <!-- Seção de informações principais -->
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-        <div>
-          <div class="mb-4">
-            <h4 class="text-sm font-semibold text-gray-500 mb-1">CÓDIGO DE BARRAS</h4>
-            <p class="font-medium text-gray-900">{{ item.produto.codigoBarras }}</p>
-          </div>
-
-          <div class="mb-4">
-            <h4 class="text-sm font-semibold text-gray-500 mb-1">MARCA</h4>
-            <p class="font-medium text-gray-900">{{ item.produto.marca }}</p>
-          </div>
-
-          <div class="mb-4">
-            <h4 class="text-sm font-semibold text-gray-500 mb-1">FORNECEDOR</h4>
-            <p class="font-medium text-gray-900">{{ item.fornecedor }}</p>
-          </div>
-
-          <div>
-            <h4 class="text-sm font-semibold text-gray-500 mb-1">LOTE</h4>
-            <p class="font-medium text-gray-900">{{ item.lote }}</p>
-          </div>
-        </div>
-
-        <div>
-          <div class="mb-4">
-            <h4 class="text-sm font-semibold text-gray-500 mb-1">CATEGORIA</h4>
-            <p class="font-medium text-gray-900">{{ item.categoria }}</p>
-          </div>
-
-          <div class="mb-4">
-            <h4 class="text-sm font-semibold text-gray-500 mb-1">CORREDOR</h4>
-            <p class="font-medium text-gray-900">{{ item.corredor }}</p>
-          </div>
-
-          <div class="mb-4">
-            <h4 class="text-sm font-semibold text-gray-500 mb-1">UNIDADE DE MEDIDA</h4>
-            <p class="font-medium text-gray-900">{{ item.produto.unidadeMedida }}</p>
-          </div>
-
-          <div>
-            <h4 class="text-sm font-semibold text-gray-500 mb-1">PREÇO DE VENDA</h4>
-            <p class="font-medium text-gray-900">R$ {{ item.precoVenda | number:'1.2-2' }}</p>
-          </div>
-        </div>
-      </div>
-
-      <!-- Seção de datas -->
-      <div class="bg-gray-50 p-4 rounded-md mb-6">
-        <h4 class="text-sm font-bold text-gray-700 mb-3">INFORMAÇÕES DE PRAZOS</h4>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div>
-            <h5 class="text-xs font-semibold text-gray-500 mb-1">DATA DE FABRICAÇÃO</h5>
-            <p class="font-medium text-gray-900">{{ item.dataFabricacao | date:'dd/MM/yyyy' }}</p>
-            <p class="text-xs text-gray-500">{{ item.dataFabricacao | date:'HH:mm:ss' }}</p>
-          </div>
-
-          <div>
-            <h5 class="text-xs font-semibold text-gray-500 mb-1">DATA DE RECEBIMENTO</h5>
-            <p class="font-medium text-gray-900">{{ item.dataRecebimento | date:'dd/MM/yyyy' }}</p>
-          </div>
-
-          <div>
-            <h5 class="text-xs font-semibold text-gray-500 mb-1">DATA DE VENCIMENTO</h5>
-            <p class="font-medium text-gray-900">{{ item.dataValidade | date:'dd/MM/yyyy' }}</p>
-            <p class="text-xs text-gray-500">{{ item.dataValidade | date:'HH:mm:ss' }}</p>
-          </div>
-        </div>
-      </div>
-
-      <!-- Status de inspeção -->
-      <div class="border rounded-md p-4 mb-6">
-        <div class="flex flex-col md:flex-row md:items-start md:justify-between">
-          <div>
-            <h4 class="text-sm font-bold text-gray-700 mb-1">STATUS DE INSPEÇÃO</h4>
-            <div class="flex items-center">
-              <div class="w-3 h-3 rounded-full mr-2"
-                  [ngClass]="{'bg-green-500': item.inspecionado, 'bg-red-500': !item.inspecionado}"></div>
-              <p class="font-medium"
-                 [ngClass]="{'text-green-600': item.inspecionado, 'text-red-600': !item.inspecionado}">
-                {{ item.inspecionado ? 'Inspecionado' : 'Não inspecionado' }}
-              </p>
-            </div>
-            <p *ngIf="item.inspecionado && item.motivoInspecao" class="text-sm text-gray-500 mt-1">
-              Motivo: {{ item.motivoInspecao }}
-            </p>
-            <p *ngIf="item.inspecionado && item.usuarioInspecao" class="text-sm text-gray-500 mt-1">
-              Inspecionado por: {{ item.usuarioInspecao }}
-            </p>
-            <p *ngIf="item.inspecionado && item.dataHoraInspecao" class="text-sm text-gray-500 mt-1">
-              Data/hora: {{ item.dataHoraInspecao | date:'dd/MM/yyyy HH:mm:ss' }}
-            </p>
-          </div>
-
-          <div *ngIf="!item.inspecionado" class="relative md:min-w-[320px] mt-4 md:mt-0">
-            <button
-              (click)="toggleMotivosDropdown()"
-              class="px-3 py-1 border border-gray-300 rounded-lg flex items-center justify-between bg-white hover:bg-gray-50 text-sm w-full md:max-w-[320px]"
-              [class.border-red-500]="motivoError"
-            >
-              <span class="font-medium">{{ motivoInspecao || 'Selecione um motivo' }}</span>
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-              </svg>
-            </button>
-
-            <div *ngIf="showMotivosDropdown" class="absolute z-10 right-0 w-full md:max-w-[320px] mt-1 bg-white border border-gray-300 rounded-md shadow-lg">
-              <div *ngFor="let motivo of motivosInspecao"
-                  (click)="selecionarMotivo(motivo)"
-                  class="px-4 py-2 text-sm hover:bg-gray-100 cursor-pointer">
-                {{ motivo }}
-              </div>
-            </div>
-
-            <!-- Campo para motivo customizado -->
-            <div *ngIf="motivoInspecao === 'Outro'" class="mt-2">
-              <input
-                type="text"
-                [(ngModel)]="motivoCustomizado"
-                placeholder="Informe o motivo da inspeção"
-                class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-sm"
-              />
-            </div>
-          </div>
-        </div>
-
-        <!-- Mensagem de erro específica para o motivo -->
-        <div *ngIf="motivoError" class="mt-2 text-red-500 text-sm">
-          {{ motivoError }}
-        </div>
-      </div>
-    </div>
-
-    <!-- Rodapé com botão de ação -->
-    <div class="border-t px-5 py-4 flex justify-end">
-      <button
-        *ngIf="!item.inspecionado"
-        (click)="marcarInspecionado()"
-        [disabled]="processandoInspecao || !motivoInspecao || (motivoInspecao === 'Outro' && !motivoCustomizado)"
-        class="flex items-center px-5 py-2 rounded-md text-sm font-medium focus:outline-none"
-        [ngClass]="{
-          'bg-blue-600 text-white hover:bg-blue-700 transition-colors': !processandoInspecao && !(motivoInspecao === 'Outro' && !motivoCustomizado),
-          'bg-gray-400 text-white cursor-not-allowed': processandoInspecao || (motivoInspecao === 'Outro' && !motivoCustomizado)
-        }">
-        <ng-container *ngIf="!processandoInspecao">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-          </svg>
-          Marcar como inspecionado
-        </ng-container>
-        <ng-container *ngIf="processandoInspecao">
-          <div class="animate-spin rounded-full h-4 w-4 mr-2 border-t-2 border-b-2 border-white"></div>
-          Processando...
-        </ng-container>
-      </button>
-
-      <div *ngIf="item.inspecionado" class="flex items-center text-green-600">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-        </svg>
-        <span class="font-medium">Produto já inspecionado</span>
-      </div>
+    <!-- Títulos -->
+  <div>
+      <div class="text-gray-500 text-base cursor-pointer hover:underline" (click)="voltar()">Mural de Produtos</div>
+      <div class="text-3xl font-bold">Detalhes do Produto</div>
+      <p class="text-gray-800 text-base mt-1">Informações detalhadas do lote selecionado e status de inspeção.</p>
     </div>
   </div>
 </div>
+
+<!-- Loading e erros -->
+<div *ngIf="loading" class="flex justify-center items-center py-10">
+  <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+</div>
+
+<div *ngIf="error" class="bg-red-100 border-l-4 border-red-500 text-red-700 px-4 py-3 rounded mb-4 mx-6">
+  <p>{{ error }}</p>
+</div>
+
+<!-- Card principal -->
+<div *ngIf="item && !loading" class="bg-white rounded-lg shadow-md overflow-hidden mx-6">
+  <!-- Cabeçalho do card -->
+  <div class="bg-gray-50 p-4 border-b">
+    <div class="flex flex-col items-center">
+      <h3 class="text-2xl font-bold text-gray-800 text-center w-full">{{ item.produto.descricao }}</h3>
+    </div>
+  </div>
+
+  <!-- Cards temáticos -->
+  <div class="p-6 space-y-6">
+    <!-- Card Status Principal -->
+    <div class="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg px-4 py-3 border-l-4"
+         [ngClass]="{
+           'border-yellow-400': item.status === 'proximo',
+           'border-orange-400': item.status === 'hoje',
+           'border-red-400': item.status === 'vencido'
+         }">
+      <div class="flex items-center justify-between w-full">
+        <div class="flex items-center gap-3">
+          <div class="p-1.5 rounded-full"
+               [ngClass]="{
+                 'bg-yellow-100': item.status === 'proximo',
+                 'bg-orange-100': item.status === 'hoje',
+                 'bg-red-100': item.status === 'vencido'
+               }">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5"
+                 [ngClass]="{
+                   'text-yellow-600': item.status === 'proximo',
+                   'text-orange-600': item.status === 'hoje',
+                   'text-red-600': item.status === 'vencido'
+                 }" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </div>
+      <div class="flex items-center gap-3">
+            <h3 class="text-lg font-semibold text-gray-800">Status do Produto:</h3>
+            <p class="text-xl font-bold"
+           [ngClass]="{
+                 'text-yellow-700': item.status === 'proximo',
+                 'text-orange-700': item.status === 'hoje',
+                 'text-red-700': item.status === 'vencido'
+           }">
+        {{ item.status === 'proximo' ? 'Próximo a vencer' :
+           item.status === 'hoje' ? 'Vence hoje' :
+           'Vencido' }}
+            </p>
+    </div>
+  </div>
+    <button
+      *ngIf="!item.inspecionado"
+        (click)="abrirModalInspecao()"
+        [disabled]="processandoInspecao"
+          class="flex items-center px-4 py-1.5 rounded-md text-base font-semibold focus:outline-none text-white transition-colors ml-4"
+        style="background-color:#5084C1;"
+        onmouseover="this.style.backgroundColor='#3d6ba3'"
+        onmouseout="this.style.backgroundColor='#5084C1'">
+      <ng-container *ngIf="!processandoInspecao">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+        </svg>
+          Inspecionar
+      </ng-container>
+      <ng-container *ngIf="processandoInspecao">
+        <div class="animate-spin rounded-full h-4 w-4 mr-2 border-t-2 border-b-2 border-white"></div>
+        Processando...
+      </ng-container>
+    </button>
+        <div *ngIf="item.inspecionado" class="flex items-center px-4 py-1.5 bg-green-100 text-green-800 rounded-md text-base font-medium ml-4">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+          </svg>
+          <span>Produto já inspecionado</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card Inspeção (quando aplicável) -->
+    <div *ngIf="item.inspecionado" class="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200 px-6 py-3 border-l-4 border-emerald-400 mb-6">
+      <div class="flex items-center gap-3 mb-4">
+        <div class="p-2 bg-emerald-100 rounded-full">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+        </div>
+        <h3 class="text-lg font-semibold text-gray-800">Informações da Inspeção</h3>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div *ngIf="item.motivoInspecao" class="text-center">
+          <div class="text-base font-medium text-gray-600 mb-2">Motivo</div>
+          <div class="text-lg text-gray-800">{{ item.motivoInspecao }}</div>
+        </div>
+        <div *ngIf="item.usuarioInspecao" class="text-center">
+          <div class="text-base font-medium text-gray-600 mb-2">Inspecionado por</div>
+          <div class="text-lg text-gray-800">{{ item.usuarioInspecao }}</div>
+        </div>
+        <div *ngIf="item.dataHoraInspecao" class="text-center">
+          <div class="text-base font-medium text-gray-600 mb-2">Data/Hora</div>
+          <div class="text-lg text-gray-800">{{ item.dataHoraInspecao | date:'dd/MM/yyyy HH:mm:ss' }}</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Grid de Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+      <!-- Card Informações Básicas -->
+      <div class="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200 px-6 py-3 border-l-4 border-blue-400">
+        <div class="flex items-center gap-3 mb-4">
+          <div class="p-2 bg-blue-100 rounded-full">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+            </svg>
+          </div>
+          <h3 class="text-lg font-semibold text-gray-800">Informações Básicas</h3>
+        </div>
+        <div class="space-y-4">
+          <div class="flex justify-between items-center">
+            <span class="text-base font-medium text-gray-600">Código de Barras</span>
+            <span class="text-lg text-gray-800 font-mono">{{ item.produto.codigoBarras }}</span>
+          </div>
+          <div class="flex justify-between items-center">
+            <span class="text-base font-medium text-gray-600">Marca</span>
+            <span class="text-lg text-gray-800">{{ item.produto.marca }}</span>
+          </div>
+          <div class="flex justify-between items-center">
+            <span class="text-base font-medium text-gray-600">Lote</span>
+            <span class="text-lg text-gray-800 font-mono">{{ item.lote }}</span>
+          </div>
+    </div>
+  </div>
+
+      <!-- Card Localização -->
+      <div class="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200 px-6 py-3 border-l-4 border-green-400">
+        <div class="flex items-center gap-3 mb-4">
+          <div class="p-2 bg-green-100 rounded-full">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+            </svg>
+          </div>
+          <h3 class="text-lg font-semibold text-gray-800">Encontre o produto</h3>
+        </div>
+        <div class="space-y-4">
+          <div class="flex justify-between items-center">
+            <span class="text-base font-medium text-gray-600">Corredor</span>
+            <span class="text-lg text-gray-800">{{ item.corredor }}</span>
+          </div>
+          <div class="flex justify-between items-center">
+            <span class="text-base font-medium text-gray-600">Categoria</span>
+            <span class="text-lg text-gray-800">{{ item.categoria }}</span>
+          </div>
+          <div class="flex justify-between items-center">
+            <span class="text-base font-medium text-gray-600 flex-shrink-0">Fornecedor</span>
+            <span class="text-base text-gray-800 text-right ml-4">{{ item.fornecedor }}</span>
+          </div>
+        </div>
+  </div>
+
+      <!-- Card Cronologia -->
+      <div class="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200 px-6 py-3 border-l-4 border-purple-400">
+        <div class="flex items-center gap-3 mb-4">
+          <div class="p-2 bg-purple-100 rounded-full">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+      </svg>
+          </div>
+          <h3 class="text-lg font-semibold text-gray-800">Datas</h3>
+        </div>
+        <div class="space-y-4">
+          <div class="flex justify-between items-center">
+            <span class="text-base font-medium text-gray-600">Fabricação</span>
+            <div class="text-right">
+              <div class="text-lg text-gray-800">{{ item.dataFabricacao | date:'dd/MM/yyyy' }}</div>
+              <div class="text-sm text-gray-500">{{ item.dataFabricacao | date:'HH:mm:ss' }}</div>
+            </div>
+          </div>
+          <div class="flex justify-between items-center">
+            <span class="text-base font-medium text-gray-600">Recebimento</span>
+            <span class="text-lg text-gray-800">{{ item.dataRecebimento | date:'dd/MM/yyyy' }}</span>
+          </div>
+          <div class="flex justify-between items-center">
+            <span class="text-base font-medium text-gray-600">Vencimento</span>
+            <div class="text-right">
+              <div class="text-lg text-gray-800">{{ item.dataValidade | date:'dd/MM/yyyy' }}</div>
+              <div class="text-sm text-gray-500">{{ item.dataValidade | date:'HH:mm:ss' }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+
+</div>
+
+<!-- Modal de inspeção -->
+<app-modal-inspecao (inspecaoConfirmada)="onInspecaoConfirmada()"></app-modal-inspecao>

@@ -1,0 +1,253 @@
+<!-- cabeçalho padrão -->
+<div class="bg-gray-100 -mx-6 md:-mx-6 py-6 mb-10">
+  <div class="flex items-center gap-2 px-6">
+    <!-- ícone de seta (voltar)-->
+    <button (click)="voltar()" class="p-1 hover:bg-gray-200 rounded transition-colors">
+      <span class="material-icons text-gray-600" style="font-size: 24px;">keyboard_arrow_left</span>
+    </button>
+
+    <!-- títulos -->
+          <div>
+      <div class="text-gray-500 text-base cursor-pointer hover:underline" (click)="voltar()">Gestão de Alertas</div>
+      <div class="text-3xl font-bold">{{ obterTituloTela() }}</div>
+      <p class="text-gray-800 text-base mt-1">{{ isEdicao ? 'Edite as informações do alerta personalizado' : 'Preencha os dados para criar um novo alerta personalizado' }}</p>
+        </div>
+      </div>
+    </div>
+
+<!-- estado de carregamento -->
+<div *ngIf="carregando" class="flex justify-center items-center py-12">
+  <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+  <span class="ml-3 text-gray-600">{{ isEdicao ? 'Carregando alerta...' : 'Processando...' }}</span>
+    </div>
+
+<!-- formulário -->
+<div *ngIf="!carregando" class="bg-white rounded-lg shadow-sm border border-gray-200">
+  <form (ngSubmit)="salvar()" #alertaForm="ngForm" class="p-6">
+
+    <table class="w-full border-collapse">
+      <tbody>
+
+          <!-- título -->
+        <tr class="border-b border-gray-200">
+          <td class="py-2 pr-1 w-1/6 text-sm font-medium text-gray-700 whitespace-nowrap align-middle">
+              Título *
+          </td>
+          <td class="py-4">
+            <input
+              type="text"
+              id="titulo"
+              name="titulo"
+              [(ngModel)]="alertaDTO.titulo"
+              #titulo="ngModel"
+              required
+              maxlength="100"
+              class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-[#5084C1] focus:border-[#5084C1]"
+              placeholder="Digite o título do alerta">
+            <div *ngIf="titulo.invalid && titulo.touched" class="text-red-500 text-sm mt-1">
+              Título é obrigatório
+            </div>
+          </td>
+        </tr>
+
+          <!-- descrição -->
+        <tr class="border-b border-gray-200">
+          <td class="py-2 pr-1 w-1/6 text-sm font-medium text-gray-700 whitespace-nowrap align-middle">
+              Descrição *
+          </td>
+          <td class="py-4">
+            <input
+              type="text"
+              id="descricao"
+              name="descricao"
+              [(ngModel)]="alertaDTO.descricao"
+              #descricao="ngModel"
+              required
+              maxlength="500"
+              class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-[#5084C1] focus:border-[#5084C1]"
+              placeholder="Descreva o alerta...">
+            <div *ngIf="descricao.invalid && descricao.touched" class="text-red-500 text-sm mt-1">
+              Descrição é obrigatória
+            </div>
+          </td>
+        </tr>
+
+        <!-- data/hora de disparo removida - alertas personalizados são disparados imediatamente -->
+
+        <!-- seção de recorrência removida - alertas personalizados são mais simples -->
+
+        <!-- produto relacionado -->
+        <tr class="border-b border-gray-200">
+          <td class="py-2 pr-1 w-1/6 text-sm font-medium text-gray-700 whitespace-nowrap align-middle">
+              Produto Relacionado
+          </td>
+          <td class="py-4">
+            <div class="relative">
+              <input
+                type="text"
+              id="produto"
+              name="produto"
+                [(ngModel)]="termoBuscaProduto"
+                (input)="onBuscaProdutoChange()"
+                (focus)="mostrarDropdown = produtosFiltrados.length > 0"
+                (blur)="fecharDropdownComDelay()"
+                placeholder="Digite para buscar produtos..."
+                class="w-full px-3 py-2 pr-16 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-[#5084C1] focus:border-[#5084C1]"
+                autocomplete="off">
+
+              <div class="absolute right-2 top-2 flex items-center gap-1">
+              <button
+                type="button"
+                (click)="executarBuscaProduto()"
+                  class="p-1 text-gray-400 hover:text-gray-600">
+                  <span class="material-icons text-base">search</span>
+              </button>
+              <button
+                *ngIf="produtoSelecionado"
+                type="button"
+                (click)="limparSelecaoProduto()"
+                  class="p-1 text-gray-400 hover:text-gray-600">
+                  <span class="material-icons text-base">close</span>
+              </button>
+              </div>
+
+              <!-- dropdown de produtos -->
+              <div *ngIf="mostrarDropdown && produtosFiltrados.length > 0"
+                   class="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded shadow-lg max-h-48 overflow-y-auto">
+                <div *ngFor="let produto of produtosFiltrados"
+                     (click)="selecionarProduto(produto)"
+                     class="px-3 py-2 hover:bg-gray-50 cursor-pointer border-b border-gray-100 last:border-b-0">
+                  <div class="font-medium text-gray-900 text-sm">{{ produto.descricao }}</div>
+                  <div class="text-xs text-gray-500">{{ produto.marca }}</div>
+                </div>
+              </div>
+
+              <div *ngIf="mostrarDropdown && produtosFiltrados.length === 0 && termoBuscaProduto.length >= 2"
+                   class="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded shadow-lg p-3">
+                <div class="text-sm text-gray-500 text-center">Nenhum produto encontrado</div>
+              </div>
+            </div>
+
+            <!-- itens monitorados -->
+            <div *ngIf="produtoSelecionado && itensProdutoNaoInspecionados.length > 0"
+                 class="mt-2 border border-blue-200 rounded">
+              <!-- cabeçalho -->
+              <div class="bg-blue-50 text-blue-800 text-xs font-semibold px-3 py-1 rounded-t">
+                {{ itensProdutoNaoInspecionados.length }} {{ itensProdutoNaoInspecionados.length === 1 ? 'item monitorado' : 'itens monitorados' }}
+              </div>
+              <div class="px-3 py-1 text-gray-600 text-xs bg-blue-50 border-t border-blue-200">
+                Itens monitorados correspondem aos itens de um produto que ainda não foram inspecionados. Após a inspeção, deixam de aparecer nesta lista.
+                  </div>
+              <!-- lista -->
+              <div class="max-h-40 overflow-y-auto bg-white">
+                <table class="min-w-full text-xs table-fixed border-collapse">
+                  <thead class="bg-blue-50 sticky top-0">
+                    <tr>
+                      <th class="w-2/5 px-2 py-1 text-left text-blue-800 font-semibold">Nome</th>
+                      <th class="w-1/5 px-2 py-1 text-left text-blue-800 font-semibold">Lote</th>
+                      <th class="w-1/5 px-2 py-1 text-left text-blue-800 font-semibold">Data de vencimento</th>
+                      <th class="w-1/5 px-2 py-1 text-left text-blue-800 font-semibold">Vence em</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let item of itensProdutoNaoInspecionados" class="hover:bg-blue-50">
+                      <td class="px-2 py-1 text-gray-600 truncate">{{ item.produto && item.produto.descricao ? item.produto.descricao : descricaoProdutoSelecionado }}</td>
+                      <td class="px-2 py-1 font-medium text-gray-700 truncate">{{ item.lote }}</td>
+                      <td class="px-2 py-1 text-gray-600">{{ item.dataVencimento | date:'dd/MM/yyyy' }}</td>
+                      <td class="px-2 py-1">
+                        <span [class]="getStatusVencimento(item.dataVencimento) + ' rounded-full px-2 py-0.5 whitespace-nowrap'">
+                    {{ getTextoVencimento(item.dataVencimento) }}
+                        </span>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </td>
+        </tr>
+
+        <!-- colaboradores -->
+        <tr class="border-b border-gray-200">
+          <td class="py-2 pr-1 w-1/6 text-sm font-medium text-gray-700 whitespace-nowrap align-middle">
+            Colaboradores<span *ngIf="!isEdicao"> *</span>
+          </td>
+          <td class="py-4">
+            <div class="relative">
+              <input
+                type="text"
+                id="colaboradores"
+                     name="termoBuscaUsuario"
+                     [(ngModel)]="termoBuscaUsuario"
+                     (input)="onBuscaUsuarioChange()"
+                     (focus)="mostrarDropdownUsuarios = usuariosFiltrados.length > 0"
+                     placeholder="Digite para buscar colaboradores..."
+                class="w-full px-3 py-2 pr-8 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-[#5084C1] focus:border-[#5084C1]"
+                     autocomplete="off">
+
+              <button type="button"
+                      (click)="onBuscaUsuarioChange()"
+                      class="absolute right-2 top-2 text-gray-400 hover:text-gray-600">
+                <span class="material-icons text-base">search</span>
+              </button>
+
+              <!-- dropdown colaboradores -->
+              <div *ngIf="mostrarDropdownUsuarios && usuariosFiltrados.length > 0"
+                   class="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded shadow-lg max-h-48 overflow-y-auto">
+                <div *ngFor="let u of usuariosFiltrados"
+                     (click)="selecionarUsuario(u)"
+                     class="px-3 py-2 hover:bg-gray-50 cursor-pointer border-b border-gray-100 last:border-b-0">
+                  <div class="font-medium text-gray-900 text-sm">{{ u.nome }}</div>
+                  <div class="text-xs text-gray-500">{{ u.email }}</div>
+                </div>
+              </div>
+
+              <div *ngIf="mostrarDropdownUsuarios && usuariosFiltrados.length === 0 && termoBuscaUsuario.length >= 2"
+                   class="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded shadow-lg p-3">
+                <div class="text-sm text-gray-500 text-center">Nenhum colaborador encontrado</div>
+              </div>
+            </div>
+
+            <!-- colaboradores selecionados -->
+            <div *ngIf="usuariosSelecionados.length > 0" class="mt-2 flex flex-wrap gap-1">
+              <span *ngFor="let uid of usuariosSelecionados"
+                    class="inline-flex items-center gap-1 bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">
+                {{ obterUsuarioPorId(uid)?.nome || 'Usuário' }}
+                <button type="button"
+                        (click)="removerUsuario(uid)"
+                        class="text-blue-600 hover:text-blue-800 font-bold">×</button>
+              </span>
+            </div>
+            
+            <!-- mensagem de erro para colaboradores obrigatórios -->
+            <div *ngIf="isColaboradoresInvalido()" class="text-red-500 text-sm mt-1">
+              Pelo menos um colaborador deve ser selecionado
+            </div>
+          </td>
+        </tr>
+
+      </tbody>
+    </table>
+
+    <!-- botões -->
+    <div class="flex justify-end gap-3 mt-6 pt-4 border-t border-gray-200">
+          <button
+            type="button"
+            (click)="voltar()"
+        class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-50 transition-colors">
+            Cancelar
+          </button>
+
+          <button
+            type="submit"
+            [disabled]="alertaForm.invalid || carregando"
+        class="px-4 py-2 text-sm font-medium text-white bg-[#5084C1] border border-transparent rounded hover:bg-[#4071a8] transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+        <span *ngIf="!carregando">{{ isEdicao ? 'Atualizar' : 'Criar' }}</span>
+            <span *ngIf="carregando" class="flex items-center">
+              <span class="material-icons text-base animate-spin -ml-1 mr-2">refresh</span>
+              Processando...
+            </span>
+          </button>
+        </div>
+      </form>
+</div>

@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, OnDestroy } from '@angular/core';
+import { Component, inject, OnInit, OnDestroy, HostBinding } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Corredor } from '../../../shared/model/entity/corredor';
 import { CategoriaService } from '../../../shared/service/categoria.service';
@@ -12,6 +12,7 @@ import { CommonModule } from '@angular/common';
 import { CorredorSeletor } from '../../../shared/model/seletor/corredor.seletor';
 import { Usuario } from '../../../shared/model/entity/usuario.model';
 import { DragDropModule } from '@angular/cdk/drag-drop';
+import { LayoutService } from '../../../shared/service/layout.service';
 
 @Component({
   selector: 'app-corredor-listagem',
@@ -24,14 +25,17 @@ export class CorredorListagemComponent implements OnInit, OnDestroy {
   private categoriaService = inject(CategoriaService);
   private corredorService = inject(CorredorService);
   private router = inject(Router);
+  private layoutService = inject(LayoutService);
   private destroy$ = new Subject<void>();
+
+  @HostBinding('class.sidebar-closed') sidebarClosed = false;
 
   public seletor: CorredorSeletor = new CorredorSeletor();
   public corredores: Corredor[] = [];
   public totalPaginas: number = 0;
   public tamanhoPagina: number = 5;
   public opcoesItensPorPagina: number[] = [5, 10, 15, 20, 25, 50];
-  public itensPorPagina: number = 5;
+  public itensPorPagina: number = 10;
   public mostrarFiltros: boolean = false;
   public filtroResponsavel: Usuario | null = null;
   public responsaveis: Usuario[] = [];
@@ -56,6 +60,13 @@ export class CorredorListagemComponent implements OnInit, OnDestroy {
 
     this.buscarCorredores();
     this.buscarResponsaveis();
+
+    // Inscrever-se nas mudanças do estado do sidebar
+    this.layoutService.sidebarState$.pipe(
+      takeUntil(this.destroy$)
+    ).subscribe((isOpen: boolean) => {
+      this.sidebarClosed = !isOpen;
+    });
   }
 
   private buscarResponsaveis(): void {

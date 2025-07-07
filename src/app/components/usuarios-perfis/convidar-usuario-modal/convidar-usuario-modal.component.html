@@ -1,0 +1,53 @@
+<!-- Overlay -->
+<div class="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+  <!-- Click outside to close -->
+  <div class="absolute inset-0" (click)="onClose()"></div>
+
+  <!-- Modal Card -->
+  <div class="relative bg-white rounded-lg shadow-lg w-full max-w-md p-8 z-10">
+    <!-- Close icon -->
+    <button class="absolute top-3 right-3 text-gray-400 hover:text-gray-600" (click)="onClose()">
+      <span class="material-icons text-xl">close</span>
+    </button>
+
+    <!-- Title -->
+    <h2 class="text-2xl font-semibold mb-6">Convidar usuário</h2>
+
+    <form #inviteForm="ngForm" (ngSubmit)="enviarConvite(inviteForm, $event)" class="space-y-0">
+      <!-- Perfil select -->
+      <label class="block text-sm font-medium mb-1">perfil</label>
+      <div class="relative mb-6">
+        <select #perfil="ngModel" [(ngModel)]="usuarioConviteDTO.perfilAcesso" name="perfil" class="w-full appearance-none border-b border-gray-300 focus:border-blue-500 outline-none py-2 pr-8" required>
+          <option *ngFor="let p of perfis" [value]="p">{{ p }}</option>
+        </select>
+        <span class="material-icons absolute right-0 top-1/2 -translate-y-1/2 text-gray-400">expand_more</span>
+      </div>
+
+      <!-- Cargo input -->
+      <label class="block text-sm font-medium mb-1">cargo</label>
+      <input #cargo="ngModel" type="text" [(ngModel)]="usuarioConviteDTO.cargo" name="cargo" required pattern="^(?=.*[A-Za-zÀ-ÖØ-öø-ÿ])[A-Za-zÀ-ÖØ-öø-ÿ\s]+$" title="Somente letras e espaços são permitidos" class="w-full border-b border-gray-300 focus:border-blue-500 outline-none py-2" />
+      <div class="mb-4"></div>
+
+      <!-- Nome input -->
+      <label class="block text-sm font-medium mb-1">nome</label>
+      <input #nome="ngModel" type="text" [(ngModel)]="usuarioConviteDTO.nome" name="nome" required pattern="^(?=.*[A-Za-zÀ-ÖØ-öø-ÿ])[A-Za-zÀ-ÖØ-öø-ÿ\s]+$" title="Somente letras e espaços são permitidos" class="w-full border-b border-gray-300 focus:border-blue-500 outline-none py-2" />
+      <div class="mb-4"></div>
+
+      <!-- Email input -->
+      <label class="block text-sm font-medium mb-1">e-mail</label>
+      <input #email="ngModel" type="email" [(ngModel)]="usuarioConviteDTO.email" name="email" required class="w-full border-b border-gray-300 focus:border-blue-500 outline-none py-2" />
+      <div class="mb-2"></div>
+
+      <p class="text-xs text-gray-500 mb-4">Um código de acesso será enviado para o e-mail informado; ele deverá utilizá-lo para fazer login.</p>
+
+      <!-- Action buttons -->
+      <div class="flex justify-end gap-4">
+        <button type="button" class="px-4 py-2 rounded text-gray-600 border border-gray-300 hover:bg-gray-100" (click)="onClose()">cancelar</button>
+        <button type="submit" [disabled]="inviteForm.invalid || isLoading" class="px-6 py-2 rounded bg-[#5084C1] hover:bg-[#3969a1] text-white font-semibold flex items-center justify-center gap-2 disabled:opacity-50">
+          <span *ngIf="!isLoading">enviar convite</span>
+          <span *ngIf="isLoading" class="material-icons animate-spin text-base">autorenew</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

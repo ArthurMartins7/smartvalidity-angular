@@ -1,0 +1,29 @@
+/* override para inputs datetime-local */
+input[type="datetime-local"] {
+  min-height: 38px;
+}
+
+/* estados de validação personalizados: */
+.ng-invalid.ng-touched:not(form) {
+  border-color: #ef4444;
+  box-shadow: 0 0 0 1px #ef4444;
+}
+
+.ng-valid.ng-touched:not(form) {
+  border-color: #10b981;
+  box-shadow: 0 0 0 1px #10b981;
+}
+
+/* animação de loading: */
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+}

@@ -1,112 +1,155 @@
-<div *ngIf="visible" class="fixed inset-0 z-50 overflow-y-auto">
-  <!-- Overlay que impede interação com elementos abaixo do modal -->
-  <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-    <!-- Fundo escuro com opacidade -->
-    <div class="fixed inset-0 transition-opacity" aria-hidden="true">
-      <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
-    </div>
+<!-- Modal de Ações em Lote -->
+<div *ngIf="visible" class="modal-acoes-container">
+  <!-- Overlay -->
+  <div class="modal-acoes-overlay" aria-hidden="true" (click)="closeModal()"></div>
 
-    <!-- Modal -->
-    <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-3xl sm:w-full">
-      <!-- Cabeçalho com título e botão de fechar -->
-      <div class="bg-white px-6 pt-5 pb-4 sm:p-6">
-        <div class="flex justify-between items-center mb-6">
-          <h3 class="text-xl leading-6 font-medium text-gray-900">
-            Ações em lote
-          </h3>
-          <button
-            type="button"
-            (click)="closeModal()"
-            class="bg-white rounded-md p-2 inline-flex items-center justify-center text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500">
-            <span class="sr-only">Fechar</span>
-            <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
-        </div>
-
-        <div class="mt-2">
-          <p class="text-sm text-gray-600 mb-6">
-            Selecione a ação desejada para os {{ itensSelecionadosCount }} item(ns) selecionado(s):
-          </p>
-
-          <!-- Grid de botões -->
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <!-- Coluna de Relatórios -->
-            <div class="space-y-4">
-              <h4 class="text-sm font-medium text-gray-700 mb-4">Gerar Relatório com:</h4>
-
-              <!-- Opção 1: Itens Selecionados -->
-              <button
-                type="button"
-                (click)="selecionarAcao('relatorio-selecionados')"
-                class="w-full flex items-center p-4 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-600 mr-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                </svg>
-                <div class="text-left flex-1">
-                  <span class="text-sm font-medium text-gray-900 block">Itens Selecionados</span>
-                  <span class="text-xs text-gray-500">{{ itensSelecionadosCount }} item(ns)</span>
-                </div>
-              </button>
-
-              <!-- Opção 2: Itens da Página -->
-              <button
-                type="button"
-                (click)="selecionarAcao('relatorio-pagina')"
-                class="w-full flex items-center p-4 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-600 mr-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-                </svg>
-                <div class="text-left flex-1">
-                  <span class="text-sm font-medium text-gray-900 block">Página Atual</span>
-                  <span class="text-xs text-gray-500">{{ itensPaginaCount }} item(ns) nesta página</span>
-                </div>
-              </button>
-
-              <!-- Opção 3: Todos os Itens -->
-              <button
-                type="button"
-                (click)="selecionarAcao('relatorio-todos')"
-                class="w-full flex items-center p-4 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-purple-600 mr-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2" />
-                </svg>
-                <div class="text-left flex-1">
-                  <span class="text-sm font-medium text-gray-900 block">Todos os Itens</span>
-                  <span class="text-xs text-gray-500">{{ totalItensAba }} item(ns) no total</span>
-                </div>
-              </button>
-            </div>
-
-            <!-- Coluna de Inspeção -->
-            <div class="space-y-4">
-              <h4 class="text-sm font-medium text-gray-700 mb-4">Inspecionar</h4>
-              <button
-                type="button"
-                (click)="selecionarAcao('inspecao')"
-                class="w-full flex items-center p-4 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-600 mr-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                </svg>
-                <div class="text-left flex-1">
-                  <span class="text-sm font-medium text-gray-900 block">Marcar como Inspecionado</span>
-                  <span class="text-xs text-gray-500">{{ itensSelecionadosCount }} item(ns) selecionado(s)</span>
-                </div>
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="bg-gray-50 px-6 py-4 sm:flex sm:flex-row-reverse">
+  <!-- Conteúdo do Modal -->
+  <div class="modal-acoes-content">
+    <!-- Cabeçalho -->
+    <div class="bg-white px-6 pt-5 pb-4 sm:p-6">
+      <div class="flex justify-between items-center mb-6">
+        <h3 class="text-xl leading-6 font-medium text-gray-900">
+          Ações em lote
+        </h3>
         <button
           type="button"
           (click)="closeModal()"
-          class="w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-6 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 sm:w-auto sm:text-sm transition-colors">
-          Cancelar
+          class="bg-white rounded-md p-2 inline-flex items-center justify-center text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500">
+          <span class="sr-only">Fechar</span>
+          <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
         </button>
       </div>
+
+      <!-- Corpo do Modal -->
+      <div class="mt-2">
+        <p class="text-gray-700 mb-6">
+          Selecione a ação desejada para os {{ itensSelecionadosCount }} item(ns) selecionado(s):
+        </p>
+
+        <!-- Mensagens de Aviso -->
+        <div *ngIf="selecoesMisturadas" class="mb-4">
+          <div class="flex items-start bg-red-50 border border-red-200 text-red-800 rounded-lg p-3 mb-2">
+            <svg class="w-5 h-5 mr-2 mt-0.5 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M21 12c0 4.97-4.03 9-9 9s-9-4.03-9-9 4.03-9 9-9 9 4.03 9 9z" />
+            </svg>
+            <span>
+              Existem <b>{{ selecionadosOutrasAbas }}</b> produtos selecionados de diferentes <b>abas</b> da tabela 
+              ({{ selecionadosNaAbaAtual }} selecionados na aba atual ({{ nomeAba }}), {{ itensSelecionadosCount }} produtos no total. 
+              O botão de gerar relatórios com "<b>Todos os produtos da aba</b>", mais abaixo, só funcionará se os produtos selecionados forem da mesma aba:
+            </span>
+          </div>
+          <button 
+            type="button" 
+            (click)="desmarcarOutrasPaginasAbas()" 
+            class="w-full bg-gray-100 text-gray-800 border border-gray-300 rounded px-3 py-2 font-bold hover:bg-gray-200 transition-colors">
+            Clique aqui para desmarcar produtos de outras abas!
+          </button>
+        </div>
+
+        <div *ngIf="temItensInspecionados" class="mb-4">
+          <div class="flex items-start bg-yellow-50 border border-yellow-200 text-yellow-900 rounded-lg p-3 mb-2">
+            <svg class="w-5 h-5 mr-2 mt-0.5 text-yellow-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M21 12c0 4.97-4.03 9-9 9s-9-4.03-9-9 4.03-9 9-9 9 4.03 9 9z" />
+            </svg>
+            <span>{{ mensagemInspecao }}</span>
+          </div>
+          <button 
+            type="button" 
+            (click)="desmarcarInspecionadosSelecionados()" 
+            class="w-full bg-gray-100 text-gray-800 border border-gray-300 rounded px-3 py-2 font-bold hover:bg-gray-200 transition-colors">
+            Clique aqui para desmarcar produtos já inspecionados!
+          </button>
+        </div>
+
+        <!-- Grid de Ações -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <!-- Seção de Relatórios -->
+          <div class="space-y-4">
+            <h4 class="font-medium text-gray-700 mb-4">Gerar Relatório com:</h4>
+
+            <!-- Produtos Selecionados -->
+            <button
+              type="button"
+              (click)="selecionarAcao('relatorio-selecionados')"
+              class="w-full flex items-center p-4 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-600 mr-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+              </svg>
+              <div class="text-left flex-1">
+                <span class="text-sm font-medium text-gray-900 block">Produtos selecionados</span>
+                <span class="text-xs text-gray-500">{{ itensSelecionadosCount }} produto(s)</span>
+              </div>
+            </button>
+
+            <!-- Produtos da Página Atual -->
+            <button
+              type="button"
+              (click)="selecionarAcao('relatorio-pagina')"
+              [disabled]="selecoesMisturadas"
+              [class.opacity-50]="selecoesMisturadas"
+              [class.cursor-not-allowed]="selecoesMisturadas"
+              class="w-full flex items-center p-4 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-600 mr-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+              </svg>
+              <div class="text-left flex-1">
+                <span class="text-sm font-medium text-gray-900 block">Produtos da página atual (página {{ numeroPaginaAtual }} da aba {{ nomeAba }})</span>
+                <span class="text-xs text-gray-500">{{ itensPaginaCount }} produto(s) nesta página</span>
+              </div>
+            </button>
+
+            <!-- Todos os Produtos da Aba -->
+            <button
+              type="button"
+              (click)="selecionarAcao('relatorio-todos')"
+              [disabled]="selecoesMisturadas"
+              [class.opacity-50]="selecoesMisturadas"
+              [class.cursor-not-allowed]="selecoesMisturadas"
+              class="w-full flex items-center p-4 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-purple-600 mr-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2" />
+              </svg>
+              <div class="text-left flex-1">
+                <span class="text-sm font-medium text-gray-900 block">Todos os produtos da aba {{ nomeAba }} (Sujeito aos filtros aplicados)</span>
+                <span class="text-xs text-gray-500">{{ totalItensAba }} produto(s) no total</span>
+              </div>
+            </button>
+          </div>
+
+          <!-- Seção de Inspeção -->
+          <div class="space-y-4">
+            <h4 class="font-medium text-gray-700 mb-4">Inspecionar</h4>
+
+            <button
+              type="button"
+              (click)="selecionarAcao('inspecao')"
+              [disabled]="temItensInspecionados"
+              [class.opacity-50]="temItensInspecionados"
+              [class.cursor-not-allowed]="temItensInspecionados"
+              class="w-full flex items-center p-4 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-600 mr-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+              </svg>
+              <div class="text-left flex-1">
+                <span class="text-sm font-medium text-gray-900 block">Marcar como Inspecionado</span>
+                <span class="text-xs text-gray-500">{{ itensSelecionadosCount }} item(ns) selecionado(s)</span>
+              </div>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Rodapé -->
+    <div class="bg-gray-50 px-6 py-4 sm:flex sm:flex-row-reverse">
+      <button
+        type="button"
+        (click)="closeModal()"
+        class="w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-6 py-2 bg-white font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 sm:w-auto sm:text-sm transition-colors">
+        Cancelar
+      </button>
     </div>
   </div>
 </div>

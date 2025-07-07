@@ -1,0 +1,108 @@
+<!-- Header -->
+<header class="w-full bg-white shadow-md fixed top-0 left-0 z-50 px-4 md:px-6 flex items-center justify-between" style="height: var(--header-height);">
+
+
+  <!-- Validata Logo & Title -->
+  <div class="flex-1 min-w-0 flex items-center justify-center overflow-hidden">
+    <img class="w-8 h-8 mr-2 flex-shrink-0"
+      src="https://static.vecteezy.com/system/resources/thumbnails/016/774/412/small_2x/blue-check-mark-icon-on-transparent-background-free-png.png" alt="logo">
+    <span class="text-lg md:text-xl font-bold text-[#5084C1] truncate">VALIDATA</span>
+  </div>
+
+</header>
+
+<!-- Page Header -->
+<div class="bg-gray-100 -mx-6 md:-mx-6 py-6 px-8 mb-10">
+  <div class="flex items-center justify-between">
+    <div>
+      <!-- Cabeçalho no padrão Minha Conta -->
+      <div class="flex items-center gap-2">
+        <!-- Ícone seta -->
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6 text-gray-600">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+        </svg>
+
+        <!-- Títulos -->
+        <div>
+          <div class="text-gray-500 text-base">Home</div>
+          <div class="text-3xl font-bold">Faça login em sua conta</div>
+          <p class="text-gray-800 text-base mt-1 whitespace-nowrap">Preencha seus dados para acessar o Validata.</p>
+        </div>
+      </div>
+    </div>
+    <div class="flex items-center gap-4">
+
+      <button class="bg-[#5084C1] hover:bg-[#3969a1] text-white font-bold text-lg px-7 py-3 rounded transition transform hover:scale-105 flex items-center gap-2" (click)="realizarCadastro()">
+        cadastre-se
+      </button>
+
+      <button class="bg-white text-[#5084C1] border border-[#5084C1] hover:bg-[#E6F0FA] hover:text-[#3969a1] font-bold text-lg px-7 py-3 rounded transition transform hover:scale-105">
+        login
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Login Page -->
+<section class="bg-white">
+  <div class="flex flex-col items-center justify-start px-6 pt-8 pb-8 mx-auto min-h-screen lg:py-0">
+
+    <div class="w-full bg-white rounded-lg shadow md:mt-0 sm:max-w-xl xl:p-0">
+      <div class="p-6 space-y-4 md:space-y-6 sm:p-8">
+
+        <!-- Title -->
+        <h2 class="text-2xl font-bold text-gray-900 text-left mb-2">Fazer login</h2>
+        <div class="w-full h-px bg-gray-200 opacity-70 mb-6"></div>
+
+        <!-- Login Form -->
+        <form #loginForm="ngForm" (ngSubmit)="realizarLogin(loginForm, $event)" class="space-y-4 md:space-y-6">
+          <!-- Email -->
+          <div>
+            <label for="email" class="block mb-2 text-sm font-medium text-gray-900">Seu email</label>
+            <input [(ngModel)]="usuario.email" name="email" id="email" type="email" required
+                   placeholder="name@company.com"
+                   class="bg-gray-50 border border-gray-300 text-gray-900 placeholder-gray-400 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5">
+          </div>
+
+          <!-- Password -->
+          <div>
+            <label for="password" class="block mb-2 text-sm font-medium text-gray-900">Senha</label>
+            <div class="relative">
+              <input #senhaInput (input)="onSenhaInput(senhaInput)" [(ngModel)]="usuario.senha" name="password" id="password" [type]="showSenha ? 'text' : 'password'" required pattern=".*\S.*"
+                     placeholder="••••••••"
+                     class="bg-gray-50 border border-gray-300 text-gray-900 placeholder-gray-400 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full pr-12 p-2.5">
+              <button type="button" (click)="toggleShowSenha()" class="absolute inset-y-0 right-0 flex items-center px-3 text-gray-500">
+                <span class="material-icons text-xl">{{ showSenha ? 'visibility_off' : 'visibility' }}</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Remember & Forgot -->
+          <div class="flex items-center justify-end">
+            <button type="button" class="text-sm font-medium text-black hover:underline" (click)="esqueceuSenha()">Esqueceu a senha?</button>
+          </div>
+
+          <!-- Submit -->
+          <button type="submit" class="text-white bg-[#5084C1] hover:bg-[#3969a1] focus:ring-4 focus:outline-none focus:ring-blue-300 font-bold rounded-lg text-lg w-full py-3 text-center">
+            Entrar
+          </button>
+
+          <!-- Register link -->
+          <p class="text-sm font-light text-gray-500">
+            Não tem uma conta ainda?
+            <a class="font-medium text-[#5084C1] hover:underline cursor-pointer" (click)="realizarCadastro()">
+              Cadastre-se
+            </a>
+          </p>
+        </form>
+
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Modal assinatura existente -->
+<app-assinatura-existente-modal *ngIf="exibirModalAssinaturaExistente" (close)="exibirModalAssinaturaExistente=false"></app-assinatura-existente-modal>
+
+<!-- Header -->
+

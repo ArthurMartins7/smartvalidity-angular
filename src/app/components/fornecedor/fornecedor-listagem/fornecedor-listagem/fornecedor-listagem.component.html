@@ -1,17 +1,25 @@
-<!-- Cabeçalho -->
-<div class="flex items-center gap-2 mb-8">
-  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6 text-gray-600">
-    <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
-  </svg>
-  <div>
-    <div class="text-gray-500">Fornecedores</div>
-    <div class="text-2xl font-bold">Listagem</div>
+<!-- Header explicativo (padrão Usuários e Perfis) -->
+<div class="bg-gray-100 -mx-6 md:-mx-6 py-6 px-8 mb-10">
+  <div class="flex items-center justify-between">
+    <div>
+      <div class="flex items-center gap-2">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6 text-gray-600">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+        </svg>
+        <div>
+          <div class="text-gray-500 text-base">Fornecedores</div>
+          <div class="text-3xl font-bold">Gerenciar fornecedores</div>
+          <p class="text-gray-800 text-base mt-1 whitespace-nowrap">aqui você pode listar, editar e excluir os fornecedores do sistema</p>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 
+
 <!-- Conteúdo principal -->
 <div class="w-full flex justify-center">
-  <div class="w-full max-w-4xl p-6">
+  <div class="w-full p-6">
 
     <!-- Campo de pesquisa com filtro -->
     <div class="mb-6 relative">
@@ -100,32 +108,18 @@
         <span class="mr-2 text-xl font-semibold">+</span>
         <span class="font-medium">Adicionar Fornecedor</span>
       </button>
-
-      <!-- Seletor de itens por página -->
-      <div class="flex items-center gap-2">
-        <label for="itensPorPagina" class="text-sm text-gray-600">Itens por página:</label>
-        <select
-          id="itensPorPagina"
-          [(ngModel)]="itensPorPagina"
-          (ngModelChange)="alterarItensPorPagina()"
-          class="bg-white border border-gray-300 text-gray-700 py-2 px-4 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-          <option *ngFor="let opcao of opcoesItensPorPagina" [value]="opcao">
-            {{ opcao }}
-          </option>
-        </select>
-      </div>
     </div>
 
     <!-- Container da tabela -->
-    <div class="bg-white p-6 rounded-lg shadow">
-      <table class="w-full border-collapse border border-gray-300">
+    <div class="overflow-x-auto">
+      <table class="min-w-full border-separate border-spacing-0 border border-gray-300">
         <thead class="bg-gray-200">
           <tr>
             <th class="border border-gray-300 p-2 text-left">Nome</th>
             <th class="border border-gray-300 p-2 text-left">Telefone</th>
             <th class="border border-gray-300 p-2 text-left">CNPJ</th>
             <th class="border border-gray-300 p-2 text-left">Endereço</th>
-            <th class="border border-gray-300 p-2 text-center">Ações</th>
+            <th class="border border-gray-300 p-2 text-center" [ngClass]="{ 'sticky right-0 bg-gray-200 z-10': !mostrarFiltros }">Ações</th>
           </tr>
         </thead>
         <tbody>
@@ -137,12 +131,12 @@
               {{ fornecedor.endereco.logradouro }}, {{ fornecedor.endereco.numero }} -
               {{ fornecedor.endereco.bairro }}, {{ fornecedor.endereco.cidade }}/{{ fornecedor.endereco.estado }}
             </td>
-            <td class="p-2 text-center flex justify-center space-x-4">
-              <button (click)="editar(fornecedor)" class="text-gray-600 hover:text-blue-500 flex items-center gap-1" title="Editar fornecedor">
-                <img src="/icons/edit.png" alt="Editar" class="w-5 h-5">
+            <td class="p-2 flex justify-center gap-3" [ngClass]="{ 'sticky right-0 bg-white z-10': !mostrarFiltros }">
+              <button (click)="editar(fornecedor)" class="w-9 h-9 flex items-center justify-center border border-gray-300 rounded text-gray-700 hover:text-gray-900 hover:bg-gray-100 transition" title="Editar fornecedor">
+                <span class="material-icons text-base">edit</span>
               </button>
-              <button (click)="excluir(fornecedor)" class="text-gray-600 hover:text-red-500 flex items-center gap-1" title="Excluir fornecedor">
-                <img src="https://cdn-icons-png.flaticon.com/512/1214/1214428.png" alt="Excluir" class="w-5 h-5">
+              <button (click)="excluir(fornecedor)" class="w-9 h-9 flex items-center justify-center border border-gray-300 rounded text-red-600 hover:text-red-800 hover:bg-gray-100 transition" title="Excluir fornecedor">
+                <span class="material-icons text-base">delete</span>
               </button>
             </td>
           </tr>
@@ -151,31 +145,23 @@
     </div>
 
     <!-- Controles de Paginação -->
-    <div class="mt-4 flex justify-between items-center">
-      <!-- Botões de navegação -->
-      <div class="flex space-x-4">
-        <button
-          (click)="voltarPagina()"
-          [disabled]="seletor.pagina === 1"
-          class="px-4 py-2 bg-gray-200 text-gray-600 rounded-lg hover:bg-gray-300 disabled:opacity-50">
-          Anterior
-        </button>
-        <button
-          (click)="avancarPagina()"
-          [disabled]="seletor.pagina === totalPaginas"
-          class="px-4 py-2 bg-gray-200 text-gray-600 rounded-lg hover:bg-gray-300 disabled:opacity-50">
-          Próxima
-        </button>
+    <div class="flex items-center justify-between mt-4">
+      <!-- Seletor de itens por página -->
+      <div class="flex items-center gap-2">
+        <span class="text-gray-700">Itens por página:</span>
+        <select class="border rounded w-12 h-7 text-center text-sm" [(ngModel)]="itensPorPagina" (change)="alterarItensPorPagina()">
+          <option *ngFor="let opcao of opcoesItensPorPagina" [value]="opcao">{{ opcao }}</option>
+        </select>
       </div>
 
-      <!-- Páginas -->
-      <div class="flex space-x-2">
-        <button
-          *ngFor="let pagina of criarArrayPaginas()"
-          (click)="irParaPagina(pagina)"
-          [class.bg-blue-500]="pagina === seletor.pagina"
-          class="px-4 py-2 rounded-lg text-white hover:bg-blue-600">
-          {{ pagina }}
+      <!-- Navegação de páginas -->
+      <div class="flex items-center gap-2">
+        <button (click)="voltarPagina()" [disabled]="seletor.pagina === 1" class="w-8 h-8 flex items-center justify-center rounded bg-gray-200 disabled:opacity-50">
+          <span class="material-icons text-sm">chevron_left</span>
+        </button>
+        <span class="w-8 h-8 flex items-center justify-center rounded bg-[#5084C1] text-white select-none">{{ seletor.pagina }}</span>
+        <button (click)="avancarPagina()" [disabled]="seletor.pagina === totalPaginas" class="w-8 h-8 flex items-center justify-center rounded bg-gray-200 disabled:opacity-50">
+          <span class="material-icons text-sm">chevron_right</span>
         </button>
       </div>
     </div>

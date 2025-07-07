@@ -81,9 +81,6 @@ export class MuralTabsComponent {
   @Input() activeTab: 'proximo' | 'hoje' | 'vencido' = 'proximo';
   @Output() tabChange = new EventEmitter<'proximo' | 'hoje' | 'vencido'>();
 
-  /**
-   * Define a aba ativa e emite o evento de mudança para o componente pai
-   */
   setActiveTab(tab: 'proximo' | 'hoje' | 'vencido'): void {
     if (this.activeTab !== tab) {
       this.activeTab = tab;

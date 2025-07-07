@@ -1,21 +1,54 @@
 <!-- Header -->
-<header class="w-full bg-white shadow-md fixed top-0 left-0 z-50 px-4 py-3 flex items-center justify-between">
+<header class="w-full bg-white shadow-md fixed top-0 left-0 z-50 px-4 md:px-6 flex items-center justify-between" style="height: var(--header-height);">
   <!-- Menu Toggle Button -->
-  <button (click)="toggleSidebar()" class="text-gray-700 hover:text-blue-600 focus:outline-none transition-colors duration-200">
-    <i class="material-icons text-2xl">{{ isSidebarOpen ? 'menu_open' : 'menu' }}</i>
+  <button (click)="toggleSidebar()" class="text-black hover:opacity-80 focus:outline-none transition-colors duration-200">
+    <i class="material-icons text-3xl">{{ isSidebarOpen ? 'menu_open' : 'menu' }}</i>
   </button>
 
   <!-- Validata Logo & Title -->
-  <div class="flex items-center justify-center absolute left-1/2 transform -translate-x-1/2">
-    <img class="w-8 h-8 mr-2"
+  <div class="flex-1 min-w-0 flex items-center justify-center overflow-hidden">
+    <img class="w-8 h-8 mr-2 flex-shrink-0"
       src="https://static.vecteezy.com/system/resources/thumbnails/016/774/412/small_2x/blue-check-mark-icon-on-transparent-background-free-png.png" alt="logo">
-    <span class="text-xl font-bold text-blue-600">VALIDATA</span>
+    <span class="text-lg md:text-xl font-bold text-[#5084C1] truncate validata-logo">VALIDATA</span>
   </div>
 
-  <!-- User profile icon -->
-  <button class="text-gray-700 hover:text-blue-600 focus:outline-none">
-    <i class="material-icons text-2xl">account_circle</i>
-  </button>
+  <!-- Notification & User icons -->
+  <div class="flex items-center space-x-4">
+    <!-- Notification icon -->
+    <div class="relative cursor-pointer" (click)="goToNotifications()">
+      <i class="material-icons text-3xl" [ngClass]="hasUnreadNotifications() ? 'text-[#5084C1]' : 'text-gray-700'">notifications</i>
+      <span *ngIf="hasUnreadNotifications()"
+            class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-bold">
+        {{ unreadCount > 99 ? '99+' : unreadCount }}
+      </span>
+    </div>
+    <!-- Greeting / Profile icon -->
+    <ng-container *ngIf="!isMobile(); else mobileProfile">
+      <div class="relative">
+        <span class="text-[#5084C1] text-xl font-medium cursor-pointer flex items-center select-none" (click)="toggleDropdown(); $event.stopPropagation()">
+          Olá, {{userName}}
+          <i class="material-icons ml-1 text-base transition-transform" [ngClass]="isDropdownOpen ? 'rotate-180' : ''">expand_more</i>
+        </span>
+
+        <!-- Dropdown menu -->
+        <div *ngIf="isDropdownOpen" class="absolute right-0 mt-2 w-40 bg-white rounded-md shadow-lg border border-gray-200 z-50">
+          <div (click)="navigateToMinhaContaInfo(); closeDropdown(); $event.stopPropagation()" class="flex items-center px-4 py-2 text-gray-700 hover:bg-gray-100 cursor-pointer">
+            <i class="material-icons mr-2 text-base">person</i>
+            <span>minha conta</span>
+          </div>
+          <div (click)="logout(); closeDropdown(); $event.stopPropagation()" class="flex items-center px-4 py-2 text-gray-700 hover:bg-gray-100 cursor-pointer">
+            <i class="material-icons mr-2 text-base">logout</i>
+            <span>sair</span>
+          </div>
+        </div>
+      </div>
+    </ng-container>
+    <ng-template #mobileProfile>
+      <button class="text-[#5084C1] hover:opacity-80 focus:outline-none" (click)="navigateTo('/usuarios-perfis-listagem')">
+        <i class="material-icons text-3xl">account_circle</i>
+      </button>
+    </ng-template>
+  </div>
 </header>
 
 <!-- Overlay para fechar a sidebar em mobile -->
@@ -25,7 +58,7 @@
 </div>
 
 <!-- Sidebar -->
-<div class="w-64 md:w-64 h-screen bg-white text-gray-800 flex flex-col fixed left-0 top-16 shadow-md border-r border-gray-200 transition-all duration-300 ease-in-out overflow-y-auto z-50"
+<div class="w-64 md:w-64 h-screen bg-white text-gray-800 flex flex-col fixed left-0 shadow-md border-r border-gray-200 transition-all duration-300 ease-in-out overflow-y-auto z-50 sidebar-offset"
      [ngClass]="{
        'translate-x-0': isSidebarOpen,
        '-translate-x-full': !isSidebarOpen,
@@ -37,9 +70,14 @@
     <div *ngFor="let item of menuItems"
          (click)="setActive(item.id, item.route)"
          class="flex items-center py-3 px-6 cursor-pointer hover:bg-gray-100 transition-colors duration-200"
-         [ngClass]="{'border-l-4 border-blue-500 bg-blue-50 text-blue-600': isActive(item.id),
+         [ngClass]="{'border-l-4 border-blue-500 bg-blue-50 text-[#5084C1]': isActive(item.id),
                      'border-l-4 border-transparent': !isActive(item.id)}">
-      <i class="material-icons mr-4">{{item.icon}}</i>
+      <ng-container *ngIf="item.image; else iconTemplate">
+        <img [src]="isActive(item.id) && item.imageActive ? item.imageActive : item.image" alt="{{item.label}} icon" class="w-6 h-6 mr-4" />
+      </ng-container>
+      <ng-template #iconTemplate>
+        <i class="mr-4" [ngClass]="isActive(item.id) ? 'material-icons' : 'material-icons-outlined'">{{item.icon}}</i>
+      </ng-template>
       <span class="font-medium">{{item.label}}</span>
     </div>
   </div>
@@ -49,9 +87,14 @@
     <div *ngFor="let item of additionalItems"
          (click)="setActive(item.id, item.route)"
          class="flex items-center py-3 px-6 cursor-pointer hover:bg-gray-100 transition-colors duration-200"
-         [ngClass]="{'border-l-4 border-blue-500 bg-blue-50 text-blue-600': isActive(item.id),
+         [ngClass]="{'border-l-4 border-blue-500 bg-blue-50 text-[#5084C1]': isActive(item.id),
                      'border-l-4 border-transparent': !isActive(item.id)}">
-      <i class="material-icons mr-4">{{item.icon}}</i>
+      <ng-container *ngIf="item.image; else iconTemplate2">
+        <img [src]="isActive(item.id) && item.imageActive ? item.imageActive : item.image" alt="{{item.label}} icon" class="w-6 h-6 mr-4" />
+      </ng-container>
+      <ng-template #iconTemplate2>
+        <i class="mr-4" [ngClass]="isActive(item.id) ? 'material-icons' : 'material-icons-outlined'">{{item.icon}}</i>
+      </ng-template>
       <span class="font-medium">{{item.label}}</span>
       <span *ngIf="item.badge" class="bg-orange-500 text-white text-xs px-2 py-1 rounded-full ml-2">{{item.badge}}</span>
     </div>

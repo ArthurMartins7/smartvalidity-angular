@@ -5,7 +5,6 @@ import { Subscription } from 'rxjs';
 import { MuralListagemDTO } from '../../../shared/model/dto/mural.dto';
 import { MuralSelecaoService } from '../../../shared/service/mural.service';
 
-// Tipo para as ações disponíveis
 type AcaoTipo = 'relatorio-selecionados' | 'relatorio-pagina' | 'relatorio-todos' | 'inspecao';
 
 @Component({
@@ -19,75 +18,115 @@ export class ModalAcoesComponent implements OnInit, OnDestroy {
   @Output() acaoSelecionada = new EventEmitter<AcaoTipo>();
   @Input() itensPaginaAtual: MuralListagemDTO[] = [];
   @Input() totalItensAba: number = 0;
+  @Input() nomeAba: string = '';
+  @Input() numeroPaginaAtual: number = 1;
 
   // Propriedades para controle do modal
   visible = false;
   itensSelecionadosCount = 0;
   itensPaginaCount = 0;
+  temItensInspecionados = false;
+  mensagemInspecao = '';
+  selecoesMisturadas = false;
+  mensagemSelecaoMisturada = '';
+  itensSelecionados: MuralListagemDTO[] = [];
 
   private subscriptions: Subscription[] = [];
 
   constructor(private selecaoService: MuralSelecaoService) { }
 
   ngOnInit(): void {
-    // Inscrever-se nas mudanças de visibilidade do modal
-    const visibilitySubscription = this.selecaoService.showAcoesModal$.subscribe(
-      visible => {
-        this.visible = visible;
-        if (visible) {
-          this.atualizarContadores();
+    this.subscriptions.push(
+      this.selecaoService.showAcoesModal$.subscribe(
+        show => {
+          this.visible = show;
+          if (show) {
+            this.atualizarContadores();
+            // Adiciona classe ao body para evitar scroll
+            document.body.classList.add('modal-acoes-open');
+          } else {
+            // Remove classe do body quando modal é fechado
+            document.body.classList.remove('modal-acoes-open');
+          }
         }
-      }
+      )
     );
-
-    // Inscrever-se nas mudanças de seleção
-    const selectionSubscription = this.selecaoService.selectedItems$.subscribe(
-      () => {
-        if (this.visible) {
-          this.atualizarContadores();
-        }
-      }
-    );
-
-    this.subscriptions.push(visibilitySubscription, selectionSubscription);
   }
 
   ngOnDestroy(): void {
-    // Cancelar todas as subscriptions ativas
     this.subscriptions.forEach(sub => sub.unsubscribe());
+    // Remove classe do body ao destruir o componente
+    document.body.classList.remove('modal-acoes-open');
   }
 
-  /**
-   * Atualiza os contadores de itens
-   */
   private atualizarContadores(): void {
-    this.itensSelecionadosCount = this.selecaoService.getSelectedItemsCount();
+    this.selecaoService.getSelectedItems().subscribe(items => {
+      this.itensSelecionados = items;
+      this.itensSelecionadosCount = items.length;
+      const itensInspecionados = items.filter(item => item.inspecionado);
+      this.temItensInspecionados = itensInspecionados.length > 0;
+      if (this.temItensInspecionados) {
+        this.mensagemInspecao = `Existem ${itensInspecionados.length} produtos já inspecionados no grupo que você selecionou. Desmarque estes produtos já inspecionados e tente inspecionar os outros produtos novamente:`;
+      } else {
+        this.mensagemInspecao = '';
+      }
+      this.selecoesMisturadas = false;
+      this.mensagemSelecaoMisturada = '';
+      if (items.length > 0) {
+        const statusSet = new Set(items.map(item => item.status));
+        if (statusSet.size > 1) {
+          this.selecoesMisturadas = true;
+          this.mensagemSelecaoMisturada = 'Existem produtos selecionados de abas diferentes. As opções "Produtos da página atual" e "Todos os produtos da aba" só podem ser usadas quando todos os produtos selecionados pertencem à mesma aba.';
+        }
+      }
+    });
     this.itensPaginaCount = this.itensPaginaAtual.length;
   }
 
-  /**
-   * Fecha o modal de ações
-   */
-  closeModal(): void {
-    this.selecaoService.closeAcoesModal();
-  }
-
-  /**
-   * Seleciona uma ação e emite o evento
-   */
   selecionarAcao(acao: AcaoTipo): void {
-    switch (acao) {
-      case 'relatorio-pagina':
-        // Seleciona temporariamente todos os itens da página
-        this.selecaoService.selectAll(this.itensPaginaAtual, true);
-        break;
-      case 'relatorio-todos':
-        // Atualiza o total de itens na aba
-        this.selecaoService.selectAllInTab(this.totalItensAba);
-        break;
+    if (acao === 'inspecao' && this.temItensInspecionados) {
+      return;
     }
 
     this.acaoSelecionada.emit(acao);
     this.closeModal();
+  }
+
+  closeModal(): void {
+    this.selecaoService.closeAcoesModal();
+    // Remove classe do body ao fechar o modal
+    document.body.classList.remove('modal-acoes-open');
+  }
+
+  desmarcarInspecionadosSelecionados(): void {
+    this.selecaoService.getSelectedItems().subscribe(items => {
+      this.selecaoService.desmarcarInspecionados(items);
+      this.atualizarContadores();
+    });
+  }
+
+  desmarcarOutrasPaginasAbas(): void {
+    this.selecaoService.getSelectedItems().subscribe(items => {
+      const idsPaginaAtual = this.itensPaginaAtual.map(item => item.id);
+      const idsParaManter = items.filter(item => idsPaginaAtual.includes(item.id)).map(item => item.id);
+      this.selecaoService.updateSelectedItems(idsParaManter);
+      this.atualizarContadores();
+    });
+  }
+
+  get selecionadosNaAbaAtual(): number {
+    let statusAtual = '';
+    if (this.nomeAba === 'Próximos a vencer') statusAtual = 'proximo';
+    else if (this.nomeAba === 'Vencem hoje') statusAtual = 'hoje';
+    else if (this.nomeAba === 'Vencidos') statusAtual = 'vencido';
+    return this.itensSelecionados.filter(item => item.status === statusAtual).length;
+  }
+
+  get selecionadosOutrasAbas(): number {
+    let statusAtual = '';
+    if (this.nomeAba === 'Próximos a vencer') statusAtual = 'proximo';
+    else if (this.nomeAba === 'Vencem hoje') statusAtual = 'hoje';
+    else if (this.nomeAba === 'Vencidos') statusAtual = 'vencido';
+    return this.itensSelecionados.filter(item => item.status !== statusAtual).length;
   }
 }

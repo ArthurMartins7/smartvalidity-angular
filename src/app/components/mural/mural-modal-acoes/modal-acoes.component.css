@@ -28,3 +28,68 @@ button {
   --tw-ring-shadow: var(--tw-ring-inset) 0 0 0 calc(2px + var(--tw-ring-offset-width)) var(--tw-ring-color);
   box-shadow: var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow, 0 0 #0000);
 }
+
+.btn-desmarcar-inspecionados {
+  margin-top: 8px;
+  padding: 6px 16px;
+  background: #f3f4f6; /* bg-gray-100 */
+  color: #374151;      /* text-gray-700 */
+  border: 1px solid #d1d5db; /* border-gray-300 */
+  border-radius: 6px;
+  font-size: 0.95em;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s, border 0.2s;
+  box-shadow: none;
+}
+.btn-desmarcar-inspecionados:hover,
+.btn-desmarcar-inspecionados:focus {
+  background: #e5e7eb; /* bg-gray-200 */
+  border-color: #9ca3af; /* border-gray-400 */
+  color: #111827; /* text-gray-900 */
+}
+
+/* Corrigir z-index do modal para evitar problemas de sobreposição */
+.modal-acoes-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 9999 !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-acoes-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 9998 !important;
+}
+
+.modal-acoes-content {
+  position: relative;
+  z-index: 10000 !important;
+  max-width: 768px;
+  width: 95%;
+  max-height: 80vh;
+  overflow-y: auto;
+  background-color: white;
+  border-radius: 0.5rem;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+/* Garantir que o modal não seja interferido por outros elementos */
+.modal-acoes-container * {
+  pointer-events: auto;
+}
+
+/* Evitar problemas com elementos que possam estar sobre o modal */
+body.modal-acoes-open {
+  overflow: hidden;
+}

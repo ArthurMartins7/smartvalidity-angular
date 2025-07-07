@@ -1,9 +1,6 @@
 /* You can add global styles to this file, and also import other style files */
 
 @import "tailwindcss";
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
 
 /* Forçar o tema claro para as páginas de autenticação */
 .auth-page {
@@ -21,3 +18,27 @@
 .auth-page button {
   color-scheme: light !important;
 }
+
+:root {
+  --header-height: 5rem; /* default 80px */
+}
+
+/* utility classes for offset */
+.content-offset {
+  padding-top: var(--header-height);
+}
+.sidebar-offset {
+  top: var(--header-height);
+}
+
+/* Logo VALIDATA com fonte Oswald */
+.validata-logo {
+  font-family: 'Oswald', sans-serif;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  font-size: 1.1em; /* Tamanho otimizado para Oswald */
+}
+
+html, body { height: 100%; }
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }

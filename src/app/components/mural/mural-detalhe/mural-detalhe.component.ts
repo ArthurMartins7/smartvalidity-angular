@@ -1,15 +1,16 @@
-import { CommonModule } from '@angular/common';
+import { CommonModule, Location } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { MuralListagemDTO } from '../../../shared/model/dto/mural.dto';
-import { MuralService } from '../../../shared/service/mural.service';
+import { MuralSelecaoService, MuralService } from '../../../shared/service/mural.service';
+import { ModalInspecaoComponent } from '../mural-modal-inspecao/modal-inspecao.component';
 
 @Component({
   selector: 'app-mural-detalhe',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule, HttpClientModule],
+  imports: [CommonModule, RouterModule, FormsModule, HttpClientModule, ModalInspecaoComponent],
   templateUrl: './mural-detalhe.component.html',
   styleUrl: './mural-detalhe.component.css'
 })
@@ -19,30 +20,24 @@ export class MuralDetalheComponent implements OnInit {
   loading: boolean = true;
   error: string | null = null;
   activeTab: string = 'proximo';
-  motivoInspecao: string = '';
-  motivoCustomizado: string = '';
-  showMotivosDropdown: boolean = false;
-  motivosInspecao: string[] = ['Avaria/Quebra', 'Promoção', 'Outro'];
-  motivoError: string | null = null;
   processandoInspecao: boolean = false;
 
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private muralService: MuralService
+    private muralService: MuralService,
+    private selecaoService: MuralSelecaoService,
+    private location: Location
   ) {}
 
   ngOnInit(): void {
     this.route.params.subscribe(params => {
       this.itemId = params['id'];
-
-      // Captura a aba de onde o usuário veio
       this.route.queryParams.subscribe(queryParams => {
         if (queryParams['tab']) {
           this.activeTab = queryParams['tab'];
         }
       });
-
       this.loadItemDetails();
     });
   }
@@ -50,7 +45,6 @@ export class MuralDetalheComponent implements OnInit {
   loadItemDetails(): void {
     this.loading = true;
     this.error = null;
-
     this.muralService.getItemById(this.itemId).subscribe({
       next: (item) => {
         this.item = item;
@@ -64,52 +58,27 @@ export class MuralDetalheComponent implements OnInit {
     });
   }
 
-  marcarInspecionado(): void {
+  abrirModalInspecao(): void {
     if (!this.item) return;
+    this.selecaoService.updateSelectedItems([this.itemId]);
+    this.selecaoService.openInspecaoModal();
+  }
 
-    // Já está processando, não permitir cliques duplicados
+  onInspecaoConfirmada(): void {
+    if (!this.item) return;
     if (this.processandoInspecao) return;
-
-    // Limpa erros anteriores
-    this.motivoError = null;
-
-    // Validação específica para o motivo da inspeção
-    if (!this.motivoInspecao) {
-      this.motivoError = 'Por favor, selecione um motivo para a inspeção.';
-      return;
-    }
-
-    // Validação para motivo customizado
-    if (this.motivoInspecao === 'Outro' && !this.motivoCustomizado) {
-      this.motivoError = 'Por favor, informe o motivo da inspeção.';
-      return;
-    }
-
-    // Atualiza o status para processando
     this.processandoInspecao = true;
-
-    // Se for motivo "Outro", usa o motivo customizado
-    const motivoFinal = this.motivoInspecao === 'Outro' ? this.motivoCustomizado : this.motivoInspecao;
-
-    this.muralService.marcarInspecionado(this.itemId, motivoFinal).subscribe({
-      next: (item) => {
-        // Atualiza o estado local com o item retornado
-        if (item) {
-          this.item = item;
+    this.selecaoService.confirmarInspecao([this.item]).subscribe({
+      next: (itens) => {
+        if (itens && itens.length > 0) {
+          this.item = itens[0];
         }
-
-        // Adiciona um pequeno atraso para permitir que o usuário veja a mudança
-        setTimeout(() => {
-          // Redireciona para a mesma aba de onde o usuário veio
-          this.router.navigate(['/mural-listagem'], {
-            queryParams: { tab: this.activeTab },
-            state: { activeTab: this.activeTab }
-          });
-        }, 1000);
+        this.processandoInspecao = false;
+        this.selecaoService.closeInspecaoModal();
+        this.selecaoService.clearSelection();
       },
       error: (err) => {
         console.error('Erro ao marcar item como inspecionado:', err);
-        // Extrai a mensagem de erro da resposta se possível
         if (err.error && err.error.message) {
           this.error = err.error.message;
         } else {
@@ -120,18 +89,7 @@ export class MuralDetalheComponent implements OnInit {
     });
   }
 
-  toggleMotivosDropdown(): void {
-    this.showMotivosDropdown = !this.showMotivosDropdown;
-    // Limpa o erro de motivo quando o dropdown é aberto/fechado
-    if (this.motivoError) {
-      this.motivoError = null;
-    }
-  }
-
-  selecionarMotivo(motivo: string): void {
-    this.motivoInspecao = motivo;
-    this.showMotivosDropdown = false;
-    // Limpa o erro de motivo quando um motivo é selecionado
-    this.motivoError = null;
+  voltar(): void {
+    this.location.back();
   }
 }

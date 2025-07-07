@@ -390,6 +390,22 @@ export class NotificacaoDetalheComponent implements OnInit, OnDestroy {
     return 'help_outline';
   }
 
+  /**
+   * Obter motivo de inspeção para alertas personalizados já resolvidos
+   */
+  public obterMotivoInspecao(): string {
+    if (!this.notificacao || !this.notificacao.motivoInspecao) return '';
+    return this.notificacao.motivoInspecao;
+  }
+
+  /**
+   * Verifica se possui motivo de inspeção para exibir
+   */
+  public possuiMotivoInspecao(): boolean {
+    return this.notificacao?.motivoInspecao != null && 
+           this.notificacao.motivoInspecao.trim().length > 0;
+  }
+
   public excluirNotificacao(): void {
     console.log('Método excluirNotificacao chamado', this.notificacao?.id);
     if (!this.notificacao?.id) return;

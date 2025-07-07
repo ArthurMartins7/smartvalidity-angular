@@ -241,6 +241,15 @@ export class AlertaDetalheComponent implements OnInit, OnDestroy {
     return 'Status de inspeção não informado';
   }
 
+  public obterMotivoInspecao(): string {
+    if (!this.alerta || !this.alerta.motivoInspecao) return '';
+    return this.alerta.motivoInspecao;
+  }
+
+  public possuiMotivoInspecao(): boolean {
+    return this.alerta?.motivoInspecao != null && this.alerta.motivoInspecao.trim().length > 0;
+  }
+
   public obterCorStatusInspecao(): string {
     if (!this.alerta) return 'border-gray-400';
     

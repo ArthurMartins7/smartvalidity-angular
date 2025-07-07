@@ -18,6 +18,7 @@ export namespace AlertaDTO {
     produto?: { id: number; nome: string };
     lida?: boolean;
     itemInspecionado?: boolean;
+    motivoInspecao?: string;
     diasVencidos?: number;
     dataVencimentoItem?: Date;
   }

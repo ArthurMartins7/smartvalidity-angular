@@ -24,33 +24,33 @@
 <div *ngIf="!carregando && alerta" class="bg-white rounded-lg shadow-md overflow-hidden mx-6">
   <!-- Cabeçalho do card -->
   <div class="p-6 bg-gray-50 border-b border-gray-200">
-    <div class="flex items-start justify-between">
+    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between">
       <div>
         <h1 class="text-2xl font-bold text-gray-800 mb-2">{{ removerEmojis(alerta.titulo) }}</h1>
       </div>
-             <div class="flex items-center gap-3">
+             <div class="flex gap-2 w-full justify-center sm:w-auto mt-4 sm:mt-0">
          <button (click)="excluirAlerta()"
-                 class="bg-red-600 text-white px-3 py-2 rounded-lg hover:bg-red-700 transition-colors font-medium flex items-center justify-center w-10 h-10"
+                 class="bg-red-600 text-white w-10 h-10 rounded-lg hover:bg-red-700 transition-colors flex items-center justify-center"
                  title="Excluir este alerta">
            <span class="material-icons text-base">delete</span>
          </button>
          <button *ngIf="podeVisualizarItem()"
                  (click)="visualizarItem(obterPrimeiroProduto())"
-                 class="text-white px-4 py-2 rounded-lg transition-colors font-medium flex items-center gap-2"
+                 class="text-white w-10 h-10 rounded-lg transition-colors flex items-center justify-center"
                  style="background-color: #5084C1;"
                  onmouseover="this.style.backgroundColor='#4071a8'"
                  onmouseout="this.style.backgroundColor='#5084C1'">
            <span class="material-icons text-sm">visibility</span>
-           Visualizar Item
+           <span class="sr-only">Visualizar Item</span>
          </button>
          <button *ngIf="podeEditar()"
                  (click)="editarAlerta()"
-                 class="text-white px-4 py-2 rounded-lg transition-colors font-medium flex items-center gap-2"
+                 class="text-white w-10 h-10 rounded-lg transition-colors flex items-center justify-center"
                  style="background-color: #5084C1;"
                  onmouseover="this.style.backgroundColor='#3d6ba3'"
                  onmouseout="this.style.backgroundColor='#5084C1'">
            <span class="material-icons text-sm">edit</span>
-           Editar
+           <span class="sr-only">Editar</span>
          </button>
        </div>
     </div>
@@ -160,7 +160,7 @@
     </div>
 
     <!-- Card de Status de Inspeção (apenas para alertas automáticos) -->
-    <div *ngIf="ehAlertaAutomatico()" 
+    <div *ngIf="ehAlertaAutomatico()"
          class="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200 px-6 py-4 border-l-4"
          [ngClass]="obterCorStatusInspecao()">
       <div class="flex items-center gap-3 mb-4">

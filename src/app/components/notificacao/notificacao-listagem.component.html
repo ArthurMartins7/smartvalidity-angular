@@ -18,20 +18,20 @@
   <div class="max-w-5xl mx-auto">
     <!-- Abas e ação em lote -->
     <div class="flex items-center justify-between mb-6">
-      <div class="flex gap-2">
+      <div class="flex flex-wrap gap-2 justify-center sm:justify-start">
         <button (click)="setActiveTab('pendentes')"
                 [ngClass]="activeTab==='pendentes' ? 'bg-[#5084C1] text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'"
-                class="px-4 py-2 rounded-lg font-medium transition-colors">
+                class="px-3 sm:px-4 py-2 rounded-lg font-medium transition-colors text-sm sm:text-base">
           Pendentes
         </button>
         <button (click)="setActiveTab('jaResolvidas')"
                 [ngClass]="activeTab==='jaResolvidas' ? 'bg-[#5084C1] text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'"
-                class="px-4 py-2 rounded-lg font-medium transition-colors">
+                class="px-3 sm:px-4 py-2 rounded-lg font-medium transition-colors text-sm sm:text-base">
           Já Resolvidas
         </button>
         <button (click)="setActiveTab('personalizadas')"
                 [ngClass]="activeTab==='personalizadas' ? 'bg-[#5084C1] text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'"
-                class="px-4 py-2 rounded-lg font-medium transition-colors">
+                class="px-3 sm:px-4 py-2 rounded-lg font-medium transition-colors text-sm sm:text-base">
           Personalizadas
         </button>
       </div>

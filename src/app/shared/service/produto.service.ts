@@ -1,5 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { environment } from '@env';
 import { Observable, of } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { Produto } from '../model/entity/produto';
@@ -9,7 +10,7 @@ import { ProdutoSeletor } from '../model/seletor/produto.seletor';
   providedIn: 'root',
 })
 export class ProdutoService {
-  private readonly API = 'http://localhost:8080/smartvalidity/produto';
+  private readonly API = `${environment.apiUrl}/produto`;
 
   constructor(private httpClient: HttpClient) {}
 

@@ -1,12 +1,12 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { environment } from '@env';
 import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { AlertaDTO } from '../model/dto/alerta.dto';
 import { AlertaSeletor } from '../model/seletor/alerta.seletor';
 
-
-const API_URL = 'http://localhost:8080/smartvalidity';
+const API_URL = environment.apiUrl;
 
 @Injectable({
   providedIn: 'root',

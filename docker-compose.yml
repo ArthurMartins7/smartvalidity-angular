@@ -1,0 +1,16 @@
+version: "3.9"
+
+services:
+  frontend:
+    container_name: smartvalidity-frontend
+    build: .
+    image: smartvalidity-frontend:latest
+    ports:
+      - "80:80"
+    networks:
+      - app-network
+    restart: unless-stopped
+
+networks:
+  app-network:
+    external: true

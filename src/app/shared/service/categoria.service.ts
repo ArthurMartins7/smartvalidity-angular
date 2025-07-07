@@ -1,5 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { environment } from '@env';
 import { Observable } from 'rxjs';
 import { Categoria } from '../model/entity/categoria';
 
@@ -7,7 +8,7 @@ import { Categoria } from '../model/entity/categoria';
   providedIn: 'root',
 })
 export class CategoriaService {
-  private readonly API = 'http://localhost:8080/smartvalidity/categoria';
+  private readonly API = `${environment.apiUrl}/categoria`;
 
   constructor(private httpClient: HttpClient) {}
 

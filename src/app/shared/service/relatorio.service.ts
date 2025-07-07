@@ -1,5 +1,6 @@
 import { HttpClient, HttpResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { environment } from '@env';
 import { Observable } from 'rxjs';
 import { MuralFiltroDTO } from '../model/dto/mural.dto';
 
@@ -8,7 +9,7 @@ import { MuralFiltroDTO } from '../model/dto/mural.dto';
  * Em produção, usar URL relativa: '/smartvalidity'
  * Em desenvolvimento, usar URL completa: 'http://localhost:8080/smartvalidity'
  */
-const API_URL = 'http://localhost:8080/smartvalidity';
+const API_URL = environment.apiUrl;
 
 @Injectable({
   providedIn: 'root'

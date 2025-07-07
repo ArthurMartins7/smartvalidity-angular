@@ -1,16 +1,17 @@
+import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { environment } from '@env';
 import { Observable } from 'rxjs';
 import { Corredor } from '../model/entity/corredor';
+import { Usuario } from '../model/entity/usuario.model';
 import { CorredorSeletor } from '../model/seletor/corredor.seletor';
 import { UsuarioService } from './usuario.service';
-import { Usuario } from '../model/entity/usuario.model';
 
 @Injectable({
   providedIn: 'root'
 })
 export class CorredorService {
-  private readonly API = 'http://localhost:8080/smartvalidity/corredor';
+  private readonly API = `${environment.apiUrl}/corredor`;
 
   constructor(
     private httpClient: HttpClient,

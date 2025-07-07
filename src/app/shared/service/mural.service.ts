@@ -1,5 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { environment } from '@env';
 import { BehaviorSubject, Observable, of } from 'rxjs';
 import { MuralFiltroDTO, MuralListagemDTO } from '../model/dto/mural.dto';
 
@@ -51,7 +52,7 @@ export interface MuralFilterOptions {
   providedIn: 'root'
 })
 export class MuralService {
-  private readonly API = 'http://localhost:8080/smartvalidity/mural';
+  private readonly API = `${environment.apiUrl}/mural`;
 
   constructor(private httpClient: HttpClient) { }
 
@@ -148,7 +149,7 @@ export class MuralService {
   providedIn: 'root'
 })
 export class MuralFilterService {
-  private readonly API = 'http://localhost:8080/smartvalidity/mural';
+  private readonly API = `${environment.apiUrl}/mural`;
   private readonly FILTER_STATE_KEY = 'muralFilterState';
 
 

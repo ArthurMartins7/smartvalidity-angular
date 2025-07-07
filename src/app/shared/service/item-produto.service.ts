@@ -1,15 +1,15 @@
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { environment } from '@env';
 import { Observable } from 'rxjs';
-import { ItemProdutoDTO } from '../model/dto/item-Produto.dto'
-import { ItemProdutoSeletor } from '../model/seletor/item-produto.seletor';
+import { ItemProdutoDTO } from '../model/dto/item-Produto.dto';
 // import { Page } from '../model/page';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ItemProdutoService {
-  private readonly API = 'http://localhost:8080/smartvalidity/item-produto';
+  private readonly API = `${environment.apiUrl}/item-produto`;
 
   constructor(private httpClient: HttpClient) {}
 

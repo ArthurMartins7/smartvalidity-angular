@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, of } from 'rxjs';
 import { catchError, map, tap } from 'rxjs/operators';
 
+import { environment } from '@env';
 import { AlertaDTO } from '../model/dto/alerta.dto';
 import { TipoAlerta } from '../model/enum/tipo-alerta.enum';
 
@@ -10,7 +11,7 @@ import { TipoAlerta } from '../model/enum/tipo-alerta.enum';
   providedIn: 'root'
 })
 export class NotificacaoService {
-  private readonly API_URL = 'http://localhost:8080/smartvalidity/api/notificacoes';
+  private readonly API_URL = `${environment.apiUrl}/notificacoes`;
 
   private unreadCountSubject = new BehaviorSubject<number>(0);
   public unreadCount$ = this.unreadCountSubject.asObservable();
@@ -131,7 +132,8 @@ export class NotificacaoService {
       limite: 2,
       pagina: 1
     };
-    return this.http.post<any[]>('http://localhost:8080/smartvalidity/mural/filtrar', filtro);
+    const muralApi = `${environment.apiUrl}/mural/filtrar`;
+    return this.http.post<any[]>(muralApi, filtro);
   }
 
   gerarParametrosMural(notificacao: AlertaDTO.Listagem): { [key: string]: string } | null {

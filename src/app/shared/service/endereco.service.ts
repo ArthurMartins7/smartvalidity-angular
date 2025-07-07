@@ -1,5 +1,6 @@
-import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { Injectable } from '@angular/core';
+import { environment } from '@env';
 import { Observable } from 'rxjs';
 import { EnderecoDTO } from '../model/dto/endereco.dto';
 
@@ -7,7 +8,7 @@ import { EnderecoDTO } from '../model/dto/endereco.dto';
   providedIn: 'root'
 })
 export class EnderecoService {
-  private readonly API = 'http://localhost:8080/smartvalidity/endereco';
+  private readonly API = `${environment.apiUrl}/endereco`;
 
   constructor(private httpClient: HttpClient) { }
 

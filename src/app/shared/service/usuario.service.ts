@@ -1,5 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { environment } from '@env';
 import { Observable } from 'rxjs';
 import { UsuarioConviteDTO } from '../model/dto/usuario-convite.dto';
 import { Usuario } from '../model/entity/usuario.model';
@@ -8,7 +9,7 @@ import { Usuario } from '../model/entity/usuario.model';
   providedIn: 'root'
 })
 export class UsuarioService {
-  private readonly API = 'http://localhost:8080/smartvalidity/usuario';
+  private readonly API = `${environment.apiUrl}/usuario`;
 
   constructor(private httpClient: HttpClient) {
 

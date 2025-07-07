@@ -1,14 +1,15 @@
 import { HttpClient } from "@angular/common/http";
 import { inject, Injectable } from "@angular/core";
-import { Empresa } from "../model/entity/empresa";
+import { environment } from '@env';
 import { Observable } from "rxjs";
+import { Empresa } from "../model/entity/empresa";
 
 @Injectable({
   providedIn: 'root'
 })
 export class EmpresaService {
 
-  private readonly API = 'http://localhost:8080/smartvalidity/empresa';
+  private readonly API = `${environment.apiUrl}/empresa`;
 
   private httpClient = inject(HttpClient);
 

@@ -1,15 +1,15 @@
-import { Component, OnInit, AfterViewInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
-import { Produto } from '../../../../../shared/model/entity/produto';
-import { ProdutoService } from '../../../../../shared/service/produto.service';
-import { FornecedorService } from '../../../../../shared/service/fornecedor.service';
-import { CategoriaService } from '../../../../../shared/service/categoria.service';
-import { Fornecedor } from '../../../../../shared/model/entity/fornecedor';
-import { ActivatedRoute, Router } from '@angular/router';
-import Swal from 'sweetalert2';
-import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { HttpClient } from '@angular/common/http';
-import { HttpClientModule } from '@angular/common/http';
+import { HttpClient, HttpClientModule } from '@angular/common/http';
+import { AfterViewInit, ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { ActivatedRoute, Router } from '@angular/router';
+import { environment } from '@env';
+import Swal from 'sweetalert2';
+import { Fornecedor } from '../../../../../shared/model/entity/fornecedor';
+import { Produto } from '../../../../../shared/model/entity/produto';
+import { CategoriaService } from '../../../../../shared/service/categoria.service';
+import { FornecedorService } from '../../../../../shared/service/fornecedor.service';
+import { ProdutoService } from '../../../../../shared/service/produto.service';
 
 @Component({
   selector: 'app-produto-detalhe',
@@ -149,7 +149,7 @@ export class ProdutoDetalheComponent implements OnInit, AfterViewInit, OnDestroy
       error: (erro) => {
         console.error('Erro ao criar produto:', erro);
         console.error('Detalhes do erro:', JSON.stringify(erro, null, 2));
-        
+
         // Tenta montar mensagem a partir do payload do backend
         let mensagemErro = 'Ocorreu um erro ao salvar o produto.';
 
@@ -222,11 +222,11 @@ export class ProdutoDetalheComponent implements OnInit, AfterViewInit, OnDestroy
 
   voltar(): void {
     if (this.categoriaId) {
-      this.router.navigate(['/produto-listagem'], { 
-        queryParams: { 
+      this.router.navigate(['/produto-listagem'], {
+        queryParams: {
           categoriaId: this.categoriaId,
-          categoriaNome: this.categoriaNome 
-        } 
+          categoriaNome: this.categoriaNome
+        }
       });
     } else {
       this.router.navigate(['/produto-listagem']);
@@ -324,7 +324,7 @@ export class ProdutoDetalheComponent implements OnInit, AfterViewInit, OnDestroy
   buscarProdutoOpenFoodFacts(codigo: string) {
     console.log('Buscando produto na Open Food Facts para o código:', codigo);
     // URL base do backend – mantenha consistente com outros services
-    const API_URL = 'http://localhost:8080/smartvalidity';
+    const API_URL = environment.apiUrl;
     this.http.get<any>(`${API_URL}/public/openfoodfacts/product/${codigo}`).subscribe({
       next: (res) => {
         console.log('Resposta da Open Food Facts:', res);

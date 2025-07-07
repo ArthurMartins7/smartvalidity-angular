@@ -2,6 +2,7 @@ import { HttpClient, HttpHeaders, HttpResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 //import { UsuarioDTO } from '../../model/dto/UsuarioDTO';
+import { environment } from '@env';
 import { EmpresaUsuarioDto } from '../../../shared/model/dto/empresaUsuario.dto';
 import { Empresa } from '../../../shared/model/entity/empresa';
 import { Usuario } from '../../../shared/model/entity/usuario.model';
@@ -10,7 +11,7 @@ import { Usuario } from '../../../shared/model/entity/usuario.model';
   providedIn: 'root',
 })
 export class AuthenticationService {
-  private readonly API = 'http://localhost:8080/smartvalidity/auth';
+  private readonly API = `${environment.apiUrl}/auth`;
 
   constructor(private httpClient: HttpClient) {}
 

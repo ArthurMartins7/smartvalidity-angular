@@ -187,28 +187,6 @@
       </div>
     </div>
 
-    <!-- Card de Status de Inspeção (apenas para notificações personalizadas) -->
-    <div *ngIf="ehAlertaPersonalizado() && notificacao.itemInspecionado !== undefined" 
-         class="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200 px-6 py-4 border-l-4"
-         [ngClass]="obterCorStatusInspecao()">
-      <div class="flex items-center gap-3 mb-4">
-        <div class="p-2 rounded-full" [ngClass]="obterCorFundoStatusInspecao()">
-          <span class="material-icons" [ngClass]="obterCorIconeStatusInspecao()">{{ obterIconeStatusInspecao() }}</span>
-        </div>
-        <h3 class="text-lg font-semibold text-gray-800">Status de Inspeção</h3>
-      </div>
-      <div class="space-y-4">
-        <div class="flex justify-between items-center">
-          <span class="text-base font-medium text-gray-600">Status</span>
-          <div class="text-lg text-gray-800 font-medium">{{ obterStatusInspecao() }}</div>
-        </div>
-        <div *ngIf="possuiMotivoInspecao()" class="flex justify-between items-center">
-          <span class="text-base font-medium text-gray-600">Motivo</span>
-          <div class="text-lg text-gray-800 font-medium">{{ obterMotivoInspecao() }}</div>
-        </div>
-      </div>
-    </div>
-
     <!-- Card Criador -->
     <div *ngIf="notificacao.usuarioCriador"
          class="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200 px-6 py-4 border-l-4 border-orange-400">

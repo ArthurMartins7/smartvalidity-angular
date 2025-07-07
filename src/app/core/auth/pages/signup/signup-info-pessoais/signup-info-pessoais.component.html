@@ -18,35 +18,35 @@
           <div>
             <label for="nome" class="block mb-2 text-sm font-medium text-gray-900">Nome completo</label>
             <input [(ngModel)]="usuario.nome" name="nome" id="nome" type="text" required pattern="^(?=.*[A-Za-zÀ-ÖØ-öø-ÿ])[A-Za-zÀ-ÖØ-öø-ÿ\s]+$" title="Somente letras e espaços são permitidos"
-                   class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
+                   class="bg-gray-50 border border-gray-300 text-gray-900 placeholder-gray-400 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
                    placeholder="Digite seu nome completo">
           </div>
 
           <div>
             <label for="email" class="block mb-2 text-sm font-medium text-gray-900">E-mail</label>
             <input [(ngModel)]="usuario.email" name="email" id="email" type="email" required
-                   class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
+                   class="bg-gray-50 border border-gray-300 text-gray-900 placeholder-gray-400 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
                    placeholder="exemplo@empresa.com">
           </div>
 
           <div>
             <label for="cnpj" class="block mb-2 text-sm font-medium text-gray-900">CNPJ</label>
             <input #cnpjInput (input)="onCnpjInput(cnpjInput)" name="cnpj" id="cnpj" type="text" required
-                   class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
+                   class="bg-gray-50 border border-gray-300 text-gray-900 placeholder-gray-400 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
                    placeholder="00.000.000/0000-00">
           </div>
 
           <div>
             <label for="razaoSocial" class="block mb-2 text-sm font-medium text-gray-900">Razão social</label>
             <input [(ngModel)]="empresa.razaoSocial" name="razaoSocial" id="razaoSocial" type="text" required pattern="^(?=.*[A-Za-zÀ-ÖØ-öø-ÿ])[A-Za-zÀ-ÖØ-öø-ÿ\s]+$" title="Somente letras e espaços são permitidos"
-                   class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
+                   class="bg-gray-50 border border-gray-300 text-gray-900 placeholder-gray-400 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
                    placeholder="Nome empresarial">
           </div>
 
           <div>
             <label for="cargo" class="block mb-2 text-sm font-medium text-gray-900">Cargo</label>
             <input [(ngModel)]="usuario.cargo" name="cargo" id="cargo" type="text" required pattern="^(?=.*[A-Za-zÀ-ÖØ-öø-ÿ])[A-Za-zÀ-ÖØ-öø-ÿ\s]+$" title="Somente letras e espaços são permitidos"
-                   class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
+                   class="bg-gray-50 border border-gray-300 text-gray-900 placeholder-gray-400 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
                    placeholder="Seu cargo na empresa">
           </div>
 

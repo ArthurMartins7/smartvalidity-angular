@@ -6,11 +6,12 @@ import { Empresa } from '../../../../../shared/model/entity/empresa';
 import { Usuario } from '../../../../../shared/model/entity/usuario.model';
 import { HeaderAuthComponent } from "../../../../../shared/ui/headers/header-auth/header-auth.component";
 import { AuthenticationService } from '../../../services/auth.service';
+import { CommonModule } from '@angular/common';
 
 
 @Component({
   selector: 'app-signup-verificacao',
-  imports: [FormsModule, HeaderAuthComponent],
+  imports: [FormsModule, CommonModule, HeaderAuthComponent],
   templateUrl: './signup-verificacao.component.html',
   styleUrl: './signup-verificacao.component.css'
 })

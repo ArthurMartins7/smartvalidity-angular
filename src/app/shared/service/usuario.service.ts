@@ -44,7 +44,7 @@ export class UsuarioService {
     return this.httpClient.get<Usuario>(`${this.API}/${id}`);
   }
 
-  alterar(id: string, usuario: Usuario): Observable<Usuario> {
+  alterar(id: string, usuario: Partial<Usuario>): Observable<Usuario> {
     return this.httpClient.put<Usuario>(`${this.API}/${id}`, usuario);
   }
 

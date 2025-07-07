@@ -55,7 +55,13 @@ export class UsuariosPerfisEditarComponent implements OnInit {
       return;
     }
 
-    this.usuarioService.alterar(this.id, this.usuario).subscribe({
+    const payload = {
+      perfilAcesso: this.usuario.perfilAcesso,
+      nome: this.usuario.nome,
+      cargo: this.usuario.cargo
+    } as Partial<Usuario>;
+
+    this.usuarioService.alterar(this.id, payload).subscribe({
       next: (_) => {
         console.log(this.usuario);
         Swal.fire({ icon: 'success', title: 'Alterações salvas', confirmButtonColor: '#5084C1' }).then(() => {

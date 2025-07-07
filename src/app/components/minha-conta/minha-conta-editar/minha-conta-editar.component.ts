@@ -52,7 +52,12 @@ export class MinhaContaEditarComponent implements OnInit {
       return;
     }
 
-    this.usuarioService.alterar(this.usuario.id, this.usuario).subscribe({
+    const payload = {
+      nome: this.usuario.nome,
+      cargo: this.usuario.cargo
+    } as Partial<Usuario>;
+
+    this.usuarioService.alterar(this.usuario.id, payload).subscribe({
       next: () => {
         Swal.fire({ icon: 'success', title: 'Alterações salvas', confirmButtonColor: '#5084C1' }).then(() => {
           this.router.navigate(['/minha-conta-info']);

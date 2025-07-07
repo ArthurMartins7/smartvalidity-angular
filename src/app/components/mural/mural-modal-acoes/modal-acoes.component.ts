@@ -42,6 +42,11 @@ export class ModalAcoesComponent implements OnInit, OnDestroy {
           this.visible = show;
           if (show) {
             this.atualizarContadores();
+            // Adiciona classe ao body para evitar scroll
+            document.body.classList.add('modal-acoes-open');
+          } else {
+            // Remove classe do body quando modal é fechado
+            document.body.classList.remove('modal-acoes-open');
           }
         }
       )
@@ -50,6 +55,8 @@ export class ModalAcoesComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.subscriptions.forEach(sub => sub.unsubscribe());
+    // Remove classe do body ao destruir o componente
+    document.body.classList.remove('modal-acoes-open');
   }
 
   private atualizarContadores(): void {
@@ -87,6 +94,8 @@ export class ModalAcoesComponent implements OnInit, OnDestroy {
 
   closeModal(): void {
     this.selecaoService.closeAcoesModal();
+    // Remove classe do body ao fechar o modal
+    document.body.classList.remove('modal-acoes-open');
   }
 
   desmarcarInspecionadosSelecionados(): void {

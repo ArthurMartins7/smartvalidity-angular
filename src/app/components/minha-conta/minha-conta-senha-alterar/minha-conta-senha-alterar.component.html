@@ -30,22 +30,11 @@
         <h2 class="text-2xl font-bold text-gray-900 text-left mb-2">3. Altere sua senha</h2>
         <div class="w-full h-px bg-gray-200 opacity-70 mb-6"></div>
         <!-- Formulário simplificado -->
-        <form class="space-y-6" action="#">
-          <div>
-            <label for="senhaAntiga" class="block mb-2 text-sm font-medium text-gray-900">Senha antiga <span class="text-gray-500">(somente visualização)</span></label>
-            <div class="relative">
-              <input [type]="showSenhaAntiga ? 'text' : 'password'" disabled class="w-full border-b-2 border-gray-300 text-xl py-2 text-gray-500 bg-transparent" [ngModel]="senhaAntiga" name="senhaAntiga">
-              <button type="button" (click)="toggleShowSenhaAntiga()" class="absolute inset-y-0 right-0 flex items-center px-3 text-gray-500">
-                <span class="material-icons text-xl">{{ showSenhaAntiga ? 'visibility_off' : 'visibility' }}</span>
-              </button>
-              <span class="material-icons absolute right-10 top-1/2 -translate-y-1/2 text-gray-400">lock</span>
-            </div>
-          </div>
-
+        <form #senhaForm="ngForm" (ngSubmit)="alterarSenha(senhaForm, $event)" class="space-y-6">
           <div>
             <label for="senha" class="block mb-2 text-sm font-medium text-gray-900">Nova senha</label>
             <div class="relative">
-              <input [(ngModel)]="senha" name="senha" id="senha" [type]="showSenha ? 'text' : 'password'" required
+              <input [(ngModel)]="senha" name="senha" id="senha" [type]="showSenha ? 'text' : 'password'" required pattern=".*\S.*" title="A senha não pode estar vazia ou conter apenas espaços."
                      class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full pr-12 p-2.5"
                      placeholder="Crie uma senha segura">
               <button type="button" (click)="toggleShowSenha()" class="absolute inset-y-0 right-0 flex items-center px-3 text-gray-500">
@@ -57,7 +46,7 @@
           <div>
             <label for="confirmaSenha" class="block mb-2 text-sm font-medium text-gray-900">Confirmar senha</label>
             <div class="relative">
-              <input [(ngModel)]="confirmarSenha" name="confirmaSenha" id="confirmaSenha" [type]="showConfirmarSenha ? 'text' : 'password'" required
+              <input [(ngModel)]="confirmarSenha" name="confirmaSenha" id="confirmaSenha" [type]="showConfirmarSenha ? 'text' : 'password'" required pattern=".*\S.*" title="A senha não pode estar vazia ou conter apenas espaços."
                      class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full pr-12 p-2.5"
                      placeholder="Repita a senha">
               <button type="button" (click)="toggleShowConfirmarSenha()" class="absolute inset-y-0 right-0 flex items-center px-3 text-gray-500">
@@ -73,7 +62,7 @@
               Voltar
             </button>
 
-            <button (click)="alterarSenha()" type="button"
+            <button type="submit"
                     class="text-white bg-[#5084C1] hover:bg-[#3969a1] focus:ring-4 focus:outline-none focus:ring-blue-300 font-bold rounded-lg text-lg w-full py-3 text-center">
               Alterar senha
             </button>

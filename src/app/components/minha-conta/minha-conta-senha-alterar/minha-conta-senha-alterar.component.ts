@@ -1,63 +1,76 @@
+import { CommonModule } from '@angular/common';
 import { Component, inject } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, NgForm } from '@angular/forms';
 import { Router } from '@angular/router';
-import { Usuario } from '../../../shared/model/entity/usuario.model';
-import { Empresa } from '../../../shared/model/entity/empresa';
+import Swal from 'sweetalert2';
+import { AuthenticationService } from '../../../core/auth/services/auth.service';
 
 @Component({
   selector: 'app-minha-conta-senha-alterar',
-  imports: [FormsModule],
+  standalone: true,
+  imports: [CommonModule, FormsModule],
   templateUrl: './minha-conta-senha-alterar.component.html',
   styleUrl: './minha-conta-senha-alterar.component.css'
 })
 export class MinhaContaSenhaAlterarComponent {
 
-  public usuario: Usuario = new Usuario();
-  public empresa: Empresa = new Empresa();
+  // Senha antiga removida
 
-  /**
-   * Flags dos checkboxes exibidos no formulário
-   */
-  public aceitaTermos: boolean = false;
-  public receberNoticias: boolean = false;
-
-  // Campos de senha da etapa 2
+  // Campos de senha nova
   public senha: string = '';
   public confirmarSenha: string = '';
 
-  // Senha antiga (somente leitura)
-  public senhaAntiga: string = 'arthur123';
-
   // Flags de visibilidade dos campos de senha
-  public showSenhaAntiga: boolean = false;
   public showSenha: boolean = false;
   public showConfirmarSenha: boolean = false;
 
   private router = inject(Router);
+  private authService = inject(AuthenticationService);
 
   /**
    * Avança para a próxima etapa do cadastro.
    * Por enquanto apenas persiste as informações no sessionStorage
    * e redireciona para a etapa de criação de senha.
    */
-  public alterarSenha(): void {
-
-    if (this.senha !== this.confirmarSenha) {
-      alert('As senhas não coincidem.');
+  public alterarSenha(form: NgForm, event: Event): void {
+    const formEl = event.target as HTMLFormElement;
+    if (form.invalid || !formEl.checkValidity()) {
+      formEl.reportValidity();
       return;
     }
 
-    // Persistir a senha (exemplo) e navegar para verificação
-    sessionStorage.setItem('signup_senha', this.senha);
+    if (this.senha !== this.confirmarSenha) {
+      Swal.fire({ icon: 'warning', title: 'As senhas não coincidem.', confirmButtonColor: '#5084C1' });
+      return;
+    }
 
-    this.router.navigate(['minha-conta-info']);
+    const email = sessionStorage.getItem('usuarioEmail');
+    const token = sessionStorage.getItem('alterar_senha_token');
+    if (!email || !token) {
+      Swal.fire({ icon: 'error', title: 'Fluxo inválido', text: 'Tente novamente.', confirmButtonColor: '#5084C1' });
+      this.router.navigate(['']);
+      return;
+    }
+
+    this.authService.alterarSenha(email, token, this.senha).subscribe({
+      next: () => {
+        Swal.fire({ icon: 'success', title: 'Senha alterada', confirmButtonColor: '#5084C1' }).then(()=>{
+          sessionStorage.removeItem('alterar_senha_token');
+          this.router.navigate(['minha-conta-info']);
+        });
+      },
+      error: (err) => {
+        const msg = err?.error || 'Erro ao alterar senha';
+        Swal.fire({ icon: 'error', title: 'Erro', text: msg, confirmButtonColor: '#5084C1' });
+      }
+    });
   }
 
   /**
    * Retorna para a etapa anterior (informações pessoais)
    */
   public voltar(): void {
-    this.router.navigate(['']);
+    this.router.navigate(['minha-conta-senha-codigo-verificacao']);
   }
 
   public toggleShowSenha(): void {
@@ -66,10 +79,6 @@ export class MinhaContaSenhaAlterarComponent {
 
   public toggleShowConfirmarSenha(): void {
     this.showConfirmarSenha = !this.showConfirmarSenha;
-  }
-
-  public toggleShowSenhaAntiga(): void {
-    this.showSenhaAntiga = !this.showSenhaAntiga;
   }
 
 }

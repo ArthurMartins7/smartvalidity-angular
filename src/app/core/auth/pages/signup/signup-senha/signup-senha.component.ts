@@ -47,7 +47,7 @@ export class SignupSenhaComponent {
   }
 
   public voltar(): void {
-    this.router.navigate(['']);
+    this.router.navigate(['signup-info-pessoais']);
   }
 
   public toggleShowSenha(): void {

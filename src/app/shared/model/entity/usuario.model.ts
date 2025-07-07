@@ -8,6 +8,7 @@ export class Usuario {
   email: string;
   senha: string;
   cargo: string;
+  dataCriacao: Date;
   empresa: Empresa;
 
   // Campos do Spring Security que não devem ser serializados

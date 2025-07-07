@@ -25,6 +25,7 @@ export class SignupValidarIdentidadeComponent {
   public codigo: string = '';
 
   public emailDestino: string = '';
+  isResending = false;
 
   private router = inject(Router);
   private authenticationService = inject(AuthenticationService);
@@ -95,12 +96,14 @@ export class SignupValidarIdentidadeComponent {
       return;
     }
 
+    this.isResending = true;
     this.authenticationService.enviarOtpEmail(this.emailDestino).subscribe({
       next: () => Swal.fire({ icon: 'success', title: 'Código enviado', confirmButtonColor: '#5084C1' }),
       error: (err) => {
         const mensagem = err?.error || 'Não foi possível enviar o código.';
         Swal.fire({ icon: 'error', title: 'Erro', text: mensagem, confirmButtonColor: '#5084C1' });
-      }
+      },
+      complete: () => { this.isResending = false; }
     });
   }
 

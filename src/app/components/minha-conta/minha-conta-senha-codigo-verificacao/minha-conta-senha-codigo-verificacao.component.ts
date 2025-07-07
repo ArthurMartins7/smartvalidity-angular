@@ -1,26 +1,19 @@
+import { CommonModule } from '@angular/common';
 import { Component, inject } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, NgForm } from '@angular/forms';
 import { Router } from '@angular/router';
-import { Usuario } from '../../../shared/model/entity/usuario.model';
-import { Empresa } from '../../../shared/model/entity/empresa';
+import Swal from 'sweetalert2';
+import { AuthenticationService } from '../../../core/auth/services/auth.service';
 import { HeaderAuthComponent } from '../../../shared/ui/headers/header-auth/header-auth.component';
 
 @Component({
   selector: 'app-minha-conta-senha-codigo-verificacao',
-  imports: [FormsModule, HeaderAuthComponent],
+  standalone: true,
+  imports: [CommonModule, FormsModule, HeaderAuthComponent],
   templateUrl: './minha-conta-senha-codigo-verificacao.component.html',
   styleUrl: './minha-conta-senha-codigo-verificacao.component.css'
 })
 export class MinhaContaSenhaCodigoVerificacaoComponent {
-
-  public usuario: Usuario = new Usuario();
-  public empresa: Empresa = new Empresa();
-
-  /**
-   * Flags dos checkboxes exibidos no formulário
-   */
-  public aceitaTermos: boolean = false;
-  public receberNoticias: boolean = false;
 
   // Código de verificação digitado pelo usuário
   public codigo: string = '';
@@ -29,43 +22,65 @@ export class MinhaContaSenhaCodigoVerificacaoComponent {
   public emailDestino: string = '';
 
   private router = inject(Router);
+  private authService = inject(AuthenticationService);
+
+  isResending = false;
 
   constructor() {
-    // Tenta recuperar o e-mail salvo na etapa 1
-    const usuarioJson = sessionStorage.getItem('signup_usuario');
-    if (usuarioJson) {
-      try {
-        const usuario = JSON.parse(usuarioJson);
-        this.emailDestino = usuario.email || '';
-      } catch (_) {}
-    }
+    // Recupera o e-mail salvo na etapa anterior
+    const email = sessionStorage.getItem('usuarioEmail');
+    if (email) this.emailDestino = email;
   }
 
   /**
    * Finaliza criação da conta após validar código
    */
-  public criarConta(): void {
-    if (this.codigo.length !== 6) {
-      alert('Informe o código de 6 dígitos.');
+  public confirmarCodigo(form: NgForm, event: Event): void {
+    const formEl = event.target as HTMLFormElement;
+    if (form.invalid || !formEl.checkValidity()) {
+      formEl.reportValidity();
       return;
     }
 
-    // Aqui você validaria o código com o backend.
-    alert('Conta criada com sucesso!');
-
-    this.router.navigate(['minha-conta-senha-alterar']);
+    this.authService.validarOtpAlterarSenha(this.emailDestino, this.codigo).subscribe({
+      next: () => {
+        sessionStorage.setItem('alterar_senha_token', this.codigo);
+        this.router.navigate(['minha-conta-senha-alterar']);
+      },
+      error: (err) => {
+        const msg = err?.error || 'Código inválido ou expirado';
+        Swal.fire({ icon: 'error', title: 'Erro', text: msg, confirmButtonColor: '#5084C1' });
+      }
+    });
   }
 
   /**
    * Retorna para a etapa anterior (informações pessoais)
    */
   public voltar(): void {
-    this.router.navigate(['signup-senha']);
+    this.router.navigate(['minha-conta-senha-validar-identidade']);
   }
 
   // Reenvia o código para o e-mail do usuário
   public reenviarCodigo(): void {
-    alert('Novo código enviado para ' + this.emailDestino);
+    if (!this.emailDestino) return;
+    this.isResending = true;
+    this.authService.enviarOtpAlterarSenha(this.emailDestino).subscribe({
+      next: () => Swal.fire({ icon: 'success', title: 'Código enviado', confirmButtonColor: '#5084C1' }),
+      error: (_) => Swal.fire({ icon: 'error', title: 'Erro', text: 'Não foi possível enviar o código.', confirmButtonColor: '#5084C1' }),
+      complete: () => { this.isResending = false; }
+    });
+  }
+
+  public onCodigoInput(input: HTMLInputElement): void {
+    const digits = input.value.replace(/\D/g, '').slice(0, 6);
+    this.codigo = digits;
+    input.value = digits;
+    if (digits.length < 6) {
+      input.setCustomValidity('Informe 6 dígitos.');
+    } else {
+      input.setCustomValidity('');
+    }
   }
 
 }

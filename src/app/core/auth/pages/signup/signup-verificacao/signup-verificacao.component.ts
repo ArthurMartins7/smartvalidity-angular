@@ -29,6 +29,7 @@ export class SignupVerificacaoComponent {
   public showConfirmarSenha: boolean = false;
 
   public emailDestino: string = '';
+  isSending = false;
 
   private router = inject(Router);
   private authenticationService = inject(AuthenticationService);
@@ -74,6 +75,7 @@ export class SignupVerificacaoComponent {
       return;
     }
 
+    this.isSending = true;
     this.authenticationService.enviarOtpEmail(this.emailDestino).subscribe({
       next: () => {
         Swal.fire({ icon: 'success', title: 'Código enviado', confirmButtonColor: '#5084C1' });
@@ -81,10 +83,12 @@ export class SignupVerificacaoComponent {
           sessionStorage.setItem('signup_senha', this.senha);
         }
         this.router.navigate(['signup-validar-identidade']);
+        this.isSending = false;
       },
       error: (err) => {
         const mensagem = err?.error?.message ?? (typeof err?.error === 'string' ? err.error : err.message) ?? 'Não foi possível enviar o código. Verifique os dados e tente novamente.';
         Swal.fire({ icon: 'error', title: 'Erro', text: mensagem, confirmButtonColor: '#5084C1' });
+        this.isSending = false;
       }
     });
   }

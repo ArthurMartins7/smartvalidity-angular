@@ -16,12 +16,12 @@
     <!-- Message -->
     <p class="mb-8 text-gray-700 leading-relaxed">
       Já existe uma assinatura ativa neste sistema.<br/>
-      Entre em contato com o(a) administrador(a) que realizou a assinatura para receber um convite à equipe e conseguir fazer login.
+      Entre em contato com o(a) administrador(a) <span class="font-semibold">{{ assinanteNome }} ({{ assinanteEmail }})</span> para receber um convite à equipe e conseguir fazer login.
     </p>
 
     <!-- Action -->
     <div class="flex justify-end">
-      <button class="px-6 py-2 rounded bg-[#5084C1] text-white font-semibold" (click)="onClose()">Entendi</button>
+      <button class="px-6 py-2 rounded bg-[#5084C1] hover:bg-[#3969a1] text-white font-semibold" (click)="onClose()">Entendi</button>
     </div>
   </div>
 </div>

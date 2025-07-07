@@ -55,22 +55,22 @@
         <div class="w-full h-px bg-gray-200 opacity-70 mb-6"></div>
 
         <!-- Login Form -->
-        <form class="space-y-4 md:space-y-6" (ngSubmit)="realizarLogin()">
+        <form #loginForm="ngForm" (ngSubmit)="realizarLogin(loginForm, $event)" class="space-y-4 md:space-y-6">
           <!-- Email -->
           <div>
             <label for="email" class="block mb-2 text-sm font-medium text-gray-900">Seu email</label>
             <input [(ngModel)]="usuario.email" name="email" id="email" type="email" required
                    placeholder="name@company.com"
-                   class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5">
+                   class="bg-gray-50 border border-gray-300 text-gray-900 placeholder-gray-400 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5">
           </div>
 
           <!-- Password -->
           <div>
             <label for="password" class="block mb-2 text-sm font-medium text-gray-900">Senha</label>
             <div class="relative">
-              <input [(ngModel)]="usuario.senha" name="password" id="password" [type]="showSenha ? 'text' : 'password'" required
+              <input #senhaInput (input)="onSenhaInput(senhaInput)" [(ngModel)]="usuario.senha" name="password" id="password" [type]="showSenha ? 'text' : 'password'" required pattern=".*\S.*"
                      placeholder="••••••••"
-                     class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full pr-12 p-2.5">
+                     class="bg-gray-50 border border-gray-300 text-gray-900 placeholder-gray-400 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full pr-12 p-2.5">
               <button type="button" (click)="toggleShowSenha()" class="absolute inset-y-0 right-0 flex items-center px-3 text-gray-500">
                 <span class="material-icons text-xl">{{ showSenha ? 'visibility_off' : 'visibility' }}</span>
               </button>

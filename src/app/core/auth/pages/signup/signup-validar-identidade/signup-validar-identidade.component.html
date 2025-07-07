@@ -23,6 +23,11 @@
             <label for="codigo" class="block mb-2 text-sm font-medium text-gray-900 uppercase tracking-wide">código verificador</label>
             <input #codigoInput (input)="onCodigoInput(codigoInput)" [(ngModel)]="codigo" name="codigo" id="codigo" maxlength="6" minlength="6" pattern="\d{6}" required inputmode="numeric"
                    class="bg-white border-b-2 border-gray-400 focus:border-[#5084C1] block w-40 text-center text-2xl tracking-widest outline-none">
+            <button type="button" (click)="reenviarCodigo()" [disabled]="isResending" class="mt-6 text-sm text-black flex items-center gap-1 hover:underline disabled:opacity-50">
+              <span *ngIf="!isResending" class="material-icons text-base">refresh</span>
+              <span *ngIf="isResending" class="material-icons animate-spin text-base">autorenew</span>
+              <span>{{ isResending ? 'Enviando...' : 'Reenviar código' }}</span>
+            </button>
           </div>
           <!-- Botões Voltar e Avançar -->
           <div class="flex justify-between gap-4 pt-4">

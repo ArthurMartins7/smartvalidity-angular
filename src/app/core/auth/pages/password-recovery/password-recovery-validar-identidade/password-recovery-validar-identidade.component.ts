@@ -1,10 +1,10 @@
-import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import { HeaderPasswordRecoveryComponent } from '../../../../../shared/ui/headers/header-password-recovery/header-password-recovery.component';
+import { Component, inject } from '@angular/core';
+import { FormsModule, NgForm } from '@angular/forms';
 import { Router } from '@angular/router';
-import { AuthenticationService } from '../../../services/auth.service';
 import Swal from 'sweetalert2';
+import { HeaderPasswordRecoveryComponent } from '../../../../../shared/ui/headers/header-password-recovery/header-password-recovery.component';
+import { AuthenticationService } from '../../../services/auth.service';
 
 @Component({
   selector: 'app-password-recovery-validar-identidade',
@@ -19,22 +19,20 @@ export class PasswordRecoveryValidarIdentidadeComponent {
   private authenticationService = inject(AuthenticationService);
 
   public email: string = '';
+  isLoading = false;
 
   public voltar(): void {
     this.router.navigate(['']);
   }
 
-  public confirrmarEmail(): void {
-    if (!this.email) {
-      Swal.fire({
-        icon: 'warning',
-        title: 'Atenção',
-        text: 'Informe o e-mail.',
-        confirmButtonColor: '#5084C1'
-      });
+  public confirrmarEmail(form: NgForm, event: Event): void {
+    const formEl = event.target as HTMLFormElement;
+    if (form.invalid || !formEl.checkValidity()) {
+      formEl.reportValidity();
       return;
     }
 
+    this.isLoading = true;
     this.authenticationService.solicitarOtpRecuperacao(this.email).subscribe({
       next: () => {
         Swal.fire({
@@ -45,6 +43,7 @@ export class PasswordRecoveryValidarIdentidadeComponent {
         });
         sessionStorage.setItem('password_recovery_email', this.email);
         this.router.navigate(['/password-recovery-codigo-verificacao']);
+        this.isLoading = false;
       },
       error: (err) => {
         console.log('err: ', err);
@@ -55,6 +54,7 @@ export class PasswordRecoveryValidarIdentidadeComponent {
           text: mensagem,
           confirmButtonColor: '#5084C1'
         });
+        this.isLoading = false;
       }
     });
   }

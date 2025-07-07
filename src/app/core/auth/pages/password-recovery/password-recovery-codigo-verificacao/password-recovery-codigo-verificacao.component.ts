@@ -1,12 +1,12 @@
+import { CommonModule } from '@angular/common';
 import { Component, inject } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, NgForm } from '@angular/forms';
 import { Router } from '@angular/router';
+import Swal from 'sweetalert2';
 import { Empresa } from '../../../../../shared/model/entity/empresa';
 import { Usuario } from '../../../../../shared/model/entity/usuario.model';
-import { CommonModule } from '@angular/common';
 import { HeaderPasswordRecoveryComponent } from '../../../../../shared/ui/headers/header-password-recovery/header-password-recovery.component';
 import { AuthenticationService } from '../../../services/auth.service';
-import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-password-recovery-codigo-verificacao',
@@ -26,6 +26,7 @@ export class PasswordRecoveryCodigoVerificacaoComponent {
   public codigo: string = '';
 
   public emailDestino: string = '';
+  isResending = false;
 
   private router = inject(Router);
   private authenticationService = inject(AuthenticationService);
@@ -37,14 +38,10 @@ export class PasswordRecoveryCodigoVerificacaoComponent {
     }
   }
 
-  public confirmarCodigo(): void {
-    if (this.codigo.length !== 6) {
-      Swal.fire({
-        icon: 'warning',
-        title: 'Atenção',
-        text: 'Informe o código de 6 dígitos.',
-        confirmButtonColor: '#5084C1'
-      });
+  public confirmarCodigo(form: NgForm, event: Event): void {
+    const formEl = event.target as HTMLFormElement;
+    if (form.invalid || !formEl.checkValidity()) {
+      formEl.reportValidity();
       return;
     }
 
@@ -71,13 +68,28 @@ export class PasswordRecoveryCodigoVerificacaoComponent {
   }
 
   public reenviarCodigo(): void {
+    this.isResending = true;
     this.authenticationService.solicitarOtpRecuperacao(this.emailDestino).subscribe({
       next: () => Swal.fire({ icon: 'success', title: 'Sucesso', text: 'Código enviado', confirmButtonColor: '#5084C1' }),
       error: (err) => {
         const mensagem = err?.error || 'Não foi possível enviar o código.';
         Swal.fire({ icon: 'error', title: 'Erro', text: mensagem, confirmButtonColor: '#5084C1' });
+      },
+      complete: () => {
+        this.isResending = false;
       }
     });
+  }
+
+  public onCodigoInput(input: HTMLInputElement): void {
+    const digits = input.value.replace(/\D/g, '').slice(0, 6);
+    this.codigo = digits;
+    input.value = digits;
+    if (digits.length < 6) {
+      input.setCustomValidity('Informe 6 dígitos.');
+    } else {
+      input.setCustomValidity('');
+    }
   }
 
 }

@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, NgForm } from '@angular/forms';
 import { Router } from '@angular/router';
 import Swal from 'sweetalert2';
 import { AssinaturaExistenteModalComponent } from '../../../../components/assinatura-existente-modal/assinatura-existente-modal.component';
@@ -24,8 +24,12 @@ export class SigninComponent {
   public showSenha: boolean = false;
   public exibirModalAssinaturaExistente: boolean = false;
 
-  realizarLogin() {
-    //console.log('usuarioDTO: ', this.usuarioDTO);
+  realizarLogin(form: NgForm, event: Event): void {
+    const formEl = event.target as HTMLFormElement;
+    if (form.invalid || !formEl.checkValidity()) {
+      formEl.reportValidity();
+      return;
+    }
     localStorage.removeItem('tokenUsuarioAutenticado');
     this.authenticationService.authenticate(this.usuario).subscribe({
       next: (jwt) => {
@@ -104,6 +108,15 @@ export class SigninComponent {
 
   public toggleShowSenha(): void {
     this.showSenha = !this.showSenha;
+  }
+
+  public onSenhaInput(input: HTMLInputElement): void {
+    const isOnlyWhitespace = input.value.trim().length === 0;
+    if (isOnlyWhitespace) {
+      input.setCustomValidity('A senha não pode ser vazia ou conter somente espaços.');
+    } else {
+      input.setCustomValidity('');
+    }
   }
 
 }

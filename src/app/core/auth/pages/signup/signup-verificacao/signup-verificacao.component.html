@@ -28,9 +28,10 @@
               Voltar
             </button>
 
-            <button (click)="receberCodigo()" type="button"
-                    class="text-white bg-[#5084C1] hover:bg-[#3969a1] focus:ring-4 focus:outline-none focus:ring-blue-300 font-bold rounded-lg text-lg w-full py-3 text-center">
-              Receber código →
+            <button (click)="receberCodigo()" type="button" [disabled]="isSending"
+                    class="text-white bg-[#5084C1] hover:bg-[#3969a1] focus:ring-4 focus:outline-none focus:ring-blue-300 font-bold rounded-lg text-lg w-full py-3 text-center flex items-center justify-center gap-2 disabled:opacity-50">
+              <span *ngIf="!isSending">Receber código →</span>
+              <span *ngIf="isSending" class="material-icons animate-spin text-base">autorenew</span>
             </button>
           </div>
         </form>

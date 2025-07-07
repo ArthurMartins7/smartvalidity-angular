@@ -2,9 +2,9 @@ import { HttpClient, HttpHeaders, HttpResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 //import { UsuarioDTO } from '../../model/dto/UsuarioDTO';
-import { Usuario } from '../../../shared/model/entity/usuario.model';
 import { EmpresaUsuarioDto } from '../../../shared/model/dto/empresaUsuario.dto';
 import { Empresa } from '../../../shared/model/entity/empresa';
+import { Usuario } from '../../../shared/model/entity/usuario.model';
 
 @Injectable({
   providedIn: 'root',
@@ -33,6 +33,10 @@ export class AuthenticationService {
 
   public getCurrentUser(): Observable<Usuario> {
     return this.httpClient.get<Usuario>(this.API + '/current-user');
+  }
+
+  public buscarAssinante(): Observable<Usuario> {
+    return this.httpClient.get<Usuario>(this.API + '/assinante');
   }
 
   logout() {
@@ -72,5 +76,18 @@ export class AuthenticationService {
   /* Passo 3 – Redefinir senha */
   public redefinirSenha(email: string, token: string, novaSenha: string): Observable<void> {
     return this.httpClient.post<void>(this.API + '/resetar-senha', { email, token, novaSenha });
+  }
+
+  /* Fluxo alterar senha (usuário logado) */
+  enviarOtpAlterarSenha(email: string): Observable<void> {
+    return this.httpClient.post<void>(this.API + '/enviar-otp-alterar-senha', { email });
+  }
+
+  validarOtpAlterarSenha(email: string, token: string): Observable<void> {
+    return this.httpClient.post<void>(this.API + '/validar-otp-alterar-senha', { email, token });
+  }
+
+  alterarSenha(email: string, token: string, novaSenha: string): Observable<void> {
+    return this.httpClient.post<void>(this.API + '/alterar-senha', { email, token, novaSenha });
   }
 }

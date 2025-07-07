@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -34,6 +34,11 @@ export class EntradaEstoqueComponent implements OnInit {
   produtos: Produto[] = [];
   produtoSelecionado: Produto | null = null;
 
+  // Controle de busca/autocomplete de produto
+  searchTermProduto: string = '';
+  filteredProdutos: Produto[] = [];
+  showProdutoDropdown: boolean = false;
+
   constructor(
     private route: ActivatedRoute,
     private router: Router,
@@ -52,6 +57,8 @@ export class EntradaEstoqueComponent implements OnInit {
           next: (produto) => {
             this.produtoSelecionado = produto;
             this.formData.produto = produto.id;
+            // Preenche campo de busca para exibir produto selecionado
+            this.searchTermProduto = `${produto.descricao} (${produto.codigoBarras})`;
           },
           error: (erro) => {
             console.error('Erro ao carregar produto:', erro);
@@ -66,6 +73,8 @@ export class EntradaEstoqueComponent implements OnInit {
     this.produtoService.listarTodos().subscribe({
       next: (produtos) => {
         this.produtos = produtos;
+        // Inicializa lista filtrada com todos os produtos
+        this.filteredProdutos = [...this.produtos];
       },
       error: (erro) => {
         console.error('Erro ao carregar produtos:', erro);
@@ -170,5 +179,44 @@ export class EntradaEstoqueComponent implements OnInit {
 
   voltar(): void {
     this.router.navigate(['/mural-listagem']);
+  }
+
+  /**
+   * Filtra produtos de acordo com o termo digitado.
+   */
+  onProdutoSearch(): void {
+    const term = this.searchTermProduto.toLowerCase();
+
+    if (!term) {
+      this.filteredProdutos = [...this.produtos];
+    } else {
+      this.filteredProdutos = this.produtos.filter(p => {
+        return p.descricao.toLowerCase().includes(term) ||
+               (p.marca && p.marca.toLowerCase().includes(term)) ||
+               (p.codigoBarras && p.codigoBarras.toLowerCase().includes(term));
+      });
+    }
+  }
+
+  /** Exibe dropdown de produtos. */
+  openProdutoDropdown(): void {
+    this.showProdutoDropdown = true;
+  }
+
+  /** Seleciona um produto da lista */
+  selectProduto(produto: Produto): void {
+    this.produtoSelecionado = produto;
+    this.formData.produto = produto.id;
+    this.searchTermProduto = `${produto.descricao} (${produto.codigoBarras})`;
+    this.showProdutoDropdown = false;
+  }
+
+  /** Fecha dropdown quando clicar fora */
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent): void {
+    const target = event.target as HTMLElement;
+    if (!target.closest('.produto-dropdown-container')) {
+      this.showProdutoDropdown = false;
+    }
   }
 }

@@ -87,12 +87,24 @@ export class AlertaListagemComponent implements OnInit, OnDestroy {
       this.limparFiltros();
       return;
     }
-    this.searchSubject.next(this.filtroTitulo);
+
+    // Só faz busca se tem pelo menos 3 caracteres
+    if (this.filtroTitulo.trim().length >= 3) {
+      this.searchSubject.next(this.filtroTitulo);
+    } else {
+      // Se tem menos de 3 caracteres, limpa os resultados filtrados
+      this.searchSubject.next('');
+    }
   }
 
   public realizarPesquisa(): void {
     if (!this.filtroTitulo || this.filtroTitulo.trim() === '') {
       this.limparFiltros();
+      return;
+    }
+
+    // Só faz busca se tem pelo menos 3 caracteres
+    if (this.filtroTitulo.trim().length < 3) {
       return;
     }
 
@@ -108,9 +120,9 @@ export class AlertaListagemComponent implements OnInit, OnDestroy {
 
   public buscarAlertas(): void {
     this.loading = true;
-    
+
     let observable;
-    
+
     switch (this.activeTab) {
       case 'ativos':
         observable = this.alertaService.buscarAlertasAtivos();
@@ -125,7 +137,7 @@ export class AlertaListagemComponent implements OnInit, OnDestroy {
         observable = this.alertaService.buscarComFiltros(this.seletor);
         break;
     }
-    
+
     observable.subscribe({
       next: (resultado) => {
         this.alertas = resultado;
@@ -338,12 +350,12 @@ export class AlertaListagemComponent implements OnInit, OnDestroy {
     if (alerta.tipo === TipoAlerta.VENCIMENTO_ATRASO) {
       return 'alta';
     }
-    
+
     // Vencimentos hoje têm prioridade média
     if (alerta.tipo === TipoAlerta.VENCIMENTO_HOJE) {
       return 'media';
     }
-    
+
     // Vencimentos amanhã têm prioridade baixa
     if (alerta.tipo === TipoAlerta.VENCIMENTO_AMANHA) {
       return 'baixa';
@@ -422,7 +434,7 @@ export class AlertaListagemComponent implements OnInit, OnDestroy {
     }
 
     const dias = alerta.diasVencidos;
-    
+
     if (dias < 0) {
       // Ainda não venceu
       const diasRestantes = Math.abs(dias);
@@ -440,8 +452,8 @@ export class AlertaListagemComponent implements OnInit, OnDestroy {
    * Verifica se deve mostrar o badge de dias vencidos
    */
   public deveMostrarBadgeDias(alerta: AlertaDTO.Listagem): boolean {
-    return alerta.tipo === TipoAlerta.VENCIMENTO_ATRASO && 
-           alerta.diasVencidos !== undefined && 
+    return alerta.tipo === TipoAlerta.VENCIMENTO_ATRASO &&
+           alerta.diasVencidos !== undefined &&
            alerta.diasVencidos > 0;
   }
 

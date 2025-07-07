@@ -63,11 +63,10 @@ export class NotificacaoListagemComponent implements OnInit, OnDestroy {
         break;
     }
 
-    // Em seguida, aplica filtro por título ou descrição, se houver termo de busca
-    if (this.filtroTitulo && this.filtroTitulo.trim() !== '') {
+    // Em seguida, aplica filtro por descrição, se houver termo de busca com pelo menos 3 caracteres
+    if (this.filtroTitulo && this.filtroTitulo.trim() !== '' && this.filtroTitulo.trim().length >= 3) {
       const termo = this.filtroTitulo.trim().toLowerCase();
       lista = lista.filter(n =>
-        (this.removerEmojis(n.titulo).toLowerCase().includes(termo)) ||
         (n.descricao ? n.descricao.toLowerCase().includes(termo) : false)
       );
     }
@@ -115,7 +114,7 @@ export class NotificacaoListagemComponent implements OnInit, OnDestroy {
     this.carregando = true;
 
     let observable;
-    
+
     switch (this.activeTab) {
       case 'pendentes':
         observable = this.notificacaoService.buscarNotificacoesPendentes();
@@ -311,7 +310,14 @@ export class NotificacaoListagemComponent implements OnInit, OnDestroy {
       this.searchSubject.next('');
       return;
     }
-    this.searchSubject.next(this.filtroTitulo);
+
+    // Só faz busca se tem pelo menos 3 caracteres
+    if (this.filtroTitulo.trim().length >= 3) {
+      this.searchSubject.next(this.filtroTitulo);
+    } else {
+      // Se tem menos de 3 caracteres, limpa os resultados filtrados
+      this.searchSubject.next('');
+    }
   }
 
   /**
@@ -347,12 +353,12 @@ export class NotificacaoListagemComponent implements OnInit, OnDestroy {
     }
 
     const dias = notificacao.diasVencidos;
-    
+
     if (dias > 0) {
       // Já venceu - mostrar apenas "há X dias"
       return dias === 1 ? 'há 1 dia' : `há ${dias} dias`;
     }
-    
+
     // Para produtos que não venceram, não mostrar badge
     return '';
   }
@@ -361,7 +367,7 @@ export class NotificacaoListagemComponent implements OnInit, OnDestroy {
    * Verifica se deve mostrar o badge de dias vencidos
    */
   public deveMostrarBadgeDias(notificacao: AlertaDTO.Listagem): boolean {
-    return notificacao.diasVencidos !== undefined && 
+    return notificacao.diasVencidos !== undefined &&
            notificacao.diasVencidos > 0;
   }
 

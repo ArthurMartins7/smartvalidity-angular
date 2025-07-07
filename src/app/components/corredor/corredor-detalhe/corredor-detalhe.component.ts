@@ -97,7 +97,7 @@ export class CorredorDetalheComponent implements OnInit {
         perfilAcesso: this.responsavelSelecionado.perfilAcesso,
         senha: this.responsavelSelecionado.senha,
         cargo: this.responsavelSelecionado.cargo,
-        dataCriacao: this.responsavelSelecionado.dataCriacao,
+        dataCriacao: new Date(this.responsavelSelecionado.dataCriacao as any),
         empresa: this.responsavelSelecionado.empresa
       };
       this.corredor.responsaveis.push(responsavelLimpo);

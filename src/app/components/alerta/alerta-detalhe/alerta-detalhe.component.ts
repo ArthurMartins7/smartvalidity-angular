@@ -6,8 +6,10 @@ import { takeUntil } from 'rxjs/operators';
 import Swal from 'sweetalert2';
 
 import { AlertaDTO } from '../../../shared/model/dto/alerta.dto';
+import { ItemProdutoDTO } from '../../../shared/model/dto/item-Produto.dto';
 import { TipoAlerta } from '../../../shared/model/enum/tipo-alerta.enum';
 import { AlertaService } from '../../../shared/service/alerta.service';
+import { ItemProdutoService } from '../../../shared/service/item-produto.service';
 import { NotificacaoService } from '../../../shared/service/notificacao.service';
 
 @Component({
@@ -23,6 +25,7 @@ export class AlertaDetalheComponent implements OnInit, OnDestroy {
   alerta: AlertaDTO.Listagem | null = null;
   carregando: boolean = false;
   alertaId: number | null = null;
+  itensProdutoNaoInspecionados: ItemProdutoDTO[] = [];
 
   public TipoAlerta = TipoAlerta;
 
@@ -31,6 +34,7 @@ export class AlertaDetalheComponent implements OnInit, OnDestroy {
     private router: Router,
     private location: Location,
     private alertaService: AlertaService,
+    private itemProdutoService: ItemProdutoService,
     private notificacaoService: NotificacaoService
   ) {}
 
@@ -61,6 +65,12 @@ export class AlertaDetalheComponent implements OnInit, OnDestroy {
         next: (alerta) => {
           this.alerta = alerta;
           this.carregando = false;
+          
+          // Carregar itens-produto se for alerta personalizado e houver produtos relacionados
+          if (this.alerta && this.alerta.tipo === TipoAlerta.PERSONALIZADO && 
+              this.alerta.produtosAlertaIds && this.alerta.produtosAlertaIds.length > 0) {
+            this.carregarItensProduto();
+          }
         },
         error: (error) => {
           this.carregando = false;
@@ -85,6 +95,69 @@ export class AlertaDetalheComponent implements OnInit, OnDestroy {
           }
         }
       });
+  }
+
+  /**
+   * Carregar itens-produto não inspecionados dos produtos relacionados
+   */
+  private carregarItensProduto(): void {
+    if (!this.alerta?.produtosAlertaIds || this.alerta.produtosAlertaIds.length === 0) {
+      return;
+    }
+
+    // Buscar itens do primeiro produto
+    const produtoId = this.alerta.produtosAlertaIds[0];
+    
+    this.itemProdutoService.buscarItensProdutoNaoInspecionadosPorProduto(produtoId)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (itens: ItemProdutoDTO[]) => {
+          this.itensProdutoNaoInspecionados = itens;
+          console.log(`Encontrados ${itens.length} itens-produto não inspecionados para o alerta`);
+        },
+        error: (erro: any) => {
+          console.error('Erro ao buscar itens-produto não inspecionados:', erro);
+          this.itensProdutoNaoInspecionados = [];
+        }
+      });
+  }
+
+  /**
+   * Obtém a classe CSS para o status de vencimento
+   */
+  public getStatusVencimento(dataVencimento: Date | string): string {
+    const hoje = new Date();
+    const vencimento = new Date(dataVencimento);
+    const diffDays = Math.ceil((vencimento.getTime() - hoje.getTime()) / (1000 * 60 * 60 * 24));
+
+    if (diffDays < 0) return 'bg-red-100 text-red-800';
+    if (diffDays === 0) return 'bg-orange-100 text-orange-800';
+    if (diffDays <= 3) return 'bg-yellow-100 text-yellow-800';
+    return 'bg-green-100 text-green-800';
+  }
+
+  /**
+   * Obtém o texto do status de vencimento
+   */
+  public getTextoVencimento(dataVencimento: Date | string): string {
+    const hoje = new Date();
+    const vencimento = new Date(dataVencimento);
+    const diffDays = Math.ceil((vencimento.getTime() - hoje.getTime()) / (1000 * 60 * 60 * 24));
+
+    if (diffDays < 0) return 'Vencido';
+    if (diffDays === 0) return 'Vence hoje';
+    if (diffDays === 1) return 'Vence amanhã';
+    return `${diffDays} dias`;
+  }
+
+  /**
+   * Verifica se o alerta é personalizado
+   */
+  public ehAlertaPersonalizado(): boolean {
+    if (!this.alerta) {
+      return false;
+    }
+    return this.alerta.tipo === TipoAlerta.PERSONALIZADO;
   }
 
   public voltarParaLista(): void {
@@ -133,6 +206,10 @@ export class AlertaDetalheComponent implements OnInit, OnDestroy {
 
   public podeVisualizarItem(): boolean {
     if (!this.alerta || !this.alerta.produtosAlerta) {
+      return false;
+    }
+    // Remove o botão para alertas personalizados
+    if (this.alerta.tipo === TipoAlerta.PERSONALIZADO) {
       return false;
     }
     return this.alerta.produtosAlerta.length > 0;

@@ -69,6 +69,61 @@
       <p class="text-gray-700 leading-relaxed" [innerHTML]="alerta.descricao"></p>
     </div>
 
+    <!-- Card de Produtos Relacionados -->
+    <div *ngIf="alerta.produtosAlerta && alerta.produtosAlerta.length > 0"
+         class="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200 px-6 py-4 border-l-4 border-green-400">
+      <div class="flex items-center gap-3 mb-4">
+        <div class="p-2 rounded-full bg-green-100">
+          <span class="material-icons text-green-600">inventory_2</span>
+        </div>
+        <h3 class="text-lg font-semibold text-gray-800">Produtos Relacionados</h3>
+      </div>
+      <div class="flex flex-wrap gap-2 mb-4">
+        <span *ngFor="let produto of alerta.produtosAlerta"
+              class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800 border border-green-200">
+          {{ produto }}
+        </span>
+      </div>
+
+      <!-- Tabela de Itens monitorados (apenas para alertas personalizados) -->
+      <div *ngIf="ehAlertaPersonalizado() && itensProdutoNaoInspecionados.length > 0"
+           class="mt-4 border border-blue-200 rounded">
+        <!-- Cabeçalho -->
+        <div class="bg-blue-50 text-blue-800 text-xs font-semibold px-3 py-1 rounded-t">
+          {{ itensProdutoNaoInspecionados.length }} {{ itensProdutoNaoInspecionados.length === 1 ? 'item monitorado' : 'itens monitorados' }}
+        </div>
+        <div class="px-3 py-1 text-gray-600 text-xs bg-blue-50 border-t border-blue-200">
+          Itens monitorados correspondem aos itens de um produto que ainda não foram inspecionados. Após a inspeção, deixam de aparecer nesta lista.
+        </div>
+        <!-- Lista -->
+        <div class="max-h-40 overflow-y-auto bg-white">
+          <table class="min-w-full text-xs table-fixed border-collapse">
+            <thead class="bg-blue-50 sticky top-0">
+              <tr>
+                <th class="w-2/5 px-2 py-1 text-left text-blue-800 font-semibold">Nome</th>
+                <th class="w-1/5 px-2 py-1 text-left text-blue-800 font-semibold">Lote</th>
+                <th class="w-1/5 px-2 py-1 text-left text-blue-800 font-semibold">Data de vencimento</th>
+                <th class="w-1/5 px-2 py-1 text-left text-blue-800 font-semibold">Vence em</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let item of itensProdutoNaoInspecionados" class="hover:bg-blue-50">
+                <td class="px-2 py-1 text-gray-600 truncate">{{ item.produto?.descricao || alerta.produtosAlerta[0] }}</td>
+                <td class="px-2 py-1 font-medium text-gray-700 truncate">{{ item.lote }}</td>
+                <td class="px-2 py-1 text-gray-600">{{ item.dataVencimento ? (item.dataVencimento | date:'dd/MM/yyyy') : 'N/A' }}</td>
+                <td class="px-2 py-1">
+                  <span *ngIf="item.dataVencimento" [class]="getStatusVencimento(item.dataVencimento) + ' rounded-full px-2 py-0.5 whitespace-nowrap'">
+                    {{ getTextoVencimento(item.dataVencimento) }}
+                  </span>
+                  <span *ngIf="!item.dataVencimento" class="text-gray-400 text-xs">N/A</span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
     <!-- Grid de Cards -->
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
       <!-- Card com Informações de Tempo -->
@@ -80,10 +135,6 @@
           <h3 class="text-lg font-semibold text-gray-800">Informações de Tempo</h3>
         </div>
         <div class="space-y-4">
-          <div class="flex justify-between items-center">
-            <span class="text-base font-medium text-gray-600">Data/Hora de Disparo</span>
-            <div class="text-lg text-gray-800">{{ formatarDataHora(alerta.dataHoraDisparo) }}</div>
-          </div>
           <div class="flex justify-between items-center">
             <span class="text-base font-medium text-gray-600">Data de Criação</span>
             <div class="text-lg text-gray-800">{{ formatarDataHora(alerta.dataCriacao) }}</div>
@@ -139,23 +190,6 @@
         <span *ngFor="let usuario of alerta.usuariosAlerta"
               class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-indigo-100 text-indigo-800 border border-indigo-200">
           {{ usuario }}
-        </span>
-      </div>
-    </div>
-
-    <!-- Card de Produtos -->
-    <div *ngIf="alerta.produtosAlerta && alerta.produtosAlerta.length > 0"
-         class="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200 px-6 py-4 border-l-4 border-green-400">
-      <div class="flex items-center gap-3 mb-4">
-        <div class="p-2 rounded-full bg-green-100">
-          <span class="material-icons text-green-600">inventory_2</span>
-        </div>
-        <h3 class="text-lg font-semibold text-gray-800">Produtos Relacionados</h3>
-      </div>
-      <div class="flex flex-wrap gap-2">
-        <span *ngFor="let produto of alerta.produtosAlerta"
-              class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800 border border-green-200">
-          {{ produto }}
         </span>
       </div>
     </div>

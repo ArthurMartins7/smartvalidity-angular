@@ -452,6 +452,14 @@ export class MuralListagemComponent implements OnInit, OnDestroy {
       default: return '';
     }
   }
+  get descricaoAbaAtual(): string {
+    switch (this.activeTab) {
+      case 'proximo': return 'Monitore produtos próximos ao vencimento (em até 15 dias). Gerencie inspeções e gere relatórios.';
+      case 'hoje': return 'Produtos com vencimento hoje. Ação imediata necessária. Realize inspeções e tome as medidas adequadas.';
+      case 'vencido': return 'Produtos já vencidos. Verifique o status e tome as ações necessárias para evitar perdas.';
+      default: return 'Monitore produtos próximos ao vencimento (em até 15 dias), que vencem hoje e vencidos. Gerencie inspeções e gere relatórios.';
+    }
+  }
   onRemoveFilterValue(event: {filterName: string, value: string}): void {
     this.filterService.removeFilterValue(event.filterName as keyof MuralFilter, event.value);
     this.applyFilters();

@@ -6,6 +6,4 @@ import { Component } from '@angular/core';
   templateUrl: './header-password-recovery.component.html',
   styleUrl: './header-password-recovery.component.css'
 })
-export class HeaderPasswordRecoveryComponent {
-
-}
+export class HeaderPasswordRecoveryComponent {}

@@ -25,18 +25,20 @@
     <!-- Greeting / Profile icon -->
     <ng-container *ngIf="!isMobile(); else mobileProfile">
       <div class="relative">
-        <span class="text-[#5084C1] text-xl font-medium cursor-pointer flex items-center select-none" (click)="toggleDropdown(); $event.stopPropagation()">
+        <span class="text-[#5084C1] text-xl font-medium cursor-pointer flex items-center select-none profile-button group" (click)="toggleDropdown(); $event.stopPropagation()">
           Olá, {{userName}}
           <i class="material-icons ml-1 text-base transition-transform" [ngClass]="isDropdownOpen ? 'rotate-180' : ''">expand_more</i>
         </span>
 
         <!-- Dropdown menu -->
-        <div *ngIf="isDropdownOpen" class="absolute right-0 mt-2 w-40 bg-white rounded-md shadow-lg border border-gray-200 z-50">
-          <div (click)="navigateToMinhaContaInfo(); closeDropdown(); $event.stopPropagation()" class="flex items-center px-4 py-2 text-gray-700 hover:bg-gray-100 cursor-pointer">
+        <div *ngIf="isDropdownOpen" class="absolute right-0 mt-2 w-40 bg-white rounded-md shadow-lg border border-gray-200 z-50 dropdown-menu transform transition-all duration-150 origin-top">
+          <div (click)="navigateToMinhaContaInfo(); closeDropdown(); $event.stopPropagation()"
+            class="flex items-center px-4 py-2 text-gray-700 hover:bg-blue-50 hover:text-[#5084C1] cursor-pointer transition-colors duration-150 first:rounded-t-md">
             <i class="material-icons mr-2 text-base">person</i>
             <span>minha conta</span>
           </div>
-          <div (click)="logout(); closeDropdown(); $event.stopPropagation()" class="flex items-center px-4 py-2 text-gray-700 hover:bg-gray-100 cursor-pointer">
+          <div (click)="logout(); closeDropdown(); $event.stopPropagation()"
+            class="flex items-center px-4 py-2 text-gray-700 hover:bg-blue-50 hover:text-[#5084C1] cursor-pointer transition-colors duration-150 last:rounded-b-md">
             <i class="material-icons mr-2 text-base">logout</i>
             <span>sair</span>
           </div>
@@ -44,9 +46,29 @@
       </div>
     </ng-container>
     <ng-template #mobileProfile>
-      <button class="text-[#5084C1] hover:opacity-80 focus:outline-none" (click)="navigateTo('/usuarios-perfis-listagem')">
-        <i class="material-icons text-3xl">account_circle</i>
-      </button>
+      <div class="relative">
+        <button class="text-[#5084C1] hover:opacity-80 focus:outline-none profile-button p-1 rounded-full hover:bg-blue-50 transition-colors duration-150" (click)="toggleDropdown(); $event.stopPropagation()">
+          <i class="material-icons text-3xl">account_circle</i>
+        </button>
+
+        <!-- Mobile Dropdown menu -->
+        <div *ngIf="isDropdownOpen" class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg border border-gray-200 z-50 dropdown-menu transform transition-all duration-150 origin-top">
+          <div class="px-4 py-3 border-b border-gray-100 hover:bg-blue-50 transition-colors duration-150 rounded-t-md">
+            <span class="text-sm text-gray-600">Olá,</span>
+            <div class="font-medium text-gray-800 truncate">{{userName}}</div>
+          </div>
+          <div (click)="navigateToMinhaContaInfo(); closeDropdown(); $event.stopPropagation()"
+            class="flex items-center px-4 py-3 text-gray-700 hover:bg-blue-50 hover:text-[#5084C1] cursor-pointer transition-colors duration-150">
+            <i class="material-icons mr-2 text-base">person</i>
+            <span>minha conta</span>
+          </div>
+          <div (click)="logout(); closeDropdown(); $event.stopPropagation()"
+            class="flex items-center px-4 py-3 text-gray-700 hover:bg-blue-50 hover:text-[#5084C1] cursor-pointer transition-colors duration-150 last:rounded-b-md">
+            <i class="material-icons mr-2 text-base">logout</i>
+            <span>sair</span>
+          </div>
+        </div>
+      </div>
     </ng-template>
   </div>
 </header>

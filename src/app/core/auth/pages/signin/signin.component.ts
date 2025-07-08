@@ -68,6 +68,7 @@ export class SigninComponent {
       next: (usuarioLogado) => {
         sessionStorage.setItem('usuarioEmail', usuarioLogado.email);
         sessionStorage.setItem('usuarioNome', usuarioLogado.nome);
+        sessionStorage.setItem('usuarioPerfil', usuarioLogado.perfilAcesso);
 
         this.verificarPerfilAcesso();
       },

@@ -1,27 +1,31 @@
 <!-- Overlay -->
-<div class="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+<div class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
   <!-- Click outside to close -->
   <div class="absolute inset-0" (click)="onClose()"></div>
 
   <!-- Modal Card -->
-  <div class="relative bg-white rounded-lg shadow-lg w-full max-w-md p-8 z-10">
+  <div class="relative bg-white rounded-lg shadow-lg w-full max-w-md mx-4 p-5 md:p-8 z-10">
     <!-- Close icon -->
-    <button class="absolute top-3 right-3 text-gray-400 hover:text-gray-600" (click)="onClose()">
-      <span class="material-icons text-xl">close</span>
+    <button class="absolute top-2 md:top-3 right-2 md:right-3 text-gray-400 hover:text-gray-600 transition-colors duration-200 p-1" (click)="onClose()">
+      <span class="material-icons text-lg md:text-xl">close</span>
     </button>
 
     <!-- Title -->
-    <h2 class="text-2xl font-semibold mb-6">Assinatura já existente</h2>
+    <h2 class="text-xl md:text-2xl font-semibold mb-4 md:mb-6 pr-8">Assinatura já existente</h2>
 
     <!-- Message -->
-    <p class="mb-8 text-gray-700 leading-relaxed">
-      Já existe uma assinatura ativa neste sistema.<br/>
-      Entre em contato com o(a) administrador(a) <span class="font-semibold">{{ assinanteNome }} ({{ assinanteEmail }})</span> para receber um convite à equipe e conseguir fazer login.
+    <p class="mb-6 md:mb-8 text-sm md:text-base text-gray-700 leading-relaxed">
+      Já existe uma assinatura ativa neste sistema.<br class="hidden md:block"/>
+      Entre em contato com o(a) administrador(a) <span class="font-semibold break-all">{{ assinanteNome }} ({{ assinanteEmail }})</span> para receber um convite à equipe e conseguir fazer login.
     </p>
 
     <!-- Action -->
     <div class="flex justify-end">
-      <button class="px-6 py-2 rounded bg-[#5084C1] hover:bg-[#3969a1] text-white font-semibold" (click)="onClose()">Entendi</button>
+      <button
+        class="w-full md:w-auto px-4 md:px-6 py-2 rounded bg-[#5084C1] hover:bg-[#3969a1] text-white font-semibold text-sm md:text-base transition-colors duration-200 active:bg-[#2d5380]"
+        (click)="onClose()">
+        Entendi
+      </button>
     </div>
   </div>
 </div>

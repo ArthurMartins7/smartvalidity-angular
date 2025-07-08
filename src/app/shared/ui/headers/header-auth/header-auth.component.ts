@@ -1,4 +1,5 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-header-auth',
@@ -8,4 +9,9 @@ import { Component } from '@angular/core';
 })
 export class HeaderAuthComponent {
 
+  private router = inject(Router);
+
+  irParaLogin(): void {
+    this.router.navigate(['/']);
+  }
 }

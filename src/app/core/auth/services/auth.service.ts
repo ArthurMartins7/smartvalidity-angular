@@ -44,6 +44,7 @@ export class AuthenticationService {
     localStorage.removeItem('tokenUsuarioAutenticado');
     sessionStorage.removeItem('usuarioEmail');
     sessionStorage.removeItem('usuarioNome');
+    sessionStorage.removeItem('usuarioPerfil');
   }
 
   public verificarAssinaturaExistente(): Observable<boolean> {

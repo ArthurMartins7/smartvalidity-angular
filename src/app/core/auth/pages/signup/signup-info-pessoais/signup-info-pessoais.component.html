@@ -1,69 +1,70 @@
 <app-header-auth></app-header-auth>
 
 <!-- New multi-step sign-up – Etapa 01. Informações pessoais -->
-<section class="bg-white">
-  <div class="flex flex-col items-center justify-center px-6 pt-0 pb-8 mx-auto md:h-screen lg:py-0">
+<section class="bg-white h-[calc(100vh-var(--header-height))] mt-[var(--header-height)]">
+  <div class="flex flex-col items-center justify-start px-4 md:px-6 py-6 md:py-8 mx-auto">
 
-
-    <!-- Header estilo Validata -->
-
-
-    <div class="w-full bg-white rounded-lg shadow md:mt-0 sm:max-w-xl xl:p-0">
-      <div class="p-6 space-y-4 md:space-y-6 sm:p-8">
+    <div class="w-full bg-white rounded-lg shadow-sm md:shadow sm:max-w-xl xl:p-0">
+      <div class="p-4 md:p-6 space-y-4 md:space-y-6 sm:p-8">
         <!-- Título do formulário -->
-        <h2 class="text-2xl font-bold text-gray-900 text-left mb-2">1. Informações Pessoais</h2>
-        <div class="w-full h-px bg-gray-200 opacity-70 mb-6"></div>
+        <h2 class="text-xl md:text-2xl font-bold text-gray-900 text-left mb-2">1. Informações Pessoais</h2>
+        <div class="w-full h-px bg-gray-200 opacity-70 mb-4 md:mb-6"></div>
         <!-- Formulário -->
-        <form #infoForm="ngForm" (ngSubmit)="avancar(infoForm, $event)" class="space-y-4 md:space-y-6">
-          <div>
-            <label for="nome" class="block mb-2 text-sm font-medium text-gray-900">Nome completo</label>
-            <input [(ngModel)]="usuario.nome" name="nome" id="nome" type="text" required pattern="^(?=.*[A-Za-zÀ-ÖØ-öø-ÿ])[A-Za-zÀ-ÖØ-öø-ÿ\s]+$" title="Somente letras e espaços são permitidos"
-                   class="bg-gray-50 border border-gray-300 text-gray-900 placeholder-gray-400 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
-                   placeholder="Digite seu nome completo">
-          </div>
+        <form #infoForm="ngForm" (ngSubmit)="avancar(infoForm, $event)" class="space-y-4 md:space-y-5">
+          <!-- Grid para campos do formulário -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+            <!-- Nome e Email na primeira linha em desktop -->
+            <div>
+              <label for="nome" class="block mb-1.5 md:mb-2 text-xs md:text-sm font-medium text-gray-900">Nome completo</label>
+              <input [(ngModel)]="usuario.nome" name="nome" id="nome" type="text" required pattern="^(?=.*[A-Za-zÀ-ÖØ-öø-ÿ])[A-Za-zÀ-ÖØ-öø-ÿ\s]+$" title="Somente letras e espaços são permitidos"
+                     class="bg-gray-50 border border-gray-300 text-gray-900 text-sm md:text-base placeholder-gray-400 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full py-2.5 md:py-3 px-3 md:px-4 transition-all duration-200"
+                     placeholder="Digite seu nome completo">
+            </div>
 
-          <div>
-            <label for="email" class="block mb-2 text-sm font-medium text-gray-900">E-mail</label>
-            <input [(ngModel)]="usuario.email" name="email" id="email" type="email" required
-                   class="bg-gray-50 border border-gray-300 text-gray-900 placeholder-gray-400 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
-                   placeholder="exemplo@empresa.com">
-          </div>
+            <div>
+              <label for="email" class="block mb-1.5 md:mb-2 text-xs md:text-sm font-medium text-gray-900">E-mail</label>
+              <input [(ngModel)]="usuario.email" name="email" id="email" type="email" required
+                     class="bg-gray-50 border border-gray-300 text-gray-900 text-sm md:text-base placeholder-gray-400 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full py-2.5 md:py-3 px-3 md:px-4 transition-all duration-200"
+                     placeholder="exemplo@empresa.com">
+            </div>
 
-          <div>
-            <label for="cnpj" class="block mb-2 text-sm font-medium text-gray-900">CNPJ</label>
-            <input #cnpjInput (input)="onCnpjInput(cnpjInput)" name="cnpj" id="cnpj" type="text" required
-                   class="bg-gray-50 border border-gray-300 text-gray-900 placeholder-gray-400 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
-                   placeholder="00.000.000/0000-00">
-          </div>
+            <!-- CNPJ e Razão Social na segunda linha em desktop -->
+            <div>
+              <label for="cnpj" class="block mb-1.5 md:mb-2 text-xs md:text-sm font-medium text-gray-900">CNPJ</label>
+              <input #cnpjInput (input)="onCnpjInput(cnpjInput)" name="cnpj" id="cnpj" type="text" required
+                     class="bg-gray-50 border border-gray-300 text-gray-900 text-sm md:text-base placeholder-gray-400 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full py-2.5 md:py-3 px-3 md:px-4 transition-all duration-200"
+                     placeholder="00.000.000/0000-00">
+            </div>
 
-          <div>
-            <label for="razaoSocial" class="block mb-2 text-sm font-medium text-gray-900">Razão social</label>
-            <input [(ngModel)]="empresa.razaoSocial" name="razaoSocial" id="razaoSocial" type="text" required pattern="^(?=.*[A-Za-zÀ-ÖØ-öø-ÿ])[A-Za-zÀ-ÖØ-öø-ÿ\s]+$" title="Somente letras e espaços são permitidos"
-                   class="bg-gray-50 border border-gray-300 text-gray-900 placeholder-gray-400 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
-                   placeholder="Nome empresarial">
-          </div>
+            <div>
+              <label for="razaoSocial" class="block mb-1.5 md:mb-2 text-xs md:text-sm font-medium text-gray-900">Razão social</label>
+              <input [(ngModel)]="empresa.razaoSocial" name="razaoSocial" id="razaoSocial" type="text" required pattern="^(?=.*[A-Za-zÀ-ÖØ-öø-ÿ])[A-Za-zÀ-ÖØ-öø-ÿ\s]+$" title="Somente letras e espaços são permitidos"
+                     class="bg-gray-50 border border-gray-300 text-gray-900 text-sm md:text-base placeholder-gray-400 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full py-2.5 md:py-3 px-3 md:px-4 transition-all duration-200"
+                     placeholder="Nome empresarial">
+            </div>
 
-          <div>
-            <label for="cargo" class="block mb-2 text-sm font-medium text-gray-900">Cargo</label>
-            <input [(ngModel)]="usuario.cargo" name="cargo" id="cargo" type="text" required pattern="^(?=.*[A-Za-zÀ-ÖØ-öø-ÿ])[A-Za-zÀ-ÖØ-öø-ÿ\s]+$" title="Somente letras e espaços são permitidos"
-                   class="bg-gray-50 border border-gray-300 text-gray-900 placeholder-gray-400 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
-                   placeholder="Seu cargo na empresa">
+            <!-- Cargo ocupa linha inteira em desktop -->
+            <div class="md:col-span-2">
+              <label for="cargo" class="block mb-1.5 md:mb-2 text-xs md:text-sm font-medium text-gray-900">Cargo</label>
+              <input [(ngModel)]="usuario.cargo" name="cargo" id="cargo" type="text" required pattern="^(?=.*[A-Za-zÀ-ÖØ-öø-ÿ])[A-Za-zÀ-ÖØ-öø-ÿ\s]+$" title="Somente letras e espaços são permitidos"
+                     class="bg-gray-50 border border-gray-300 text-gray-900 text-sm md:text-base placeholder-gray-400 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full py-2.5 md:py-3 px-3 md:px-4 transition-all duration-200"
+                     placeholder="Seu cargo na empresa">
+            </div>
           </div>
 
           <!-- Checkboxes -->
-          <div class="flex flex-col space-y-2 pt-2">
-            <label class="inline-flex items-start text-sm text-gray-500">
+          <div class="flex flex-col space-y-2 pt-2 md:pt-3">
+            <label class="inline-flex items-start text-xs md:text-sm text-gray-500">
               <input type="checkbox" [(ngModel)]="aceitaTermos" name="aceitaTermos" required
-                     class="w-4 h-4 mt-1 border border-gray-300 rounded bg-gray-50 focus:ring-3 focus:ring-primary-300">
+                     class="w-4 h-4 mt-0.5 md:mt-1 border border-gray-300 rounded bg-gray-50 focus:ring-3 focus:ring-primary-300">
               <span class="ml-2">Ao me cadastrar eu concordo com os <a href="#" (click)="openTerms($event)" class="text-blue-600 hover:underline">termos e condições de uso</a> do Validata.</span>
             </label>
-
           </div>
 
           <!-- Botão Avançar -->
-          <div class="flex justify-center pt-4">
+          <div class="pt-4 md:pt-6">
             <button type="submit"
-                    class="text-white bg-[#5084C1] hover:bg-[#3969a1] focus:ring-4 focus:outline-none focus:ring-blue-300 font-bold rounded-lg text-lg w-full py-3 text-center">
+                    class="text-white bg-[#5084C1] hover:bg-[#3969a1] focus:ring-4 focus:outline-none focus:ring-blue-300 font-bold rounded-lg text-base md:text-lg w-full py-2.5 md:py-3 text-center transition-colors duration-200">
               Avançar →
             </button>
           </div>

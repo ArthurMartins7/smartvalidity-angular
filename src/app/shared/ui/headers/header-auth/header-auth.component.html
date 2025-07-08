@@ -1,42 +1,37 @@
 <!-- Header -->
-<header class="w-full bg-white shadow-md fixed top-0 left-0 z-50 px-4 md:px-6 flex items-center justify-between" style="height: var(--header-height);">
-
-
-  <!-- Validata Logo & Title -->
-  <div class="flex-1 min-w-0 flex items-center justify-center overflow-hidden">
-    <img class="w-8 h-8 mr-2 flex-shrink-0"
-      src="https://static.vecteezy.com/system/resources/thumbnails/016/774/412/small_2x/blue-check-mark-icon-on-transparent-background-free-png.png" alt="logo">
-    <span class="text-lg md:text-xl font-bold text-[#5084C1] truncate">VALIDATA</span>
+<header class="w-full bg-white shadow-md fixed top-0 left-0 z-50 px-3 sm:px-4 md:px-6 flex items-center justify-center" style="height: var(--header-height);">
+  <!-- Logo & Title Container -->
+  <div class="flex items-center justify-center px-4 md:px-6">
+    <img
+      class="w-6 h-6 md:w-8 md:h-8 mr-2"
+      src="https://static.vecteezy.com/system/resources/thumbnails/016/774/412/small_2x/blue-check-mark-icon-on-transparent-background-free-png.png"
+      alt="Validata Logo">
+    <span class="text-base md:text-xl font-bold text-[#5084C1] whitespace-nowrap">VALIDATA</span>
   </div>
-
 </header>
 
 <!-- Page Header -->
-<div class="bg-gray-100 -mx-6 md:-mx-6 py-6 px-8 mb-10">
-  <div class="flex items-center justify-between">
+<div class="bg-gray-100 -mx-3 sm:-mx-6 py-4 sm:py-6 px-4 sm:px-8 mb-6 sm:mb-10">
+  <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
     <div>
       <!-- Cabeçalho no padrão Minha Conta -->
       <div class="flex items-center gap-2">
         <!-- Ícone seta -->
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6 text-gray-600">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 sm:w-6 h-5 sm:h-6 text-gray-600">
           <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
         </svg>
 
         <!-- Títulos -->
         <div>
-          <div class="text-gray-500 text-base">Home</div>
-          <div class="text-3xl font-bold">Crie sua conta</div>
-          <p class="text-gray-800 text-base mt-1 whitespace-nowrap">Preencha as informações abaixo para criar sua conta no Validata.</p>
+          <div class="text-gray-500 text-sm sm:text-base">Home</div>
+          <div class="text-xl sm:text-2xl md:text-3xl font-bold">Crie sua conta</div>
+          <p class="text-gray-800 text-sm sm:text-base mt-1 whitespace-normal sm:whitespace-nowrap">Preencha as informações abaixo para criar sua conta no Validata.</p>
         </div>
       </div>
     </div>
-    <div class="flex items-center gap-4">
+    <div class="flex flex-col sm:flex-row items-center gap-2 sm:gap-4 w-full sm:w-auto">
 
-      <button class="bg-[#5084C1] hover:bg-[#3969a1] text-white font-bold text-lg px-7 py-3 rounded transition transform hover:scale-105 flex items-center gap-2">
-        cadastre-se
-      </button>
-
-      <button class="bg-white text-[#5084C1] border border-[#5084C1] hover:bg-[#E6F0FA] hover:text-[#3969a1] font-bold text-lg px-7 py-3 rounded transition transform hover:scale-105">
+      <button (click)="irParaLogin()" class="bg-white text-[#5084C1] border border-[#5084C1] hover:bg-[#E6F0FA] hover:text-[#3969a1] font-bold text-base md:text-lg w-full sm:w-auto px-6 md:px-7 py-2.5 md:py-3 rounded transition transform hover:scale-105">
         login
       </button>
     </div>

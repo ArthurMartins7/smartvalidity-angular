@@ -1,82 +1,82 @@
 <!-- Cabeçalho com background -->
-<div class="bg-gray-100 -mx-6 md:-mx-6 py-6 mb-10">
-  <div class="flex items-center gap-2 px-6">
+<div class="bg-gray-100 -mx-3 sm:-mx-6 py-4 sm:py-6 mb-6 sm:mb-10">
+  <div class="flex items-start sm:items-center gap-2 px-4 sm:px-6">
     <!-- Ícone seta -->
-    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6 text-gray-600">
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 sm:w-6 h-5 sm:h-6 text-gray-600 mt-1 sm:mt-0">
       <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
     </svg>
 
     <!-- Títulos -->
     <div>
-      <div class="text-gray-500 text-base">Home</div>
-      <div class="text-3xl font-bold">Minha conta</div>
-      <p class="text-gray-800 text-base mt-1 whitespace-nowrap">Aqui você pode visualizar e atualizar suas informações pessoais e preferências de conta.</p>
+      <div class="text-gray-500 text-sm sm:text-base">Home</div>
+      <div class="text-xl sm:text-2xl md:text-3xl font-bold">Minha conta</div>
+      <p class="text-sm sm:text-base text-gray-800 mt-1 break-words sm:whitespace-nowrap">Aqui você pode visualizar e atualizar suas informações pessoais e preferências de conta.</p>
     </div>
   </div>
 </div>
 
-<div class="p-4 max-w-6xl mx-auto">
+<div class="px-3 sm:px-4 max-w-6xl mx-auto">
   <!-- Informações pessoais -->
-  <h2 class="text-xl font-bold mb-4">Informações pessoais</h2>
+  <h2 class="text-lg sm:text-xl font-bold mb-4">Informações pessoais</h2>
 
-  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 items-start">
     <!-- Card Dados Pessoais -->
-    <div class="bg-white border border-gray-200 rounded-lg p-6 lg:col-span-2">
-      <div class="flex justify-between mb-6">
-        <div class="flex items-center gap-6">
+    <div class="bg-white border border-gray-200 rounded-lg p-4 sm:p-6 lg:col-span-2">
+      <div class="flex justify-between mb-4 sm:mb-6">
+        <div class="flex items-center gap-4 sm:gap-6">
           <!-- Avatar -->
-          <div class="flex-shrink-0 w-16 h-16 rounded-full bg-gray-200 flex items-center justify-center">
-            <span class="material-icons text-gray-600 text-6xl">person</span>
+          <div class="flex-shrink-0 w-12 sm:w-16 h-12 sm:h-16 rounded-full bg-gray-200 flex items-center justify-center">
+            <span class="material-icons text-gray-600 text-4xl sm:text-6xl">person</span>
           </div>
         </div>
         <!-- Link editar -->
-        <button (click)="editarPerfil()" class="text-[#5084C1] font-medium flex items-center gap-1 hover:underline text-base">
+        <button (click)="editarPerfil()" class="text-[#5084C1] font-medium flex items-center gap-1 hover:underline text-sm sm:text-base">
           editar
-          <span class="material-icons text-base ">edit</span>
+          <span class="material-icons text-base">edit</span>
         </button>
       </div>
 
       <!-- Lista de Dados -->
-      <dl class="grid grid-cols-1 gap-y-2 text-sm">
-        <div class="flex">
-          <dt class="w-28 text-gray-600 font-medium text-base">nome</dt>
-          <dd class="font-semibold text-lg">{{ usuarioLogado.nome }}</dd>
+      <dl class="grid grid-cols-1 gap-y-2 sm:gap-y-3">
+        <div class="flex flex-col sm:flex-row sm:items-center">
+          <dt class="text-gray-600 font-medium text-sm sm:text-base sm:w-28 mb-1 sm:mb-0">nome</dt>
+          <dd class="font-semibold text-base sm:text-lg">{{ usuarioLogado.nome }}</dd>
         </div>
-        <div class="flex">
-          <dt class="w-28 text-gray-600 font-medium text-base">e-mail</dt>
-          <dd class="font-semibold text-lg">{{ usuarioLogado.email }}</dd>
+        <div class="flex flex-col sm:flex-row sm:items-center">
+          <dt class="text-gray-600 font-medium text-sm sm:text-base sm:w-28 mb-1 sm:mb-0">e-mail</dt>
+          <dd class="font-semibold text-base sm:text-lg break-all sm:break-normal">{{ usuarioLogado.email }}</dd>
         </div>
-        <div class="flex">
-          <dt class="w-28 text-gray-600 font-medium text-base">perfil</dt>
-          <dd class="font-semibold text-lg">{{ usuarioLogado.perfilAcesso }}</dd>
+        <div class="flex flex-col sm:flex-row sm:items-center">
+          <dt class="text-gray-600 font-medium text-sm sm:text-base sm:w-28 mb-1 sm:mb-0">perfil</dt>
+          <dd class="font-semibold text-base sm:text-lg">{{ usuarioLogado.perfilAcesso }}</dd>
         </div>
-        <div class="flex">
-          <dt class="w-28 text-gray-600 font-medium text-base">criado em</dt>
-          <dd class="font-semibold text-lg">25/05/2025</dd>
+        <div class="flex flex-col sm:flex-row sm:items-center">
+          <dt class="text-gray-600 font-medium text-sm sm:text-base sm:w-28 mb-1 sm:mb-0">criado em</dt>
+          <dd class="font-semibold text-base sm:text-lg">25/05/2025</dd>
         </div>
-        <div class="flex">
-          <dt class="w-28 text-gray-600 font-medium text-base">CNPJ</dt>
-          <dd class="font-semibold text-lg">73.266.899/0001-62</dd>
+        <div class="flex flex-col sm:flex-row sm:items-center">
+          <dt class="text-gray-600 font-medium text-sm sm:text-base sm:w-28 mb-1 sm:mb-0">CNPJ</dt>
+          <dd class="font-semibold text-base sm:text-lg">73.266.899/0001-62</dd>
         </div>
-        <div class="flex">
-          <dt class="w-28 text-gray-600 font-medium text-base">razão social</dt>
-          <dd class="font-semibold text-lg">{{ empresa.razaoSocial }}</dd>
+        <div class="flex flex-col sm:flex-row sm:items-center">
+          <dt class="text-gray-600 font-medium text-sm sm:text-base sm:w-28 mb-1 sm:mb-0">razão social</dt>
+          <dd class="font-semibold text-base sm:text-lg">{{ empresa.razaoSocial }}</dd>
         </div>
-        <div class="flex">
-          <dt class="w-28 text-gray-600 font-medium text-base">cargo</dt>
-          <dd class="font-semibold text-lg">{{ usuarioLogado.cargo }}</dd>
+        <div class="flex flex-col sm:flex-row sm:items-center">
+          <dt class="text-gray-600 font-medium text-sm sm:text-base sm:w-28 mb-1 sm:mb-0">cargo</dt>
+          <dd class="font-semibold text-base sm:text-lg">{{ usuarioLogado.cargo }}</dd>
         </div>
       </dl>
     </div>
 
     <!-- Card Senha (mais compacto) -->
     <div class="bg-white border border-gray-200 rounded-lg p-3 flex items-center gap-3">
-      <div class="w-14 h-14 rounded-full bg-gray-200 flex items-center justify-center flex-shrink-0">
-        <span class="material-icons text-gray-600 text-2xl">shield</span>
+      <div class="w-12 sm:w-14 h-12 sm:h-14 rounded-full bg-gray-200 flex items-center justify-center flex-shrink-0">
+        <span class="material-icons text-gray-600 text-xl sm:text-2xl">shield</span>
       </div>
       <div>
-        <p class="text-gray-600 text-base font-semibold">senha</p>
-        <button (click)="alterarSenha()" class="text-[#5084C1] flex items-center gap-1 hover:underline text-base font-medium">
+        <p class="text-gray-600 text-sm sm:text-base font-semibold">senha</p>
+        <button (click)="alterarSenha()" class="text-[#5084C1] flex items-center gap-1 hover:underline text-sm sm:text-base font-medium">
           alterar senha
           <span class="material-icons text-base">edit</span>
         </button>

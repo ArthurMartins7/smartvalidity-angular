@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, HostListener, OnDestroy, OnInit } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
 import { Subject, interval } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
@@ -35,6 +35,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
   isDropdownOpen = false;
   userName: string = '';
   unreadCount: number = 0;
+  perfil: string = '';
 
   menuItems: MenuItem[] = [
     { id: 'mural', image: '/icons/mural.svg', imageActive: '/icons/mural-blue.svg', label: 'Mural', route: '/mural-listagem' },
@@ -58,6 +59,23 @@ export class SidebarComponent implements OnInit, OnDestroy {
 
     ngOnInit(): void {
     this.userName = sessionStorage.getItem('usuarioNome') ?? 'Usuário';
+    this.perfil = sessionStorage.getItem('usuarioPerfil') ?? '';
+
+    if (!this.perfil) {
+      // Caso não exista no sessionStorage, buscar via API
+      this.authService.getCurrentUser().subscribe({
+        next: (u) => {
+          this.perfil = u.perfilAcesso;
+          sessionStorage.setItem('usuarioPerfil', this.perfil);
+          this.aplicarRestricoesMenu();
+        },
+        error: () => {
+          this.aplicarRestricoesMenu();
+        }
+      });
+    } else {
+      this.aplicarRestricoesMenu();
+    }
 
     // Subscrever para atualizações de notificações não lidas
     this.notificacaoService.unreadCount$
@@ -146,5 +164,32 @@ export class SidebarComponent implements OnInit, OnDestroy {
     // Clear stored auth data and redirect the user to the login page
     this.authService.logout();
     this.router.navigate(['']);
+  }
+
+  @HostListener('document:click', ['$event'])
+  handleClick(event: Event) {
+    // Fechar o dropdown quando clicar fora dele
+    if (this.isDropdownOpen) {
+      const target = event.target as HTMLElement;
+      const dropdown = document.querySelector('.dropdown-menu');
+      const button = document.querySelector('.profile-button');
+
+      if (!dropdown?.contains(target) && !button?.contains(target)) {
+        this.closeDropdown();
+      }
+    }
+  }
+
+  /**
+   * Remove ou oculta itens do menu conforme o perfil de acesso.
+   */
+  private aplicarRestricoesMenu(): void {
+    if (this.perfil === 'ADMIN') {
+      this.additionalItems = this.additionalItems.filter(item => item.id !== 'usuarios-perfis');
+    } else if (this.perfil === 'OPERADOR') {
+      const proibidos = ['usuarios-perfis', 'fornecedores', 'alertas'];
+      this.additionalItems = this.additionalItems.filter(item => !proibidos.includes(item.id));
+      this.menuItems = this.menuItems.filter(item => item.id !== 'layout');
+    }
   }
 }

@@ -1,16 +1,18 @@
 <!-- Cabeçalho com background -->
-<div class="bg-gray-100 -mx-6 md:-mx-6 py-4 mb-12">
-  <div class="flex items-center gap-2 px-6">
+<div class="bg-gray-100 -mx-4 md:-mx-6 py-3 md:py-4 mb-6 md:mb-12">
+  <div class="flex items-start md:items-center gap-2 px-4 md:px-6">
     <!-- Ícone seta -->
-    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6 text-gray-600">
-      <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
-    </svg>
+    <span (click)="voltar()" class="cursor-pointer inline-flex items-center transition-transform duration-150 ease-out hover:-translate-x-1 hover:text-[#5084C1] mt-1 md:mt-0">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5 md:w-6 md:h-6 text-gray-600">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+      </svg>
+    </span>
 
     <!-- Títulos -->
     <div>
-      <div class="text-gray-500 text-base">Minha conta</div>
-      <div class="text-3xl font-bold">Alterar senha</div>
-      <p class="text-gray-800 text-base mt-1">Siga os passos para concluir a alteração de senha.</p>
+      <div class="text-gray-500 text-sm md:text-base">Minha conta</div>
+      <div class="text-2xl md:text-3xl font-bold">Alterar senha</div>
+      <p class="text-gray-800 text-sm md:text-base mt-1">Siga os passos para concluir a alteração de senha.</p>
     </div>
   </div>
 </div>
@@ -18,52 +20,52 @@
 
 <!-- New multi-step sign-up – Etapa 01. Informações pessoais -->
 <section class="bg-white">
-  <div class="flex flex-col items-center justify-start px-6 pt-8 pb-8 mx-auto min-h-[calc(100vh-200px)] lg:py-0">
+  <div class="flex flex-col items-center justify-start px-4 md:px-6 pt-4 md:pt-8 pb-8 mx-auto min-h-[calc(100vh-200px)] lg:py-0">
 
 
     <!-- Header estilo Validata -->
 
 
-    <div class="w-full bg-white rounded-lg shadow md:mt-0 sm:max-w-xl xl:p-0">
-      <div class="p-6 space-y-6 sm:p-8">
+    <div class="w-full bg-white rounded-lg shadow-sm md:shadow md:mt-0 sm:max-w-xl xl:p-0">
+      <div class="p-4 md:p-6 space-y-4 md:space-y-6 sm:p-8">
         <!-- Título do formulário -->
-        <h2 class="text-2xl font-bold text-gray-900 text-left mb-2">3. Altere sua senha</h2>
-        <div class="w-full h-px bg-gray-200 opacity-70 mb-6"></div>
+        <h2 class="text-xl md:text-2xl font-bold text-gray-900 text-left mb-2">3. Altere sua senha</h2>
+        <div class="w-full h-px bg-gray-200 opacity-70 mb-4 md:mb-6"></div>
         <!-- Formulário simplificado -->
-        <form #senhaForm="ngForm" (ngSubmit)="alterarSenha(senhaForm, $event)" class="space-y-6">
+        <form #senhaForm="ngForm" (ngSubmit)="alterarSenha(senhaForm, $event)" class="space-y-4 md:space-y-6">
           <div>
-            <label for="senha" class="block mb-2 text-sm font-medium text-gray-900">Nova senha</label>
+            <label for="senha" class="block mb-2 text-xs md:text-sm font-medium text-gray-900">Nova senha</label>
             <div class="relative">
               <input [(ngModel)]="senha" name="senha" id="senha" [type]="showSenha ? 'text' : 'password'" required pattern=".*\S.*" title="A senha não pode estar vazia ou conter apenas espaços."
-                     class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full pr-12 p-2.5"
+                     class="bg-gray-50 border border-gray-300 text-gray-900 text-sm md:text-base rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full pr-12 p-2 md:p-2.5 transition-all duration-200"
                      placeholder="Crie uma senha segura">
-              <button type="button" (click)="toggleShowSenha()" class="absolute inset-y-0 right-0 flex items-center px-3 text-gray-500">
-                <span class="material-icons text-xl">{{ showSenha ? 'visibility_off' : 'visibility' }}</span>
+              <button type="button" (click)="toggleShowSenha()" class="absolute inset-y-0 right-0 flex items-center px-2 md:px-3 text-gray-500">
+                <span class="material-icons text-lg md:text-xl">{{ showSenha ? 'visibility_off' : 'visibility' }}</span>
               </button>
             </div>
           </div>
 
           <div>
-            <label for="confirmaSenha" class="block mb-2 text-sm font-medium text-gray-900">Confirmar senha</label>
+            <label for="confirmaSenha" class="block mb-2 text-xs md:text-sm font-medium text-gray-900">Confirmar senha</label>
             <div class="relative">
               <input [(ngModel)]="confirmarSenha" name="confirmaSenha" id="confirmaSenha" [type]="showConfirmarSenha ? 'text' : 'password'" required pattern=".*\S.*" title="A senha não pode estar vazia ou conter apenas espaços."
-                     class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full pr-12 p-2.5"
+                     class="bg-gray-50 border border-gray-300 text-gray-900 text-sm md:text-base rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full pr-12 p-2 md:p-2.5 transition-all duration-200"
                      placeholder="Repita a senha">
-              <button type="button" (click)="toggleShowConfirmarSenha()" class="absolute inset-y-0 right-0 flex items-center px-3 text-gray-500">
-                <span class="material-icons text-xl">{{ showConfirmarSenha ? 'visibility_off' : 'visibility' }}</span>
+              <button type="button" (click)="toggleShowConfirmarSenha()" class="absolute inset-y-0 right-0 flex items-center px-2 md:px-3 text-gray-500">
+                <span class="material-icons text-lg md:text-xl">{{ showConfirmarSenha ? 'visibility_off' : 'visibility' }}</span>
               </button>
             </div>
           </div>
 
           <!-- Botões Voltar e Avançar -->
-          <div class="flex justify-between gap-4 pt-4">
+          <div class="flex flex-col md:flex-row justify-between gap-3 md:gap-4 pt-4">
             <button (click)="voltar()" type="button"
-                    class="text-gray-700 bg-gray-100 hover:bg-gray-200 border border-gray-300 font-bold rounded-lg text-lg w-48 py-3 text-center">
+                    class="text-gray-700 bg-gray-100 hover:bg-gray-200 border border-gray-300 font-bold rounded-lg text-base md:text-lg w-full md:w-48 py-2.5 md:py-3 text-center transition-colors duration-200">
               Voltar
             </button>
 
             <button type="submit"
-                    class="text-white bg-[#5084C1] hover:bg-[#3969a1] focus:ring-4 focus:outline-none focus:ring-blue-300 font-bold rounded-lg text-lg w-full py-3 text-center">
+                    class="text-white bg-[#5084C1] hover:bg-[#3969a1] focus:ring-4 focus:outline-none focus:ring-blue-300 font-bold rounded-lg text-base md:text-lg w-full py-2.5 md:py-3 text-center transition-colors duration-200">
               Alterar senha
             </button>
           </div>
